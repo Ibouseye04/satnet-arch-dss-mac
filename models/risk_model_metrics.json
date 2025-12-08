@@ -1,0 +1,53 @@
+{
+  "accuracy": 1.0,
+  "roc_auc": 1.0,
+  "confusion_matrix": [
+    [
+      195,
+      0
+    ],
+    [
+      0,
+      205
+    ]
+  ],
+  "classification_report": {
+    "0": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 195.0
+    },
+    "1": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 205.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 400.0
+    }
+  },
+  "feature_importances": {
+    "num_nodes_0": 0.0,
+    "num_edges_0": 0.0,
+    "avg_degree_0": 0.0,
+    "num_satellites": 0.0,
+    "num_ground_stations": 0.0,
+    "node_failure_prob": 0.0,
+    "edge_failure_prob": 0.0,
+    "failed_nodes": 0.2687715730483403,
+    "failed_edges": 0.052568130977238565,
+    "largest_component_ratio": 0.6786602959744211
+  }
+}
