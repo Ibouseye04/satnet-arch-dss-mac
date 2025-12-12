@@ -54,7 +54,7 @@ DESIGN_FEATURE_COLUMNS: List[str] = [
 TIER1_FEATURE_COLUMNS: List[str] = [
     "num_planes",
     "sats_per_plane",
-    "inclination",
+    "inclination_deg",
 ]
 
 
@@ -117,7 +117,8 @@ def train_design_risk_model(
 def load_tier1_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(csv_path)
     X = df[TIER1_FEATURE_COLUMNS].copy()
-    y = df[LABEL_COLUMN].astype(int)
+    # Derive partitioned label: 1 if components_after_failure > 1, else 0
+    y = (df["components_after_failure"] > 1).astype(int)
     return X, y
 
 
