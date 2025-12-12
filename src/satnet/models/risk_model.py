@@ -51,6 +51,12 @@ DESIGN_FEATURE_COLUMNS: List[str] = [
     "edge_failure_prob",
 ]
 
+TIER1_FEATURE_COLUMNS: List[str] = [
+    "num_planes",
+    "sats_per_plane",
+    "inclination",
+]
+
 
 def load_design_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(csv_path)
@@ -106,6 +112,64 @@ def train_design_risk_model(
     )
 
     return clf, metrics
+
+
+def load_tier1_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
+    df = pd.read_csv(csv_path)
+    X = df[TIER1_FEATURE_COLUMNS].copy()
+    y = df[LABEL_COLUMN].astype(int)
+    return X, y
+
+
+def train_tier1_risk_model(
+    csv_path: Path,
+    cfg: RiskModelConfig | None = None,
+) -> Tuple[RandomForestClassifier, dict]:
+    if cfg is None:
+        cfg = RiskModelConfig()
+
+    X, y = load_tier1_dataset(csv_path)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=cfg.test_size,
+        random_state=cfg.random_state,
+        stratify=y,
+    )
+
+    clf = RandomForestClassifier(
+        n_estimators=cfg.n_estimators,
+        max_depth=cfg.max_depth,
+        random_state=cfg.random_state,
+        n_jobs=-1,
+        class_weight="balanced",
+    )
+
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+    y_proba = clf.predict_proba(X_test)[:, 1]
+
+    metrics: dict = {}
+    metrics["accuracy"] = accuracy_score(y_test, y_pred)
+    try:
+        metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
+    except ValueError:
+        metrics["roc_auc"] = float("nan")
+
+    metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
+    metrics["classification_report"] = classification_report(
+        y_test, y_pred, output_dict=True
+    )
+
+    metrics["feature_importances"] = dict(
+        zip(TIER1_FEATURE_COLUMNS, clf.feature_importances_.tolist())
+    )
+
+    return clf, metrics
+
+
 def load_failure_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(csv_path)
     X = df[FEATURE_COLUMNS].copy()
