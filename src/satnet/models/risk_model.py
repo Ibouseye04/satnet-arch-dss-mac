@@ -131,6 +131,15 @@ def train_tier1_risk_model(
 
     X, y = load_tier1_dataset(csv_path)
 
+    # Check if we have both classes
+    unique_classes = y.unique()
+    if len(unique_classes) < 2:
+        raise ValueError(
+            f"Dataset has only one class (all labels = {unique_classes[0]}). "
+            "Need both partitioned (1) and non-partitioned (0) samples to train. "
+            "Generate more diverse failure scenarios."
+        )
+
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -150,7 +159,12 @@ def train_tier1_risk_model(
     clf.fit(X_train, y_train)
 
     y_pred = clf.predict(X_test)
-    y_proba = clf.predict_proba(X_test)[:, 1]
+    proba = clf.predict_proba(X_test)
+    # Handle case where only one class is present in predictions
+    if proba.shape[1] == 2:
+        y_proba = proba[:, 1]
+    else:
+        y_proba = proba[:, 0] if clf.classes_[0] == 1 else 1 - proba[:, 0]
 
     metrics: dict = {}
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
