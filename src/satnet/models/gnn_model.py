@@ -1,11 +1,11 @@
 """
-EvolveGCN-O Model for Satellite Network Temporal Graph Classification.
+GCLSTM Model for Satellite Network Temporal Graph Classification.
 
-This module implements the "Thesis Model" - an Evolving Graph Convolutional Network
+This module implements the "Thesis Model" - a Graph Convolutional LSTM Network
 that processes temporal sequences of satellite network graphs to predict partition risk.
 
 Architecture:
-    - EvolveGCN-O: Uses LSTM to evolve GCN weights over time (preserves node_features dim)
+    - GCLSTM: Combines GCN with LSTM for temporal graph learning
     - Global Mean Pooling: Aggregates node embeddings to graph-level
     - Linear Classifier: Binary classification (Robust vs. Partitioned)
 
@@ -21,23 +21,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import Data
 from torch_geometric.nn import global_mean_pool
-from torch_geometric_temporal.nn.recurrent import EvolveGCNO
+from torch_geometric_temporal.nn.recurrent import GCLSTM
 
 
-class SatelliteEvolveGCN(nn.Module):
+class SatelliteGNN(nn.Module):
     """
-    EvolveGCN-O model for satellite network graph classification.
+    GCLSTM model for satellite network graph classification.
     
     This model processes temporal sequences of graph snapshots and produces
     a single graph-level prediction (binary classification).
     
     Architecture:
-        1. EvolveGCN-O (recurrent): Processes node features through time-evolving GCN
+        1. GCLSTM (recurrent): Combines GCN with LSTM for temporal learning
         2. Global Mean Pool: Aggregates node embeddings to graph embedding
         3. Linear: Maps graph embedding to class logits
     
     Attributes:
-        node_features: Dimension of input/output node features (default: 3)
+        node_features: Dimension of input node features (default: 3)
+        hidden_channels: Dimension of hidden state (default: 64)
         out_channels: Number of output classes (default: 2)
     """
     
@@ -48,11 +49,11 @@ class SatelliteEvolveGCN(nn.Module):
         out_channels: int = 2,
     ):
         """
-        Initialize the SatelliteEvolveGCN model.
+        Initialize the SatelliteGNN model.
         
         Args:
             node_features: Dimension of node features (sats_per_plane, altitude, inclination).
-            hidden_channels: Hidden dimension (unused in simple arch, kept for compatibility).
+            hidden_channels: Hidden dimension for GCLSTM output.
             out_channels: Number of output classes (2 for binary classification).
         """
         super().__init__()
@@ -61,18 +62,18 @@ class SatelliteEvolveGCN(nn.Module):
         self.hidden_channels = hidden_channels
         self.out_channels = out_channels
         
-        # EvolveGCN-O: Evolving GCN with LSTM-based weight evolution
-        # Note: EvolveGCNO(in_channels) outputs same dimension as input
-        self.recurrent = EvolveGCNO(in_channels=node_features)
+        # GCLSTM: Graph Convolutional LSTM
+        # K=1 means 1-hop neighborhood (Chebyshev filter order)
+        self.recurrent = GCLSTM(in_channels=node_features, out_channels=hidden_channels, K=1)
         
         # Linear classifier: graph embedding -> class logits
-        self.linear = nn.Linear(node_features, out_channels)
+        self.linear = nn.Linear(hidden_channels, out_channels)
     
     def forward(self, data_list: List[Data]) -> torch.Tensor:
         """
         Forward pass through the temporal GNN.
         
-        Processes a sequence of graph snapshots through EvolveGCN-O,
+        Processes a sequence of graph snapshots through GCLSTM,
         then pools and classifies.
         
         Args:
@@ -88,23 +89,27 @@ class SatelliteEvolveGCN(nn.Module):
         if len(data_list) == 0:
             raise ValueError("data_list cannot be empty")
         
-        # Process each time step through EvolveGCN-O
-        # EvolveGCN-O maintains internal state (LSTM) that evolves the GCN weights
-        h = None
+        # CRITICAL: Reset hidden states at the start of each forward pass
+        # This ensures each batch is independent and prevents the
+        # "backward through graph a second time" error
+        h: Optional[torch.Tensor] = None
+        c: Optional[torch.Tensor] = None
+        
+        # Process each time step through GCLSTM
         for data in data_list:
             x = data.x  # [num_nodes, node_features]
             edge_index = data.edge_index  # [2, num_edges]
             edge_weight = getattr(data, "edge_weight", None)
             
-            # EvolveGCN-O forward: updates internal LSTM state and applies GCN
-            h = self.recurrent(x, edge_index, edge_weight)  # [num_nodes, node_features]
+            # GCLSTM forward: returns (h, c) hidden and cell states
+            h, c = self.recurrent(x, edge_index, edge_weight, h, c)  # h: [num_nodes, hidden_channels]
         
         # h now contains the final time step's node embeddings
         # Global mean pooling: aggregate node embeddings to graph embedding
         num_nodes = h.size(0)
         batch = torch.zeros(num_nodes, dtype=torch.long, device=h.device)
         
-        graph_embedding = global_mean_pool(h, batch)  # [1, node_features]
+        graph_embedding = global_mean_pool(h, batch)  # [1, hidden_channels]
         
         # Classify
         logits = self.linear(graph_embedding)  # [1, out_channels]
@@ -144,10 +149,10 @@ class SatelliteEvolveGCN(nn.Module):
 
 if __name__ == "__main__":
     # Quick sanity check
-    print("SatelliteEvolveGCN model definition loaded successfully.")
+    print("SatelliteGNN (GCLSTM) model definition loaded successfully.")
     
     # Create a dummy model
-    model = SatelliteEvolveGCN(node_features=3, out_channels=2)
+    model = SatelliteGNN(node_features=3, hidden_channels=64, out_channels=2)
     print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
     
     # Create dummy data sequence (3 time steps, 10 nodes each)

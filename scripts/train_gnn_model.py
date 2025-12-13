@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Training Script for SatelliteEvolveGCN Model.
+Training Script for SatelliteGNN Model.
 
-This script trains the EvolveGCN-O model on the SatNetTemporalDataset
+This script trains the GCLSTM model on the SatNetTemporalDataset
 for binary classification of satellite network partition risk.
 
 Usage:
     python scripts/train_gnn_model.py [--epochs 20] [--lr 0.01] [--data-dir data/]
 
 Output:
-    - Trained model saved to models/satellite_evolvegcn.pt
+    - Trained model saved to models/satellite_gnn.pt
     - Training metrics logged to console
 """
 
@@ -33,7 +33,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from satnet.models.gnn_dataset import SatNetTemporalDataset
-from satnet.models.gnn_model import SatelliteEvolveGCN
+from satnet.models.gnn_model import SatelliteGNN
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Train SatelliteEvolveGCN on temporal satellite network graphs."
+        description="Train SatelliteGNN on temporal satellite network graphs."
     )
     parser.add_argument(
         "--data-dir",
@@ -70,7 +70,7 @@ def parse_args() -> argparse.Namespace:
         "--hidden-dim",
         type=int,
         default=64,
-        help="Hidden dimension for EvolveGCN (default: 64)",
+        help="Hidden dimension for GCLSTM (default: 64)",
     )
     parser.add_argument(
         "--test-split",
@@ -87,8 +87,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-model",
         type=str,
-        default="models/satellite_evolvegcn.pt",
-        help="Path to save trained model (default: models/satellite_evolvegcn.pt)",
+        default="models/satellite_gnn.pt",
+        help="Path to save trained model (default: models/satellite_gnn.pt)",
     )
     parser.add_argument(
         "--device",
@@ -117,7 +117,7 @@ def move_data_to_device(data_sequence: List[Data], device: torch.device) -> List
 
 
 def train_epoch(
-    model: SatelliteEvolveGCN,
+    model: SatelliteGNN,
     train_indices: List[int],
     dataset: SatNetTemporalDataset,
     optimizer: optim.Optimizer,
@@ -128,7 +128,7 @@ def train_epoch(
     Train for one epoch.
     
     Args:
-        model: The SatelliteEvolveGCN model
+        model: The SatelliteGNN model
         train_indices: Indices of training samples
         dataset: The SatNetTemporalDataset
         optimizer: Adam optimizer
@@ -178,7 +178,7 @@ def train_epoch(
 
 @torch.no_grad()
 def evaluate(
-    model: SatelliteEvolveGCN,
+    model: SatelliteGNN,
     test_indices: List[int],
     dataset: SatNetTemporalDataset,
     criterion: nn.Module,
@@ -188,7 +188,7 @@ def evaluate(
     Evaluate the model on test data.
     
     Args:
-        model: The SatelliteEvolveGCN model
+        model: The SatelliteGNN model
         test_indices: Indices of test samples
         dataset: The SatNetTemporalDataset
         criterion: CrossEntropyLoss
@@ -297,7 +297,7 @@ def main():
     logger.info(f"Train/Test split: {len(train_indices)}/{len(test_indices)}")
     
     # Initialize model
-    model = SatelliteEvolveGCN(
+    model = SatelliteGNN(
         node_features=3,
         hidden_channels=args.hidden_dim,
         out_channels=2,
