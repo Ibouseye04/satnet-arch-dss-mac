@@ -144,5 +144,80 @@
 
 ---
 
+# Remediation Summary (Post-Review Fixes)
+
+The issues flagged above were addressed on `main` after this review was written.
+
+## Fixes applied (by finding)
+
+### 1) Determinism violated by default epoch (`datetime.utcnow()`)
+- **Fix**
+  - Added an explicit rollout epoch to the rollout contract (`Tier1RolloutConfig.epoch_iso`) defaulting to a fixed constant (`DEFAULT_EPOCH_ISO = "2000-01-01T12:00:00+00:00"`, J2000.0), and passed it into `HypatiaAdapter`.
+  - Updated `HypatiaAdapter` to accept `epoch` and pass it into `WalkerDeltaConfig`.
+  - Fixed timezone-aware datetime arithmetic in TLE generation (`_generate_tle_lines`).
+- **Key files**
+  - `src/satnet/simulation/tier1_rollout.py`
+  - `src/satnet/network/hypatia_adapter.py`
+- **Commit**
+  - `3c248c0` — `fix: add explicit epoch to Tier1RolloutConfig for reproducibility`
+
+### 2) Time-step contract mismatch (`num_steps` semantics inconsistent)
+- **Fix**
+  - Unified `Tier1RolloutConfig.num_steps` to the inclusive `t=0..T` convention:
+    - `num_steps = duration_seconds // step_seconds + 1`
+  - Updated unit tests to match the inclusive convention.
+- **Key files**
+  - `src/satnet/simulation/tier1_rollout.py`
+  - `tests/simulation/test_tier1_rollout.py`
+- **Commit**
+  - `ca60698` — `fix: unify num_steps to inclusive t=0..T convention`
+
+### 3) Schema validation exists but is not enforced at write-time
+- **Fix**
+  - Added a canonical writer `write_tier1_dataset_csv(...)` which:
+    - converts rows → dicts
+    - calls `validate_runs_schema(...)` and `validate_steps_schema(...)`
+    - writes CSV only if validation passes
+  - Updated export scripts to use the canonical writer.
+- **Key files**
+  - `src/satnet/simulation/monte_carlo.py`
+  - `scripts/export_design_dataset.py`
+  - `scripts/export_failure_dataset.py`
+- **Commit**
+  - `e30d4c9` — `fix: enforce schema validation at write-time in export scripts`
+
+### 4) `SimulationEngine` still centers a static `t=0` snapshot (conceptual trap remains)
+- **Fix**
+  - Introduced `graph_at_t0` as the explicit snapshot accessor.
+  - Kept `network_graph`/`get_graph` as deprecated compatibility aliases.
+  - Updated `SimulationEngine.run()` to use `graph_at_t0` and to log (not print).
+- **Key file**
+  - `src/satnet/simulation/engine.py`
+- **Commit**
+  - `c0d6aaa` — `refactor: remove sys.path patching and replace print with logging`
+
+### 5) Production modules contain runtime `sys.path` patching and verbose `print()`
+- **Fix**
+  - Removed import-time `sys.path` mutation from:
+    - `src/satnet/simulation/engine.py`
+    - `src/satnet/network/hypatia_adapter.py`
+  - Replaced runtime `print()` with structured logging in both modules (script-only prints remain in `__main__` blocks).
+- **Key files**
+  - `src/satnet/simulation/engine.py`
+  - `src/satnet/network/hypatia_adapter.py`
+- **Commit**
+  - `c0d6aaa` — `refactor: remove sys.path patching and replace print with logging`
+
+## Verification
+- **Unit tests**
+  - `PYTHONPATH=src pytest tests/` → **87 passed**
+
 # Notes about Beads status
-Beads issues for Steps 1–11 are currently marked **closed**. Several acceptance checks are only partially met (notably determinism via epoch and schema enforcement at write-time). Consider reopening/creating new Beads issues for these gaps so the repo’s issue state matches engineering reality.
+Beads issues for Steps 1–11 are currently marked **closed**.
+
+The acceptance gaps identified in this review were remediated via follow-up Beads issues (created and closed) corresponding to the fixes above:
+- `satnet-arch-dss-mac-9k1` (epoch determinism)
+- `satnet-arch-dss-mac-cwg` (time-step contract)
+- `satnet-arch-dss-mac-5c9` (write-time schema enforcement)
+- `satnet-arch-dss-mac-2o2` (SimulationEngine t=0 trap)
+- `satnet-arch-dss-mac-m70` (remove sys.path patching / print)
