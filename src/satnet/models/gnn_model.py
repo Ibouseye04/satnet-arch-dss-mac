@@ -5,9 +5,9 @@ This module implements the "Thesis Model" - an Evolving Graph Convolutional Netw
 that processes temporal sequences of satellite network graphs to predict partition risk.
 
 Architecture:
-    - EvolveGCN-O: Uses LSTM to evolve GCN weights over time
+    - EvolveGCN-O: Uses LSTM to evolve GCN weights over time (preserves node_features dim)
     - Global Mean Pooling: Aggregates node embeddings to graph-level
-    - MLP Classifier: Binary classification (Partitioned vs. Robust)
+    - Linear Classifier: Binary classification (Robust vs. Partitioned)
 
 Target: Predict `partition_any` label from temporal ISL connectivity patterns.
 """
@@ -32,58 +32,43 @@ class SatelliteEvolveGCN(nn.Module):
     a single graph-level prediction (binary classification).
     
     Architecture:
-        1. EvolveGCN-O layer: Processes node features through time-evolving GCN
+        1. EvolveGCN-O (recurrent): Processes node features through time-evolving GCN
         2. Global Mean Pool: Aggregates node embeddings to graph embedding
-        3. MLP: Maps graph embedding to class logits
+        3. Linear: Maps graph embedding to class logits
     
     Attributes:
-        input_dim: Dimension of input node features (default: 3)
-        hidden_dim: Hidden dimension for GCN layers (default: 64)
-        output_dim: Number of output classes (default: 2)
+        node_features: Dimension of input/output node features (default: 3)
+        out_channels: Number of output classes (default: 2)
     """
     
     def __init__(
         self,
-        input_dim: int = 3,
-        hidden_dim: int = 64,
-        output_dim: int = 2,
+        node_features: int = 3,
+        hidden_channels: int = 64,
+        out_channels: int = 2,
     ):
         """
         Initialize the SatelliteEvolveGCN model.
         
         Args:
-            input_dim: Dimension of input node features.
-                       Default is 3 (sats_per_plane, altitude, inclination normalized).
-            hidden_dim: Hidden dimension for the EvolveGCN layer.
-            output_dim: Number of output classes (2 for binary classification).
+            node_features: Dimension of node features (sats_per_plane, altitude, inclination).
+            hidden_channels: Hidden dimension (unused in simple arch, kept for compatibility).
+            out_channels: Number of output classes (2 for binary classification).
         """
         super().__init__()
         
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
+        self.node_features = node_features
+        self.hidden_channels = hidden_channels
+        self.out_channels = out_channels
         
         # EvolveGCN-O: Evolving GCN with LSTM-based weight evolution
-        # Input: node features of dimension input_dim
-        # Output: node embeddings of dimension hidden_dim
-        self.evolve_gcn = EvolveGCNO(
-            in_channels=input_dim,
-            out_channels=hidden_dim,
-        )
+        # Note: EvolveGCNO(in_channels) outputs same dimension as input
+        self.recurrent = EvolveGCNO(in_channels=node_features)
         
-        # MLP classifier: graph embedding -> class logits
-        self.classifier = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(p=0.3),
-            nn.Linear(hidden_dim // 2, output_dim),
-        )
+        # Linear classifier: graph embedding -> class logits
+        self.linear = nn.Linear(node_features, out_channels)
     
-    def forward(
-        self,
-        data_sequence: List[Data],
-        return_embeddings: bool = False,
-    ) -> torch.Tensor:
+    def forward(self, data_list: List[Data]) -> torch.Tensor:
         """
         Forward pass through the temporal GNN.
         
@@ -91,89 +76,69 @@ class SatelliteEvolveGCN(nn.Module):
         then pools and classifies.
         
         Args:
-            data_sequence: List of PyG Data objects, one per time step.
-                          Each Data must have:
-                          - x: Node features [num_nodes, input_dim]
-                          - edge_index: Edge connectivity [2, num_edges]
-            return_embeddings: If True, also return intermediate embeddings.
+            data_list: List of PyG Data objects, one per time step.
+                       Each Data must have:
+                       - x: Node features [num_nodes, node_features]
+                       - edge_index: Edge connectivity [2, num_edges]
+                       - edge_weight (optional): Edge weights [num_edges]
         
         Returns:
-            logits: Class logits [1, output_dim] for the graph sequence.
-            (Optional) embeddings: Final graph embedding if return_embeddings=True.
+            logits: Class logits [1, out_channels] for the graph sequence.
         """
-        if len(data_sequence) == 0:
-            raise ValueError("data_sequence cannot be empty")
+        if len(data_list) == 0:
+            raise ValueError("data_list cannot be empty")
         
         # Process each time step through EvolveGCN-O
         # EvolveGCN-O maintains internal state (LSTM) that evolves the GCN weights
-        node_embeddings_list = []
-        
-        for data in data_sequence:
-            x = data.x  # [num_nodes, input_dim]
+        h = None
+        for data in data_list:
+            x = data.x  # [num_nodes, node_features]
             edge_index = data.edge_index  # [2, num_edges]
+            edge_weight = getattr(data, "edge_weight", None)
             
             # EvolveGCN-O forward: updates internal LSTM state and applies GCN
-            h = self.evolve_gcn(x, edge_index)  # [num_nodes, hidden_dim]
-            node_embeddings_list.append(h)
+            h = self.recurrent(x, edge_index, edge_weight)  # [num_nodes, node_features]
         
-        # Use the final time step's node embeddings for classification
-        # This captures the evolved representation after seeing all time steps
-        final_node_embeddings = node_embeddings_list[-1]  # [num_nodes, hidden_dim]
-        
+        # h now contains the final time step's node embeddings
         # Global mean pooling: aggregate node embeddings to graph embedding
-        # Create a batch tensor (all nodes belong to graph 0)
-        num_nodes = final_node_embeddings.size(0)
-        batch = torch.zeros(num_nodes, dtype=torch.long, device=final_node_embeddings.device)
+        num_nodes = h.size(0)
+        batch = torch.zeros(num_nodes, dtype=torch.long, device=h.device)
         
-        graph_embedding = global_mean_pool(final_node_embeddings, batch)  # [1, hidden_dim]
+        graph_embedding = global_mean_pool(h, batch)  # [1, node_features]
         
         # Classify
-        logits = self.classifier(graph_embedding)  # [1, output_dim]
-        
-        if return_embeddings:
-            return logits, graph_embedding
+        logits = self.linear(graph_embedding)  # [1, out_channels]
         
         return logits
     
-    def reset_hidden_state(self) -> None:
-        """
-        Reset the internal LSTM state of EvolveGCN-O.
-        
-        Call this before processing a new graph sequence to ensure
-        the model starts with a fresh state.
-        """
-        # EvolveGCN-O resets automatically on each forward call
-        # This method is provided for API consistency
-        pass
-    
-    def predict(self, data_sequence: List[Data]) -> int:
+    def predict(self, data_list: List[Data]) -> int:
         """
         Make a prediction for a single graph sequence.
         
         Args:
-            data_sequence: List of PyG Data objects (temporal sequence).
+            data_list: List of PyG Data objects (temporal sequence).
         
         Returns:
             Predicted class (0 = Robust, 1 = Partitioned).
         """
         self.eval()
         with torch.no_grad():
-            logits = self.forward(data_sequence)
+            logits = self.forward(data_list)
             return logits.argmax(dim=1).item()
     
-    def predict_proba(self, data_sequence: List[Data]) -> torch.Tensor:
+    def predict_proba(self, data_list: List[Data]) -> torch.Tensor:
         """
         Get prediction probabilities for a single graph sequence.
         
         Args:
-            data_sequence: List of PyG Data objects (temporal sequence).
+            data_list: List of PyG Data objects (temporal sequence).
         
         Returns:
-            Probability tensor [1, output_dim] with softmax probabilities.
+            Probability tensor [1, out_channels] with softmax probabilities.
         """
         self.eval()
         with torch.no_grad():
-            logits = self.forward(data_sequence)
+            logits = self.forward(data_list)
             return F.softmax(logits, dim=1)
 
 
@@ -182,7 +147,7 @@ if __name__ == "__main__":
     print("SatelliteEvolveGCN model definition loaded successfully.")
     
     # Create a dummy model
-    model = SatelliteEvolveGCN(input_dim=3, hidden_dim=64, output_dim=2)
+    model = SatelliteEvolveGCN(node_features=3, out_channels=2)
     print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
     
     # Create dummy data sequence (3 time steps, 10 nodes each)

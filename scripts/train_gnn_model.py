@@ -6,7 +6,7 @@ This script trains the EvolveGCN-O model on the SatNetTemporalDataset
 for binary classification of satellite network partition risk.
 
 Usage:
-    python scripts/train_gnn_model.py [--epochs 50] [--lr 0.01] [--data-dir data/]
+    python scripts/train_gnn_model.py [--epochs 20] [--lr 0.01] [--data-dir data/]
 
 Output:
     - Trained model saved to models/satellite_evolvegcn.pt
@@ -25,7 +25,6 @@ from typing import List, Tuple
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
 from torch_geometric.data import Data
 
 # Add src to path for imports
@@ -58,8 +57,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--epochs",
         type=int,
-        default=50,
-        help="Number of training epochs (default: 50)",
+        default=20,
+        help="Number of training epochs (default: 20)",
     )
     parser.add_argument(
         "--lr",
@@ -291,21 +290,17 @@ def main():
     neg_count, pos_count = dataset.get_label_distribution()
     logger.info(f"Dataset: {num_samples} samples (Robust: {neg_count}, Partitioned: {pos_count})")
     
-    # Split train/test
-    all_indices = list(range(num_samples))
-    train_indices, test_indices = train_test_split(
-        all_indices,
-        test_size=args.test_split,
-        random_state=args.seed,
-        shuffle=True,
-    )
+    # Split train/test: simple 80/20 split (first 1600 train, last 400 test)
+    split_idx = int(num_samples * 0.8)
+    train_indices = list(range(split_idx))
+    test_indices = list(range(split_idx, num_samples))
     logger.info(f"Train/Test split: {len(train_indices)}/{len(test_indices)}")
     
     # Initialize model
     model = SatelliteEvolveGCN(
-        input_dim=3,
-        hidden_dim=args.hidden_dim,
-        output_dim=2,
+        node_features=3,
+        hidden_channels=args.hidden_dim,
+        out_channels=2,
     )
     model = model.to(device)
     
