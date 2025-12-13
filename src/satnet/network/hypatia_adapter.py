@@ -27,7 +27,7 @@ import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Optional, Set, Tuple
 
 # ---------------------------------------------------------------------------
 # Objective 1: Dynamic sys.path for satgenpy sibling directory ("Omen" Patch)
@@ -1215,6 +1215,67 @@ class HypatiaAdapter:
             Dictionary mapping time_step -> networkx.Graph
         """
         return {step: self.get_graph_at_step(step) for step in self._isl_data}
+
+    def iter_graphs(
+        self,
+        start_step: int = 0,
+        end_step: Optional[int] = None,
+    ) -> "Iterator[Tuple[int, nx.Graph]]":
+        """
+        Iterate over network graphs for a range of time steps.
+        
+        This generator yields (time_step, graph) tuples, reusing the cached
+        ISL data computed by calculate_isls(). It avoids re-parsing TLEs
+        or recomputing ISLs per step.
+        
+        Args:
+            start_step: First time step to yield (0-indexed, inclusive).
+            end_step: Last time step to yield (exclusive). If None, iterates
+                      through all available steps.
+        
+        Yields:
+            Tuple of (time_step, nx.Graph) for each step in range.
+        
+        Raises:
+            ValueError: If ISLs haven't been calculated.
+        
+        Example:
+            >>> adapter.calculate_isls(duration_minutes=10, step_seconds=60)
+            >>> for t, G in adapter.iter_graphs():
+            ...     print(f"Step {t}: {G.number_of_edges()} edges")
+        """
+        if not self._isl_data:
+            raise ValueError(
+                "ISL data not available. Call calculate_isls() first."
+            )
+        
+        max_available_step = max(self._isl_data.keys())
+        
+        if end_step is None:
+            end_step = max_available_step + 1
+        
+        # Clamp to available range
+        start_step = max(0, start_step)
+        end_step = min(end_step, max_available_step + 1)
+        
+        for step in range(start_step, end_step):
+            if step in self._isl_data:
+                yield step, self.get_graph_at_step(step)
+
+    @property
+    def num_steps(self) -> int:
+        """Return the number of computed time steps, or 0 if ISLs not calculated."""
+        return len(self._isl_data)
+
+    @property
+    def step_seconds(self) -> int:
+        """Return the time step interval in seconds."""
+        return self._step_seconds
+
+    @property
+    def duration_seconds(self) -> int:
+        """Return the total simulation duration in seconds."""
+        return self._duration_seconds
     
     def get_positions_at_step(self, time_step: int) -> List[SatellitePosition]:
         """
