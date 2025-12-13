@@ -124,6 +124,16 @@ class SatNetTemporalDataset(Dataset):
             )
     
     @property
+    def raw_dir(self) -> str:
+        """Return root directory directly (CSV lives in data/, not data/raw/)."""
+        return self.root
+    
+    @property
+    def processed_dir(self) -> str:
+        """Return processed directory for caching."""
+        return os.path.join(self.root, "processed")
+    
+    @property
     def raw_file_names(self) -> List[str]:
         """Return list of raw file names (the CSV)."""
         return [self.csv_file]
@@ -380,9 +390,7 @@ if __name__ == "__main__":
     
     try:
         dataset = SatNetTemporalDataset(root=data_dir)
-        print("Dataset loaded successfully.")
-        print(f"  Number of runs: {len(dataset)}")
-        print(f"  Label distribution: {dataset.get_label_distribution()}")
+        print(f"Found {len(dataset)} runs")
     except FileNotFoundError as e:
         print(f"Dataset loading failed: {e}")
         print("\nTo use this dataset, ensure tier1_design_runs.csv exists in data/")
