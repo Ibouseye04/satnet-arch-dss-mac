@@ -10,15 +10,7 @@ The engine uses Tier 1 physics from HypatiaAdapter:
     - Earth obscuration checks
 """
 
-import sys
-from pathlib import Path
-
-# Add src directory to path for direct script execution
-_THIS_FILE = Path(__file__).resolve()
-_SRC_DIR = _THIS_FILE.parent.parent.parent  # src/satnet/simulation -> src
-if str(_SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(_SRC_DIR))
-
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
@@ -31,6 +23,8 @@ from satnet.simulation.failures import (
     apply_failures,
     compute_impact,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -48,8 +42,11 @@ class SimulationEngine:
     constellation using Tier 1 physics (SGP4, link budget, Earth obscuration).
     
     This engine supports temporal evaluation via get_graph_at_step() and
-    iter_graphs() methods. The legacy network_graph property returns t=0
-    for backward compatibility.
+    iter_graphs() methods.
+    
+    IMPORTANT: Prefer iter_graphs() for temporal evaluation. The graph_at_t0
+    property is provided only for backward compatibility and should not be
+    used in new code (see AGENTS.md: NO STATIC SNAPSHOTS).
     """
     
     def __init__(
@@ -72,8 +69,6 @@ class SimulationEngine:
             duration_minutes: ISL computation duration
             step_seconds: Time step interval in seconds
         """
-        print("Initializing SimulationEngine with HypatiaAdapter...")
-        
         self._duration_minutes = duration_minutes
         self._step_seconds = step_seconds
         
@@ -92,17 +87,30 @@ class SimulationEngine:
             step_seconds=step_seconds,
         )
         
-        print(f"Engine initialized with {self.adapter.total_satellites} satellites, "
-              f"{self.adapter.num_steps} time steps")
+        logger.info(
+            "Engine initialized with %d satellites, %d time steps",
+            self.adapter.total_satellites,
+            self.adapter.num_steps,
+        )
     
     @property
-    def network_graph(self) -> nx.Graph:
-        """Return the network graph at t=0 (for backward compatibility)."""
+    def graph_at_t0(self) -> nx.Graph:
+        """Return the network graph at t=0.
+        
+        DEPRECATED: Use iter_graphs() or get_graph_at_step() for temporal evaluation.
+        This property exists only for backward compatibility.
+        """
         return self.adapter.get_graph_at_step(0)
     
+    # Backward compatibility aliases (deprecated)
+    @property
+    def network_graph(self) -> nx.Graph:
+        """DEPRECATED: Use graph_at_t0 or iter_graphs() instead."""
+        return self.graph_at_t0
+    
     def get_graph(self) -> nx.Graph:
-        """Return the network graph at t=0 (for backward compatibility)."""
-        return self.network_graph
+        """DEPRECATED: Use get_graph_at_step() or iter_graphs() instead."""
+        return self.graph_at_t0
     
     def get_graph_at_step(self, time_step: int) -> nx.Graph:
         """Return the network graph at a specific time step.
@@ -142,14 +150,15 @@ class SimulationEngine:
         """
         Run the simulation: assign load, detect bottlenecks, inject failures.
         
+        NOTE: This method uses graph_at_t0 (static snapshot). For temporal
+        evaluation, use iter_graphs() with run_tier1_rollout() instead.
+        
         Returns:
             SimulationResult with node/edge counts and bottleneck count
         """
-        G = self.network_graph
+        G = self.graph_at_t0
         
-        print("=== Simulation Started ===")
-        print(f"Nodes: {G.number_of_nodes()}")
-        print(f"Edges: {G.number_of_edges()}")
+        logger.info("Simulation started: %d nodes, %d edges", G.number_of_nodes(), G.number_of_edges())
         
         # --- Fake load assignment ---
         for u, v, data in G.edges(data=True):
@@ -164,7 +173,7 @@ class SimulationEngine:
             if cap > 0 and load / cap > 0.8:
                 bottlenecks.append((u, v))
         
-        print(f"Bottlenecks detected: {len(bottlenecks)}")
+        logger.debug("Bottlenecks detected: %d", len(bottlenecks))
         
         # --- Failure injection + impact analysis ---
         fail_cfg = FailureConfig(
@@ -176,16 +185,15 @@ class SimulationEngine:
         G_failed = apply_failures(G, failures)
         impact = compute_impact(G, G_failed)
         
-        print(f"Failed nodes: {len(failures.failed_nodes)}")
-        print(f"Failed edges: {len(failures.failed_edges)}")
-        print(
-            f"Components: {impact.num_components_before} -> "
-            f"{impact.num_components_after}, "
-            f"largest component: {impact.largest_component_before} -> "
-            f"{impact.largest_component_after}"
+        logger.debug(
+            "Failures: %d nodes, %d edges. Components: %d -> %d",
+            len(failures.failed_nodes),
+            len(failures.failed_edges),
+            impact.num_components_before,
+            impact.num_components_after,
         )
         
-        print("=== Simulation Complete ===")
+        logger.info("Simulation complete")
         
         return SimulationResult(
             num_nodes=G.number_of_nodes(),
@@ -209,6 +217,9 @@ def run_simulation() -> SimulationResult:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    # Configure logging for script execution
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    
     print("=" * 60)
     print("Simulation Engine - Hypatia Adapter Integration Test")
     print("=" * 60)
@@ -226,8 +237,9 @@ if __name__ == "__main__":
     print("Engine initialized with Hypatia Adapter")
     print("=" * 60)
     
-    G = engine.get_graph()
-    print(f"Network Graph:")
+    # Use get_graph_at_step for temporal access (preferred over deprecated get_graph)
+    G = engine.get_graph_at_step(0)
+    print(f"Network Graph at t=0:")
     print(f"  Nodes: {G.number_of_nodes()}")
     print(f"  Edges: {G.number_of_edges()}")
     

@@ -20,31 +20,19 @@ Dependencies:
 
 from __future__ import annotations
 
+import logging
 import math
 import os
-import sys
 import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
-# ---------------------------------------------------------------------------
-# Objective 1: Dynamic sys.path for satgenpy sibling directory ("Omen" Patch)
-# ---------------------------------------------------------------------------
-# Look for hypatia in ../../hypatia relative to this script's location.
-# This allows using the high-fidelity library when deployed alongside hypatia.
-_THIS_FILE = Path(__file__).resolve()
-_HYPATIA_PATH = _THIS_FILE.parent.parent.parent.parent.parent / "hypatia"
-if _HYPATIA_PATH.exists() and str(_HYPATIA_PATH) not in sys.path:
-    sys.path.insert(0, str(_HYPATIA_PATH))
-    # Also add satgenpy subdirectory if it exists
-    _SATGENPY_PATH = _HYPATIA_PATH / "satgenpy"
-    if _SATGENPY_PATH.exists() and str(_SATGENPY_PATH) not in sys.path:
-        sys.path.insert(0, str(_SATGENPY_PATH))
-
 import networkx as nx
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # SGP4 Import (Orbital Engine)
@@ -55,7 +43,7 @@ try:
     SGP4_AVAILABLE = True
 except ImportError:
     SGP4_AVAILABLE = False
-    print("Warning: sgp4 not available. Using simplified Keplerian model.")
+    logger.warning("sgp4 not available. Using simplified Keplerian model.")
 
 # Try to import satgenpy modules
 try:
@@ -1026,11 +1014,12 @@ class HypatiaAdapter:
             f.write('\n'.join(lines))
         
         self._tle_file = tle_path
-        print(f"Generated TLEs for {self.total_satellites} satellites: {tle_path}")
-        if SGP4_AVAILABLE:
-            print("  SGP4 propagation: ENABLED (WGS72 gravity model)")
-        else:
-            print("  SGP4 propagation: DISABLED (using Keplerian fallback)")
+        logger.info(
+            "Generated TLEs for %d satellites: %s (SGP4: %s)",
+            self.total_satellites,
+            tle_path,
+            "enabled" if SGP4_AVAILABLE else "disabled",
+        )
         
         return tle_path
     
@@ -1123,21 +1112,18 @@ class HypatiaAdapter:
                         f"{link.link_mode} {link.margin_db:.1f}\n"
                     )
         
-        print(
-            f"Calculated ISLs for {num_steps} time steps "
-            f"({duration_minutes} min @ {step_seconds}s intervals): {isl_path}"
+        logger.info(
+            "Calculated ISLs for %d steps (%d min @ %ds): %s",
+            num_steps, duration_minutes, step_seconds, isl_path,
         )
-        print(
-            f"  Total candidates: {total_stats.total_candidate_links}, "
-            f"Accepted: {total_stats.links_accepted}"
-        )
-        print(
-            f"  Rejected (Earth obscuration): {total_stats.links_rejected_los}, "
-            f"Rejected (link budget): {total_stats.links_rejected_budget}"
-        )
-        print(
-            f"  Link modes: Optical={total_stats.optical_links}, "
-            f"RF={total_stats.rf_links}"
+        logger.debug(
+            "ISL stats: candidates=%d, accepted=%d, rejected_los=%d, rejected_budget=%d, optical=%d, rf=%d",
+            total_stats.total_candidate_links,
+            total_stats.links_accepted,
+            total_stats.links_rejected_los,
+            total_stats.links_rejected_budget,
+            total_stats.optical_links,
+            total_stats.rf_links,
         )
         
         return isl_path, total_stats
