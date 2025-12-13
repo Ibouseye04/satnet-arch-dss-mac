@@ -6,7 +6,6 @@ Outputs both runs table (per-run summaries) and steps table (per-step metrics).
 
 from pathlib import Path
 import sys
-import csv
 
 # --- Make sure Python can see the `src` folder ---
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -18,8 +17,7 @@ if str(SRC_PATH) not in sys.path:
 from satnet.simulation.monte_carlo import (  # noqa: E402
     Tier1MonteCarloConfig,
     generate_tier1_temporal_dataset,
-    runs_to_dicts,
-    steps_to_dicts,
+    write_tier1_dataset_csv,
 )
 
 
@@ -42,30 +40,15 @@ def main() -> None:
 
     runs, steps = generate_tier1_temporal_dataset(cfg)
 
+    # Save to CSV with schema validation
     out_dir = PROJECT_ROOT / "data"
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    # Export runs table
     runs_path = out_dir / "tier1_failure_runs.csv"
-    runs_dicts = runs_to_dicts(runs)
-    if runs_dicts:
-        fieldnames = list(runs_dicts[0].keys())
-        with runs_path.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(runs_dicts)
-    print(f"Written {len(runs_dicts)} run rows to {runs_path}")
-
-    # Export steps table
     steps_path = out_dir / "tier1_failure_steps.csv"
-    steps_dicts = steps_to_dicts(steps)
-    if steps_dicts:
-        fieldnames = list(steps_dicts[0].keys())
-        with steps_path.open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(steps_dicts)
-    print(f"Written {len(steps_dicts)} step rows to {steps_path}")
+
+    # Use canonical writer (validates schema before writing)
+    write_tier1_dataset_csv(runs, steps, runs_path, steps_path)
+    print(f"Written {len(runs)} run rows to {runs_path}")
+    print(f"Written {len(steps)} step rows to {steps_path}")
 
     # Print aggregate stats
     print("\n=== Aggregate Stats ===")

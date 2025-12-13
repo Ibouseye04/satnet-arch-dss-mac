@@ -381,3 +381,60 @@ def validate_steps_schema(steps_dicts: List[dict]) -> None:
             raise SchemaValidationError(
                 f"Row {i}: partitioned must be 0 or 1"
             )
+
+
+# ---------------------------------------------------------------------------
+# Canonical Dataset Writer (validates before writing)
+# ---------------------------------------------------------------------------
+
+
+def write_tier1_dataset_csv(
+    runs: List[Tier1RunRow],
+    steps: List[Tier1StepRow],
+    runs_path: "Path",
+    steps_path: "Path",
+) -> None:
+    """Write Tier 1 temporal dataset to CSV with schema validation.
+
+    This is the canonical writer that enforces schema validation before
+    writing. Use this instead of manually writing CSV files.
+
+    Args:
+        runs: List of Tier1RunRow objects.
+        steps: List of Tier1StepRow objects.
+        runs_path: Path for runs CSV output.
+        steps_path: Path for steps CSV output.
+
+    Raises:
+        SchemaValidationError: If data does not conform to v1 schema.
+    """
+    import csv
+    from pathlib import Path
+
+    # Convert to dicts
+    runs_dicts = runs_to_dicts(runs)
+    steps_dicts = steps_to_dicts(steps)
+
+    # Validate schemas (raises SchemaValidationError if invalid)
+    validate_runs_schema(runs_dicts)
+    validate_steps_schema(steps_dicts)
+
+    # Ensure output directories exist
+    Path(runs_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(steps_path).parent.mkdir(parents=True, exist_ok=True)
+
+    # Write runs table
+    if runs_dicts:
+        fieldnames = list(runs_dicts[0].keys())
+        with open(runs_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(runs_dicts)
+
+    # Write steps table
+    if steps_dicts:
+        fieldnames = list(steps_dicts[0].keys())
+        with open(steps_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(steps_dicts)
