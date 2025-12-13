@@ -94,9 +94,13 @@ class Tier1RolloutConfig:
 
     @property
     def num_steps(self) -> int:
-        """Compute the number of time steps in this rollout."""
+        """Compute the number of time steps in this rollout.
+        
+        Uses inclusive t=0..T convention: duration_seconds // step_seconds + 1.
+        Example: 3 minutes @ 60s = steps 0,1,2,3 = 4 steps.
+        """
         total_seconds = self.duration_minutes * 60
-        return total_seconds // self.step_seconds
+        return total_seconds // self.step_seconds + 1
 
     @property
     def total_satellites(self) -> int:

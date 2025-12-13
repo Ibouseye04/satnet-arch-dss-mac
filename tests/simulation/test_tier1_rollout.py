@@ -58,19 +58,19 @@ class TestTier1RolloutConfig:
             duration_minutes=90,
             step_seconds=60,
         )
-        # 90 minutes * 60 seconds / 60 seconds per step = 90 steps
-        assert cfg.num_steps == 90
+        # 90 minutes @ 60s = steps 0..90 = 91 steps (inclusive t=0..T)
+        assert cfg.num_steps == 91
 
     def test_num_steps_non_divisible(self) -> None:
-        """num_steps uses integer division."""
+        """num_steps uses integer division with +1 for inclusive range."""
         cfg = Tier1RolloutConfig(
             num_planes=6,
             sats_per_plane=10,
             duration_minutes=10,
             step_seconds=180,  # 3 minutes
         )
-        # 10 minutes * 60 = 600 seconds / 180 = 3 (integer division)
-        assert cfg.num_steps == 3
+        # 10 minutes * 60 = 600 seconds / 180 = 3, +1 = 4 steps (inclusive t=0..T)
+        assert cfg.num_steps == 4
 
     def test_total_satellites_property(self) -> None:
         """total_satellites computed correctly."""
