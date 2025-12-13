@@ -10,9 +10,8 @@ Usage:
     from satnet.models.gnn_dataset import SatNetTemporalDataset
     
     dataset = SatNetTemporalDataset(
-        csv_path="data/tier1_design_runs.csv",
-        duration_minutes=10,
-        step_seconds=60,
+        root="data/",
+        csv_file="tier1_design_runs.csv",
     )
     
     # Get temporal sequence for run idx
@@ -22,6 +21,7 @@ Usage:
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -52,7 +52,8 @@ class SatNetTemporalDataset(Dataset):
     large numbers of runs (~2000).
     
     Attributes:
-        csv_path: Path to tier1_design_runs.csv
+        root: Root directory containing the CSV file
+        csv_file: Name of the CSV file within root
         duration_minutes: Simulation duration for ISL calculation
         step_seconds: Time step interval for ISL calculation
         transform: Optional transform to apply to Data objects
@@ -61,44 +62,50 @@ class SatNetTemporalDataset(Dataset):
     
     def __init__(
         self,
-        csv_path: str | Path,
-        duration_minutes: int = 10,
-        step_seconds: int = 60,
-        root: Optional[str] = None,
+        root: str,
+        csv_file: str = "tier1_design_runs.csv",
         transform: Optional[callable] = None,
         pre_transform: Optional[callable] = None,
-        pre_filter: Optional[callable] = None,
+        duration_minutes: int = 10,
+        step_seconds: int = 60,
     ):
         """
         Initialize the SatNet Temporal Dataset.
         
         Args:
-            csv_path: Path to the tier1_design_runs.csv file containing
-                      constellation configurations and labels.
-            duration_minutes: Duration for ISL calculation (default: 10 min).
-            step_seconds: Time step interval (default: 60 sec).
-            root: Root directory for dataset (optional, for caching).
+            root: Root directory containing the CSV file.
+            csv_file: Name of the CSV file within root (default: tier1_design_runs.csv).
             transform: Transform to apply to each Data object.
             pre_transform: Pre-transform (not used in on-the-fly mode).
-            pre_filter: Pre-filter (not used in on-the-fly mode).
+            duration_minutes: Duration for ISL calculation (default: 10 min).
+            step_seconds: Time step interval (default: 60 sec).
+        
+        Raises:
+            FileNotFoundError: If the CSV file does not exist at root/csv_file.
         """
-        self.csv_path = Path(csv_path)
+        self.csv_file = csv_file
         self.duration_minutes = duration_minutes
         self.step_seconds = step_seconds
         
+        # Validate that the CSV file exists before proceeding
+        csv_path = os.path.join(root, csv_file)
+        if not os.path.isfile(csv_path):
+            raise FileNotFoundError(
+                f"CSV file not found: {csv_path}. "
+                f"Please ensure the file exists at the specified location."
+            )
+        
+        # Initialize parent class (creates raw/processed dirs)
+        super().__init__(root, transform, pre_transform)
+        
         # Load the CSV with run configurations
-        # Note: File existence is not checked locally - CSV is expected to exist
-        # at runtime on the deployment server (data/tier1_design_runs.csv)
-        self._df = pd.read_csv(self.csv_path)
+        self._df = pd.read_csv(self.raw_paths[0])
         self._validate_csv()
         
         logger.info(
             "Loaded %d runs from %s (duration=%d min, step=%d s)",
-            len(self._df), self.csv_path, duration_minutes, step_seconds,
+            len(self._df), self.raw_paths[0], duration_minutes, step_seconds,
         )
-        
-        # Initialize parent class
-        super().__init__(root, transform, pre_transform, pre_filter)
     
     def _validate_csv(self) -> None:
         """Validate that required columns exist in the CSV."""
@@ -119,7 +126,7 @@ class SatNetTemporalDataset(Dataset):
     @property
     def raw_file_names(self) -> List[str]:
         """Return list of raw file names (the CSV)."""
-        return [self.csv_path.name]
+        return [self.csv_file]
     
     @property
     def processed_file_names(self) -> List[str]:
@@ -364,9 +371,18 @@ def collate_temporal_sequences(batch: List[List[Data]]) -> List[List[Data]]:
 
 
 if __name__ == "__main__":
-    # Quick test (will fail without CSV, but validates imports)
-    print("SatNetTemporalDataset module loaded successfully.")
-    print("Required dependencies: torch, torch_geometric, pandas")
-    print("\nUsage:")
-    print("  dataset = SatNetTemporalDataset('data/tier1_design_runs.csv')")
-    print("  data_list = dataset[0]  # Get temporal sequence for run 0")
+    # Determine the data directory relative to this file
+    # This file is at src/satnet/models/gnn_dataset.py
+    # Data is at data/ (project root: 3 levels up from models/)
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(this_dir, "..", "..", ".."))
+    data_dir = os.path.join(project_root, "data")
+    
+    try:
+        dataset = SatNetTemporalDataset(root=data_dir)
+        print("Dataset loaded successfully.")
+        print(f"  Number of runs: {len(dataset)}")
+        print(f"  Label distribution: {dataset.get_label_distribution()}")
+    except FileNotFoundError as e:
+        print(f"Dataset loading failed: {e}")
+        print("\nTo use this dataset, ensure tier1_design_runs.csv exists in data/")
