@@ -46,6 +46,10 @@ class SimulationEngine:
     
     Replaces the legacy toy topology generator with a realistic Walker Delta
     constellation using Tier 1 physics (SGP4, link budget, Earth obscuration).
+    
+    This engine supports temporal evaluation via get_graph_at_step() and
+    iter_graphs() methods. The legacy network_graph property returns t=0
+    for backward compatibility.
     """
     
     def __init__(
@@ -55,6 +59,7 @@ class SimulationEngine:
         inclination_deg: float = 53.0,
         altitude_km: float = 550.0,
         duration_minutes: int = 10,
+        step_seconds: int = 60,
     ):
         """
         Initialize the simulation engine with Hypatia Adapter.
@@ -65,8 +70,12 @@ class SimulationEngine:
             inclination_deg: Orbital inclination in degrees
             altitude_km: Orbital altitude above Earth surface
             duration_minutes: ISL computation duration
+            step_seconds: Time step interval in seconds
         """
         print("Initializing SimulationEngine with HypatiaAdapter...")
+        
+        self._duration_minutes = duration_minutes
+        self._step_seconds = step_seconds
         
         # Initialize HypatiaAdapter with constellation parameters
         self.adapter = HypatiaAdapter(
@@ -78,17 +87,56 @@ class SimulationEngine:
         
         # Generate TLEs and compute ISLs on startup
         self.adapter.generate_tles()
-        self.adapter.calculate_isls(duration_minutes=duration_minutes)
+        self.adapter.calculate_isls(
+            duration_minutes=duration_minutes,
+            step_seconds=step_seconds,
+        )
         
-        # Load network graph at t=0 (static for now, preserves compatibility)
-        self.network_graph: nx.Graph = self.adapter.get_graph_at_step(0)
-        
-        print(f"Engine initialized with {self.network_graph.number_of_nodes()} nodes, "
-              f"{self.network_graph.number_of_edges()} edges")
+        print(f"Engine initialized with {self.adapter.total_satellites} satellites, "
+              f"{self.adapter.num_steps} time steps")
+    
+    @property
+    def network_graph(self) -> nx.Graph:
+        """Return the network graph at t=0 (for backward compatibility)."""
+        return self.adapter.get_graph_at_step(0)
     
     def get_graph(self) -> nx.Graph:
-        """Return the current network graph."""
+        """Return the network graph at t=0 (for backward compatibility)."""
         return self.network_graph
+    
+    def get_graph_at_step(self, time_step: int) -> nx.Graph:
+        """Return the network graph at a specific time step.
+        
+        Args:
+            time_step: The time step index (0-based).
+            
+        Returns:
+            networkx.Graph at the specified time step.
+        """
+        return self.adapter.get_graph_at_step(time_step)
+    
+    def iter_graphs(self):
+        """Iterate over network graphs for all time steps.
+        
+        Yields:
+            Tuple of (time_step, nx.Graph) for each step.
+        """
+        return self.adapter.iter_graphs()
+    
+    @property
+    def num_steps(self) -> int:
+        """Return the number of computed time steps."""
+        return self.adapter.num_steps
+    
+    @property
+    def step_seconds(self) -> int:
+        """Return the time step interval in seconds."""
+        return self._step_seconds
+    
+    @property
+    def duration_minutes(self) -> int:
+        """Return the simulation duration in minutes."""
+        return self._duration_minutes
     
     def run(self) -> SimulationResult:
         """

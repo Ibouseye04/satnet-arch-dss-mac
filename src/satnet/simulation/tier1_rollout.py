@@ -144,3 +144,150 @@ class Tier1RolloutSummary:
     def to_dict(self) -> dict:
         """Convert summary to dictionary for serialization."""
         return asdict(self)
+
+
+# ---------------------------------------------------------------------------
+# Tier 1 Rollout Runner
+# ---------------------------------------------------------------------------
+
+def run_tier1_rollout(
+    cfg: Tier1RolloutConfig,
+) -> tuple[list[Tier1RolloutStep], Tier1RolloutSummary]:
+    """
+    Execute a Tier 1 temporal rollout using HypatiaAdapter.
+
+    This function:
+    1. Constructs a HypatiaAdapter from constellation parameters
+    2. Generates TLEs and calculates ISLs over time
+    3. Samples persistent failures from the t=0 graph
+    4. For each time step, applies failures and computes GCC metrics
+    5. Aggregates results into a summary
+
+    v1 Assumptions:
+    - Node failures are persistent (sampled once, applied at all steps)
+    - Edge failures are sampled from edges present at t=0
+    - Edges that appear later are not eligible to fail
+
+    Args:
+        cfg: Tier1RolloutConfig with constellation, time, and failure parameters.
+
+    Returns:
+        Tuple of (steps, summary) where:
+        - steps: List of Tier1RolloutStep for each time step
+        - summary: Tier1RolloutSummary with aggregated labels
+    """
+    import random
+
+    from satnet.metrics.labels import (
+        aggregate_partition_streaks,
+        compute_gcc_frac,
+        compute_gcc_size,
+        compute_num_components,
+        compute_partitioned,
+    )
+    from satnet.network.hypatia_adapter import HypatiaAdapter
+
+    # 1. Construct HypatiaAdapter
+    adapter = HypatiaAdapter(
+        num_planes=cfg.num_planes,
+        sats_per_plane=cfg.sats_per_plane,
+        inclination_deg=cfg.inclination_deg,
+        altitude_km=cfg.altitude_km,
+        phasing_factor=cfg.phasing_factor,
+    )
+
+    # 2. Generate TLEs and calculate ISLs
+    adapter.generate_tles()
+
+    isl_kwargs = {
+        "duration_minutes": cfg.duration_minutes,
+        "step_seconds": cfg.step_seconds,
+    }
+    if cfg.max_isl_distance_km is not None:
+        isl_kwargs["max_isl_distance_km"] = cfg.max_isl_distance_km
+
+    adapter.calculate_isls(**isl_kwargs)
+
+    # 3. Sample persistent failures from t=0 graph
+    rng = random.Random(cfg.seed)
+    G0 = adapter.get_graph_at_step(0)
+
+    # Sample failed nodes
+    failed_nodes: set[int] = set()
+    for node in G0.nodes():
+        if rng.random() < cfg.node_failure_prob:
+            failed_nodes.add(node)
+
+    # Sample failed edges (from t=0 edges only)
+    failed_edges: set[tuple[int, int]] = set()
+    for u, v in G0.edges():
+        if rng.random() < cfg.edge_failure_prob:
+            # Store as sorted tuple for consistent lookup
+            failed_edges.add((min(u, v), max(u, v)))
+
+    # 4. Loop over time steps, apply failures, compute metrics
+    steps: list[Tier1RolloutStep] = []
+    partitioned_flags: list[int] = []
+
+    for t, G_t in adapter.iter_graphs():
+        # Apply persistent node failures
+        G_eff = G_t.copy()
+        nodes_to_remove = [n for n in failed_nodes if G_eff.has_node(n)]
+        G_eff.remove_nodes_from(nodes_to_remove)
+
+        # Apply edge failures (only if edge exists at this step)
+        for u, v in failed_edges:
+            if G_eff.has_edge(u, v):
+                G_eff.remove_edge(u, v)
+
+        # Compute metrics using pure label functions
+        num_nodes = G_eff.number_of_nodes()
+        num_edges = G_eff.number_of_edges()
+        num_components = compute_num_components(G_eff)
+        gcc_size = compute_gcc_size(G_eff)
+        gcc_frac = compute_gcc_frac(G_eff)
+        partitioned = compute_partitioned(gcc_frac, cfg.gcc_threshold)
+
+        step = Tier1RolloutStep(
+            t=t,
+            num_nodes=num_nodes,
+            num_edges=num_edges,
+            num_components=num_components,
+            gcc_size=gcc_size,
+            gcc_frac=gcc_frac,
+            partitioned=partitioned,
+        )
+        steps.append(step)
+        partitioned_flags.append(partitioned)
+
+    # 5. Aggregate into summary
+    gcc_fracs = [s.gcc_frac for s in steps]
+    num_steps = len(steps)
+
+    if num_steps > 0:
+        gcc_frac_min = min(gcc_fracs)
+        gcc_frac_mean = sum(gcc_fracs) / num_steps
+        partition_count = sum(partitioned_flags)
+        partition_fraction = partition_count / num_steps
+        partition_any = 1 if partition_count > 0 else 0
+    else:
+        gcc_frac_min = 0.0
+        gcc_frac_mean = 0.0
+        partition_fraction = 0.0
+        partition_any = 0
+
+    max_partition_streak = aggregate_partition_streaks(partitioned_flags)
+
+    summary = Tier1RolloutSummary(
+        gcc_frac_min=gcc_frac_min,
+        gcc_frac_mean=gcc_frac_mean,
+        partition_fraction=partition_fraction,
+        partition_any=partition_any,
+        max_partition_streak=max_partition_streak,
+        num_steps=num_steps,
+        num_failed_nodes=len(failed_nodes),
+        num_failed_edges=len(failed_edges),
+        config_hash=cfg.config_hash(),
+    )
+
+    return steps, summary

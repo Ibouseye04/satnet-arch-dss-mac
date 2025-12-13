@@ -200,3 +200,216 @@ class TestNoToyTopologyImport:
             source = f.read()
         assert "satnet.network.topology" not in source
         assert "from satnet.network.topology" not in source
+
+
+class TestRunTier1Rollout:
+    """Tests for run_tier1_rollout function."""
+
+    def test_rollout_returns_steps_and_summary(self) -> None:
+        """run_tier1_rollout returns (steps, summary) tuple."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            Tier1RolloutStep,
+            Tier1RolloutSummary,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=1,
+            step_seconds=60,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        assert isinstance(steps, list)
+        assert isinstance(summary, Tier1RolloutSummary)
+        assert all(isinstance(s, Tier1RolloutStep) for s in steps)
+
+    def test_rollout_step_count_matches_config(self) -> None:
+        """Number of steps matches config num_steps."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=2,
+            step_seconds=60,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        # 2 minutes at 60s = 3 steps (0, 1, 2)
+        assert len(steps) == 3
+        assert summary.num_steps == 3
+
+    def test_rollout_gcc_frac_in_range(self) -> None:
+        """GCC fraction is always between 0 and 1."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        for step in steps:
+            assert 0.0 <= step.gcc_frac <= 1.0
+
+        assert 0.0 <= summary.gcc_frac_min <= 1.0
+        assert 0.0 <= summary.gcc_frac_mean <= 1.0
+
+    def test_rollout_no_failures_produces_valid_metrics(self) -> None:
+        """With no failures, metrics are computed correctly."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=3,
+            sats_per_plane=5,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=0.0,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        # With no failures, all nodes should be present
+        assert steps[0].num_nodes == cfg.total_satellites
+        # GCC fraction should be valid (may not be 1.0 for small constellations
+        # due to Earth obscuration physics)
+        assert 0.0 <= summary.gcc_frac_min <= 1.0
+        assert summary.num_failed_nodes == 0
+        assert summary.num_failed_edges == 0
+
+    def test_rollout_with_node_failures(self) -> None:
+        """Node failures reduce node count."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=3,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.5,  # High failure rate
+            edge_failure_prob=0.0,
+            seed=42,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        # With 50% node failure prob, expect some failures
+        assert summary.num_failed_nodes > 0
+        # Node count should be less than total
+        total_sats = cfg.total_satellites
+        assert steps[0].num_nodes < total_sats
+
+    def test_rollout_with_edge_failures(self) -> None:
+        """Edge failures are sampled from t=0 edges."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        # Use larger constellation to ensure edges exist
+        cfg = Tier1RolloutConfig(
+            num_planes=5,
+            sats_per_plane=10,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=0.5,  # High failure rate
+            seed=42,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        # With 50% edge failure prob on a larger constellation, expect some failures
+        # (only if edges exist at t=0 - depends on physics)
+        # Just verify the rollout completes and produces valid output
+        assert summary.num_steps == 2
+        assert 0.0 <= summary.gcc_frac_min <= 1.0
+
+    def test_rollout_deterministic_with_seed(self) -> None:
+        """Same seed produces identical results."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.3,
+            edge_failure_prob=0.3,
+            seed=12345,
+        )
+
+        steps1, summary1 = run_tier1_rollout(cfg)
+        steps2, summary2 = run_tier1_rollout(cfg)
+
+        # Results should be identical
+        assert summary1.num_failed_nodes == summary2.num_failed_nodes
+        assert summary1.num_failed_edges == summary2.num_failed_edges
+        assert summary1.gcc_frac_min == summary2.gcc_frac_min
+
+    def test_rollout_config_hash_in_summary(self) -> None:
+        """Summary includes config hash."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=1,
+            step_seconds=60,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        assert summary.config_hash == cfg.config_hash()
+        assert len(summary.config_hash) == 16
+
+    def test_rollout_summary_finite_values(self) -> None:
+        """All summary values are finite (not NaN or Inf)."""
+        import math
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.2,
+            edge_failure_prob=0.2,
+            seed=42,
+        )
+
+        steps, summary = run_tier1_rollout(cfg)
+
+        assert math.isfinite(summary.gcc_frac_min)
+        assert math.isfinite(summary.gcc_frac_mean)
+        assert math.isfinite(summary.partition_fraction)

@@ -1,288 +1,383 @@
+"""Tier 1 Temporal Monte Carlo Dataset Generator.
+
+This module generates datasets using the Tier 1 (Hypatia-based) temporal
+pipeline. It replaces the legacy toy topology generator with physics-based
+satellite network simulation.
+
+Key features:
+- Uses HypatiaAdapter for Walker Delta constellations with SGP4 propagation
+- Temporal evaluation: metrics computed over t=0..T time steps
+- GCC-based partition labels (no leaky post-failure features)
+- Reproducible with config + seed
+"""
+
 from __future__ import annotations
 
-from dataclasses import dataclass
-from math import fsum
-from typing import List
+from dataclasses import dataclass, field, asdict
+from typing import List, Optional, Tuple
+import random
 
-import networkx as nx
-
-from satnet.network.topology import TopologyConfig, generate_topology
-from satnet.simulation.failures import (
-    FailureConfig,
-    sample_failures,
-    apply_failures,
-    compute_impact,
+from satnet.simulation.tier1_rollout import (
+    DATASET_VERSION,
+    SCHEMA_VERSION,
+    Tier1RolloutConfig,
+    Tier1RolloutStep,
+    Tier1RolloutSummary,
+    run_tier1_rollout,
 )
 
+
 # ---------------------------------------------------------------------------
-# Monte Carlo config + outcome-aware samples (Model A / sanity check)
+# Tier 1 Monte Carlo Configuration
 # ---------------------------------------------------------------------------
 
 
 @dataclass
-class MonteCarloConfig:
-    num_runs: int = 1000
-    node_failure_prob: float = 0.02
-    edge_failure_prob: float = 0.05
-    seed: int | None = 123
+class Tier1MonteCarloConfig:
+    """Configuration for Tier 1 temporal Monte Carlo dataset generation.
 
-
-@dataclass
-class MonteCarloSample:
+    Attributes:
+        num_runs: Number of failure realizations to simulate.
+        num_planes_range: (min, max) range for number of orbital planes.
+        sats_per_plane_range: (min, max) range for satellites per plane.
+        inclination_deg: Orbital inclination in degrees.
+        altitude_km: Orbital altitude in km.
+        duration_minutes: Simulation duration per run.
+        step_seconds: Time step interval.
+        gcc_threshold: Threshold for partition detection.
+        node_failure_prob_range: (min, max) range for node failure probability.
+        edge_failure_prob_range: (min, max) range for edge failure probability.
+        seed: Base random seed for reproducibility.
+        sample_constellation: If True, sample constellation params per run.
+                              If False, use midpoint of ranges for all runs.
     """
-    One row for ML / analysis: includes post-failure outcomes.
 
-    This is the "oracle" / outcome-aware dataset used for sanity checks
-    (Model A) – not the design-time model for the thesis.
+    num_runs: int = 100
+
+    # Constellation parameter ranges
+    num_planes_range: Tuple[int, int] = (3, 6)
+    sats_per_plane_range: Tuple[int, int] = (4, 8)
+    inclination_deg: float = 53.0
+    altitude_km: float = 550.0
+
+    # Time parameters
+    duration_minutes: int = 10
+    step_seconds: int = 60
+
+    # Labeling
+    gcc_threshold: float = 0.8
+
+    # Failure parameter ranges
+    node_failure_prob_range: Tuple[float, float] = (0.0, 0.1)
+    edge_failure_prob_range: Tuple[float, float] = (0.0, 0.2)
+
+    # Reproducibility
+    seed: int = 42
+
+    # Sampling mode
+    sample_constellation: bool = True
+
+
+@dataclass
+class Tier1RunRow:
+    """One row in the runs table (per-run summary).
+
+    Contains design-time features and temporal aggregate labels.
+    No post-failure leakage (features are design inputs only).
     """
 
     run_id: int
 
-    # topology-level parameters
-    num_nodes_0: int
-    num_edges_0: int
-    avg_degree_0: float
-    num_satellites: int
-    num_ground_stations: int
+    # Design-time features (constellation architecture)
+    num_planes: int
+    sats_per_plane: int
+    total_satellites: int
+    inclination_deg: float
+    altitude_km: float
 
-    # failure config
+    # Design-time features (failure assumptions)
     node_failure_prob: float
     edge_failure_prob: float
 
-    # realized failures
-    failed_nodes: int
-    failed_edges: int
+    # Time parameters
+    duration_minutes: int
+    step_seconds: int
+    num_steps: int
 
-    # structural impact
-    nodes_after: int
-    edges_after: int
-    num_components_after: int
-    largest_component_after: int
-    largest_component_ratio: float  # largest_after / num_nodes_0
+    # Temporal aggregate labels (computed from simulation)
+    gcc_frac_min: float
+    gcc_frac_mean: float
+    partition_fraction: float
+    partition_any: int
+    max_partition_streak: int
 
-    # label
-    partitioned: int  # 1 if partition / significant shrink, else 0
+    # Failure counts (for analysis, not features)
+    num_failed_nodes: int
+    num_failed_edges: int
 
-
-@dataclass
-class MonteCarloStats:
-    num_runs: int
-    mean_failed_nodes: float
-    mean_failed_edges: float
-    prob_partition: float
-    mean_largest_component_ratio: float
-
-
-def generate_failure_dataset(cfg: MonteCarloConfig) -> List[MonteCarloSample]:
-    """
-    Outcome-aware dataset:
-    - Build one base topology
-    - Run num_runs failure scenarios
-    - Record BOTH pre- and post-failure metrics
-    """
-    topo_cfg = TopologyConfig()
-    G_base: nx.Graph = generate_topology(topo_cfg)
-
-    n0 = G_base.number_of_nodes()
-    e0 = G_base.number_of_edges()
-    avg_deg0 = (2 * e0 / n0) if n0 > 0 else 0.0
-
-    samples: List[MonteCarloSample] = []
-
-    for i in range(cfg.num_runs):
-        seed_i = None if cfg.seed is None else cfg.seed + i
-
-        fail_cfg = FailureConfig(
-            node_failure_prob=cfg.node_failure_prob,
-            edge_failure_prob=cfg.edge_failure_prob,
-            seed=seed_i,
-        )
-
-        failures = sample_failures(G_base, fail_cfg)
-        G_failed = apply_failures(G_base, failures)
-        impact = compute_impact(G_base, G_failed)
-
-        partitioned = int(
-            (impact.num_components_after > impact.num_components_before)
-            or (
-                impact.largest_component_after
-                < impact.largest_component_before
-            )
-        )
-
-        largest_ratio = (
-            impact.largest_component_after / float(n0) if n0 > 0 else 0.0
-        )
-
-        sample = MonteCarloSample(
-            run_id=i,
-            num_nodes_0=n0,
-            num_edges_0=e0,
-            avg_degree_0=avg_deg0,
-            num_satellites=topo_cfg.num_satellites,
-            num_ground_stations=topo_cfg.num_ground_stations,
-            node_failure_prob=cfg.node_failure_prob,
-            edge_failure_prob=cfg.edge_failure_prob,
-            failed_nodes=len(failures.failed_nodes),
-            failed_edges=len(failures.failed_edges),
-            nodes_after=impact.nodes_after,
-            edges_after=impact.edges_after,
-            num_components_after=impact.num_components_after,
-            largest_component_after=impact.largest_component_after,
-            largest_component_ratio=largest_ratio,
-            partitioned=partitioned,
-        )
-        samples.append(sample)
-
-    return samples
-
-
-def summarize_samples(samples: List[MonteCarloSample]) -> MonteCarloStats:
-    n = len(samples)
-    if n == 0:
-        return MonteCarloStats(0, 0.0, 0.0, 0.0)
-
-    mean_failed_nodes = fsum(s.failed_nodes for s in samples) / n
-    mean_failed_edges = fsum(s.failed_edges for s in samples) / n
-    prob_partition = fsum(s.partitioned for s in samples) / n
-    mean_largest_ratio = (
-        fsum(s.largest_component_ratio for s in samples) / n
-    )
-
-    return MonteCarloStats(
-        num_runs=n,
-        mean_failed_nodes=mean_failed_nodes,
-        mean_failed_edges=mean_failed_edges,
-        prob_partition=prob_partition,
-        mean_largest_component_ratio=mean_largest_ratio,
-    )
-
-
-def run_failure_sweep(cfg: MonteCarloConfig) -> MonteCarloStats:
-    """
-    Backward-compatible helper used by scripts/failure_sweep.py.
-    """
-    samples = generate_failure_dataset(cfg)
-    return summarize_samples(samples)
-
-
-# ---------------------------------------------------------------------------
-# Design-time dataset (Model B / thesis model)
-# ---------------------------------------------------------------------------
+    # Metadata
+    seed: int
+    config_hash: str
+    schema_version: int = SCHEMA_VERSION
+    dataset_version: str = DATASET_VERSION
 
 
 @dataclass
-class DesignScenarioConfig:
-    """
-    One design *configuration* to sample around.
-    We will simulate many runs per scenario with the same design parameters.
-    """
+class Tier1StepRow:
+    """One row in the steps table (per-step metrics).
 
-    scenario_id: int
-    num_satellites: int
-    num_ground_stations: int
-    isl_degree: int
-    node_failure_prob: float
-    edge_failure_prob: float
-    runs_per_scenario: int = 100
-
-
-@dataclass
-class DesignSample:
-    """
-    Single Monte Carlo run for a given design scenario.
-
-    Features: only design-time quantities (architecture + failure probs).
-    Label: whether that run produced a partition.
-
-    This is the dataset we train the thesis model on.
+    Contains time-series data for detailed analysis.
     """
 
-    scenario_id: int
     run_id: int
-
-    # architecture features
-    num_nodes_0: int
-    num_edges_0: int
-    avg_degree_0: float
-    num_satellites: int
-    num_ground_stations: int
-    isl_degree: int
-
-    # design-time failure assumptions
-    node_failure_prob: float
-    edge_failure_prob: float
-
-    # label
+    t: int
+    num_nodes: int
+    num_edges: int
+    num_components: int
+    gcc_size: int
+    gcc_frac: float
     partitioned: int
 
 
-def generate_designtime_dataset(
-    scenarios: List[DesignScenarioConfig],
-    base_seed: int = 1000,
-) -> List[DesignSample]:
+# ---------------------------------------------------------------------------
+# Dataset Generation Functions
+# ---------------------------------------------------------------------------
+
+
+def generate_tier1_temporal_dataset(
+    cfg: Tier1MonteCarloConfig,
+) -> Tuple[List[Tier1RunRow], List[Tier1StepRow]]:
     """
-    Generate a dataset for *design-time* prediction.
+    Generate a Tier 1 temporal connectivity dataset.
 
-    For each DesignScenarioConfig:
-      - Build a topology for that design
-      - Run runs_per_scenario random failure realizations
-      - Label each run as partitioned / not
+    For each run:
+    1. Sample or use fixed constellation parameters
+    2. Sample failure probabilities from configured ranges
+    3. Execute temporal rollout using run_tier1_rollout()
+    4. Collect per-run summary and per-step metrics
 
-    NOTE: Features here are *only* pre-failure knowledge.
-    No post-failure leakage (no failed_nodes, largest_component_ratio, etc.).
+    Args:
+        cfg: Tier1MonteCarloConfig with generation parameters.
+
+    Returns:
+        Tuple of (runs_rows, steps_rows) where:
+        - runs_rows: List of Tier1RunRow (one per run)
+        - steps_rows: List of Tier1StepRow (one per step per run)
     """
-    samples: List[DesignSample] = []
-    global_run_id = 0
+    rng = random.Random(cfg.seed)
 
-    for sc in scenarios:
-        topo_cfg = TopologyConfig(
-            num_satellites=sc.num_satellites,
-            num_ground_stations=sc.num_ground_stations,
-            isl_degree=sc.isl_degree,
+    runs_rows: List[Tier1RunRow] = []
+    steps_rows: List[Tier1StepRow] = []
+
+    for run_id in range(cfg.num_runs):
+        # Sample or use fixed constellation parameters
+        if cfg.sample_constellation:
+            num_planes = rng.randint(*cfg.num_planes_range)
+            sats_per_plane = rng.randint(*cfg.sats_per_plane_range)
+        else:
+            num_planes = (cfg.num_planes_range[0] + cfg.num_planes_range[1]) // 2
+            sats_per_plane = (cfg.sats_per_plane_range[0] + cfg.sats_per_plane_range[1]) // 2
+
+        # Sample failure probabilities
+        node_failure_prob = rng.uniform(*cfg.node_failure_prob_range)
+        edge_failure_prob = rng.uniform(*cfg.edge_failure_prob_range)
+
+        # Create rollout config with unique seed per run
+        run_seed = cfg.seed + run_id
+        rollout_cfg = Tier1RolloutConfig(
+            num_planes=num_planes,
+            sats_per_plane=sats_per_plane,
+            inclination_deg=cfg.inclination_deg,
+            altitude_km=cfg.altitude_km,
+            duration_minutes=cfg.duration_minutes,
+            step_seconds=cfg.step_seconds,
+            gcc_threshold=cfg.gcc_threshold,
+            node_failure_prob=node_failure_prob,
+            edge_failure_prob=edge_failure_prob,
+            seed=run_seed,
         )
 
-        G_base = generate_topology(topo_cfg)
+        # Execute rollout
+        steps, summary = run_tier1_rollout(rollout_cfg)
 
-        n0 = G_base.number_of_nodes()
-        e0 = G_base.number_of_edges()
-        avg_deg0 = (2 * e0 / n0) if n0 > 0 else 0.0
+        # Build run row
+        run_row = Tier1RunRow(
+            run_id=run_id,
+            num_planes=num_planes,
+            sats_per_plane=sats_per_plane,
+            total_satellites=num_planes * sats_per_plane,
+            inclination_deg=cfg.inclination_deg,
+            altitude_km=cfg.altitude_km,
+            node_failure_prob=node_failure_prob,
+            edge_failure_prob=edge_failure_prob,
+            duration_minutes=cfg.duration_minutes,
+            step_seconds=cfg.step_seconds,
+            num_steps=summary.num_steps,
+            gcc_frac_min=summary.gcc_frac_min,
+            gcc_frac_mean=summary.gcc_frac_mean,
+            partition_fraction=summary.partition_fraction,
+            partition_any=summary.partition_any,
+            max_partition_streak=summary.max_partition_streak,
+            num_failed_nodes=summary.num_failed_nodes,
+            num_failed_edges=summary.num_failed_edges,
+            seed=run_seed,
+            config_hash=summary.config_hash,
+        )
+        runs_rows.append(run_row)
 
-        for _ in range(sc.runs_per_scenario):
-            seed_i = base_seed + global_run_id
-
-            fail_cfg = FailureConfig(
-                node_failure_prob=sc.node_failure_prob,
-                edge_failure_prob=sc.edge_failure_prob,
-                seed=seed_i,
+        # Build step rows
+        for step in steps:
+            step_row = Tier1StepRow(
+                run_id=run_id,
+                t=step.t,
+                num_nodes=step.num_nodes,
+                num_edges=step.num_edges,
+                num_components=step.num_components,
+                gcc_size=step.gcc_size,
+                gcc_frac=step.gcc_frac,
+                partitioned=step.partitioned,
             )
+            steps_rows.append(step_row)
 
-            failures = sample_failures(G_base, fail_cfg)
-            G_failed = apply_failures(G_base, failures)
-            impact = compute_impact(G_base, G_failed)
+    return runs_rows, steps_rows
 
-            partitioned = int(
-                (impact.num_components_after > impact.num_components_before)
-                or (
-                    impact.largest_component_after
-                    < impact.largest_component_before
+
+def runs_to_dicts(runs: List[Tier1RunRow]) -> List[dict]:
+    """Convert run rows to list of dicts for DataFrame/Parquet export."""
+    return [asdict(r) for r in runs]
+
+
+def steps_to_dicts(steps: List[Tier1StepRow]) -> List[dict]:
+    """Convert step rows to list of dicts for DataFrame/Parquet export."""
+    return [asdict(s) for s in steps]
+
+
+# ---------------------------------------------------------------------------
+# Schema Validation
+# ---------------------------------------------------------------------------
+
+# Required columns for runs table (v1 schema)
+RUNS_REQUIRED_COLUMNS = frozenset([
+    "run_id",
+    "num_planes",
+    "sats_per_plane",
+    "total_satellites",
+    "inclination_deg",
+    "altitude_km",
+    "node_failure_prob",
+    "edge_failure_prob",
+    "duration_minutes",
+    "step_seconds",
+    "num_steps",
+    "gcc_frac_min",
+    "gcc_frac_mean",
+    "partition_fraction",
+    "partition_any",
+    "max_partition_streak",
+    "num_failed_nodes",
+    "num_failed_edges",
+    "seed",
+    "config_hash",
+    "schema_version",
+    "dataset_version",
+])
+
+# Required columns for steps table (v1 schema)
+STEPS_REQUIRED_COLUMNS = frozenset([
+    "run_id",
+    "t",
+    "num_nodes",
+    "num_edges",
+    "num_components",
+    "gcc_size",
+    "gcc_frac",
+    "partitioned",
+])
+
+
+class SchemaValidationError(ValueError):
+    """Raised when dataset does not conform to required schema."""
+    pass
+
+
+def validate_runs_schema(runs_dicts: List[dict]) -> None:
+    """Validate that runs data conforms to v1 schema.
+
+    Args:
+        runs_dicts: List of run row dictionaries.
+
+    Raises:
+        SchemaValidationError: If required fields are missing or invalid.
+    """
+    if not runs_dicts:
+        return  # Empty dataset is valid
+
+    # Check first row for required columns
+    first_row = runs_dicts[0]
+    present_columns = set(first_row.keys())
+    missing = RUNS_REQUIRED_COLUMNS - present_columns
+
+    if missing:
+        raise SchemaValidationError(
+            f"Runs table missing required columns: {sorted(missing)}"
+        )
+
+    # Validate value ranges
+    for i, row in enumerate(runs_dicts):
+        # GCC fractions must be in [0, 1]
+        for col in ["gcc_frac_min", "gcc_frac_mean", "partition_fraction"]:
+            val = row.get(col)
+            if val is not None and not (0.0 <= val <= 1.0):
+                raise SchemaValidationError(
+                    f"Row {i}: {col}={val} out of range [0, 1]"
                 )
+
+        # Binary columns must be 0 or 1
+        if row.get("partition_any") not in (0, 1):
+            raise SchemaValidationError(
+                f"Row {i}: partition_any must be 0 or 1"
             )
 
-            sample = DesignSample(
-                scenario_id=sc.scenario_id,
-                run_id=global_run_id,
-                num_nodes_0=n0,
-                num_edges_0=e0,
-                avg_degree_0=avg_deg0,
-                num_satellites=sc.num_satellites,
-                num_ground_stations=sc.num_ground_stations,
-                isl_degree=sc.isl_degree,
-                node_failure_prob=sc.node_failure_prob,
-                edge_failure_prob=sc.edge_failure_prob,
-                partitioned=partitioned,
+        # Schema version must match
+        if row.get("schema_version") != SCHEMA_VERSION:
+            raise SchemaValidationError(
+                f"Row {i}: schema_version={row.get('schema_version')}, expected {SCHEMA_VERSION}"
             )
-            samples.append(sample)
-            global_run_id += 1
 
-    return samples
+
+def validate_steps_schema(steps_dicts: List[dict]) -> None:
+    """Validate that steps data conforms to v1 schema.
+
+    Args:
+        steps_dicts: List of step row dictionaries.
+
+    Raises:
+        SchemaValidationError: If required fields are missing or invalid.
+    """
+    if not steps_dicts:
+        return  # Empty dataset is valid
+
+    # Check first row for required columns
+    first_row = steps_dicts[0]
+    present_columns = set(first_row.keys())
+    missing = STEPS_REQUIRED_COLUMNS - present_columns
+
+    if missing:
+        raise SchemaValidationError(
+            f"Steps table missing required columns: {sorted(missing)}"
+        )
+
+    # Validate value ranges
+    for i, row in enumerate(steps_dicts):
+        # GCC fraction must be in [0, 1]
+        val = row.get("gcc_frac")
+        if val is not None and not (0.0 <= val <= 1.0):
+            raise SchemaValidationError(
+                f"Row {i}: gcc_frac={val} out of range [0, 1]"
+            )
+
+        # Partitioned must be 0 or 1
+        if row.get("partitioned") not in (0, 1):
+            raise SchemaValidationError(
+                f"Row {i}: partitioned must be 0 or 1"
+            )
