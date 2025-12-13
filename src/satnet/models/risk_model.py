@@ -41,6 +41,14 @@ TIER1_V1_FEATURE_COLUMNS: List[str] = [
     "step_seconds",
 ]
 
+# Pure design features (no failure params) for design-time risk prediction
+TIER1_V1_DESIGN_FEATURE_COLUMNS: List[str] = [
+    "num_planes",
+    "sats_per_plane",
+    "inclination_deg",
+    "altitude_km",
+]
+
 # Label column for v1 temporal dataset
 TIER1_V1_LABEL_COLUMN = "partition_any"
 
@@ -402,6 +410,89 @@ def train_tier1_v1_risk_model(
     )
 
     metrics["label_column"] = label_column
+    metrics["num_samples"] = len(y)
+    metrics["positive_rate"] = float(y.mean())
+
+    return clf, metrics
+
+
+def train_tier1_v1_design_model(
+    csv_path: Path,
+    cfg: RiskModelConfig | None = None,
+) -> Tuple[RandomForestClassifier, dict]:
+    """Train a design-time risk model on Tier 1 v1 temporal dataset.
+
+    Uses only pure design features (num_planes, sats_per_plane, inclination_deg,
+    altitude_km) to predict partition risk. No failure parameters are used.
+
+    Args:
+        csv_path: Path to the runs CSV file (e.g., tier1_design_runs.csv).
+        cfg: Model configuration.
+
+    Returns:
+        Tuple of (trained model, metrics dict).
+    """
+    if cfg is None:
+        cfg = RiskModelConfig()
+
+    df = pd.read_csv(csv_path)
+
+    # Use only design features (no failure params)
+    X = df[TIER1_V1_DESIGN_FEATURE_COLUMNS].copy()
+    y = df[TIER1_V1_LABEL_COLUMN].astype(int)
+
+    # Check if we have both classes
+    unique_classes = y.unique()
+    if len(unique_classes) < 2:
+        raise ValueError(
+            f"Dataset has only one class (all labels = {unique_classes[0]}). "
+            "Need both partitioned (1) and non-partitioned (0) samples to train. "
+            "Try using smaller constellations or longer durations."
+        )
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=cfg.test_size,
+        random_state=cfg.random_state,
+        stratify=y,
+    )
+
+    clf = RandomForestClassifier(
+        n_estimators=cfg.n_estimators,
+        max_depth=cfg.max_depth,
+        random_state=cfg.random_state,
+        n_jobs=-1,
+        class_weight="balanced",
+    )
+
+    clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+    proba = clf.predict_proba(X_test)
+    if proba.shape[1] == 2:
+        y_proba = proba[:, 1]
+    else:
+        y_proba = proba[:, 0] if clf.classes_[0] == 1 else 1 - proba[:, 0]
+
+    metrics: dict = {}
+    metrics["accuracy"] = accuracy_score(y_test, y_pred)
+    try:
+        metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
+    except ValueError:
+        metrics["roc_auc"] = float("nan")
+
+    metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
+    metrics["classification_report"] = classification_report(
+        y_test, y_pred, output_dict=True
+    )
+
+    # Feature importances
+    metrics["feature_importances"] = dict(
+        zip(TIER1_V1_DESIGN_FEATURE_COLUMNS, clf.feature_importances_.tolist())
+    )
+
+    metrics["label_column"] = TIER1_V1_LABEL_COLUMN
     metrics["num_samples"] = len(y)
     metrics["positive_rate"] = float(y.mean())
 
