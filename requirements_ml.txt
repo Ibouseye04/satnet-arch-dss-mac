@@ -1,0 +1,7 @@
+# ML/GNN dependencies for Thesis Model (EvolveGCN-O)
+# Install with: pip install -r requirements_ml.txt
+
+torch>=2.0.0
+torch_geometric>=2.4.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
