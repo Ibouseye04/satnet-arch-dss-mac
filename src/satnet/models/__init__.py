@@ -4,6 +4,7 @@
 __all__ = [
     "SatNetTemporalDataset",
     "collate_temporal_sequences",
+    "SatelliteEvolveGCN",
 ]
 
 
@@ -17,4 +18,7 @@ def __getattr__(name: str):
         if name == "SatNetTemporalDataset":
             return SatNetTemporalDataset
         return collate_temporal_sequences
+    if name == "SatelliteEvolveGCN":
+        from satnet.models.gnn_model import SatelliteEvolveGCN
+        return SatelliteEvolveGCN
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
