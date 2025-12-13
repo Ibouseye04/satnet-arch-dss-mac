@@ -17,7 +17,13 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, field, asdict
+from datetime import datetime, timezone
 from typing import Optional
+
+
+# Fixed epoch for reproducibility (J2000.0 epoch: 2000-01-01T12:00:00Z)
+# Using a well-known astronomical reference epoch ensures determinism
+DEFAULT_EPOCH_ISO = "2000-01-01T12:00:00+00:00"
 
 
 # Dataset versioning constants
@@ -42,6 +48,7 @@ class Tier1RolloutConfig:
         node_failure_prob: Probability of node failure (sampled once per run).
         edge_failure_prob: Probability of edge failure (sampled once per run from t=0 edges).
         seed: Random seed for reproducibility.
+        epoch_iso: TLE epoch as ISO 8601 string for reproducibility (default: J2000.0).
     """
 
     # Constellation parameters
@@ -65,6 +72,15 @@ class Tier1RolloutConfig:
     node_failure_prob: float = 0.0
     edge_failure_prob: float = 0.0
     seed: int = 42
+
+    # Epoch for orbital propagation (ISO 8601 string for JSON serialization)
+    # Default is J2000.0 epoch for reproducibility
+    epoch_iso: str = DEFAULT_EPOCH_ISO
+
+    @property
+    def epoch(self) -> datetime:
+        """Parse epoch_iso string to datetime object."""
+        return datetime.fromisoformat(self.epoch_iso)
 
     def config_hash(self) -> str:
         """Compute a deterministic hash of this configuration.
@@ -187,13 +203,14 @@ def run_tier1_rollout(
     )
     from satnet.network.hypatia_adapter import HypatiaAdapter
 
-    # 1. Construct HypatiaAdapter
+    # 1. Construct HypatiaAdapter with explicit epoch for reproducibility
     adapter = HypatiaAdapter(
         num_planes=cfg.num_planes,
         sats_per_plane=cfg.sats_per_plane,
         inclination_deg=cfg.inclination_deg,
         altitude_km=cfg.altitude_km,
         phasing_factor=cfg.phasing_factor,
+        epoch=cfg.epoch,
     )
 
     # 2. Generate TLEs and calculate ISLs

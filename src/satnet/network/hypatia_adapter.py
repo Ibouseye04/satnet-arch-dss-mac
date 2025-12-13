@@ -447,7 +447,9 @@ def _generate_tle_lines(
     
     # Epoch: year (2-digit) + day of year with fractional day
     year_2digit = epoch.year % 100
-    day_of_year = (epoch - datetime(epoch.year, 1, 1)).total_seconds() / SECONDS_PER_DAY + 1
+    # Handle both timezone-aware and naive datetimes
+    year_start = datetime(epoch.year, 1, 1, tzinfo=epoch.tzinfo)
+    day_of_year = (epoch - year_start).total_seconds() / SECONDS_PER_DAY + 1
     epoch_str = f"{year_2digit:02d}{day_of_year:012.8f}"
     
     # Line 1
@@ -920,6 +922,7 @@ class HypatiaAdapter:
         phasing_factor: int = 1,
         output_dir: Optional[Path] = None,
         link_budget: Optional[LinkBudgetEngine] = None,
+        epoch: Optional[datetime] = None,
     ):
         """
         Initialize the Hypatia adapter with Walker Delta constellation parameters.
@@ -932,13 +935,18 @@ class HypatiaAdapter:
             phasing_factor: Walker phasing factor (F parameter)
             output_dir: Directory for generated files (default: temp directory)
             link_budget: LinkBudgetEngine instance (default: creates one with defaults)
+            epoch: TLE epoch datetime (default: current UTC time for backward compat)
         """
+        # Use provided epoch or fall back to utcnow for backward compatibility
+        effective_epoch = epoch if epoch is not None else datetime.utcnow()
+        
         self.config = WalkerDeltaConfig(
             num_planes=num_planes,
             sats_per_plane=sats_per_plane,
             inclination_deg=inclination_deg,
             altitude_km=altitude_km,
             phasing_factor=phasing_factor,
+            epoch=effective_epoch,
         )
         
         if output_dir is None:
