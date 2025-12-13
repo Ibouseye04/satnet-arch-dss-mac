@@ -4,8 +4,13 @@ Generates diverse constellation designs with temporal GCC-based labels
 using the Tier 1 (Hypatia-based) temporal pipeline.
 
 Outputs both runs table (per-run summaries) and steps table (per-step metrics).
+
+Usage:
+    python scripts/export_design_dataset.py --num-runs 2000 --seed 12345
+    python scripts/export_design_dataset.py --altitude-min 400 --altitude-max 800
 """
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -22,28 +27,121 @@ from satnet.simulation.monte_carlo import (  # noqa: E402
 )
 
 
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Generate Tier 1 Temporal Design Dataset",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "--num-runs",
+        type=int,
+        default=200,
+        help="Number of simulation runs to generate",
+    )
+    parser.add_argument(
+        "--altitude-min",
+        type=float,
+        default=300.0,
+        help="Minimum orbital altitude in km",
+    )
+    parser.add_argument(
+        "--altitude-max",
+        type=float,
+        default=1200.0,
+        help="Maximum orbital altitude in km",
+    )
+    parser.add_argument(
+        "--inclination-min",
+        type=float,
+        default=30.0,
+        help="Minimum orbital inclination in degrees",
+    )
+    parser.add_argument(
+        "--inclination-max",
+        type=float,
+        default=98.0,
+        help="Maximum orbital inclination in degrees",
+    )
+    parser.add_argument(
+        "--planes-min",
+        type=int,
+        default=3,
+        help="Minimum number of orbital planes",
+    )
+    parser.add_argument(
+        "--planes-max",
+        type=int,
+        default=8,
+        help="Maximum number of orbital planes",
+    )
+    parser.add_argument(
+        "--sats-min",
+        type=int,
+        default=4,
+        help="Minimum satellites per plane",
+    )
+    parser.add_argument(
+        "--sats-max",
+        type=int,
+        default=12,
+        help="Maximum satellites per plane",
+    )
+    parser.add_argument(
+        "--duration",
+        type=int,
+        default=10,
+        help="Simulation duration in minutes",
+    )
+    parser.add_argument(
+        "--step-seconds",
+        type=int,
+        default=60,
+        help="Time step interval in seconds",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for reproducibility",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory (default: PROJECT_ROOT/data)",
+    )
+
+    return parser.parse_args()
+
+
 def main() -> None:
     """Generate diverse constellation designs with temporal labels."""
+    args = parse_args()
 
     cfg = Tier1MonteCarloConfig(
-        num_runs=200,
-        num_planes_range=(3, 8),
-        sats_per_plane_range=(4, 12),
-        inclination_deg=53.0,
-        altitude_km=550.0,
-        duration_minutes=10,
-        step_seconds=60,
+        num_runs=args.num_runs,
+        num_planes_range=(args.planes_min, args.planes_max),
+        sats_per_plane_range=(args.sats_min, args.sats_max),
+        inclination_deg_range=(args.inclination_min, args.inclination_max),
+        altitude_km_range=(args.altitude_min, args.altitude_max),
+        duration_minutes=args.duration,
+        step_seconds=args.step_seconds,
         gcc_threshold=0.8,
         node_failure_prob_range=(0.0, 0.2),
         edge_failure_prob_range=(0.0, 0.3),
-        seed=42,
+        seed=args.seed,
         sample_constellation=True,
     )
 
     print("Generating Tier 1 Temporal Design Dataset...")
     print(f"  Runs: {cfg.num_runs}")
     print(f"  Planes: {cfg.num_planes_range}, Sats/plane: {cfg.sats_per_plane_range}")
+    print(f"  Altitude: {cfg.altitude_km_range[0]:.0f}-{cfg.altitude_km_range[1]:.0f} km")
+    print(f"  Inclination: {cfg.inclination_deg_range[0]:.0f}-{cfg.inclination_deg_range[1]:.0f} deg")
     print(f"  Duration: {cfg.duration_minutes} min @ {cfg.step_seconds}s steps")
+    print(f"  Seed: {cfg.seed}")
     print("=" * 60)
 
     runs, steps = generate_tier1_temporal_dataset(cfg)
@@ -51,11 +149,10 @@ def main() -> None:
     print(f"\nGenerated {len(runs)} runs, {len(steps)} step records")
 
     # Save to CSV with schema validation
-    out_dir = PROJECT_ROOT / "data"
+    out_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "data"
     runs_path = out_dir / "tier1_design_runs.csv"
     steps_path = out_dir / "tier1_design_steps.csv"
 
-    # Use canonical writer (validates schema before writing)
     write_tier1_dataset_csv(runs, steps, runs_path, steps_path)
     print(f"Written {len(runs)} run rows to {runs_path}")
     print(f"Written {len(steps)} step rows to {steps_path}")

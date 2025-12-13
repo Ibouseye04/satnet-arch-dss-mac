@@ -14,8 +14,14 @@ Key features:
 from __future__ import annotations
 
 from dataclasses import dataclass, field, asdict
-from typing import List, Optional, Tuple
+from typing import Callable, Iterator, List, Optional, Tuple
 import random
+
+try:
+    from tqdm import tqdm
+    HAS_TQDM = True
+except ImportError:
+    HAS_TQDM = False
 
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
@@ -57,8 +63,8 @@ class Tier1MonteCarloConfig:
     # Constellation parameter ranges
     num_planes_range: Tuple[int, int] = (3, 6)
     sats_per_plane_range: Tuple[int, int] = (4, 8)
-    inclination_deg: float = 53.0
-    altitude_km: float = 550.0
+    inclination_deg_range: Tuple[float, float] = (30.0, 98.0)
+    altitude_km_range: Tuple[float, float] = (300.0, 1200.0)
 
     # Time parameters
     duration_minutes: int = 10
@@ -169,14 +175,29 @@ def generate_tier1_temporal_dataset(
     runs_rows: List[Tier1RunRow] = []
     steps_rows: List[Tier1StepRow] = []
 
-    for run_id in range(cfg.num_runs):
+    # Progress iterator
+    run_iter: Iterator[int] = range(cfg.num_runs)
+    if HAS_TQDM:
+        run_iter = tqdm(run_iter, desc="Generating runs", unit="run")
+    else:
+        print(f"Generating {cfg.num_runs} runs...")
+
+    for run_id in run_iter:
+        # Print progress every 10% if no tqdm
+        if not HAS_TQDM and cfg.num_runs >= 10 and run_id % max(1, cfg.num_runs // 10) == 0:
+            print(f"  Progress: {run_id}/{cfg.num_runs} ({100*run_id//cfg.num_runs}%)")
+
         # Sample or use fixed constellation parameters
         if cfg.sample_constellation:
             num_planes = rng.randint(*cfg.num_planes_range)
             sats_per_plane = rng.randint(*cfg.sats_per_plane_range)
+            altitude_km = rng.uniform(*cfg.altitude_km_range)
+            inclination_deg = rng.uniform(*cfg.inclination_deg_range)
         else:
             num_planes = (cfg.num_planes_range[0] + cfg.num_planes_range[1]) // 2
             sats_per_plane = (cfg.sats_per_plane_range[0] + cfg.sats_per_plane_range[1]) // 2
+            altitude_km = (cfg.altitude_km_range[0] + cfg.altitude_km_range[1]) / 2
+            inclination_deg = (cfg.inclination_deg_range[0] + cfg.inclination_deg_range[1]) / 2
 
         # Sample failure probabilities
         node_failure_prob = rng.uniform(*cfg.node_failure_prob_range)
@@ -187,8 +208,8 @@ def generate_tier1_temporal_dataset(
         rollout_cfg = Tier1RolloutConfig(
             num_planes=num_planes,
             sats_per_plane=sats_per_plane,
-            inclination_deg=cfg.inclination_deg,
-            altitude_km=cfg.altitude_km,
+            inclination_deg=inclination_deg,
+            altitude_km=altitude_km,
             duration_minutes=cfg.duration_minutes,
             step_seconds=cfg.step_seconds,
             gcc_threshold=cfg.gcc_threshold,
@@ -206,8 +227,8 @@ def generate_tier1_temporal_dataset(
             num_planes=num_planes,
             sats_per_plane=sats_per_plane,
             total_satellites=num_planes * sats_per_plane,
-            inclination_deg=cfg.inclination_deg,
-            altitude_km=cfg.altitude_km,
+            inclination_deg=inclination_deg,
+            altitude_km=altitude_km,
             node_failure_prob=node_failure_prob,
             edge_failure_prob=edge_failure_prob,
             duration_minutes=cfg.duration_minutes,
