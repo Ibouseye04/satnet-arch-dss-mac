@@ -35,13 +35,15 @@ The key parameters are:
 These parameters flow into our `HypatiaAdapter` class, which generates **Two-Line Elements (TLEs)** for each satellite.
 
 ```
-HypatiaAdapter.__init__()
-    └── WalkerDeltaConfig creation
+HypatiaAdapter.__init__()                    # Line 904
+    └── WalkerDeltaConfig creation           # Line 931
     
-HypatiaAdapter.generate_tles()
-    └── Loop over planes → Loop over satellites
-        └── Calculate RAAN & mean anomaly
-        └── _generate_tle_lines() → (name, line1, line2)
+HypatiaAdapter.generate_tles()               # Line 962
+    └── Loop over planes                     # Line 977
+        └── Loop over satellites             # Line 981
+            └── Calculate RAAN & mean anomaly    # Line 979, 985
+            └── _generate_tle_lines()        # Line 992
+                └── → (name, line1, line2)   # Line 470
 ```
 
 The TLEs encode the orbital mechanics—epoch, inclination, RAAN, eccentricity, mean anomaly—in a standardized format that SGP4 propagators understand.
@@ -55,14 +57,14 @@ This is **Tier 1 physics**—no toy models, no random graphs. Real orbital mecha
 "With TLEs in hand, we propagate satellite positions over time using **SGP4**—the same algorithm used by NORAD to track objects in orbit.
 
 ```
-adapter.calculate_isls()
-    └── Loop over time steps
-        └── SGP4 position calculation
-            └── satellite.sgp4(jd, fr) → TEME coordinates
-            └── TEME → ECEF transformation
-        └── ISL topology generation
-            └── _compute_grid_plus_isls()
-                └── Link budget evaluation
+adapter.calculate_isls()                     # Line 1026
+    └── Loop over time steps                 # Line 1075
+        └── SGP4 position calculation        # Line 1080
+            └── satellite.sgp4(jd, fr)       # Line 534
+            └── TEME → ECEF transformation   # Line 547
+        └── ISL topology generation          # Line 1091
+            └── _compute_grid_plus_isls()    # Line 765
+                └── Link budget evaluation   # Line 821
 ```
 
 At each time step, we:
@@ -87,16 +89,17 @@ The output is a **temporal sequence of NetworkX graphs**—one per time step—r
 "Now we stress-test the network. The key question: *What happens when satellites fail?*
 
 ```
-run_tier1_rollout()
-    └── Sample persistent failures at t=0
-        └── Node failures: if rng.random() < prob
-        └── Edge failures: sample failed_edges
-    └── Temporal loop over graphs
-        └── Apply failures: G_eff.remove_nodes_from()
-        └── Compute connectivity metrics
-            └── compute_gcc_size(G_eff)
-            └── compute_gcc_frac(G_eff)
-            └── compute_partitioned()
+# tier1_rollout.py
+run_tier1_rollout()                          # Line 173
+    └── Sample persistent failures at t=0    # Line 232
+        └── Node failures                    # Line 238-239
+        └── Edge failures                    # Line 244-247
+    └── Temporal loop over graphs            # Line 253
+        └── Apply failures                   # Line 257
+        └── Compute connectivity metrics     # Line 264
+            └── compute_gcc_size(G_eff)      # Line 268 → labels.py:43
+            └── compute_gcc_frac(G_eff)      # Line 269 → labels.py:59
+            └── compute_partitioned()        # Line 270 → labels.py:75
 ```
 
 **Failure model**: At t=0, we sample which nodes and edges fail. These failures are **persistent**—they stay failed for the entire simulation. This models hardware failures, not transient outages.
@@ -122,12 +125,13 @@ These are our **labels** for machine learning."
 - Failure scenarios (different random seeds)
 
 ```
-generate_tier1_temporal_dataset()
-    └── Sample design parameters
-    └── Execute rollout per config
-        └── run_tier1_rollout() → (steps, summary)
-    └── Extract temporal labels
-    └── write_tier1_dataset_csv()
+# monte_carlo.py
+generate_tier1_temporal_dataset()            # Line 153
+    └── Sample design parameters             # Line 192
+    └── Execute rollout per config           # Line 222
+        └── run_tier1_rollout()              # → tier1_rollout.py:173
+    └── Extract temporal labels              # Line 237
+    └── write_tier1_dataset_csv()            # Line 450
 ```
 
 This produces a **labeled dataset**: design features → partition outcomes.
@@ -135,12 +139,14 @@ This produces a **labeled dataset**: design features → partition outcomes.
 Then we train a **RandomForest classifier**:
 
 ```
-train_tier1_v1_design_model()
-    └── Load dataset from CSV
-    └── Extract design features: [num_planes, sats_per_plane, inclination, altitude]
-    └── Load partition labels
-    └── clf.fit(X_train, y_train)
-    └── clf.predict_proba(X_test) → reliability scores
+# risk_model.py
+train_tier1_v1_design_model()                # Line 419
+    └── Load dataset from CSV                # Line 438
+    └── Extract design features              # Line 441
+    └── Load partition labels                # Line 442
+    └── clf.fit(X_train, y_train)            # Line 469
+    └── clf.predict_proba(X_test)            # Line 472
+        └── Extract y_proba[:, 1]            # Line 474
 ```
 
 The model learns: *Given only the design parameters, what's the probability this constellation will partition under failure?*
@@ -154,11 +160,15 @@ The output is a **continuous reliability score** between 0 and 1."
 "Finally, we convert continuous scores into **actionable risk tiers**:
 
 ```
-bin_satellite_risk()
-    └── scores.apply(compute_tier)
-        └── score > 0.8 → Tier 1 (Healthy)
-        └── score < 0.5 → Tier 3 (Critical)
-        └── else → Tier 2 (Watchlist)
+# risk_binning.py
+bin_satellite_risk()                         # Line 210
+    └── Load scores                          # Line 227
+    └── scores.apply(compute_tier)           # Line 244
+        └── score > 0.8 → Tier 1             # Line 296
+        └── score < 0.5 → Tier 3             # Line 298
+        └── else → Tier 2                    # Line 300
+    └── Map to labels                        # Line 247
+    └── Map to actions                       # Line 248
 ```
 
 Each tier maps to a **recommended action**:
