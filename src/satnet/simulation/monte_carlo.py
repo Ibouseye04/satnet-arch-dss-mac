@@ -25,6 +25,7 @@ except ImportError:
 
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
+    DEFAULT_EPOCH_ISO,
     SCHEMA_VERSION,
     Tier1RolloutConfig,
     Tier1RolloutStep,
@@ -124,6 +125,7 @@ class Tier1RunRow:
     # Metadata
     seed: int
     config_hash: str
+    epoch_iso: str = DEFAULT_EPOCH_ISO
     schema_version: int = SCHEMA_VERSION
     dataset_version: str = DATASET_VERSION
 
@@ -243,6 +245,7 @@ def generate_tier1_temporal_dataset(
             num_failed_edges=summary.num_failed_edges,
             seed=run_seed,
             config_hash=summary.config_hash,
+            epoch_iso=rollout_cfg.epoch_iso,
         )
         runs_rows.append(run_row)
 
@@ -299,6 +302,7 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "num_failed_edges",
     "seed",
     "config_hash",
+    "epoch_iso",
     "schema_version",
     "dataset_version",
 ])

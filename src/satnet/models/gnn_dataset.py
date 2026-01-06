@@ -30,7 +30,10 @@ import torch
 from torch_geometric.data import Data, Dataset
 from torch_geometric.utils import from_networkx
 
+from datetime import datetime
+
 from satnet.network.hypatia_adapter import HypatiaAdapter
+from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO
 
 logger = logging.getLogger(__name__)
 
@@ -198,13 +201,18 @@ class SatNetTemporalDataset(Dataset):
         # Get seed if available (for reproducibility)
         seed = row.get("seed", None)
         
-        # Instantiate HypatiaAdapter
+        # Get epoch from CSV or use default (Tier 1 determinism requirement)
+        epoch_iso = row.get("epoch_iso", DEFAULT_EPOCH_ISO)
+        epoch = datetime.fromisoformat(str(epoch_iso))
+        
+        # Instantiate HypatiaAdapter with explicit epoch for reproducibility
         adapter = HypatiaAdapter(
             num_planes=num_planes,
             sats_per_plane=sats_per_plane,
             inclination_deg=inclination_deg,
             altitude_km=altitude_km,
             phasing_factor=phasing_factor,
+            epoch=epoch,
         )
         
         # Calculate ISLs for the specified duration

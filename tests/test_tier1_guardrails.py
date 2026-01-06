@@ -127,27 +127,27 @@ class TestNoUtcnowEpochInTier1:
         )
 
 
-class TestNonTier1CallersLackEpoch:
-    """Document which non-Tier1 callers don't pass epoch (audit targets for Step 2)."""
+class TestEpochContractEnforced:
+    """Verify all HypatiaAdapter callers pass explicit epoch (Step 2 fixes)."""
 
-    def test_gnn_dataset_does_not_pass_epoch(self) -> None:
-        """SatNetTemporalDataset.get() does not pass epoch to HypatiaAdapter.
+    def test_gnn_dataset_passes_explicit_epoch(self) -> None:
+        """SatNetTemporalDataset.get() passes explicit epoch to HypatiaAdapter.
         
-        This is a known issue (H2 in the audit). This test documents it.
-        When Step 2 is complete, this test should be updated to verify the fix.
+        Step 2 fixed the H2 audit issue: epoch is now passed explicitly.
         """
         from satnet.models.gnn_dataset import SatNetTemporalDataset
         
         source = inspect.getsource(SatNetTemporalDataset.get)
         
-        # Currently, HypatiaAdapter is called without epoch=
-        # This test will need to be inverted after Step 2 fixes this
-        adapter_call_has_epoch = "epoch=" in source and "HypatiaAdapter" in source
+        # Verify HypatiaAdapter is called with epoch=
+        assert "epoch=" in source, (
+            "SatNetTemporalDataset.get() must pass epoch= to HypatiaAdapter. "
+            "This is required for Tier 1 determinism."
+        )
         
-        # For now, assert the bug exists (so we know when it's fixed)
-        assert not adapter_call_has_epoch, (
-            "SatNetTemporalDataset.get() now passes epoch to HypatiaAdapter! "
-            "Update this test to verify the fix is correct."
+        # Verify DEFAULT_EPOCH_ISO is used as fallback
+        assert "DEFAULT_EPOCH_ISO" in source or "epoch_iso" in source, (
+            "SatNetTemporalDataset.get() should use DEFAULT_EPOCH_ISO or epoch_iso from CSV."
         )
 
 
