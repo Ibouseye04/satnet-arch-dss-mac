@@ -1,13 +1,16 @@
-"""
-Simulation Engine for SatNet Architecture DSS
+"""Legacy Simulation Engine — QUARANTINED.
 
-This module provides the main simulation engine that integrates the Hypatia
-satellite network adapter with failure injection and impact analysis.
+This module is preserved for reference but should NOT be used in Tier 1 code.
+It uses static t=0 snapshots and lacks explicit epoch handling.
 
-The engine uses Tier 1 physics from HypatiaAdapter:
-    - SGP4 orbital propagation
-    - Link budget analysis (Optical + RF)
-    - Earth obscuration checks
+For Tier 1 temporal evaluation, use:
+- satnet.simulation.tier1_rollout.run_tier1_rollout()
+- satnet.simulation.monte_carlo.generate_tier1_temporal_dataset()
+
+Issues with this module (from audit):
+- HypatiaAdapter constructed without explicit epoch (falls back to utcnow())
+- SimulationEngine.run() uses graph_at_t0 (static snapshot, not temporal)
+- Placeholder "fake load" logic
 """
 
 import logging
@@ -17,7 +20,7 @@ from typing import Optional
 import networkx as nx
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
-from satnet.simulation.failures import (
+from satnet.legacy.failures import (
     FailureConfig,
     sample_failures,
     apply_failures,
@@ -36,17 +39,10 @@ class SimulationResult:
 
 class SimulationEngine:
     """
-    Main simulation engine using HypatiaAdapter for network topology.
+    DEPRECATED: Legacy simulation engine using HypatiaAdapter for network topology.
     
-    Replaces the legacy toy topology generator with a realistic Walker Delta
-    constellation using Tier 1 physics (SGP4, link budget, Earth obscuration).
-    
-    This engine supports temporal evaluation via get_graph_at_step() and
-    iter_graphs() methods.
-    
-    IMPORTANT: Prefer iter_graphs() for temporal evaluation. The graph_at_t0
-    property is provided only for backward compatibility and should not be
-    used in new code (see AGENTS.md: NO STATIC SNAPSHOTS).
+    This engine uses static t=0 snapshots and lacks explicit epoch handling.
+    For Tier 1 temporal evaluation, use run_tier1_rollout() instead.
     """
     
     def __init__(
@@ -61,18 +57,14 @@ class SimulationEngine:
         """
         Initialize the simulation engine with Hypatia Adapter.
         
-        Args:
-            num_planes: Number of orbital planes (default: 24 for Starlink-like)
-            sats_per_plane: Satellites per plane (default: 24)
-            inclination_deg: Orbital inclination in degrees
-            altitude_km: Orbital altitude above Earth surface
-            duration_minutes: ISL computation duration
-            step_seconds: Time step interval in seconds
+        WARNING: This does NOT pass an explicit epoch to HypatiaAdapter,
+        so it falls back to datetime.utcnow() (nondeterministic).
         """
         self._duration_minutes = duration_minutes
         self._step_seconds = step_seconds
         
         # Initialize HypatiaAdapter with constellation parameters
+        # NOTE: No epoch passed - this is the bug documented in the audit
         self.adapter = HypatiaAdapter(
             num_planes=num_planes,
             sats_per_plane=sats_per_plane,
@@ -113,22 +105,11 @@ class SimulationEngine:
         return self.graph_at_t0
     
     def get_graph_at_step(self, time_step: int) -> nx.Graph:
-        """Return the network graph at a specific time step.
-        
-        Args:
-            time_step: The time step index (0-based).
-            
-        Returns:
-            networkx.Graph at the specified time step.
-        """
+        """Return the network graph at a specific time step."""
         return self.adapter.get_graph_at_step(time_step)
     
     def iter_graphs(self):
-        """Iterate over network graphs for all time steps.
-        
-        Yields:
-            Tuple of (time_step, nx.Graph) for each step.
-        """
+        """Iterate over network graphs for all time steps."""
         return self.adapter.iter_graphs()
     
     @property
@@ -150,11 +131,8 @@ class SimulationEngine:
         """
         Run the simulation: assign load, detect bottlenecks, inject failures.
         
-        NOTE: This method uses graph_at_t0 (static snapshot). For temporal
-        evaluation, use iter_graphs() with run_tier1_rollout() instead.
-        
-        Returns:
-            SimulationResult with node/edge counts and bottleneck count
+        DEPRECATED: This method uses graph_at_t0 (static snapshot). For temporal
+        evaluation, use run_tier1_rollout() instead.
         """
         G = self.graph_at_t0
         
@@ -204,59 +182,9 @@ class SimulationEngine:
 
 def run_simulation() -> SimulationResult:
     """
-    Legacy function for backward compatibility.
+    DEPRECATED: Legacy function for backward compatibility.
     
-    Creates a SimulationEngine and runs the simulation.
+    Use satnet.simulation.tier1_rollout.run_tier1_rollout() instead.
     """
     engine = SimulationEngine()
     return engine.run()
-
-
-# ---------------------------------------------------------------------------
-# Main Test Block
-# ---------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    # Configure logging for script execution
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-    
-    print("=" * 60)
-    print("Simulation Engine - Hypatia Adapter Integration Test")
-    print("=" * 60)
-    
-    # Initialize engine with Starlink-like parameters
-    engine = SimulationEngine(
-        num_planes=24,
-        sats_per_plane=24,
-        inclination_deg=53.0,
-        altitude_km=550.0,
-        duration_minutes=10,
-    )
-    
-    print("\n" + "=" * 60)
-    print("Engine initialized with Hypatia Adapter")
-    print("=" * 60)
-    
-    # Use get_graph_at_step for temporal access (preferred over deprecated get_graph)
-    G = engine.get_graph_at_step(0)
-    print(f"Network Graph at t=0:")
-    print(f"  Nodes: {G.number_of_nodes()}")
-    print(f"  Edges: {G.number_of_edges()}")
-    
-    # Show link type breakdown
-    intra = sum(1 for _, _, d in G.edges(data=True) if d.get('link_type') == 'intra_plane')
-    inter = sum(1 for _, _, d in G.edges(data=True) if d.get('link_type') == 'inter_plane')
-    seam = sum(1 for _, _, d in G.edges(data=True) if d.get('link_type') == 'seam_link')
-    print(f"  Intra-plane links: {intra}")
-    print(f"  Inter-plane links: {inter}")
-    print(f"  Seam links: {seam}")
-    
-    # Show link mode breakdown (Tier 1 physics)
-    optical = sum(1 for _, _, d in G.edges(data=True) if d.get('link_mode') == 'optical')
-    rf = sum(1 for _, _, d in G.edges(data=True) if d.get('link_mode') == 'rf')
-    print(f"  Optical links: {optical}")
-    print(f"  RF links: {rf}")
-    
-    print("\n" + "=" * 60)
-    print("Integration Test Complete!")
-    print("=" * 60)

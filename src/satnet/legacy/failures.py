@@ -1,3 +1,12 @@
+"""Legacy failure injection module — QUARANTINED.
+
+This module is preserved for reference but should NOT be used in Tier 1 code.
+Tier 1 temporal rollout uses inline failure sampling in tier1_rollout.py.
+
+For Tier 1 failure injection, use:
+- satnet.simulation.tier1_rollout.run_tier1_rollout() with node_failure_prob/edge_failure_prob
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
