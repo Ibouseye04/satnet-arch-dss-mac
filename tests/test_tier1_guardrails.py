@@ -234,7 +234,7 @@ class TestNoStaticSnapshotInTier1:
             step_seconds=60,
         )
         
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
         
         # 2 minutes at 60s = 3 steps (0, 1, 2)
         assert len(steps) == 3, f"Expected 3 steps, got {len(steps)}"
@@ -344,3 +344,159 @@ class TestTier1ScriptsNoLegacyImports:
             f"scripts/simulate.py still exists at {simulate_path}. "
             "It should be removed as part of Step 1 cleanup."
         )
+
+
+# ---------------------------------------------------------------------------
+# Test 4: Graph Reconstruction Contract (Step 3)
+# ---------------------------------------------------------------------------
+
+
+class TestGraphReconstructionContract:
+    """Verify the graph reconstruction contract for ML (Step 3).
+    
+    The contract ensures that:
+    1. Dataset exports include failure realization (failed_nodes_json, failed_edges_json)
+    2. Regenerated graphs with failures applied match original labels
+    """
+
+    def test_dataset_exports_failure_realization(self) -> None:
+        """Monte Carlo dataset includes failure realization columns."""
+        from satnet.simulation.monte_carlo import (
+            Tier1MonteCarloConfig,
+            generate_tier1_temporal_dataset,
+            runs_to_dicts,
+        )
+        
+        cfg = Tier1MonteCarloConfig(
+            num_runs=1,
+            num_planes_range=(2, 2),
+            sats_per_plane_range=(3, 3),
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob_range=(0.2, 0.2),
+            edge_failure_prob_range=(0.2, 0.2),
+            seed=42,
+        )
+        
+        runs, _ = generate_tier1_temporal_dataset(cfg)
+        runs_dicts = runs_to_dicts(runs)
+        
+        # Verify failure realization columns exist
+        assert "failed_nodes_json" in runs_dicts[0], (
+            "Dataset must include failed_nodes_json for graph reconstruction"
+        )
+        assert "failed_edges_json" in runs_dicts[0], (
+            "Dataset must include failed_edges_json for graph reconstruction"
+        )
+
+    def test_failure_realization_matches_counts(self) -> None:
+        """Failure realization JSON matches num_failed_nodes/edges counts."""
+        import json
+        from satnet.simulation.monte_carlo import (
+            Tier1MonteCarloConfig,
+            generate_tier1_temporal_dataset,
+            runs_to_dicts,
+        )
+        
+        cfg = Tier1MonteCarloConfig(
+            num_runs=3,
+            num_planes_range=(3, 3),
+            sats_per_plane_range=(4, 4),
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob_range=(0.3, 0.3),
+            edge_failure_prob_range=(0.3, 0.3),
+            seed=42,
+        )
+        
+        runs, _ = generate_tier1_temporal_dataset(cfg)
+        runs_dicts = runs_to_dicts(runs)
+        
+        for row in runs_dicts:
+            failed_nodes = json.loads(row["failed_nodes_json"])
+            failed_edges = json.loads(row["failed_edges_json"])
+            
+            assert len(failed_nodes) == row["num_failed_nodes"], (
+                f"failed_nodes_json length {len(failed_nodes)} != "
+                f"num_failed_nodes {row['num_failed_nodes']}"
+            )
+            assert len(failed_edges) == row["num_failed_edges"], (
+                f"failed_edges_json length {len(failed_edges)} != "
+                f"num_failed_edges {row['num_failed_edges']}"
+            )
+
+    def test_reconstruction_reproduces_label(self) -> None:
+        """Regenerated graph sequence with failures produces matching partition_any.
+        
+        This is the key acceptance test for Step 3: given a run row from the
+        dataset, we can reconstruct the exact graph sequence and verify that
+        the computed partition_any matches the stored label.
+        """
+        from satnet.simulation.monte_carlo import (
+            Tier1MonteCarloConfig,
+            generate_tier1_temporal_dataset,
+            runs_to_dicts,
+        )
+        from satnet.simulation.tier1_rollout import (
+            DEFAULT_EPOCH_ISO,
+            Tier1FailureRealization,
+        )
+        from satnet.network.hypatia_adapter import HypatiaAdapter
+        from satnet.metrics.labels import compute_gcc_frac, compute_partitioned
+        from datetime import datetime
+        
+        # Generate a small dataset with failures
+        cfg = Tier1MonteCarloConfig(
+            num_runs=2,
+            num_planes_range=(2, 2),
+            sats_per_plane_range=(3, 3),
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob_range=(0.3, 0.3),
+            edge_failure_prob_range=(0.3, 0.3),
+            seed=42,
+        )
+        
+        runs, _ = generate_tier1_temporal_dataset(cfg)
+        runs_dicts = runs_to_dicts(runs)
+        
+        for row in runs_dicts:
+            # Reconstruct using the contract
+            epoch = datetime.fromisoformat(row.get("epoch_iso", DEFAULT_EPOCH_ISO))
+            failures = Tier1FailureRealization.from_json_strings(
+                row["failed_nodes_json"],
+                row["failed_edges_json"],
+            )
+            
+            adapter = HypatiaAdapter(
+                num_planes=row["num_planes"],
+                sats_per_plane=row["sats_per_plane"],
+                inclination_deg=row["inclination_deg"],
+                altitude_km=row["altitude_km"],
+                epoch=epoch,
+            )
+            adapter.calculate_isls(
+                duration_minutes=row["duration_minutes"],
+                step_seconds=row["step_seconds"],
+            )
+            
+            # Compute partition_any from reconstructed graphs
+            partition_any_reconstructed = 0
+            for t, G in adapter.iter_graphs():
+                G_eff = G.copy()
+                nodes_to_remove = [n for n in failures.failed_nodes if G_eff.has_node(n)]
+                G_eff.remove_nodes_from(nodes_to_remove)
+                for u, v in failures.failed_edges:
+                    if G_eff.has_edge(u, v):
+                        G_eff.remove_edge(u, v)
+                
+                gcc_frac = compute_gcc_frac(G_eff)
+                if compute_partitioned(gcc_frac, 0.8):  # Default threshold
+                    partition_any_reconstructed = 1
+                    break
+            
+            assert partition_any_reconstructed == row["partition_any"], (
+                f"Run {row['run_id']}: reconstructed partition_any="
+                f"{partition_any_reconstructed} != stored={row['partition_any']}. "
+                "Graph reconstruction contract violated."
+            )

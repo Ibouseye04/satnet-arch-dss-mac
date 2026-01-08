@@ -38,6 +38,8 @@ The dataset consists of two tables:
 | `max_partition_streak` | int | ✓ | Longest consecutive run of partitioned steps |
 | `num_failed_nodes` | int | ✓ | Number of nodes that failed (persistent) |
 | `num_failed_edges` | int | ✓ | Number of edges that failed (from t=0) |
+| `failed_nodes_json` | str | ✓ | JSON array of failed node IDs, e.g. `"[1, 5, 12]"` |
+| `failed_edges_json` | str | ✓ | JSON array of failed edge tuples, e.g. `"[[0,1], [3,4]]"` |
 | `seed` | int | ✓ | Random seed used for this run |
 | `config_hash` | str | ✓ | Hash of configuration for reproducibility |
 | `schema_version` | int | ✓ | Schema version (must be 1) |
@@ -57,6 +59,9 @@ The dataset consists of two tables:
 
 **Analysis Columns** (not features, for diagnostics):
 - `num_failed_nodes`, `num_failed_edges`
+
+**Graph Reconstruction Columns** (for ML pipeline):
+- `failed_nodes_json`, `failed_edges_json`
 
 **Metadata**:
 - `run_id`, `seed`, `config_hash`, `schema_version`, `dataset_version`
@@ -102,6 +107,29 @@ Rerunning with identical config + seed must produce bit-identical outputs.
 
 ---
 
+## Graph Reconstruction Contract (Step 3)
+
+To reconstruct the exact graph sequence for ML training:
+
+1. **Parse epoch**: Use `epoch_iso` (or `DEFAULT_EPOCH_ISO` if missing)
+2. **Create adapter**: `HypatiaAdapter(num_planes, sats_per_plane, inclination_deg, altitude_km, epoch=epoch)`
+3. **Calculate ISLs**: `adapter.calculate_isls(duration_minutes, step_seconds)`
+4. **Parse failures**: `Tier1FailureRealization.from_json_strings(failed_nodes_json, failed_edges_json)`
+5. **Apply failures at each step**:
+   ```python
+   for t, G in adapter.iter_graphs():
+       G_eff = G.copy()
+       G_eff.remove_nodes_from([n for n in failures.failed_nodes if G_eff.has_node(n)])
+       for u, v in failures.failed_edges:
+           if G_eff.has_edge(u, v):
+               G_eff.remove_edge(u, v)
+       # G_eff is now the effective graph at time t
+   ```
+
+This ensures regenerated graphs match the `partition_any` labels from simulation.
+
+---
+
 ## Example Usage
 
 ```python
@@ -132,4 +160,5 @@ steps_dicts = steps_to_dicts(steps)
 
 ## Changelog
 
+- **v1.1** (2026-01): Added `failed_nodes_json` and `failed_edges_json` for graph reconstruction contract (Step 3).
 - **v1** (2025-12): Initial schema for Tier 1 temporal connectivity with GCC-based labels.

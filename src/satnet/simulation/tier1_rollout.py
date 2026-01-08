@@ -132,6 +132,50 @@ class Tier1RolloutStep:
 
 
 @dataclass
+class Tier1FailureRealization:
+    """Failure realization for graph reconstruction (Step 3 contract).
+    
+    This dataclass captures the exact failure state sampled during a rollout,
+    enabling ML pipelines to reconstruct identical graph sequences.
+    
+    Attributes:
+        failed_nodes: Set of node IDs that failed (persistent).
+        failed_edges: Set of (u, v) tuples that failed (from t=0, sorted).
+    """
+    failed_nodes: set[int]
+    failed_edges: set[tuple[int, int]]
+    
+    def to_json_strings(self) -> tuple[str, str]:
+        """Serialize to JSON strings for CSV/Parquet export.
+        
+        Returns:
+            Tuple of (failed_nodes_json, failed_edges_json).
+        """
+        import json
+        nodes_list = sorted(self.failed_nodes)
+        edges_list = sorted([list(e) for e in self.failed_edges])
+        return json.dumps(nodes_list), json.dumps(edges_list)
+    
+    @classmethod
+    def from_json_strings(
+        cls, failed_nodes_json: str, failed_edges_json: str
+    ) -> "Tier1FailureRealization":
+        """Deserialize from JSON strings.
+        
+        Args:
+            failed_nodes_json: JSON string like "[1, 5, 12]".
+            failed_edges_json: JSON string like "[[0,1], [3,4]]".
+        
+        Returns:
+            Tier1FailureRealization instance.
+        """
+        import json
+        nodes = set(json.loads(failed_nodes_json))
+        edges = set(tuple(e) for e in json.loads(failed_edges_json))
+        return cls(failed_nodes=nodes, failed_edges=edges)
+
+
+@dataclass
 class Tier1RolloutSummary:
     """Aggregated summary of a Tier 1 temporal rollout.
 
@@ -172,7 +216,7 @@ class Tier1RolloutSummary:
 
 def run_tier1_rollout(
     cfg: Tier1RolloutConfig,
-) -> tuple[list[Tier1RolloutStep], Tier1RolloutSummary]:
+) -> tuple[list[Tier1RolloutStep], Tier1RolloutSummary, Tier1FailureRealization]:
     """
     Execute a Tier 1 temporal rollout using HypatiaAdapter.
 
@@ -192,9 +236,10 @@ def run_tier1_rollout(
         cfg: Tier1RolloutConfig with constellation, time, and failure parameters.
 
     Returns:
-        Tuple of (steps, summary) where:
+        Tuple of (steps, summary, failures) where:
         - steps: List of Tier1RolloutStep for each time step
         - summary: Tier1RolloutSummary with aggregated labels
+        - failures: Tier1FailureRealization for graph reconstruction
     """
     import random
 
@@ -310,5 +355,11 @@ def run_tier1_rollout(
         num_failed_edges=len(failed_edges),
         config_hash=cfg.config_hash(),
     )
+    
+    # Build failure realization for graph reconstruction (Step 3 contract)
+    failures = Tier1FailureRealization(
+        failed_nodes=failed_nodes,
+        failed_edges=failed_edges,
+    )
 
-    return steps, summary
+    return steps, summary, failures

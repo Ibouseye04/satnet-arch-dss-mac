@@ -4,7 +4,15 @@ PyTorch Geometric Dataset for SatNet Temporal GNN Training.
 This module provides a Dataset class that regenerates graph topology on-the-fly
 from the tier1_design_runs.csv configuration file using the HypatiaAdapter.
 
-Target Model: EvolveGCN-O (Thesis Model)
+Graph Reconstruction Contract (Step 3):
+    This dataset implements the Tier 1 graph reconstruction contract:
+    1. Uses epoch_iso from CSV (or DEFAULT_EPOCH_ISO) for deterministic propagation
+    2. Uses duration_minutes and step_seconds from CSV for temporal iteration
+    3. Applies failed_nodes_json and failed_edges_json to match original labels
+    
+    This ensures regenerated graphs match the partition_any labels from simulation.
+
+Target Model: GCLSTM (Thesis Model)
 
 Usage:
     from satnet.models.gnn_dataset import SatNetTemporalDataset
@@ -33,7 +41,7 @@ from torch_geometric.utils import from_networkx
 from datetime import datetime
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
-from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO
+from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO, Tier1FailureRealization
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +133,17 @@ class SatNetTemporalDataset(Dataset):
                 f"CSV missing required columns: {missing}. "
                 f"Available columns: {list(self._df.columns)}"
             )
+        
+        # Check for graph reconstruction columns (Step 3 contract)
+        reconstruction_cols = ["failed_nodes_json", "failed_edges_json"]
+        has_reconstruction = all(c in self._df.columns for c in reconstruction_cols)
+        if not has_reconstruction:
+            logger.warning(
+                "CSV missing failure realization columns (%s). "
+                "Graphs will be regenerated without failures applied. "
+                "Labels may not match regenerated graph metrics.",
+                reconstruction_cols,
+            )
     
     @property
     def raw_dir(self) -> str:
@@ -205,6 +224,17 @@ class SatNetTemporalDataset(Dataset):
         epoch_iso = row.get("epoch_iso", DEFAULT_EPOCH_ISO)
         epoch = datetime.fromisoformat(str(epoch_iso))
         
+        # Get time parameters from CSV or use instance defaults
+        duration_minutes = int(row.get("duration_minutes", self.duration_minutes))
+        step_seconds = int(row.get("step_seconds", self.step_seconds))
+        
+        # Get failure realization from CSV (Step 3 contract)
+        failed_nodes_json = row.get("failed_nodes_json", "[]")
+        failed_edges_json = row.get("failed_edges_json", "[]")
+        failures = Tier1FailureRealization.from_json_strings(
+            str(failed_nodes_json), str(failed_edges_json)
+        )
+        
         # Instantiate HypatiaAdapter with explicit epoch for reproducibility
         adapter = HypatiaAdapter(
             num_planes=num_planes,
@@ -217,16 +247,23 @@ class SatNetTemporalDataset(Dataset):
         
         # Calculate ISLs for the specified duration
         adapter.calculate_isls(
-            duration_minutes=self.duration_minutes,
-            step_seconds=self.step_seconds,
+            duration_minutes=duration_minutes,
+            step_seconds=step_seconds,
         )
         
         # Convert each time step to PyG Data
         data_list = []
         
         for time_step, G in adapter.iter_graphs():
+            # Apply persistent failures (Step 3 contract)
+            G_eff = G.copy()
+            nodes_to_remove = [n for n in failures.failed_nodes if G_eff.has_node(n)]
+            G_eff.remove_nodes_from(nodes_to_remove)
+            for u, v in failures.failed_edges:
+                if G_eff.has_edge(u, v):
+                    G_eff.remove_edge(u, v)
             data = self._networkx_to_pyg_data(
-                G=G,
+                G=G_eff,
                 label=label,
                 run_id=idx,
                 time_step=time_step,

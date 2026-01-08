@@ -11,6 +11,7 @@ import pytest
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
     SCHEMA_VERSION,
+    Tier1FailureRealization,
     Tier1RolloutConfig,
     Tier1RolloutStep,
     Tier1RolloutSummary,
@@ -181,6 +182,66 @@ class TestTier1RolloutSummary:
         assert d["schema_version"] == SCHEMA_VERSION
 
 
+class TestTier1FailureRealization:
+    """Tests for Tier1FailureRealization dataclass (Step 3 contract)."""
+
+    def test_instantiation(self) -> None:
+        """Can instantiate with sets."""
+        failures = Tier1FailureRealization(
+            failed_nodes={1, 5, 12},
+            failed_edges={(0, 1), (3, 4)},
+        )
+        assert failures.failed_nodes == {1, 5, 12}
+        assert failures.failed_edges == {(0, 1), (3, 4)}
+
+    def test_to_json_strings(self) -> None:
+        """to_json_strings serializes to sorted JSON."""
+        failures = Tier1FailureRealization(
+            failed_nodes={12, 1, 5},
+            failed_edges={(3, 4), (0, 1)},
+        )
+        nodes_json, edges_json = failures.to_json_strings()
+        
+        assert nodes_json == "[1, 5, 12]"  # Sorted
+        assert edges_json == "[[0, 1], [3, 4]]"  # Sorted
+
+    def test_from_json_strings(self) -> None:
+        """from_json_strings deserializes correctly."""
+        failures = Tier1FailureRealization.from_json_strings(
+            "[1, 5, 12]",
+            "[[0, 1], [3, 4]]",
+        )
+        assert failures.failed_nodes == {1, 5, 12}
+        assert failures.failed_edges == {(0, 1), (3, 4)}
+
+    def test_roundtrip_serialization(self) -> None:
+        """Serialize then deserialize produces identical data."""
+        original = Tier1FailureRealization(
+            failed_nodes={1, 5, 12},
+            failed_edges={(0, 1), (3, 4)},
+        )
+        nodes_json, edges_json = original.to_json_strings()
+        restored = Tier1FailureRealization.from_json_strings(nodes_json, edges_json)
+        
+        assert restored.failed_nodes == original.failed_nodes
+        assert restored.failed_edges == original.failed_edges
+
+    def test_empty_failures(self) -> None:
+        """Empty failures serialize correctly."""
+        failures = Tier1FailureRealization(
+            failed_nodes=set(),
+            failed_edges=set(),
+        )
+        nodes_json, edges_json = failures.to_json_strings()
+        
+        assert nodes_json == "[]"
+        assert edges_json == "[]"
+        
+        restored = Tier1FailureRealization.from_json_strings(nodes_json, edges_json)
+        assert len(restored.failed_nodes) == 0
+        assert len(restored.failed_edges) == 0
+
+
 class TestNoToyTopologyImport:
     """Verify that tier1_rollout module has no toy topology dependency."""
 
@@ -205,9 +266,10 @@ class TestNoToyTopologyImport:
 class TestRunTier1Rollout:
     """Tests for run_tier1_rollout function."""
 
-    def test_rollout_returns_steps_and_summary(self) -> None:
-        """run_tier1_rollout returns (steps, summary) tuple."""
+    def test_rollout_returns_steps_summary_and_failures(self) -> None:
+        """run_tier1_rollout returns (steps, summary, failures) tuple."""
         from satnet.simulation.tier1_rollout import (
+            Tier1FailureRealization,
             Tier1RolloutConfig,
             Tier1RolloutStep,
             Tier1RolloutSummary,
@@ -221,10 +283,11 @@ class TestRunTier1Rollout:
             step_seconds=60,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, failures = run_tier1_rollout(cfg)
 
         assert isinstance(steps, list)
         assert isinstance(summary, Tier1RolloutSummary)
+        assert isinstance(failures, Tier1FailureRealization)
         assert all(isinstance(s, Tier1RolloutStep) for s in steps)
 
     def test_rollout_step_count_matches_config(self) -> None:
@@ -241,7 +304,7 @@ class TestRunTier1Rollout:
             step_seconds=60,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
 
         # 2 minutes at 60s = 3 steps (0, 1, 2)
         assert len(steps) == 3
@@ -261,7 +324,7 @@ class TestRunTier1Rollout:
             step_seconds=60,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
 
         for step in steps:
             assert 0.0 <= step.gcc_frac <= 1.0
@@ -285,7 +348,7 @@ class TestRunTier1Rollout:
             edge_failure_prob=0.0,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, failures = run_tier1_rollout(cfg)
 
         # With no failures, all nodes should be present
         assert steps[0].num_nodes == cfg.total_satellites
@@ -294,6 +357,8 @@ class TestRunTier1Rollout:
         assert 0.0 <= summary.gcc_frac_min <= 1.0
         assert summary.num_failed_nodes == 0
         assert summary.num_failed_edges == 0
+        assert len(failures.failed_nodes) == 0
+        assert len(failures.failed_edges) == 0
 
     def test_rollout_with_node_failures(self) -> None:
         """Node failures reduce node count."""
@@ -312,10 +377,11 @@ class TestRunTier1Rollout:
             seed=42,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, failures = run_tier1_rollout(cfg)
 
         # With 50% node failure prob, expect some failures
         assert summary.num_failed_nodes > 0
+        assert len(failures.failed_nodes) == summary.num_failed_nodes
         # Node count should be less than total
         total_sats = cfg.total_satellites
         assert steps[0].num_nodes < total_sats
@@ -338,13 +404,14 @@ class TestRunTier1Rollout:
             seed=42,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, failures = run_tier1_rollout(cfg)
 
         # With 50% edge failure prob on a larger constellation, expect some failures
         # (only if edges exist at t=0 - depends on physics)
         # Just verify the rollout completes and produces valid output
         assert summary.num_steps == 2
         assert 0.0 <= summary.gcc_frac_min <= 1.0
+        assert len(failures.failed_edges) == summary.num_failed_edges
 
     def test_rollout_deterministic_with_seed(self) -> None:
         """Same seed produces identical results."""
@@ -363,13 +430,15 @@ class TestRunTier1Rollout:
             seed=12345,
         )
 
-        steps1, summary1 = run_tier1_rollout(cfg)
-        steps2, summary2 = run_tier1_rollout(cfg)
+        steps1, summary1, failures1 = run_tier1_rollout(cfg)
+        steps2, summary2, failures2 = run_tier1_rollout(cfg)
 
         # Results should be identical
         assert summary1.num_failed_nodes == summary2.num_failed_nodes
         assert summary1.num_failed_edges == summary2.num_failed_edges
         assert summary1.gcc_frac_min == summary2.gcc_frac_min
+        assert failures1.failed_nodes == failures2.failed_nodes
+        assert failures1.failed_edges == failures2.failed_edges
 
     def test_rollout_config_hash_in_summary(self) -> None:
         """Summary includes config hash."""
@@ -385,7 +454,7 @@ class TestRunTier1Rollout:
             step_seconds=60,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
 
         assert summary.config_hash == cfg.config_hash()
         assert len(summary.config_hash) == 16
@@ -408,7 +477,7 @@ class TestRunTier1Rollout:
             seed=42,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
 
         assert math.isfinite(summary.gcc_frac_min)
         assert math.isfinite(summary.gcc_frac_mean)

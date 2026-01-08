@@ -100,7 +100,7 @@ This plan is designed to be executed as **small, verifiable PRs**.
 ### M2) Link budget constants are uncited; one parameter is likely inappropriate for ISLs
 
 - Link budget constants are plausible but lack citations.
-- `RF_RAIN_MARGIN_DB` is a red flag for space-to-space ISLs.
+- `RF_RAIN_MARGIN_DB` is a red flag for space-to-space ISLs (rain attenuation is an Earth-space path concern).
 
 ### M3) Environment-dependent physics fidelity (optional dependency fallback)
 
@@ -110,7 +110,8 @@ This plan is designed to be executed as **small, verifiable PRs**.
 ### M4) Simplified TEME→ECEF transform
 
 - Implemented as GMST Z-rotation; not a full TEME→ITRS transform.
-- **Risk:** LOS/obscuration edge flips near grazing thresholds.
+- **Phase 1 note (satellite-only):** our ISL topology checks are based on inter-satellite distance and Earth-center line-of-sight with a spherical Earth model. These are invariant under any rigid rotation of the entire constellation, so a higher-fidelity TEME→ITRS/ITRF transform is **not expected** to change Phase 1 ISL edge existence.
+- **Phase 2 note (deferred):** a rigorous TEME→ITRS/ITRF transform becomes critical once we introduce any Earth-fixed quantity (e.g., ground station visibility / Earth rotation / geodetic computations used by labels).
 
 ### M5) Persistent edge failures sampled from `t=0` edge set only
 
@@ -146,6 +147,7 @@ This plan is designed to be executed as **small, verifiable PRs**.
 - **Action:** Add/extend tests that assert:
   - no `datetime.utcnow()` default epoch is reachable from Tier 1 entrypoints,
   - no code path used by Tier 1 scripts calls `get_graph_at_step(0)` and stops.
+  - satellite-only geometry invariance sanity check: `_check_line_of_sight(r1, r2)` is unchanged under a shared rigid rotation applied to both endpoints (guards against introducing non-invariant Earth-fixed logic in Phase 1).
 
 - **Acceptance:** `pytest` runs quickly locally and fails loudly on regressions.
 
@@ -182,9 +184,11 @@ This plan is designed to be executed as **small, verifiable PRs**.
   - Time parameters per run (`duration_minutes`, `step_seconds`).
   - Failure realization applied to graphs (not just failure probabilities).
 
-- **Implementation direction:**
+ - **Implementation direction:**
   - Extend dataset export to persist failure masks/lists per run (preferred), or
   - Persist enough determinism inputs to regenerate the exact same failures (risky if topology varies).
+
+  **Repo note:** the Tier 1 runs table already contains the key ingredients (`epoch_iso`, `seed`, `failed_nodes_json`, `failed_edges_json`). The remaining work is to enforce their presence in the schema and ensure `src/satnet/models/gnn_dataset.py` consumes them during graph regeneration.
 
 - **Acceptance:**
   - A unit test can take one exported run row and regenerate a temporal sequence whose aggregate label matches (`partition_any`).
@@ -195,8 +199,8 @@ This plan is designed to be executed as **small, verifiable PRs**.
   - **Hardware pair failure:** (u,v) link terminals fail and the edge can never appear.
   - **Time-specific link outage:** edges fail per step with some process.
 
-- **If hardware-pair semantics:** sample from a stable candidate set (e.g., +Grid neighbor pairs), not `G0.edges()`.
-- **If time-specific semantics:** introduce per-step outages (still Phase 1 satellite-only).
+ - **If hardware-pair semantics:** sample from a stable candidate set (e.g., the deterministic +Grid neighbor pairs implied by the adapter), not `G0.edges()`.
+ - **If time-specific semantics:** introduce per-step outages (still Phase 1 satellite-only).
 
 - **Acceptance:**
   - Dataset schema clearly encodes the semantics.
@@ -204,18 +208,16 @@ This plan is designed to be executed as **small, verifiable PRs**.
 
 ## Step 5 — Physics fidelity boundaries: coordinate transforms + link budget citations
 
-- **Action (coordinate transforms):**
-  - Either adopt a higher-fidelity TEME→ITRS transform, or
-  - Keep the approximation but implement a validation protocol:
-    - quantify edge/LOS mismatch rates vs a reference at grazing thresholds.
+ - **Action (coordinate transforms):**
+  - Phase 1: treat transform fidelity primarily as a documentation + validation item (the satellite-only LOS/distance checks are rotation-invariant).
+  - Phase 2: adopt a higher-fidelity TEME→ITRS/ITRF transform before introducing any ground-station/earth-fixed logic.
 
-- **Action (link budgets):**
+ - **Action (link budgets):**
   - Move optical/RF constants to a cited configuration layer.
   - Remove/disable rain margin for ISLs (or justify with citations if retained).
 
 - **Acceptance:**
   - A `docs/` page exists listing all constants with citations.
-  - Any approximations have bounded error claims (or explicit “unknown”).
 
 ## Step 6 — Dependency pinning strategy for Tier 1 reproducibility
 

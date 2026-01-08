@@ -27,6 +27,7 @@ from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
     DEFAULT_EPOCH_ISO,
     SCHEMA_VERSION,
+    Tier1FailureRealization,
     Tier1RolloutConfig,
     Tier1RolloutStep,
     Tier1RolloutSummary,
@@ -91,6 +92,13 @@ class Tier1RunRow:
 
     Contains design-time features and temporal aggregate labels.
     No post-failure leakage (features are design inputs only).
+    
+    Graph Reconstruction Contract (Step 3):
+        To reconstruct the exact graph sequence for ML training:
+        1. Use epoch_iso, duration_minutes, step_seconds with HypatiaAdapter
+        2. Parse failed_nodes_json and failed_edges_json
+        3. Apply failures at each time step
+        This ensures regenerated graphs match the original labels.
     """
 
     run_id: int
@@ -122,9 +130,17 @@ class Tier1RunRow:
     num_failed_nodes: int
     num_failed_edges: int
 
-    # Metadata
+    # Metadata (non-default fields)
     seed: int
     config_hash: str
+
+    # Failure realization (for graph reconstruction)
+    # JSON-encoded lists: failed_nodes_json = "[1, 5, 12]"
+    # failed_edges_json = "[[0,1], [3,4]]" (sorted tuples)
+    failed_nodes_json: str = "[]"
+    failed_edges_json: str = "[]"
+
+    # Metadata (with defaults)
     epoch_iso: str = DEFAULT_EPOCH_ISO
     schema_version: int = SCHEMA_VERSION
     dataset_version: str = DATASET_VERSION
@@ -221,7 +237,10 @@ def generate_tier1_temporal_dataset(
         )
 
         # Execute rollout
-        steps, summary = run_tier1_rollout(rollout_cfg)
+        steps, summary, failures = run_tier1_rollout(rollout_cfg)
+        
+        # Serialize failure realization for graph reconstruction (Step 3 contract)
+        failed_nodes_json, failed_edges_json = failures.to_json_strings()
 
         # Build run row
         run_row = Tier1RunRow(
@@ -243,6 +262,8 @@ def generate_tier1_temporal_dataset(
             max_partition_streak=summary.max_partition_streak,
             num_failed_nodes=summary.num_failed_nodes,
             num_failed_edges=summary.num_failed_edges,
+            failed_nodes_json=failed_nodes_json,
+            failed_edges_json=failed_edges_json,
             seed=run_seed,
             config_hash=summary.config_hash,
             epoch_iso=rollout_cfg.epoch_iso,
@@ -300,6 +321,8 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "max_partition_streak",
     "num_failed_nodes",
     "num_failed_edges",
+    "failed_nodes_json",
+    "failed_edges_json",
     "seed",
     "config_hash",
     "epoch_iso",
