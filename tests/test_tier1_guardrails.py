@@ -521,9 +521,10 @@ class TestFailureSemantics:
             run_tier1_rollout,
         )
         
+        # Use larger constellation to ensure edges exist at t=0
         cfg = Tier1RolloutConfig(
-            num_planes=3,
-            sats_per_plane=4,
+            num_planes=6,
+            sats_per_plane=10,
             duration_minutes=1,
             step_seconds=60,
             edge_failure_prob=1.0,  # 100% failure rate
@@ -536,8 +537,11 @@ class TestFailureSemantics:
         # With 100% edge failure prob, all t=0 edges should fail
         # The number of failed edges should equal the t=0 edge count
         assert summary.num_failed_edges == len(failures.failed_edges)
-        # All failed edges should be in the failure realization
-        assert len(failures.failed_edges) > 0, "Expected some edges at t=0"
+        # Larger constellation should have edges at t=0
+        assert len(failures.failed_edges) > 0, (
+            "Expected edges at t=0 for 6x10 constellation. "
+            "If this fails, the constellation may be too sparse."
+        )
 
     def test_node_failures_are_persistent(self) -> None:
         """Node failures persist across all time steps."""
