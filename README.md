@@ -1,294 +1,168 @@
-# satnet-arch-dss
+# satnet-arch-dss (Tier 1)
 
 **Satellite Network Architecture Decision Support System (DSS)**
 
-This repo implements a simulation + machine learning pipeline that helps a
-satellite network architect estimate **partition risk** for LEO constellations
-under stochastic failures.
+This repository is the **Tier 1** refactor: a physics-compliant, **time-evolving** LEO constellation connectivity simulator plus ML baselines for estimating **partition risk** under persistent failures.
 
-The system:
-
-1. Generates parameterized satellite network topologies.
-2. Samples node/link failures according to environment assumptions.
-3. Computes network connectivity / partition outcomes.
-4. Builds two ML models:
-   - **Outcome-aware model (Model A)** – oracle upper bound using post-failure metrics.
-   - **Design-time model (Model B)** – thesis model that predicts partition risk
-     *only from design-time parameters* (architecture + failure probabilities).
+For the advisor-facing architecture narrative and methodology framing, see `README_THESIS.md`.
 
 ---
 
-## Project Structure
+## Tier 1 guardrails (Phase 1)
+
+- **No toy topology**: `satnet.network.topology` is not used in `src/`.
+- **Temporal, not static**: rollouts evaluate connectivity over **t = 0..T**.
+- **Satellite-to-satellite only**: no ground stations/gateways in Phase 1.
+- **Deterministic**: explicit `seed` + fixed epoch (`DEFAULT_EPOCH_ISO`) for reproducibility.
+
+## Architecture (three layers)
+
+- **Physics layer**: `src/satnet/network/hypatia_adapter.py`
+- **Simulation layer**: `src/satnet/simulation/tier1_rollout.py` and `src/satnet/simulation/monte_carlo.py`
+- **Metrics/labels layer (pure)**: `src/satnet/metrics/labels.py`
+
+## Project structure
 
 ```text
-satnet-arch-dss/
-├── src/
-│   └── satnet/
-│       ├── network/
-│       │   └── topology.py       # Parametric constellation generator
-│       ├── simulation/
-│       │   ├── failures.py       # Failure sampling + impact computation
-│       │   └── monte_carlo.py    # Monte Carlo + dataset generators
-│       └── models/
-│           └── risk_model.py     # ML models + training helpers
-├── scripts/
-│   ├── simulate.py               # Simple one-off simulation run
-│   ├── failure_sweep.py          # Summary stats over many runs
-│   ├── export_failure_dataset.py # Outcome-aware dataset (Model A)
-│   ├── export_design_dataset.py  # Design-time dataset (Model B)
-│   ├── train_risk_model.py       # Train outcome-aware model
-│   └── train_design_risk_model.py# Train design-time model
-├── Data/
-│   ├── failure_dataset.csv       # (generated) outcome-aware samples
-│   └── design_failure_dataset.csv# (generated) design-time samples
-├── models/
-│   ├── risk_model.joblib         # (generated) Model A
-│   └── design_risk_model.joblib  # (generated) Model B
-└── README.md
-Installation
-Requires Python 3.11+ (you’re using 3.14 locally).
+src/satnet/
+  network/hypatia_adapter.py      # Tier 1 physics: SGP4 + ISLs + link budgets
+  simulation/tier1_rollout.py     # Temporal rollout: failures + t=0..T evaluation
+  simulation/monte_carlo.py       # Dataset generation + schema validation
+  metrics/labels.py               # Pure GCC / partition labels
+  models/
+    risk_model.py                 # RandomForest baselines (Tier 1 + legacy)
+    gnn_dataset.py                # PyG dataset (reconstruct graphs on-the-fly)
+    gnn_model.py                  # GCLSTM thesis model
+  legacy/                         # Quarantined Tier-0-era artifacts
+scripts/
+  export_design_dataset.py        # Writes data/tier1_design_{runs,steps}.csv
+  export_failure_dataset.py       # Writes data/tier1_failure_{runs,steps}.csv
+  failure_sweep.py                # Quick aggregate sweep (Tier 1 pipeline)
+  train_design_risk_model.py      # Baseline RF on tier1_design_runs.csv
+  train_gnn_model.py              # Temporal GNN training (optional)
+docs/datasets/
+  tier1_temporal_connectivity_v1_schema.md
+```
 
-bash
-Copy code
-git clone https://github.com/Alexsabatino/satnet-arch-dss.git
-cd satnet-arch-dss
+## Installation
 
+Requires **Python 3.11+**.
+
+```bash
 python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# Linux/macOS
-# source .venv/bin/activate
-
+source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install networkx pandas scikit-learn joblib
-(If you add a requirements.txt later, this becomes pip install -r requirements.txt.)
 
-Quickstart: Run a Simulation
-From the project root:
+# Core + dev (pytest)
+python -m pip install -e '.[dev]'
 
-bash
-Copy code
-python scripts/simulate.py
-Expected console output (example):
+# Baseline ML (RandomForest)
+python -m pip install scikit-learn
 
-text
-Copy code
-=== Simulation Started ===
-Nodes: 24
-Edges: 40
-Bottlenecks detected: 0
-=== Simulation Complete ===
-This verifies that:
+# Optional: temporal GNN dependencies
+python -m pip install -r requirements_ml.txt
 
-topology generation works
+# Optional: visualization helper
+python -m pip install matplotlib
+```
 
-failure engine runs
+## Verify
 
-basic connectivity metrics are computed
+```bash
+pytest -q
+```
 
-Generate Datasets
-1. Outcome-aware dataset (Model A – upper bound)
-bash
-Copy code
+## Quickstart: run a single Tier 1 rollout
+
+This runs a small constellation for a short duration and prints temporal connectivity metrics.
+
+```bash
+python - <<'PY'
+from satnet.simulation.tier1_rollout import Tier1RolloutConfig, run_tier1_rollout
+
+cfg = Tier1RolloutConfig(
+    num_planes=2,
+    sats_per_plane=3,
+    duration_minutes=3,
+    step_seconds=60,
+    gcc_threshold=0.8,
+    node_failure_prob=0.10,
+    edge_failure_prob=0.10,
+    seed=42,
+)
+
+steps, summary, failures = run_tier1_rollout(cfg)
+
+print("=== Tier 1 Rollout Summary ===")
+print(f"config_hash:        {summary.config_hash}")
+print(f"num_steps:          {summary.num_steps}")
+print(f"gcc_frac_min:       {summary.gcc_frac_min:.3f}")
+print(f"gcc_frac_mean:      {summary.gcc_frac_mean:.3f}")
+print(f"partition_any:      {summary.partition_any}")
+print(f"partition_fraction: {summary.partition_fraction:.3f}")
+print(f"failed_nodes:       {summary.num_failed_nodes}")
+print(f"failed_edges:       {summary.num_failed_edges}")
+
+print("\nFirst 3 steps:")
+for s in steps[:3]:
+    print(f"t={s.t:2d} | nodes={s.num_nodes:3d} | edges={s.num_edges:3d} | gcc_frac={s.gcc_frac:.3f} | partitioned={s.partitioned}")
+
+print("\nFailure realization (for reconstruction):")
+print(f"failed_nodes sample: {sorted(list(failures.failed_nodes))[:10]}")
+print(f"failed_edges sample: {sorted(list(failures.failed_edges))[:5]}")
+PY
+```
+
+## Generate datasets (Tier 1)
+
+### Design dataset (canonical)
+
+```bash
+python scripts/export_design_dataset.py --num-runs 200 --seed 42
+```
+
+Outputs:
+
+- `data/tier1_design_runs.csv`
+- `data/tier1_design_steps.csv`
+
+### Failure dataset (same pipeline, different defaults)
+
+```bash
 python scripts/export_failure_dataset.py
-This writes:
+```
 
-Data/failure_dataset.csv
+Outputs:
 
-Each row includes:
+- `data/tier1_failure_runs.csv`
+- `data/tier1_failure_steps.csv`
 
-pre-failure graph metrics
+## Train models
 
-realized failures (failed nodes/edges)
+### Baseline: design-time RandomForest
 
-post-failure largest component size
-
-binary label partitioned
-
-Used only for the oracle / sanity-check model.
-
-2. Design-time dataset (Model B – thesis model)
-bash
-Copy code
-python scripts/export_design_dataset.py
-This:
-
-Sweeps over a grid of architectures and failure assumptions:
-
-num_satellites ∈ {16, 24, 32}
-
-num_ground_stations ∈ {2, 4, 6}
-
-isl_degree ∈ {2, 4, 6}
-
-node_failure_prob ∈ {0.01, 0.03, 0.05}
-
-edge_failure_prob ∈ {0.01, 0.03, 0.05}
-
-Runs multiple Monte Carlo realizations per scenario.
-
-Writes Data/design_failure_dataset.csv.
-
-Each row has:
-
-Architecture features: num_nodes_0, num_edges_0, avg_degree_0,
-num_satellites, num_ground_stations, isl_degree
-
-Failure assumptions: node_failure_prob, edge_failure_prob
-
-Label: partitioned (1 if the network partitions under that realization, else 0)
-
-This dataset is pure design-time: no post-failure features are used as inputs.
-
-Train the Models
-Model A – Outcome-aware (sanity check / upper bound)
-bash
-Copy code
-python scripts/train_risk_model.py
-Example output:
-
-text
-Copy code
-Loading dataset from Data/failure_dataset.csv ...
-Saved model to models/risk_model.joblib
-=== Evaluation Metrics (test split) ===
-Accuracy: 1.000
-ROC AUC: 1.000
-...
-This uses post-failure metrics (e.g., largest component ratio) and is expected to
-be near-oracle performance. It’s mainly used to validate that the simulation and
-labeling logic are consistent.
-
-Model B – Design-time (thesis model)
-bash
-Copy code
+```bash
 python scripts/train_design_risk_model.py
-Example output (what we observed):
+```
 
-text
-Copy code
-Loading design dataset from Data/design_failure_dataset.csv ...
-Saved design-time model to models/design_risk_model.joblib
-=== Design-Time Model Metrics (test split) ===
-Accuracy: 0.685
-ROC AUC: 0.733
-Confusion matrix [ [TN, FP], [FN, TP] ]:
-[[719, 378], [388, 945]]
+Outputs:
 
-Top design feature importances:
-  node_failure_prob: 0.681
-  edge_failure_prob: 0.100
-  num_nodes_0: 0.069
-  num_satellites: 0.050
-  num_edges_0: 0.039
-  avg_degree_0: 0.033
-  isl_degree: 0.016
-  num_ground_stations: 0.013
-Interpretation:
+- `models/design_risk_model_tier1.joblib`
+- `models/design_risk_model_tier1_metrics.json`
 
-AUC ~0.73 → nontrivial predictive signal from design-time features only.
+### Thesis model: temporal GNN (optional)
 
-Dominant drivers: node_failure_prob, edge_failure_prob.
+```bash
+python scripts/train_gnn_model.py --data-dir data/ --device auto
+```
 
-Architectural knobs (sat count, connectivity, ISLs, GSs) have smaller but
-non-zero influence, matching engineering intuition.
+Output:
 
-What the Design-Time Model Does
-The design-time model estimates:
+- `models/satellite_gnn.pt`
 
-P(partition | architecture, failure environment)
+## Legacy artifacts (kept for backward compatibility)
 
-Given:
+Some scripts/models still target the **legacy** `Data/failure_dataset.csv` format (pre–Tier 1). They are not part of the Tier 1 dataset contract:
 
-num_satellites
-
-num_ground_stations
-
-isl_degree
-
-Derived graph metrics (num_nodes_0, num_edges_0, avg_degree_0)
-
-Assumed node_failure_prob, edge_failure_prob
-
-it predicts the probability that the constellation will partition under those
-conditions, without seeing any post-failure state.
-
-This is intended as a decision support tool for a satellite network
-architect / engineering manager:
-
-Compare candidate architectures under the same environment.
-
-Understand how risk shifts as failure rates or ISL degree change.
-
-Use model outputs to prioritize detailed simulations on the riskiest designs.
-
-How This Fits a Praxis / Thesis
-This repo supports a praxis / thesis framed roughly as:
-
-“An AI-assisted decision support tool for satellite network architecture risk.
-Given parametric constellation designs and probabilistic failure assumptions,
-we use Monte Carlo simulation to label partition outcomes and train a
-design-time classifier that predicts network partition risk from
-architecture-level features alone.”
-
-Key contributions:
-
-Simulation-backed labeling
-Partition labels are derived from graph connectivity metrics after sampled
-failures, not assumed.
-
-Outcome-aware vs design-time models
-
-Outcome-aware model shows an upper bound and validates the pipeline.
-
-Design-time model demonstrates that useful risk structure is learnable
-from high-level design parameters.
-
-Explainable drivers of risk
-Feature importances quantify how much environment vs architecture drive
-partition risk, grounding the ML model in engineering terms.
-
-Reproducibility
-To reproduce main results:
-
-bash
-Copy code
-# 1. Create virtual env and install deps
-python -m venv .venv
-.venv\Scripts\activate
-pip install networkx pandas scikit-learn joblib
-
-# 2. Generate datasets
-python scripts/export_failure_dataset.py
-python scripts/export_design_dataset.py
-
-# 3. Train models
-python scripts/train_risk_model.py
-python scripts/train_design_risk_model.py
-Metrics and feature importances are written to:
-
-models/risk_model_metrics.json
-
-models/design_risk_model_metrics.json
-
-Next Extensions (Ideas)
-Add richer graph features (clustering coefficient, algebraic connectivity).
-
-Calibrate probabilities (Platt / isotonic) for risk thresholds.
-
-Integrate simple web UI where an engineer can slide num_satellites,
-isl_degree, node_failure_prob, etc., and see risk scores live.
-
-yaml
-Copy code
-
----
-
-## 2. Commit + push the README
-
-In the repo root:
-
-```powershell
-git add README.md
-git commit -m "Add README with simulation + design-time model details"
-git push
+- `scripts/train_risk_model.py`
+- `scripts/score_risk_examples.py`

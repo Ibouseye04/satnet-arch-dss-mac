@@ -73,7 +73,7 @@ class TestRolloutShapes:
             step_seconds=60,
         )
 
-        steps, summary = run_tier1_rollout(cfg)
+        steps, summary, _ = run_tier1_rollout(cfg)
 
         # 3 minutes at 60s = 4 steps (0, 1, 2, 3)
         expected_steps = 4
@@ -94,7 +94,7 @@ class TestRolloutShapes:
             step_seconds=60,
         )
 
-        steps, _ = run_tier1_rollout(cfg)
+        steps, _, _ = run_tier1_rollout(cfg)
 
         step_indices = [s.t for s in steps]
         expected = list(range(len(steps)))
@@ -204,8 +204,8 @@ class TestDeterminism:
             seed=99999,
         )
 
-        steps1, summary1 = run_tier1_rollout(cfg)
-        steps2, summary2 = run_tier1_rollout(cfg)
+        steps1, summary1, _ = run_tier1_rollout(cfg)
+        steps2, summary2, _ = run_tier1_rollout(cfg)
 
         # Summaries should be identical
         assert summary1.gcc_frac_min == summary2.gcc_frac_min
