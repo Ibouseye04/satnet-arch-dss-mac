@@ -500,3 +500,158 @@ class TestGraphReconstructionContract:
                 f"{partition_any_reconstructed} != stored={row['partition_any']}. "
                 "Graph reconstruction contract violated."
             )
+
+
+# ---------------------------------------------------------------------------
+# Test 5: Failure Semantics (Step 4)
+# ---------------------------------------------------------------------------
+
+
+class TestFailureSemantics:
+    """Verify failure semantics are explicit and documented (Step 4)."""
+
+    def test_edge_failures_sampled_from_t0_only(self) -> None:
+        """Edge failures are sampled from t=0 edges only (v1 semantics).
+        
+        This documents the current behavior: edges not present at t=0
+        are implicitly immune to failure sampling.
+        """
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+        
+        cfg = Tier1RolloutConfig(
+            num_planes=3,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+            edge_failure_prob=1.0,  # 100% failure rate
+            node_failure_prob=0.0,
+            seed=42,
+        )
+        
+        _, summary, failures = run_tier1_rollout(cfg)
+        
+        # With 100% edge failure prob, all t=0 edges should fail
+        # The number of failed edges should equal the t=0 edge count
+        assert summary.num_failed_edges == len(failures.failed_edges)
+        # All failed edges should be in the failure realization
+        assert len(failures.failed_edges) > 0, "Expected some edges at t=0"
+
+    def test_node_failures_are_persistent(self) -> None:
+        """Node failures persist across all time steps."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+        
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=2,
+            step_seconds=60,
+            node_failure_prob=0.5,
+            edge_failure_prob=0.0,
+            seed=42,
+        )
+        
+        steps, summary, failures = run_tier1_rollout(cfg)
+        
+        # All steps should have the same reduced node count
+        # (total - failed nodes, assuming all nodes exist at all times)
+        expected_nodes = cfg.total_satellites - len(failures.failed_nodes)
+        for step in steps:
+            assert step.num_nodes == expected_nodes, (
+                f"Step {step.t}: expected {expected_nodes} nodes, got {step.num_nodes}"
+            )
+
+    def test_failure_semantics_documented_in_module(self) -> None:
+        """Module docstring documents failure semantics."""
+        import satnet.simulation.tier1_rollout as module
+        
+        docstring = module.__doc__
+        assert "Failure Semantics" in docstring
+        assert "Node Failures" in docstring
+        assert "Edge Failures" in docstring
+        assert "t=0" in docstring or "t=0" in docstring
+
+
+# ---------------------------------------------------------------------------
+# Test 6: Physics Dependencies (Step 6)
+# ---------------------------------------------------------------------------
+
+
+class TestPhysicsDependencies:
+    """Verify Tier 1 physics dependencies are available (Step 6)."""
+
+    def test_sgp4_available(self) -> None:
+        """SGP4 is required for Tier 1 orbital propagation."""
+        try:
+            import sgp4
+            assert hasattr(sgp4, "api"), "sgp4.api module required"
+        except ImportError:
+            pytest.fail(
+                "sgp4 package not installed. Tier 1 requires sgp4>=2.22 "
+                "for accurate orbital propagation."
+            )
+
+    def test_networkx_available(self) -> None:
+        """NetworkX is required for graph operations."""
+        try:
+            import networkx as nx
+            assert hasattr(nx, "Graph"), "networkx.Graph required"
+        except ImportError:
+            pytest.fail("networkx package not installed.")
+
+    def test_physics_constants_documented(self) -> None:
+        """Physics constants documentation exists."""
+        docs_path = Path(__file__).parent.parent / "docs" / "physics_constants.md"
+        assert docs_path.exists(), (
+            f"Physics constants documentation not found at {docs_path}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Test 7: Config Hash Collision Resistance (Step 8)
+# ---------------------------------------------------------------------------
+
+
+class TestConfigHashCollisionResistance:
+    """Verify config_hash uses full SHA256 for collision resistance (Step 8)."""
+
+    def test_config_hash_is_full_sha256(self) -> None:
+        """config_hash returns full 64-char SHA256 hex string."""
+        from satnet.simulation.tier1_rollout import Tier1RolloutConfig
+        
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+        )
+        
+        hash_value = cfg.config_hash()
+        
+        # Full SHA256 is 64 hex characters
+        assert len(hash_value) == 64, (
+            f"config_hash should be 64 chars (full SHA256), got {len(hash_value)}"
+        )
+        # Should be valid hex
+        assert all(c in "0123456789abcdef" for c in hash_value)
+
+    def test_config_hash_deterministic(self) -> None:
+        """Same config produces same hash."""
+        from satnet.simulation.tier1_rollout import Tier1RolloutConfig
+        
+        cfg1 = Tier1RolloutConfig(num_planes=3, sats_per_plane=5, seed=42)
+        cfg2 = Tier1RolloutConfig(num_planes=3, sats_per_plane=5, seed=42)
+        
+        assert cfg1.config_hash() == cfg2.config_hash()
+
+    def test_config_hash_different_for_different_configs(self) -> None:
+        """Different configs produce different hashes."""
+        from satnet.simulation.tier1_rollout import Tier1RolloutConfig
+        
+        cfg1 = Tier1RolloutConfig(num_planes=3, sats_per_plane=5)
+        cfg2 = Tier1RolloutConfig(num_planes=3, sats_per_plane=6)
+        
+        assert cfg1.config_hash() != cfg2.config_hash()

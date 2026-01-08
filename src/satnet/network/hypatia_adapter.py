@@ -246,14 +246,16 @@ class LinkBudgetEngine:
         return received_power_dbm, margin_db, link_viable
     
     def compute_rf_link_budget(
-        self, distance_km: float, include_rain_margin: bool = True
+        self, distance_km: float, include_rain_margin: bool = False
     ) -> Tuple[float, float, bool]:
         """
         Compute RF (Ka-Band) link budget.
         
         Args:
             distance_km: Link distance in kilometers
-            include_rain_margin: Whether to subtract rain margin
+            include_rain_margin: Whether to subtract rain margin.
+                Default False for ISLs (space-to-space paths have no rain).
+                Set True only for Earth-space links (ground station uplinks).
         
         Returns:
             Tuple of (received_power_dbm, margin_db, link_viable)

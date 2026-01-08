@@ -8,20 +8,24 @@ version = "0.1.0"
 description = "Satellite Network Architecture Risk Analysis Framework"
 readme = "README.md"
 requires-python = ">=3.11"
+
+# Core simulation dependencies (Tier 1 - pinned for reproducibility)
+# See docs/physics_constants.md for physics dependency notes
 dependencies = [
-    "networkx>=3.0",
-    "numpy>=1.24",
-    "pandas>=2.0",
-    "sgp4>=2.22",
+    "networkx>=3.0,<4.0",
+    "numpy>=1.24,<2.0",
+    "pandas>=2.0,<3.0",
+    "sgp4>=2.22,<3.0",  # Required for Tier 1 orbital propagation
 ]
 
 [project.optional-dependencies]
 ml = [
-    "torch>=2.0",
-    "torch-geometric>=2.4",
+    "torch>=2.0,<3.0",
+    "torch-geometric>=2.4,<3.0",
 ]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=4.0",
 ]
 
 [tool.setuptools.packages.find]

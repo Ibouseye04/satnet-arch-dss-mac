@@ -457,7 +457,7 @@ class TestRunTier1Rollout:
         steps, summary, _ = run_tier1_rollout(cfg)
 
         assert summary.config_hash == cfg.config_hash()
-        assert len(summary.config_hash) == 16
+        assert len(summary.config_hash) == 64  # Full SHA256 (Step 8 fix)
 
     def test_rollout_summary_finite_values(self) -> None:
         """All summary values are finite (not NaN or Inf)."""

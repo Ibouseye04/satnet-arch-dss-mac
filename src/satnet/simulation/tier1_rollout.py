@@ -10,6 +10,22 @@ Dataclasses defined here establish the contract between:
 
 No toy topology dependencies. No Hypatia imports in this module —
 these are pure data contracts.
+
+Failure Semantics (Step 4 - Tier 1 v1):
+    Node Failures:
+        - Sampled once at t=0 from all nodes in the constellation.
+        - Persistent: failed nodes are removed at every time step.
+        - Interpretation: hardware failure of the satellite.
+    
+    Edge Failures:
+        - Sampled once at t=0 from edges present in G(t=0).
+        - Persistent: if an edge (u,v) is marked failed, it is removed
+          whenever it would otherwise exist at any time step.
+        - Interpretation: ISL terminal hardware failure (not atmospheric).
+        - Limitation: edges that don't exist at t=0 (due to Earth obscuration)
+          but appear later are implicitly immune to failure sampling.
+        - This is a known simplification for v1; future versions may sample
+          from the full +Grid neighbor set or use time-varying outage models.
 """
 
 from __future__ import annotations
@@ -69,8 +85,9 @@ class Tier1RolloutConfig:
     gcc_threshold: float = 0.8
 
     # Failure parameters (v1: persistent failures sampled at t=0)
-    node_failure_prob: float = 0.0
-    edge_failure_prob: float = 0.0
+    # See module docstring for detailed failure semantics.
+    node_failure_prob: float = 0.0  # P(node fails) for each satellite
+    edge_failure_prob: float = 0.0  # P(edge fails) for each t=0 edge
     seed: int = 42
 
     # Epoch for orbital propagation (ISO 8601 string for JSON serialization)
@@ -86,11 +103,16 @@ class Tier1RolloutConfig:
         """Compute a deterministic hash of this configuration.
 
         Returns:
-            A hex string hash suitable for dataset identification.
+            Full SHA256 hex string (64 chars) for collision-resistant dataset identification.
+            
+        Note:
+            Step 8 fix: Changed from 16 chars to full 64 chars to reduce collision risk
+            for long-lived datasets. Previous 16-char hashes have ~2^64 collision resistance,
+            which is insufficient for datasets with millions of configurations.
         """
         config_dict = asdict(self)
         config_json = json.dumps(config_dict, sort_keys=True)
-        return hashlib.sha256(config_json.encode()).hexdigest()[:16]
+        return hashlib.sha256(config_json.encode()).hexdigest()  # Full 64 chars
 
     @property
     def num_steps(self) -> int:
@@ -275,16 +297,22 @@ def run_tier1_rollout(
     adapter.calculate_isls(**isl_kwargs)
 
     # 3. Sample persistent failures from t=0 graph
+    # FAILURE SEMANTICS (Step 4 documentation):
+    # - Node failures: sampled from all nodes, persistent across all t.
+    # - Edge failures: sampled from G(t=0).edges() only.
+    #   Edges not visible at t=0 (Earth obscuration) are immune.
+    #   This is a v1 simplification; see module docstring.
     rng = random.Random(cfg.seed)
     G0 = adapter.get_graph_at_step(0)
 
-    # Sample failed nodes
+    # Sample failed nodes (persistent hardware failure)
     failed_nodes: set[int] = set()
     for node in G0.nodes():
         if rng.random() < cfg.node_failure_prob:
             failed_nodes.add(node)
 
-    # Sample failed edges (from t=0 edges only)
+    # Sample failed edges from t=0 edge set only (ISL terminal failure)
+    # NOTE: Edges appearing only at t>0 are implicitly immune (v1 limitation)
     failed_edges: set[tuple[int, int]] = set()
     for u, v in G0.edges():
         if rng.random() < cfg.edge_failure_prob:
