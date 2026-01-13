@@ -303,29 +303,36 @@ class SatNetTemporalDataset(Dataset):
             PyG Data object with node features, edge_index, and label
         """
         num_nodes = G.number_of_nodes()
-        
+
+        # Create mapping from original node IDs to contiguous indices [0, num_nodes)
+        # This is required because node failures can create non-contiguous node IDs
+        # e.g., if nodes {0,1,2,5,6} remain after failure, we map to {0,1,2,3,4}
+        node_mapping = {node_id: idx for idx, node_id in enumerate(sorted(G.nodes()))}
+
         # Build node features
         # For now, use simple features: [plane_idx_normalized, sat_in_plane_normalized, 1.0]
         # This can be extended with orbital parameters later
         x = torch.zeros((num_nodes, 3), dtype=torch.float)
-        
+
         for node_id in G.nodes():
+            idx = node_mapping[node_id]
             node_data = G.nodes[node_id]
             plane_idx = node_data.get("plane", node_id // sats_per_plane)
             sat_in_plane = node_data.get("sat_in_plane", node_id % sats_per_plane)
-            
+
             # Normalize features to [0, 1] range
-            x[node_id, 0] = plane_idx / max(num_planes - 1, 1)
-            x[node_id, 1] = sat_in_plane / max(sats_per_plane - 1, 1)
-            x[node_id, 2] = 1.0  # Constant feature (node exists)
-        
-        # Build edge_index from NetworkX edges
+            x[idx, 0] = plane_idx / max(num_planes - 1, 1)
+            x[idx, 1] = sat_in_plane / max(sats_per_plane - 1, 1)
+            x[idx, 2] = 1.0  # Constant feature (node exists)
+
+        # Build edge_index from NetworkX edges, using mapped indices
         edges = list(G.edges())
         if len(edges) > 0:
-            # Create bidirectional edges (undirected graph)
+            # Create bidirectional edges (undirected graph) with mapped indices
+            mapped_edges = [(node_mapping[u], node_mapping[v]) for u, v in edges]
             edge_index = torch.tensor(
-                [[e[0] for e in edges] + [e[1] for e in edges],
-                 [e[1] for e in edges] + [e[0] for e in edges]],
+                [[e[0] for e in mapped_edges] + [e[1] for e in mapped_edges],
+                 [e[1] for e in mapped_edges] + [e[0] for e in mapped_edges]],
                 dtype=torch.long,
             )
             
