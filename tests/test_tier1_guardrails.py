@@ -78,53 +78,39 @@ class TestNoUtcnowEpochInTier1:
             "generate_tier1_temporal_dataset must use run_tier1_rollout"
         )
 
-    def test_walker_delta_config_default_epoch_is_utcnow(self) -> None:
-        """WalkerDeltaConfig defaults to utcnow() — this is the footgun we guard against.
-        
-        This test documents the current (problematic) behavior. The fix is to ensure
-        all Tier 1 code paths pass an explicit epoch to HypatiaAdapter, bypassing
-        this default.
+    def test_walker_delta_config_default_epoch_is_j2000(self) -> None:
+        """WalkerDeltaConfig defaults to J2000 epoch for reproducibility.
+
+        Previously this defaulted to utcnow() which was non-deterministic.
+        Fixed in review/hardening to use J2000 (2000-01-01T12:00:00).
         """
-        from satnet.network.hypatia_adapter import WalkerDeltaConfig
+        from satnet.network.hypatia_adapter import WalkerDeltaConfig, J2000_EPOCH
         from datetime import datetime
-        
-        # Create two configs in quick succession
+
         cfg1 = WalkerDeltaConfig()
         cfg2 = WalkerDeltaConfig()
-        
-        # Both should have epochs close to now (within 1 second)
-        now = datetime.utcnow()
-        delta1 = abs((cfg1.epoch - now).total_seconds())
-        delta2 = abs((cfg2.epoch - now).total_seconds())
-        
-        # This test passes if the default is utcnow() (documenting the footgun)
-        # If this test fails, it means someone fixed the default — update the test!
-        assert delta1 < 2.0, (
-            "WalkerDeltaConfig.epoch default should be datetime.utcnow(). "
-            "If this changed, update this test and the audit docs."
-        )
 
-    def test_hypatia_adapter_without_epoch_uses_utcnow(self) -> None:
-        """HypatiaAdapter without epoch param falls back to utcnow() — the footgun.
-        
-        This test documents the current behavior. Tier 1 code must always pass
-        an explicit epoch to avoid this fallback.
+        # Both should have the same J2000 epoch (deterministic)
+        assert cfg1.epoch == J2000_EPOCH, "Default epoch should be J2000"
+        assert cfg2.epoch == J2000_EPOCH, "Default epoch should be J2000"
+        assert cfg1.epoch == cfg2.epoch, "Multiple configs should have same default epoch"
+        assert cfg1.epoch == datetime(2000, 1, 1, 12, 0, 0), "J2000 epoch is 2000-01-01T12:00:00"
+
+    def test_hypatia_adapter_without_epoch_uses_j2000(self) -> None:
+        """HypatiaAdapter without epoch param uses J2000 for reproducibility.
+
+        Previously this fell back to utcnow() which was non-deterministic.
+        Fixed in review/hardening to use J2000 (2000-01-01T12:00:00).
         """
-        from satnet.network.hypatia_adapter import HypatiaAdapter
+        from satnet.network.hypatia_adapter import HypatiaAdapter, J2000_EPOCH
         from datetime import datetime
-        
+
         # Create adapter without epoch
         adapter = HypatiaAdapter(num_planes=2, sats_per_plane=2)
-        
-        # The config.epoch should be close to now
-        now = datetime.utcnow()
-        delta = abs((adapter.config.epoch - now).total_seconds())
-        
-        # This test passes if the fallback is utcnow() (documenting the footgun)
-        assert delta < 2.0, (
-            "HypatiaAdapter without epoch should fall back to utcnow(). "
-            "If this changed, update this test."
-        )
+
+        # The config.epoch should be J2000 (deterministic)
+        assert adapter.config.epoch == J2000_EPOCH, "Default epoch should be J2000"
+        assert adapter.config.epoch == datetime(2000, 1, 1, 12, 0, 0)
 
 
 class TestEpochContractEnforced:

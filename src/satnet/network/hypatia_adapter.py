@@ -25,7 +25,7 @@ import math
 import os
 import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Set, Tuple
 
@@ -62,6 +62,11 @@ J2 = 1.08263e-3  # Earth's J2 perturbation coefficient
 SECONDS_PER_DAY = 86400.0
 ATMOSPHERE_BUFFER_KM = 80.0  # Buffer for Earth obscuration (grazing height)
 
+# J2000.0 epoch: standard astronomical reference epoch for deterministic defaults
+# This ensures reproducibility when no explicit epoch is provided
+# Using naive datetime for compatibility with existing TLE generation code
+J2000_EPOCH = datetime(2000, 1, 1, 12, 0, 0)
+
 # Speed of light
 C_M_S = 299792458.0  # m/s
 C_KM_S = C_M_S / 1000.0  # km/s
@@ -96,7 +101,7 @@ class WalkerDeltaConfig:
     inclination_deg: float = 53.0
     altitude_km: float = 550.0
     phasing_factor: int = 1  # Walker phasing F parameter
-    epoch: datetime = field(default_factory=lambda: datetime.utcnow())
+    epoch: datetime = field(default_factory=lambda: J2000_EPOCH)
     
     @property
     def total_satellites(self) -> int:
@@ -925,10 +930,10 @@ class HypatiaAdapter:
             phasing_factor: Walker phasing factor (F parameter)
             output_dir: Directory for generated files (default: temp directory)
             link_budget: LinkBudgetEngine instance (default: creates one with defaults)
-            epoch: TLE epoch datetime (default: current UTC time for backward compat)
+            epoch: TLE epoch datetime (default: J2000.0 for reproducibility)
         """
-        # Use provided epoch or fall back to utcnow for backward compatibility
-        effective_epoch = epoch if epoch is not None else datetime.utcnow()
+        # Use provided epoch or fall back to J2000 for reproducibility
+        effective_epoch = epoch if epoch is not None else J2000_EPOCH
         
         self.config = WalkerDeltaConfig(
             num_planes=num_planes,
