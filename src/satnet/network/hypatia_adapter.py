@@ -961,7 +961,33 @@ class HypatiaAdapter:
         self._duration_seconds: int = 0
         self._step_seconds: int = 0
         self._max_isl_distance_km: float = 10000.0  # Increased - link budget decides
-    
+
+    def cleanup(self) -> None:
+        """Remove temporary directory if one was created.
+
+        Call this when done with the adapter to free disk space.
+        Also called automatically by __del__ and __exit__.
+        """
+        if self._temp_dir is not None:
+            import shutil
+            try:
+                shutil.rmtree(self._temp_dir, ignore_errors=True)
+            except Exception:
+                pass  # Best effort cleanup
+            self._temp_dir = None
+
+    def __del__(self) -> None:
+        """Clean up temp directory on garbage collection."""
+        self.cleanup()
+
+    def __enter__(self) -> "HypatiaAdapter":
+        """Context manager entry."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Context manager exit - cleanup temp directory."""
+        self.cleanup()
+
     @property
     def total_satellites(self) -> int:
         return self.config.total_satellites

@@ -144,3 +144,60 @@ class TestAdapterProperties:
     def test_duration_seconds_property(self, configured_adapter) -> None:
         """duration_seconds returns configured value."""
         assert configured_adapter.duration_seconds == 5 * 60  # 5 minutes
+
+
+class TestHypatiaAdapterCleanup:
+    """Tests for HypatiaAdapter temp directory cleanup (C.1 fix)."""
+
+    def test_cleanup_removes_temp_dir(self) -> None:
+        """cleanup() removes the temp directory if one was created."""
+        import os
+        from satnet.network.hypatia_adapter import HypatiaAdapter
+
+        adapter = HypatiaAdapter(num_planes=2, sats_per_plane=2)
+        temp_dir = adapter._temp_dir
+
+        # Verify temp dir was created
+        assert temp_dir is not None
+        assert os.path.isdir(temp_dir)
+
+        # Cleanup should remove it
+        adapter.cleanup()
+
+        assert adapter._temp_dir is None
+        assert not os.path.exists(temp_dir)
+
+    def test_cleanup_idempotent(self) -> None:
+        """cleanup() can be called multiple times safely."""
+        from satnet.network.hypatia_adapter import HypatiaAdapter
+
+        adapter = HypatiaAdapter(num_planes=2, sats_per_plane=2)
+        adapter.cleanup()
+        adapter.cleanup()  # Should not raise
+
+    def test_context_manager_cleans_up(self) -> None:
+        """Using adapter as context manager cleans up temp dir on exit."""
+        import os
+        from satnet.network.hypatia_adapter import HypatiaAdapter
+
+        with HypatiaAdapter(num_planes=2, sats_per_plane=2) as adapter:
+            temp_dir = adapter._temp_dir
+            assert temp_dir is not None
+            assert os.path.isdir(temp_dir)
+
+        # After exiting context, temp dir should be gone
+        assert not os.path.exists(temp_dir)
+
+    def test_no_cleanup_for_explicit_output_dir(self, tmp_path) -> None:
+        """No temp dir created when output_dir is provided."""
+        from satnet.network.hypatia_adapter import HypatiaAdapter
+
+        output_dir = tmp_path / "explicit_output"
+        adapter = HypatiaAdapter(
+            num_planes=2, sats_per_plane=2, output_dir=str(output_dir)
+        )
+
+        # No temp dir, explicit dir not cleaned up
+        assert adapter._temp_dir is None
+        adapter.cleanup()  # Should not raise
+        assert output_dir.exists()  # Explicit dir preserved
