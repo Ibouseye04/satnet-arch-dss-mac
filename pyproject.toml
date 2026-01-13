@@ -34,3 +34,49 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+# --- Static Analysis (minimal, incremental) ---
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+exclude = ["src/satnet/legacy/"]
+
+[tool.ruff.lint]
+# Minimal rule set: Pyflakes (F), syntax errors (E9) only
+# Avoid isort (I) for now to prevent mass style churn
+select = ["F", "E9"]
+# Ignore cleanup issues to avoid mass churn; focus on real bugs (F821, etc.)
+ignore = ["F401", "F541", "F841"]
+
+[tool.mypy]
+python_version = "3.11"
+# Permissive baseline - add strict overrides per-module later
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+# Disable strict checks initially; tighten per-module later
+check_untyped_defs = false
+disallow_untyped_defs = false
+# Allow implicit None defaults (common in existing code)
+no_implicit_optional = false
+# Disable error codes that have existing violations (tech debt)
+# TODO: Fix these and remove from disable list incrementally
+disable_error_code = ["union-attr", "return-value", "arg-type", "assignment", "valid-type"]
+exclude = ["src/satnet/legacy/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "sgp4.*",
+    "satgenpy.*",
+    "torch.*",
+    "torch_geometric.*",
+    "torch_geometric_temporal.*",
+    "sklearn.*",
+    "joblib.*",
+    "tqdm.*",
+    "pandas.*",
+    "networkx.*",
+    "numpy.*",
+]
+ignore_missing_imports = true

@@ -132,9 +132,10 @@ class TestEpochContractEnforced:
 
     def test_gnn_dataset_passes_explicit_epoch(self) -> None:
         """SatNetTemporalDataset.get() passes explicit epoch to HypatiaAdapter.
-        
+
         Step 2 fixed the H2 audit issue: epoch is now passed explicitly.
         """
+        pytest.importorskip("torch")  # Skip if ML deps not installed
         from satnet.models.gnn_dataset import SatNetTemporalDataset
         
         source = inspect.getsource(SatNetTemporalDataset.get)
