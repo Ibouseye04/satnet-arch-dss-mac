@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
 
 import joblib
+
+logger = logging.getLogger(__name__)
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -134,7 +137,8 @@ def train_design_risk_model(
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
     try:
         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-    except ValueError:
+    except ValueError as e:
+        logger.warning("ROC AUC computation failed: %s", e)
         metrics["roc_auc"] = float("nan")
 
     metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
@@ -205,7 +209,8 @@ def train_tier1_risk_model(
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
     try:
         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-    except ValueError:
+    except ValueError as e:
+        logger.warning("ROC AUC computation failed: %s", e)
         metrics["roc_auc"] = float("nan")
 
     metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
@@ -261,7 +266,8 @@ def train_risk_model(
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
     try:
         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-    except ValueError:
+    except ValueError as e:
+        logger.warning("ROC AUC computation failed: %s", e)
         metrics["roc_auc"] = float("nan")
 
     metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
@@ -395,7 +401,8 @@ def train_tier1_v1_risk_model(
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
     try:
         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-    except ValueError:
+    except ValueError as e:
+        logger.warning("ROC AUC computation failed: %s", e)
         metrics["roc_auc"] = float("nan")
 
     metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
@@ -479,7 +486,8 @@ def train_tier1_v1_design_model(
     metrics["accuracy"] = accuracy_score(y_test, y_pred)
     try:
         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-    except ValueError:
+    except ValueError as e:
+        logger.warning("ROC AUC computation failed: %s", e)
         metrics["roc_auc"] = float("nan")
 
     metrics["confusion_matrix"] = confusion_matrix(y_test, y_pred).tolist()
