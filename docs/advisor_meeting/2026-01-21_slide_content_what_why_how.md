@@ -6,6 +6,57 @@
 
 ---
 
+# Part 0: Alignment Check (Thesis Goal ↔ Repo Scope ↔ External Data)
+
+## 0.1 Thesis goal vs. Phase 1 scope (what we can credibly claim now)
+
+**Thesis goal:** an ML decision-support tool that helps engineering managers evaluate satellite network design risk before deployment.
+
+**Phase 1 (current repo focus):** space-segment **satellite-to-satellite** resilience, operationalized as **temporal ISL connectivity risk** (partition detection via GCC fraction over `t=0..T`).
+
+**Phase 2 (planned, explicitly deferred):** ground segment (SAT–GS visibility + weather), end-to-end service availability, traffic/routing/congestion modeling, and GUI.
+
+This is not “drift” from the thesis problem statement; it is **staged scope control**:
+- **You cannot defend routing/congestion claims** without a correct and reproducible time-evolving topology.
+- Phase 1 delivers the **core technical spine**: physics-based temporal simulation → non-leaky labels → ML models → risk tiers.
+
+## 0.2 Do the external datasets align with the thesis goal?
+
+### Verdict (advisor-safe)
+
+Yes, **as a supporting track**. The external datasets strengthen the advisor narrative in two ways:
+- **Credibility:** shows awareness of real operational signals (traffic logs, telemetry anomalies) and an intent to validate assumptions.
+- **Roadmap readiness:** provides concrete raw data sources for Phase 2 “service-level risk” (routing/congestion + health-driven failure priors).
+
+However, they **must not be framed as direct truth labels** for Phase 1 “ISL partition risk,” because they typically do not contain:
+- precise orbit-resolved ISL graphs over time
+- explicit partition labels for the inter-satellite network
+- controlled failure realizations
+
+### Dataset-by-dataset mapping (how to talk about it)
+
+| External dataset | What it contains | How it helps in Phase 1 (today) | How it helps in Phase 2 (future work) |
+|---|---|---|---|
+| **LEO congestion control logs** (Figshare / INFOCOM) | Traffic + congestion behavior in LEO networks | EDA evidence for “network dynamics exist”; informs what metrics to export later (queueing, loss, throughput) | Drives traffic models + congestion/routing risk labels; enables QoS / SLA-style decision outputs |
+| **NASA SMAP/MSL anomaly dataset** (Kaggle) | Telemetry time-series with anomaly labels | EDA reference for what “anomalies look like” statistically; informs how to structure telemetry features | Priors for correlated satellite health failures; anomaly-driven failure injection; health→connectivity coupling |
+| **Synthetic satellite health data** (Kaggle) | Tabular health telemetry-like features | Quick prototype for feature engineering and risk binning patterns (non-physical, but useful scaffolding) | Bridge dataset for early end-to-end demos; can be replaced by real telemetry once acquired |
+| **SatFlow planning dataset** (author request) | Planning / architecture records | Helps justify “design-space” framing and what operators care about | Could support learning planning policies or validating design feature distributions |
+| **LEO routing simulation logs** (author request) | Routing/throughput/latency metrics from simulations | Provides a future validation target for “routing vulnerability” claims | Enables service-level labels beyond partitioning (latency, throughput degradation, route churn) |
+
+## 0.3 Has the codebase drifted too far from the problem statement?
+
+**No for Phase 1**, with one important clarification to state explicitly:
+- The problem statement mentions routing + congestion + cascading failure modes.
+- The implemented Phase 1 label is **connectivity partition risk** (a prerequisite failure mode).
+
+Advisor-safe framing:
+- **Phase 1 contribution:** a defensible, reproducible “physics → temporal graphs → labels → ML” pipeline for **space-segment connectivity risk**.
+- **Phase 2 extension:** build on the same temporal graph backbone to incorporate routing/traffic and ground/service availability.
+
+## 0.4 20-second narrative (recommended)
+
+> We built a Tier 1 physics-based simulator that generates time-evolving inter-satellite network graphs using SGP4 + link budgets, injects persistent failures deterministically, and labels partition risk using pure graph metrics over time. We then train a fast, interpretable Random Forest for design-time screening and a temporal GNN for higher-fidelity dynamics. External datasets are a supporting track for EDA and Phase 2 service-level risk (traffic + telemetry), but our Phase 1 “truth labels” come from controlled temporal simulation.
+
 # Part A: What / Why / How for Slide Sections
 
 ## Section 1: Data Collection & EDA
