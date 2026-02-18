@@ -187,7 +187,7 @@ Build User Interface → Connect to Space/Ground → Simulations → Analyze Res
 
 > "Does Data produce accurate results?" — Data is retained ONLY if it produces stable, physically plausible, and decision-relevant predictions across repeated scenarios.
 
-### The NEW Version (data-utilization-new.png) Adds Detail
+### The NEW Version (data-utilization-flowchart-v2.png) Adds Detail
 
 **External Datasets Table (bottom):**
 | Dataset | Phase 1 Use | Phase 2 Use |
