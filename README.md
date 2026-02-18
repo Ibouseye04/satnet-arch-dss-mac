@@ -15,6 +15,27 @@ For the advisor-facing architecture narrative and methodology framing, see `READ
 - **Satellite-to-satellite only**: no ground stations/gateways in Phase 1.
 - **Deterministic**: explicit `seed` + fixed epoch (`DEFAULT_EPOCH_ISO`) for reproducibility.
 
+## Current execution status (2026-02-17)
+
+Phase 1 remains sat-to-sat by design, but active execution work is focused on
+closing Phase 1 and staging Phase 2 correctly:
+
+- Re-generated Tier 1 design dataset at 10k runs (`110k` temporal step rows)
+  on remote hardware for a clean post-refactor baseline.
+- Re-trained the Tier 1 RF baseline on the refreshed dataset and captured
+  reproducible metrics artifacts.
+- Started temporal GNN environment/training setup on remote hardware.
+- Last completed GNN smoke run metrics: acc=0.6155, prec=0.6615, rec=0.8648,
+  f1=0.7496 (TP=1151, FP=589, FN=180, TN=80).
+- Current run status: `train_gnn_model.py` 20-epoch full training on
+  `data/runs/2026-02-17_full_10k` is in progress on remote CPU.
+- Continued external dataset onboarding as a supporting/validation track
+  (not Phase 1 truth labels), to feed Phase 2 planning.
+
+For the detailed nightly handoff and Phase 2 entry gates, see:
+
+- `docs/advisor_meeting/2026-02-17_phase1_restart_execution_update.md`
+
 ## Architecture (three layers)
 
 - **Physics layer**: `src/satnet/network/hypatia_adapter.py`

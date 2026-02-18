@@ -12,11 +12,16 @@ build/
 .venv/
 venv/
 
-# Data artifacts (optional)
-Data/*.csv
+# Data artifacts (never commit datasets — too large)
+data/*.csv
+data/*.parquet
+data/runs/
+data/**/*.csv
+data/**/*.parquet
 
 # Models (optional)
 models/*.joblib
+models/*.pt
 
 # OS
 .DS_Store
