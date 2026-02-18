@@ -1,7 +1,0 @@
-{
-  "last_failure": "2026-02-17T22:56:53.103824-06:00",
-  "failure_count": 1,
-  "backoff_until": "2026-02-17T22:57:23.103824-06:00",
-  "needs_manual_sync": false,
-  "failure_reason": "git pull failed in worktree: exit status 1\nfatal: unable to access 'https://github.com/Ibouseye04/satnet-arch-dss-mac.git/': SSL connection timeout\n"
-}
