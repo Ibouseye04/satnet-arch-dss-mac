@@ -1,0 +1,100 @@
+{
+  "batch": "abstraction_fitness",
+  "batch_index": 5,
+  "assessments": {
+    "abstraction_fitness": 72.5
+  },
+  "dimension_notes": {
+    "abstraction_fitness": {
+      "evidence": [
+        "risk_model.py contains four nearly identical train_*_risk_model functions (train_risk_model, train_tier1_risk_model, train_tier1_v1_risk_model, train_tier1_v1_design_model) that differ only in feature column lists and label extraction — ~60 lines of duplicated load-split-train-evaluate boilerplate per function",
+        "legacy/engine.py SimulationEngine has 5 methods (get_graph_at_step, iter_graphs, num_steps, network_graph, get_graph) that forward directly to self.adapter with zero policy or translation — pure delegation without value",
+        "Tier1RolloutSummary.to_dict() at tier1_rollout.py:230 is a one-line wrapper over dataclasses.asdict(self) with no transformation or filtering",
+        "metrics/__init__.py is a pure re-export facade (10 symbols, 0 defined) — this is an intentional package facade and appropriately skipped as a defect",
+        "HypatiaAdapter exposes domain-appropriate methods (generate_tles, calculate_isls, get_graph_at_step, iter_graphs) that compose real physics logic — abstractions in the core adapter are earned",
+        "tier1_rollout.py run_tier1_rollout is a well-bounded orchestration function that composes adapter, metrics, and failure sampling — no unnecessary indirection layers",
+        "gnn_model.py SatelliteGNN is a focused model class with no gratuitous base classes or protocols — direct implementation"
+      ],
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor",
+      "confidence": "high",
+      "issues_preventing_higher_score": null,
+      "sub_axes": {
+        "abstraction_leverage": 80.0,
+        "indirection_cost": 60.0,
+        "interface_honesty": 90.0,
+        "delegation_density": 55.0,
+        "definition_directness": 50.0,
+        "type_discipline": 95.0
+      }
+    }
+  },
+  "issues": [
+    {
+      "dimension": "abstraction_fitness",
+      "identifier": "risk_model_train_duplication",
+      "summary": "Four near-identical train_*_risk_model functions duplicate ~60 lines of load-split-train-evaluate boilerplate each",
+      "related_files": [
+        "src/satnet/models/risk_model.py"
+      ],
+      "evidence": [
+        "train_risk_model (L235-283), train_tier1_risk_model (L164-225), train_tier1_v1_risk_model (L343-423), and train_tier1_v1_design_model (L426-507) all follow identical structure: load dataset, check class balance, train_test_split, fit RandomForestClassifier, compute metrics dict with accuracy/roc_auc/confusion_matrix/classification_report/feature_importances",
+        "The only varying axes are: (1) which feature columns to use, (2) how to extract the label series, and (3) which extra metadata to attach to the metrics dict"
+      ],
+      "suggestion": "Extract a shared _train_rf_classifier(X, y, cfg, feature_names) -> Tuple[RandomForestClassifier, dict] that encapsulates split-train-evaluate-metrics. Each public function becomes a thin loader + call to the shared trainer. This reduces ~240 lines to ~60 and eliminates the risk of metric-reporting drift between variants.",
+      "confidence": "high",
+      "impact_scope": "module",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": "risk_model_boilerplate"
+    },
+    {
+      "dimension": "abstraction_fitness",
+      "identifier": "legacy_engine_pure_delegation",
+      "summary": "SimulationEngine has 5 methods that forward to self.adapter with no added policy or translation",
+      "related_files": [
+        "src/satnet/legacy/engine.py"
+      ],
+      "evidence": [
+        "get_graph_at_step(time_step) returns self.adapter.get_graph_at_step(time_step) — line 107-109",
+        "iter_graphs() returns self.adapter.iter_graphs() — line 111-113",
+        "num_steps property returns self.adapter.num_steps — line 115-118",
+        "network_graph property returns self.graph_at_t0 which returns self.adapter.get_graph_at_step(0) — two-hop forwarding",
+        "get_graph() returns self.graph_at_t0 — another forwarding alias"
+      ],
+      "suggestion": "Since legacy/engine.py is quarantined and deprecated, the cleanest fix is to remove the pass-through methods and have any remaining callers use HypatiaAdapter directly. If backward compatibility aliases are still needed, document which callers depend on them and set a removal date.",
+      "confidence": "medium",
+      "impact_scope": "local",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": "legacy_indirection"
+    },
+    {
+      "dimension": "abstraction_fitness",
+      "identifier": "to_dict_trivial_wrapper",
+      "summary": "Tier1RolloutSummary.to_dict() wraps dataclasses.asdict() with no filtering or transformation",
+      "related_files": [
+        "src/satnet/simulation/tier1_rollout.py"
+      ],
+      "evidence": [
+        "Line 230-232: def to_dict(self) -> dict: return asdict(self) — a one-line pass-through that adds no value over callers using asdict(summary) directly"
+      ],
+      "suggestion": "Remove to_dict() and have callers use dataclasses.asdict(summary) directly. If the method exists to provide a stable API that might later add field filtering or renaming, add a comment documenting that intent.",
+      "confidence": "low",
+      "impact_scope": "local",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": null
+    }
+  ],
+  "retrospective": {
+    "root_causes": [
+      "risk_model_boilerplate: The four training functions grew incrementally as new dataset versions (legacy, tier1, tier1_v1, tier1_v1_design) were added — each was likely copy-pasted from the prior variant without extracting the shared train-evaluate skeleton.",
+      "legacy_indirection: SimulationEngine was originally the primary entry point before HypatiaAdapter was promoted to a direct API. The delegation layer remains because it was quarantined rather than removed."
+    ],
+    "likely_symptoms": [
+      "to_dict_trivial_wrapper is a minor symptom rather than a structural issue"
+    ],
+    "possible_false_positives": [
+      "metrics/__init__.py facade was flagged by the scanner (re_export_ratio=1.0) but is an intentional package facade stabilizing import paths — correctly skipped",
+      "gnn_model.py was flagged as a facade module (re_export_ratio=0.9) but the high ratio is due to standard library/framework imports (torch, GCLSTM, etc.), not re-exports — the module defines a real class"
+    ]
+  }
+}

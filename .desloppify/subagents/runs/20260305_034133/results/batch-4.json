@@ -1,0 +1,78 @@
+{
+  "batch": "naming_quality",
+  "batch_index": 4,
+  "assessments": {
+    "naming_quality": 84.5
+  },
+  "dimension_notes": {
+    "naming_quality": {
+      "evidence": [
+        "risk_model.py defines five feature-column constant families with incremental prefixes: FEATURE_COLUMNS, DESIGN_FEATURE_COLUMNS, TIER1_FEATURE_COLUMNS, TIER1_V1_FEATURE_COLUMNS, TIER1_V1_DESIGN_FEATURE_COLUMNS. A reader cannot predict which belongs to which schema without reading their definitions.",
+        "risk_model.py defines five training functions: train_risk_model, train_design_risk_model, train_tier1_risk_model, train_tier1_v1_risk_model, train_tier1_v1_design_model. The naming scheme conveys generation lineage but not behavioral differences (e.g., which features are used, whether failure params are included).",
+        "The bare FEATURE_COLUMNS and LABEL_COLUMN constants lack a schema prefix, making them ambiguous in a module that serves three distinct schemas (legacy, tier1, tier1_v1).",
+        "gnn_model.py and gnn_dataset.py use clear, descriptive class names (SatelliteGNN, SatNetTemporalDataset) and method names (predict_proba, get_label_distribution).",
+        "Scripts use domain-aligned names: export_design_dataset.py, export_failure_dataset.py, train_design_risk_model.py clearly communicate their purpose.",
+        "Standard ML variable conventions (X, y, clf, h, c) are used consistently and appropriately across training code."
+      ],
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor",
+      "confidence": "medium",
+      "issues_preventing_higher_score": "The five-way proliferation of constant and function name variants in risk_model.py forces developers to read definitions to distinguish between legacy, tier1, and tier1_v1 schemas. Bare unprefixed constants (FEATURE_COLUMNS, LABEL_COLUMN) are ambiguous in context."
+    }
+  },
+  "issues": [
+    {
+      "dimension": "naming_quality",
+      "identifier": "proliferating_constant_prefixes",
+      "summary": "Five feature-column constant families in risk_model.py differ only by opaque prefix, obscuring schema membership",
+      "related_files": ["src/satnet/models/risk_model.py"],
+      "evidence": [
+        "FEATURE_COLUMNS (line 66), DESIGN_FEATURE_COLUMNS (line 81), TIER1_FEATURE_COLUMNS (line 92), TIER1_V1_FEATURE_COLUMNS (line 35), TIER1_V1_DESIGN_FEATURE_COLUMNS (line 48) — all in the same module with incremental prefixes that encode generation lineage rather than behavioral intent"
+      ],
+      "suggestion": "Group constants under namespaced containers (e.g., a dataclass or module-per-schema). For example, move legacy constants into a LEGACY_SCHEMA namespace and tier1_v1 constants into a TIER1_V1_SCHEMA namespace, or split into separate modules (risk_model_legacy.py, risk_model_tier1v1.py) so the file path communicates the schema.",
+      "confidence": "medium",
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor",
+      "root_cause_cluster": "schema_version_naming_sprawl"
+    },
+    {
+      "dimension": "naming_quality",
+      "identifier": "ambiguous_unprefixed_constants",
+      "summary": "Bare FEATURE_COLUMNS and LABEL_COLUMN lack schema prefix, ambiguous alongside TIER1_ and TIER1_V1_ variants",
+      "related_files": ["src/satnet/models/risk_model.py"],
+      "evidence": [
+        "FEATURE_COLUMNS (line 66) and LABEL_COLUMN (line 79) are unprefixed legacy constants coexisting with TIER1_FEATURE_COLUMNS and TIER1_V1_FEATURE_COLUMNS in the same module — a reader cannot tell which schema the bare names belong to without reading the section comment on line 62"
+      ],
+      "suggestion": "Rename to LEGACY_FEATURE_COLUMNS and LEGACY_LABEL_COLUMN to match the naming pattern of their TIER1_ and TIER1_V1_ siblings, making schema membership explicit.",
+      "confidence": "high",
+      "impact_scope": "module",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": "schema_version_naming_sprawl"
+    },
+    {
+      "dimension": "naming_quality",
+      "identifier": "parallel_training_function_names",
+      "summary": "Five train_*_risk_model functions differ by opaque prefix; names don't convey which features or schema each uses",
+      "related_files": ["src/satnet/models/risk_model.py"],
+      "evidence": [
+        "train_risk_model (line 235), train_design_risk_model (line 106), train_tier1_risk_model (line 164), train_tier1_v1_risk_model (line 343), train_tier1_v1_design_model (line 426) — the prefix chain encodes schema version history but not the key behavioral difference (which feature set is used, whether failure params are included)"
+      ],
+      "suggestion": "Either consolidate into a single train function parameterized by a schema/feature-set enum, or rename to encode the key behavioral difference — e.g., train_risk_model_with_failure_features vs train_risk_model_design_only. Alternatively, split into schema-specific modules.",
+      "confidence": "medium",
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor",
+      "root_cause_cluster": "schema_version_naming_sprawl"
+    }
+  ],
+  "retrospective": {
+    "root_causes": [
+      "Incremental schema evolution (legacy -> tier1 -> tier1_v1 -> tier1_v1_design) accumulated in a single module without restructuring, leading to naming sprawl where prefixes encode version history rather than behavioral intent"
+    ],
+    "likely_symptoms": [
+      "proliferating_constant_prefixes",
+      "ambiguous_unprefixed_constants",
+      "parallel_training_function_names"
+    ],
+    "possible_false_positives": []
+  }
+}

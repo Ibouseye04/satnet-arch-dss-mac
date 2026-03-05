@@ -1,0 +1,128 @@
+{
+  "batch": "low_level_elegance",
+  "batch_index": 7,
+  "assessments": {
+    "low_level_elegance": 62.5
+  },
+  "dimension_notes": {
+    "low_level_elegance": {
+      "evidence": [
+        "risk_model.py contains four nearly identical train_*() functions (train_risk_model, train_tier1_risk_model, train_tier1_v1_risk_model, train_tier1_v1_design_model) that share the same load-split-train-evaluate-metrics structure with only minor variations in feature columns and class-check logic. This is a monolith-by-copy pattern that makes the module hard to maintain.",
+        "Similarly, risk_model.py has three nearly identical load_*_dataset() functions (load_failure_dataset, load_tier1_dataset, load_design_dataset, load_tier1_v1_dataset) differing only in which column constants they reference.",
+        "The _compute_grid_plus_isls function in hypatia_adapter.py (lines 772-890) has two large blocks for intra-plane and inter-plane links that are structurally identical: check added_links, compute distance, check LOS, check link budget, append ISLLink. The only differences are the partner computation and the link_type tag. This is a clear case where extraction of a helper would reduce duplication and reveal intent.",
+        "The run_tier1_rollout function in tier1_rollout.py and the SatNetTemporalDataset.get() method in gnn_dataset.py both independently implement failure application logic (remove failed nodes, then remove failed edges). This is duplicated procedural code for the same semantic operation.",
+        "The confusion matrix tracking in train_gnn_model.py evaluate() (lines 226-234) uses four separate if/elif branches to update TP/FP/TN/FN counters. This is verbose but functionally correct; it could be more direct with a lookup or sklearn's confusion_matrix.",
+        "visualize_constellation.py main() is a 130-line procedural function that mixes setup, data extraction, plotting, and I/O. The control flow is linear and readable, but the function handles four distinct responsibilities without any extraction.",
+        "labels.py and legacy/failures.py demonstrate good low-level elegance: small pure functions with direct control flow, precise edge-case handling (empty graph checks), and no defensive sprawl.",
+        "tier1_rollout.py dataclasses (Tier1RolloutConfig, Tier1RolloutStep, etc.) are cleanly structured with well-bounded state. The run_tier1_rollout function has clear sequential phases with comments marking each step.",
+        "gnn_model.py SatelliteGNN.forward() is direct and intention-revealing: iterate time steps through GCLSTM, pool, classify. Hidden state reset is clearly commented.",
+        "LinkBudgetEngine in hypatia_adapter.py has clean method extraction (optical vs RF budgets) with a well-structured evaluate_link that tries preferred mode then falls back."
+      ],
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor",
+      "confidence": "high",
+      "issues_preventing_higher_score": null
+    }
+  },
+  "issues": [
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "risk_model_train_duplication",
+      "summary": "Four near-identical train_*() functions in risk_model.py duplicate the split-train-evaluate-metrics pipeline with only column/label variations",
+      "related_files": ["src/satnet/models/risk_model.py"],
+      "evidence": [
+        "train_risk_model (lines 235-283), train_tier1_risk_model (lines 164-225), train_tier1_v1_risk_model (lines 343-423), and train_tier1_v1_design_model (lines 426-507) share identical structure: load data, check class balance, split, create RandomForest, fit, predict, compute metrics dict with accuracy/roc_auc/confusion_matrix/classification_report/feature_importances",
+        "The only meaningful differences are: which feature/label columns to use, whether to add extra metadata keys, and the class-check error message text"
+      ],
+      "suggestion": "Extract a shared _train_rf_classifier(X, y, cfg, feature_names) helper that handles split/train/evaluate/metrics. Each public function becomes a thin wrapper that loads data and calls the shared helper, eliminating ~200 lines of duplication.",
+      "confidence": "high",
+      "impact_scope": "module",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": "copy_paste_pipeline"
+    },
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "risk_model_load_duplication",
+      "summary": "Three nearly identical load_*_dataset() functions differ only in column constant references",
+      "related_files": ["src/satnet/models/risk_model.py"],
+      "evidence": [
+        "load_failure_dataset (line 228), load_design_dataset (line 99), and load_tier1_dataset (line 156) each read a CSV and select columns from a different constant list. load_tier1_v1_dataset (line 308) adds a label_column parameter but follows the same pattern.",
+        "Each is 3-5 lines: read_csv, select columns, cast label"
+      ],
+      "suggestion": "Consolidate into a single load_dataset(csv_path, feature_cols, label_col, label_transform=None) function, or at minimum parameterize the column selection.",
+      "confidence": "high",
+      "impact_scope": "local",
+      "fix_scope": "single_edit",
+      "root_cause_cluster": "copy_paste_pipeline"
+    },
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "isl_intra_inter_duplication",
+      "summary": "_compute_grid_plus_isls has two structurally identical blocks for intra-plane and inter-plane links",
+      "related_files": ["src/satnet/network/hypatia_adapter.py"],
+      "evidence": [
+        "Lines 815-847 (intra-plane) and lines 849-888 (inter-plane) follow identical structure: compute partner index, form link_key, check added_links, compute distance, check LOS, check link budget, append ISLLink with stats tracking",
+        "The only differences: partner satellite computation, link_type assignment (with seam_link special case)"
+      ],
+      "suggestion": "Extract a _try_add_link(current_sat, partner_sat, link_type, ...) helper that encapsulates the LOS check, link budget evaluation, ISLLink creation, and stats tracking. Call it twice with different partner/type arguments.",
+      "confidence": "high",
+      "impact_scope": "local",
+      "fix_scope": "single_edit"
+    },
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "failure_application_duplication",
+      "summary": "Failure application logic (remove failed nodes, then failed edges) is duplicated across tier1_rollout.py and gnn_dataset.py",
+      "related_files": ["src/satnet/simulation/tier1_rollout.py", "src/satnet/models/gnn_dataset.py"],
+      "evidence": [
+        "tier1_rollout.py lines 328-335: copy graph, remove failed nodes, iterate failed_edges and remove if present",
+        "gnn_dataset.py lines 259-264: identical pattern - copy graph, remove failed nodes, iterate failed_edges and remove if present",
+        "Both operate on a Tier1FailureRealization's failed_nodes and failed_edges sets"
+      ],
+      "suggestion": "Add an apply_to_graph(self, G: nx.Graph) -> nx.Graph method to Tier1FailureRealization that encapsulates this logic. Both call sites become one-liners.",
+      "confidence": "high",
+      "impact_scope": "module",
+      "fix_scope": "multi_file_refactor"
+    },
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "visualize_monolith",
+      "summary": "visualize_constellation.py main() is a 130-line monolith mixing setup, data extraction, plotting config, and file I/O",
+      "related_files": ["scripts/visualize_constellation.py"],
+      "evidence": [
+        "main() (lines 27-154) handles: adapter initialization, TLE/ISL generation, position extraction, matplotlib figure setup, ISL link drawing loop with dateline logic, satellite scatter plot, legend construction, stats annotation, file save, and console output",
+        "No helper functions extracted despite four distinct phases marked by print statements"
+      ],
+      "suggestion": "Extract at minimum the ISL drawing loop (lines 91-110) and the legend/stats annotation (lines 116-138) into separate functions. This would make the main function read as a sequence of clear phases.",
+      "confidence": "medium",
+      "impact_scope": "local",
+      "fix_scope": "single_edit"
+    },
+    {
+      "dimension": "low_level_elegance",
+      "identifier": "isl_stats_manual_aggregation",
+      "summary": "ISLComputationStats aggregation in calculate_isls uses six manual field additions instead of an __iadd__ or merge method",
+      "related_files": ["src/satnet/network/hypatia_adapter.py"],
+      "evidence": [
+        "Lines 1132-1137 manually add each of six fields: total_stats.total_candidate_links += step_stats.total_candidate_links, total_stats.links_rejected_los += step_stats.links_rejected_los, etc.",
+        "This is brittle: adding a new stat field requires remembering to update the aggregation loop"
+      ],
+      "suggestion": "Add a merge() or __iadd__ method to ISLComputationStats that aggregates all numeric fields, reducing the six lines to one and preventing future field-addition bugs.",
+      "confidence": "medium",
+      "impact_scope": "local",
+      "fix_scope": "single_edit"
+    }
+  ],
+  "retrospective": {
+    "root_causes": [
+      "Copy-paste evolution: risk_model.py accumulated train/load functions for each new dataset schema version without refactoring shared logic into a common helper",
+      "Inline-first development: failure application logic was written inline in tier1_rollout.py first, then copied into gnn_dataset.py when the dataset needed the same behavior, rather than being extracted to the shared dataclass"
+    ],
+    "likely_symptoms": [
+      "isl_stats_manual_aggregation is a minor symptom of the broader pattern of not adding convenience methods to dataclasses"
+    ],
+    "possible_false_positives": [
+      "visualize_monolith may be acceptable for a one-off visualization script that is not called by other code"
+    ]
+  }
+}
