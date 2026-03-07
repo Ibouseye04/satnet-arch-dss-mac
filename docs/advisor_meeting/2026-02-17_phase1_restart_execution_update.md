@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-17  
 **Audience:** Advisor prep + multi-agent handoff  
-**Status:** In progress (Phase 1 rerun executed; Phase 2 entry work staged)
+**Status:** Phase 1 rerun + RF/GNN runs completed; Phase 2 entry work staged
 
 ---
 
@@ -57,6 +57,23 @@ Interpretation: baseline remains strong and stable after rerun.
 Interpretation: smoke run is functioning and biased toward high recall (finds most
 partitioned cases) with weak true-negative performance. This is acceptable for a
 smoke test and motivates full training + threshold/calibration review.
+
+### D) Temporal GNN full run (20 epochs on 10k) completed
+
+- Command:
+  - `python scripts/train_gnn_model.py --data-dir data/runs/2026-02-17_full_10k --epochs 20 --device cpu --output-model models/satellite_gnn_10k.pt`
+- Best checkpoint summary:
+  - `best_epoch = 3`
+  - `best_test_acc = 0.7600`
+  - `precision = 0.8168`
+  - `recall = 0.8242`
+  - `f1 = 0.8205`
+  - confusion summary: `TP=1097, FP=246, FN=234, TN=423`
+
+Interpretation: full run substantially improved over smoke and now shows much
+better class balance behavior (stronger true-negative count, fewer false positives).
+Best checkpoint occurring at epoch 3 suggests we should use best-checkpoint
+selection/early-stopping logic for reproducible reporting.
 
 ---
 

@@ -27,8 +27,8 @@ closing Phase 1 and staging Phase 2 correctly:
 - Started temporal GNN environment/training setup on remote hardware.
 - Last completed GNN smoke run metrics: acc=0.6155, prec=0.6615, rec=0.8648,
   f1=0.7496 (TP=1151, FP=589, FN=180, TN=80).
-- Current run status: `train_gnn_model.py` 20-epoch full training on
-  `data/runs/2026-02-17_full_10k` is in progress on remote CPU.
+- Completed GNN full run (20 epochs, 10k dataset): best checkpoint at epoch 3
+  with test acc=0.7600, f1=0.8205, prec=0.8168, rec=0.8242.
 - Continued external dataset onboarding as a supporting/validation track
   (not Phase 1 truth labels), to feed Phase 2 planning.
 
