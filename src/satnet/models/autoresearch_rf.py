@@ -7,7 +7,7 @@ import time
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Literal, NoReturn, Sequence
 from uuid import uuid4
 
 from satnet.metrics.resilience_targets import infer_task_type
@@ -227,11 +227,20 @@ def run_rf_experiment(
 
     try:
         model, metrics, predictions = _train_rf_once(cfg)
-        _write_json(metrics_path, metrics)
-        predictions.to_csv(predictions_path, index=False)
+        try:
+            _write_json(metrics_path, metrics)
+        except Exception as exc:
+            _raise_artifact_write_error(metrics_path, "metrics artifact", exc)
+        try:
+            predictions.to_csv(predictions_path, index=False)
+        except Exception as exc:
+            _raise_artifact_write_error(predictions_path, "predictions artifact", exc)
         artifact_paths["predictions"] = str(predictions_path)
         if cfg.save_model_artifact:
-            _save_model_artifact(model, model_path)
+            try:
+                _save_model_artifact(model, model_path)
+            except Exception as exc:
+                _raise_artifact_write_error(model_path, "model artifact", exc)
             artifact_paths["model"] = str(model_path)
 
         incumbent_comparison = _build_incumbent_comparison(prior_incumbent, metrics)
@@ -271,8 +280,14 @@ def run_rf_experiment(
     }
     summary = build_run_summary(result)
     try:
-        _write_json(summary_path, summary)
-        append_result_ledger(ledger_path, result)
+        try:
+            _write_json(summary_path, summary)
+        except Exception as exc:
+            _raise_artifact_write_error(summary_path, "summary artifact", exc)
+        try:
+            append_result_ledger(ledger_path, result)
+        except Exception as exc:
+            _raise_artifact_write_error(ledger_path, "results ledger", exc)
         if prior_incumbent is None and ledger_incumbent is not None:
             incumbent_registry = upsert_incumbent_entry(
                 incumbent_registry,
@@ -284,16 +299,22 @@ def run_rf_experiment(
                 incumbent_entry_from_result(result),
             )
         if incumbent_registry.get("incumbents"):
-            save_incumbent_registry(incumbent_path, incumbent_registry)
-        _write_json(
-            last_run_path,
-            build_last_run_record(
-                result,
-                mode=command_mode,
-                summary_path=str(summary_path),
-                config_snapshot=cfg.to_dict(),
-            ),
-        )
+            try:
+                save_incumbent_registry(incumbent_path, incumbent_registry)
+            except Exception as exc:
+                _raise_artifact_write_error(incumbent_path, "incumbent registry", exc)
+        try:
+            _write_json(
+                last_run_path,
+                build_last_run_record(
+                    result,
+                    mode=command_mode,
+                    summary_path=str(summary_path),
+                    config_snapshot=cfg.to_dict(),
+                ),
+            )
+        except Exception as exc:
+            _raise_artifact_write_error(last_run_path, "last run record", exc)
     except Exception as exc:
         failure_reason = f"Post-run persistence failed with {exc.__class__.__name__}: {exc}"
         failure_payload = build_last_run_record(
@@ -650,6 +671,10 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
         json.dump(payload, f, indent=2, default=str)
 
 
+def _raise_artifact_write_error(path: Path, artifact_label: str, exc: BaseException) -> NoReturn:
+    raise exc.__class__(f"Failed writing {artifact_label} at {path}: {exc}") from exc
+
+
 def build_run_summary(result: dict[str, Any]) -> dict[str, Any]:
     return {
         "schema_version": SUMMARY_SCHEMA_VERSION,
@@ -678,6 +703,13 @@ def build_last_run_record(
     error_message: str | None = None,
 ) -> dict[str, Any]:
     artifact_paths = dict(result.get("artifact_paths", {}) or {})
+    metrics_payload = dict(result.get("metrics", {}) or {})
+    resolved_error_type = error_type
+    if resolved_error_type is None and isinstance(metrics_payload.get("error_type"), str):
+        resolved_error_type = metrics_payload["error_type"]
+    resolved_error_message = error_message
+    if resolved_error_message is None and isinstance(metrics_payload.get("error_message"), str):
+        resolved_error_message = metrics_payload["error_message"]
     payload = {
         "schema_version": LAST_RUN_SCHEMA_VERSION,
         "mode": mode,
@@ -691,7 +723,7 @@ def build_last_run_record(
         "seed": result.get("seed"),
         "model_family": result.get("model_family"),
         "experiment_type": result.get("experiment_type"),
-        "metrics": dict(result.get("metrics", {}) or {}),
+        "metrics": metrics_payload,
         "incumbent_comparison": dict(
             result.get("incumbent_comparison", {}) or _build_incumbent_comparison(None, None)
         ),
@@ -708,8 +740,8 @@ def build_last_run_record(
             if isinstance(config_snapshot, dict)
             else dict(result.get("config", {})) if isinstance(result.get("config"), dict) else None
         ),
-        "error_type": error_type,
-        "error_message": error_message,
+        "error_type": resolved_error_type,
+        "error_message": resolved_error_message,
     }
     return payload
 

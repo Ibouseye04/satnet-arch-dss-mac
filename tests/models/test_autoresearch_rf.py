@@ -558,3 +558,54 @@ def test_run_rf_experiment_preserves_summary_pointer_on_late_persistence_failure
     assert last_run_payload["error_type"] == "OSError"
     assert summary_path.exists()
     assert last_run_payload["artifact_paths"]["summary"] == str(summary_path)
+
+
+def test_run_rf_experiment_reports_predictions_artifact_path_on_export_failure(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    dataset_path = tmp_path / "tier1_design_runs.csv"
+    experiments_root = tmp_path / "experiments" / "autoresearch"
+    _write_runs_csv(dataset_path)
+
+    class FailingPredictions:
+        def to_csv(self, path, index=False) -> None:
+            raise PermissionError("[WinError 5] Access is denied")
+
+    def fake_train_rf_once(cfg: RfExperimentConfig):
+        metrics = {
+            "task_type": "regression",
+            "target_name": cfg.target_name,
+            "test_rmse": 0.100,
+            "test_spearman_rho": 0.80,
+            "test_r2": 0.70,
+        }
+        return object(), metrics, FailingPredictions()
+
+    monkeypatch.setattr(autoresearch_rf, "_train_rf_once", fake_train_rf_once)
+
+    result = run_rf_experiment(
+        RfExperimentConfig(
+            dataset_path=str(dataset_path),
+            target_name="gcc_frac_min",
+            feature_mode="tier1_full",
+            n_estimators=300,
+            seed=42,
+            save_model_artifact=False,
+        ),
+        experiments_root=experiments_root,
+        command_mode="candidate",
+    )
+
+    last_run_payload = json.loads((experiments_root / "last_run.json").read_text())
+    predictions_path = (
+        experiments_root / result["experiment_id"] / "predictions.csv"
+    )
+
+    assert result["status"] == "failed"
+    assert result["promotion_decision"] == "failed"
+    assert last_run_payload["status"] == "failed"
+    assert last_run_payload["error_type"] == "PermissionError"
+    assert str(predictions_path) in last_run_payload["error_message"]
+    assert "predictions artifact" in last_run_payload["error_message"]
+    assert last_run_payload["artifact_paths"]["predictions"] is None
