@@ -114,6 +114,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Directory for cached graph .pt files (default: artifacts/graph_cache)",
     )
+    parser.add_argument(
+        "--target-name",
+        type=str,
+        default="partition_any",
+        help="Resilience target column (default: partition_any)",
+    )
     return parser.parse_args()
 
 
@@ -142,55 +148,42 @@ def train_epoch(
     criterion: nn.Module,
     device: torch.device,
 ) -> Tuple[float, float]:
+    """Train for one epoch. Returns (avg_loss, accuracy).
+
+    For regression, accuracy is always 0.0 (not meaningful).
     """
-    Train for one epoch.
-    
-    Args:
-        model: The SatelliteGNN model
-        train_indices: Indices of training samples
-        dataset: The SatNetTemporalDataset
-        optimizer: Adam optimizer
-        criterion: CrossEntropyLoss
-        device: Torch device
-    
-    Returns:
-        Tuple of (average_loss, accuracy)
-    """
+    is_regression = model.task_type == "regression"
     model.train()
     total_loss = 0.0
     correct = 0
     total = 0
-    
+
     for idx in train_indices:
-        # Get temporal sequence for this run
         data_sequence = dataset[idx]
         data_sequence = move_data_to_device(data_sequence, device)
-        
-        # Get label from the first Data object (same for all time steps)
-        label = data_sequence[0].y.to(device)  # [1]
-        
-        # Zero gradients
+        label = data_sequence[0].y.to(device)  # [1] float
+
         optimizer.zero_grad()
-        
-        # Forward pass
-        logits = model(data_sequence)  # [1, 2]
-        
-        # Compute loss
-        loss = criterion(logits, label)
-        
-        # Backward pass
+        out = model(data_sequence)
+
+        if is_regression:
+            loss = criterion(out.squeeze(), label)
+        else:
+            loss = criterion(out, label.long())
+
         loss.backward()
         optimizer.step()
-        
-        # Track metrics
+
         total_loss += loss.item()
-        pred = logits.argmax(dim=1)
-        correct += (pred == label).sum().item()
         total += 1
-    
+
+        if not is_regression:
+            pred = out.argmax(dim=1)
+            correct += (pred == label.long()).sum().item()
+
     avg_loss = total_loss / len(train_indices)
-    accuracy = correct / total
-    
+    accuracy = correct / total if not is_regression else 0.0
+
     return avg_loss, accuracy
 
 
@@ -202,63 +195,55 @@ def evaluate(
     criterion: nn.Module,
     device: torch.device,
 ) -> Tuple[float, float, dict]:
-    """
-    Evaluate the model on test data.
-    
-    Args:
-        model: The SatelliteGNN model
-        test_indices: Indices of test samples
-        dataset: The SatNetTemporalDataset
-        criterion: CrossEntropyLoss
-        device: Torch device
-    
-    Returns:
-        Tuple of (average_loss, accuracy, metrics_dict)
-    """
+    """Evaluate the model. Returns (avg_loss, accuracy, metrics_dict)."""
+    is_regression = model.task_type == "regression"
     model.eval()
     total_loss = 0.0
     correct = 0
     total = 0
-    
-    # For confusion matrix
+
     true_positives = 0
     false_positives = 0
     true_negatives = 0
     false_negatives = 0
-    
+
     for idx in test_indices:
         data_sequence = dataset[idx]
         data_sequence = move_data_to_device(data_sequence, device)
         label = data_sequence[0].y.to(device)
-        
-        logits = model(data_sequence)
-        loss = criterion(logits, label)
-        
-        total_loss += loss.item()
-        pred = logits.argmax(dim=1)
-        correct += (pred == label).sum().item()
-        total += 1
-        
-        # Update confusion matrix
-        pred_val = pred.item()
-        label_val = label.item()
-        if pred_val == 1 and label_val == 1:
-            true_positives += 1
-        elif pred_val == 1 and label_val == 0:
-            false_positives += 1
-        elif pred_val == 0 and label_val == 0:
-            true_negatives += 1
+
+        out = model(data_sequence)
+
+        if is_regression:
+            loss = criterion(out.squeeze(), label)
         else:
-            false_negatives += 1
-    
+            loss = criterion(out, label.long())
+
+        total_loss += loss.item()
+        total += 1
+
+        if not is_regression:
+            pred = out.argmax(dim=1)
+            correct += (pred == label.long()).sum().item()
+
+            pred_val = pred.item()
+            label_val = label.long().item()
+            if pred_val == 1 and label_val == 1:
+                true_positives += 1
+            elif pred_val == 1 and label_val == 0:
+                false_positives += 1
+            elif pred_val == 0 and label_val == 0:
+                true_negatives += 1
+            else:
+                false_negatives += 1
+
     avg_loss = total_loss / len(test_indices)
-    accuracy = correct / total
-    
-    # Calculate precision, recall, F1
+    accuracy = correct / total if not is_regression else 0.0
+
     precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
     recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
-    
+
     metrics = {
         "precision": precision,
         "recall": recall,
@@ -268,33 +253,39 @@ def evaluate(
         "true_negatives": true_negatives,
         "false_negatives": false_negatives,
     }
-    
+
     return avg_loss, accuracy, metrics
 
 
 def main():
     """Main training loop."""
     args = parse_args()
-    
+
+    from satnet.metrics.resilience_targets import infer_task_type
+
+    task_type = infer_task_type(args.target_name)
+    is_regression = task_type == "regression"
+
     # Set random seeds for reproducibility
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
-    
+
     # Resolve paths
     data_dir = Path(args.data_dir)
     if not data_dir.is_absolute():
         data_dir = PROJECT_ROOT / data_dir
-    
+
     output_path = Path(args.output_model)
     if not output_path.is_absolute():
         output_path = PROJECT_ROOT / output_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Get device
     device = get_device(args.device)
     logger.info(f"Using device: {device}")
-    
+    logger.info(f"Target: {args.target_name} ({task_type})")
+
     # Load dataset
     logger.info(f"Loading dataset from {data_dir}")
     try:
@@ -303,65 +294,74 @@ def main():
             use_cache=args.use_cache,
             write_cache=args.write_cache,
             cache_dir=args.cache_dir,
+            target_name=args.target_name,
         )
     except FileNotFoundError as e:
         logger.error(f"Dataset not found: {e}")
         logger.error("Please ensure tier1_design_runs.csv exists in the data directory.")
         sys.exit(1)
-    
+
     num_samples = len(dataset)
     neg_count, pos_count = dataset.get_label_distribution()
-    logger.info(f"Dataset: {num_samples} samples (Robust: {neg_count}, Partitioned: {pos_count})")
-    
-    # Split train/test: simple 80/20 split (first 1600 train, last 400 test)
-    split_idx = int(num_samples * 0.8)
+    logger.info(f"Dataset: {num_samples} samples (neg: {neg_count}, pos: {pos_count})")
+
+    # Split train/test
+    split_idx = int(num_samples * (1.0 - args.test_split))
     train_indices = list(range(split_idx))
     test_indices = list(range(split_idx, num_samples))
     logger.info(f"Train/Test split: {len(train_indices)}/{len(test_indices)}")
-    
+
     # Initialize model
+    out_channels = 1 if is_regression else 2
     model = SatelliteGNN(
         node_features=3,
         hidden_channels=args.hidden_dim,
-        out_channels=2,
+        out_channels=out_channels,
+        task_type=task_type,
     )
     model = model.to(device)
-    
+
     num_params = sum(p.numel() for p in model.parameters())
     logger.info(f"Model parameters: {num_params:,}")
-    
+
     # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
+    if is_regression:
+        criterion = nn.SmoothL1Loss()
+    else:
+        criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    
+
     # Training loop
     logger.info(f"Starting training for {args.epochs} epochs...")
     logger.info("-" * 60)
-    
-    best_test_acc = 0.0
+
+    best_test_loss = float("inf")
     best_epoch = 0
-    
+
     for epoch in range(1, args.epochs + 1):
-        # Train
         train_loss, train_acc = train_epoch(
             model, train_indices, dataset, optimizer, criterion, device
         )
-        
-        # Evaluate
         test_loss, test_acc, metrics = evaluate(
             model, test_indices, dataset, criterion, device
         )
-        
-        # Log progress
-        logger.info(
-            f"Epoch {epoch:3d}/{args.epochs} | "
-            f"Train Loss: {train_loss:.4f} Acc: {train_acc:.4f} | "
-            f"Test Loss: {test_loss:.4f} Acc: {test_acc:.4f} F1: {metrics['f1']:.4f}"
-        )
-        
-        # Save best model
-        if test_acc > best_test_acc:
-            best_test_acc = test_acc
+
+        if is_regression:
+            logger.info(
+                f"Epoch {epoch:3d}/{args.epochs} | "
+                f"Train Loss: {train_loss:.4f} | "
+                f"Test Loss: {test_loss:.4f}"
+            )
+        else:
+            logger.info(
+                f"Epoch {epoch:3d}/{args.epochs} | "
+                f"Train Loss: {train_loss:.4f} Acc: {train_acc:.4f} | "
+                f"Test Loss: {test_loss:.4f} Acc: {test_acc:.4f} F1: {metrics['f1']:.4f}"
+            )
+
+        # Save best model (by lowest test loss)
+        if test_loss < best_test_loss:
+            best_test_loss = test_loss
             best_epoch = epoch
             torch.save({
                 "epoch": epoch,
@@ -372,25 +372,40 @@ def main():
                 "test_acc": test_acc,
                 "metrics": metrics,
                 "args": vars(args),
+                "task_type": task_type,
+                "target_name": args.target_name,
             }, output_path)
-    
+
     logger.info("-" * 60)
-    logger.info(f"Training complete!")
-    logger.info(f"Best test accuracy: {best_test_acc:.4f} at epoch {best_epoch}")
+    logger.info(f"Training complete! Best test loss: {best_test_loss:.4f} at epoch {best_epoch}")
     logger.info(f"Model saved to: {output_path}")
-    
-    # Final evaluation with detailed metrics
-    logger.info("\nFinal Test Metrics:")
-    test_loss, test_acc, metrics = evaluate(
-        model, test_indices, dataset, criterion, device
-    )
-    logger.info(f"  Accuracy:  {test_acc:.4f}")
-    logger.info(f"  Precision: {metrics['precision']:.4f}")
-    logger.info(f"  Recall:    {metrics['recall']:.4f}")
-    logger.info(f"  F1 Score:  {metrics['f1']:.4f}")
-    logger.info(f"  Confusion Matrix:")
-    logger.info(f"    TP: {metrics['true_positives']:4d}  FP: {metrics['false_positives']:4d}")
-    logger.info(f"    FN: {metrics['false_negatives']:4d}  TN: {metrics['true_negatives']:4d}")
+
+    # Save per-sample predictions
+    model.eval()
+    preds_rows = []
+    with torch.no_grad():
+        for split_name, indices in [("train", train_indices), ("test", test_indices)]:
+            for idx in indices:
+                data_seq = dataset[idx]
+                data_seq = move_data_to_device(data_seq, device)
+                out = model(data_seq)
+                if is_regression:
+                    pred_val = out.squeeze().item()
+                else:
+                    pred_val = out.argmax(dim=1).item()
+                true_val = data_seq[0].y.item()
+                preds_rows.append({
+                    "sample_idx": idx,
+                    "true": true_val,
+                    "predicted": pred_val,
+                    "split": split_name,
+                    "seed": args.seed,
+                })
+
+    import pandas as pd
+    preds_path = output_path.parent / f"{output_path.stem}_predictions.csv"
+    pd.DataFrame(preds_rows).to_csv(preds_path, index=False)
+    logger.info(f"Predictions saved to: {preds_path}")
 
 
 if __name__ == "__main__":

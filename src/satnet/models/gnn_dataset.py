@@ -82,6 +82,7 @@ class SatNetTemporalDataset(Dataset):
         use_cache: bool = False,
         write_cache: bool = False,
         cache_dir: Optional[str] = None,
+        target_name: str = "partition_any",
     ):
         """
         Initialize the SatNet Temporal Dataset.
@@ -96,6 +97,7 @@ class SatNetTemporalDataset(Dataset):
             use_cache: If True, attempt to load cached graph sequences.
             write_cache: If True, write generated sequences to cache.
             cache_dir: Directory for cached .pt files (default: artifacts/graph_cache).
+            target_name: Column name for the target variable (default: partition_any).
 
         Raises:
             FileNotFoundError: If the CSV file does not exist at root/csv_file.
@@ -106,6 +108,7 @@ class SatNetTemporalDataset(Dataset):
         self.use_cache = use_cache
         self.write_cache = write_cache
         self._cache_dir = cache_dir
+        self.target_name = target_name
         
         # Validate that the CSV file exists before proceeding
         csv_path = os.path.join(root, csv_file)
@@ -131,10 +134,10 @@ class SatNetTemporalDataset(Dataset):
         """Validate that required columns exist in the CSV."""
         required_cols = [
             "num_planes",
-            "sats_per_plane", 
+            "sats_per_plane",
             "inclination_deg",
             "altitude_km",
-            "partition_any",
+            self.target_name,
         ]
         missing = [c for c in required_cols if c not in self._df.columns]
         if missing:
@@ -232,8 +235,8 @@ class SatNetTemporalDataset(Dataset):
         # Optional parameters with defaults
         phasing_factor = int(row.get("phasing_factor", 1))
 
-        # Get the label
-        label = int(row["partition_any"])
+        # Get the label (supports any target column)
+        label = float(row[self.target_name])
 
         # Get seed if available (for reproducibility)
         seed = row.get("seed", None)
@@ -320,26 +323,13 @@ class SatNetTemporalDataset(Dataset):
     def _networkx_to_pyg_data(
         self,
         G,
-        label: int,
+        label: float,
         run_id: int,
         time_step: int,
         num_planes: int,
         sats_per_plane: int,
     ) -> Data:
-        """
-        Convert a NetworkX graph to a PyG Data object.
-        
-        Args:
-            G: NetworkX graph from HypatiaAdapter
-            label: partition_any label (0 or 1)
-            run_id: Index of the run
-            time_step: Time step index
-            num_planes: Number of orbital planes
-            sats_per_plane: Satellites per plane
-        
-        Returns:
-            PyG Data object with node features, edge_index, and label
-        """
+        """Convert a NetworkX graph to a PyG Data object."""
         num_nodes = G.number_of_nodes()
 
         # Create mapping from original node IDs to contiguous indices [0, num_nodes)
@@ -415,7 +405,7 @@ class SatNetTemporalDataset(Dataset):
             x=x,
             edge_index=edge_index,
             edge_attr=edge_attr,
-            y=torch.tensor([label], dtype=torch.long),
+            y=torch.tensor([label], dtype=torch.float),
             run_id=torch.tensor([run_id], dtype=torch.long),
             time_step=torch.tensor([time_step], dtype=torch.long),
             num_nodes=num_nodes,
@@ -439,13 +429,15 @@ class SatNetTemporalDataset(Dataset):
         return self._df.iloc[idx].to_dict()
     
     def get_label_distribution(self) -> Tuple[int, int]:
-        """
-        Get the distribution of partition_any labels.
-        
+        """Get the distribution of binary target labels.
+
         Returns:
-            Tuple of (num_negative, num_positive) counts
+            Tuple of (num_negative, num_positive) counts.
+            For continuous targets, thresholds at 0.5.
         """
-        counts = self._df["partition_any"].value_counts()
+        col = self.target_name if self.target_name in self._df.columns else "partition_any"
+        binary = (self._df[col] > 0.5).astype(int)
+        counts = binary.value_counts()
         return counts.get(0, 0), counts.get(1, 0)
 
 
