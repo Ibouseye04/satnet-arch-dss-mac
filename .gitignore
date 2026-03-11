@@ -34,3 +34,6 @@ models/*_metrics.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Codex/agent artifacts
+.desloppify/

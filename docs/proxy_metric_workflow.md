@@ -4,6 +4,14 @@ Copy-pasteable commands for the proxy-metric / instrumentation pipeline.
 
 All commands assume you are in the repository root.
 
+Install ML extras before RF/GNN training:
+
+```bash
+python -m pip install -e ".[ml]"
+```
+
+`[ml]` includes `torch-geometric-temporal`, required by the GNN path.
+
 ---
 
 ## A. Generate Dataset (Build Cache Source)
@@ -30,6 +38,7 @@ python scripts/train_design_risk_model.py \
 ```
 
 Output: `models/design_risk_model_tier1.joblib`, `models/design_risk_model_tier1_metrics.json`
+and `models/design_risk_model_tier1_predictions.csv`.
 
 ---
 
@@ -122,9 +131,10 @@ python scripts/train_design_risk_model.py --target-name partition_fraction --see
 python tools/validate_proxy_rankings.py \
     models/rf_gcc_frac_min_predictions.csv \
     models/rf_partition_fraction_predictions.csv \
-    --id-col sample_idx \
-    --score-col predicted \
+    --id-col config_hash \
+    --score-col y_pred \
     --top-k 5,10,20 \
+    --allow-partial \
     --output analysis/proxy_validation_report.json
 ```
 
@@ -135,7 +145,7 @@ Reports: Spearman rho, Kendall tau, pairwise ordering accuracy, top-k overlap, N
 ## H. Convert Experiment Log to CSV
 
 ```bash
-python -c "
+PYTHONPATH=src python -c "
 from satnet.utils.experiment_logger import jsonl_to_csv
 jsonl_to_csv('experiments/rf_log.jsonl', 'experiments/rf_summary.csv')
 "
@@ -152,6 +162,5 @@ jsonl_to_csv('experiments/rf_log.jsonl', 'experiments/rf_summary.csv')
 | `gcc_frac_min` | regression | Minimum GCC fraction across timesteps |
 | `gcc_frac_mean` | regression | Mean GCC fraction across timesteps |
 | `max_partition_streak` | regression | Longest consecutive partitioned streak |
-| `num_components_max` | regression | Maximum connected components |
 
 The primary recommended target for continuous resilience severity is **`gcc_frac_min`**.

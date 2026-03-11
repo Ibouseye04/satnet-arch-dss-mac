@@ -29,7 +29,6 @@ from satnet.models.risk_model import (  # noqa: E402
     RiskModelConfig,
     save_model,
     train_rf_model,
-    train_tier1_v1_design_model,
 )
 from satnet.utils.experiment_logger import ExperimentLogger  # noqa: E402
 
@@ -77,6 +76,7 @@ def main() -> None:
     data_path = Path(args.data_path) if args.data_path else PROJECT_ROOT / "data" / "tier1_design_runs.csv"
     out_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "models"
     log_path = Path(args.experiment_log) if args.experiment_log else PROJECT_ROOT / "experiments" / "rf_log.jsonl"
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     if not data_path.exists():
         print(f"ERROR: Dataset not found at {data_path}")
@@ -100,44 +100,38 @@ def main() -> None:
         exp_log.set("seed", args.seed)
         exp_log.set("data_path", str(data_path))
 
-        # Use the legacy path for backwards compat when target is partition_any
-        if args.target_name == "partition_any" and args.data_path is None:
-            print("Using legacy design model path for partition_any")
-            exp_log.start_timer("training")
-            model, metrics = train_tier1_v1_design_model(data_path, cfg)
-            exp_log.stop_timer("training")
+        exp_log.start_timer("training")
+        model, metrics, predictions = train_rf_model(
+            csv_path=data_path,
+            target_name=args.target_name,
+            cfg=cfg,
+        )
+        exp_log.stop_timer("training")
 
+        if args.target_name == "partition_any":
             model_path = out_dir / "design_risk_model_tier1.joblib"
             save_model(model, model_path)
             metrics_path = out_dir / "design_risk_model_tier1_metrics.json"
-
-            _print_classification_report(metrics)
+            preds_path = out_dir / "design_risk_model_tier1_predictions.csv"
         else:
-            exp_log.start_timer("training")
-            model, metrics, predictions = train_rf_model(
-                csv_path=data_path,
-                target_name=args.target_name,
-                cfg=cfg,
-            )
-            exp_log.stop_timer("training")
-
             suffix = args.target_name.replace(".", "_")
             model_path = out_dir / f"rf_{suffix}.joblib"
             save_model(model, model_path)
             metrics_path = out_dir / f"rf_{suffix}_metrics.json"
-
-            # Save predictions
             preds_path = out_dir / f"rf_{suffix}_predictions.csv"
-            predictions.to_csv(preds_path, index=False)
-            print(f"Predictions saved to {preds_path}")
 
-            if task_type == "classification":
-                _print_classification_report(metrics)
-            else:
-                _print_regression_report(metrics)
+        # Save predictions using a stable schema from train_rf_model()
+        predictions.to_csv(preds_path, index=False)
+        print(f"Predictions saved to {preds_path}")
+
+        if task_type == "classification":
+            _print_classification_report(metrics)
+        else:
+            _print_regression_report(metrics)
 
         exp_log.set_metrics(metrics)
         exp_log.set("model_path", str(model_path))
+        exp_log.set("prediction_path", str(preds_path))
 
     # Save metrics JSON
     out_dir.mkdir(parents=True, exist_ok=True)

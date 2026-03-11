@@ -6,9 +6,15 @@ import json
 
 import pytest
 
-from satnet.utils.graph_cache import make_sample_cache_key
+from satnet.utils.graph_cache import (
+    CACHE_SCHEMA_VERSION,
+    make_cache_metadata,
+    make_sample_cache_key,
+    validate_cache_entry,
+)
 
 torch = pytest.importorskip("torch")
+Data = pytest.importorskip("torch_geometric.data").Data
 
 from satnet.utils.graph_cache import (  # noqa: E402
     cache_exists,
@@ -41,26 +47,35 @@ class TestMakeSampleCacheKey:
 
 class TestSaveLoadGraphSequence:
     def test_roundtrip(self, tmp_path) -> None:
-        from torch_geometric.data import Data
-
         data_list = [
             Data(x=torch.randn(5, 3), edge_index=torch.randint(0, 5, (2, 8)))
             for _ in range(3)
         ]
         key = "test_key_abc123"
-        wt = save_graph_sequence(data_list, tmp_path, key)
+        metadata = make_cache_metadata(
+            generator_fingerprint=key,
+            generator_config={"num_planes": 4},
+        )
+        wt = save_graph_sequence(data_list, tmp_path, key, metadata=metadata)
         assert wt >= 0.0
         assert cache_exists(tmp_path, key)
 
-        loaded, lt = load_graph_sequence(tmp_path, key)
+        loaded, lt, loaded_metadata = load_graph_sequence(tmp_path, key)
         assert loaded is not None
         assert len(loaded) == 3
         assert lt >= 0.0
+        validate_cache_entry(
+            loaded,
+            loaded_metadata,
+            expected_generator_fingerprint=key,
+            expected_generator_config={"num_planes": 4},
+        )
 
     def test_miss_returns_none(self, tmp_path) -> None:
-        loaded, lt = load_graph_sequence(tmp_path, "nonexistent")
+        loaded, lt, metadata = load_graph_sequence(tmp_path, "nonexistent")
         assert loaded is None
         assert lt == 0.0
+        assert metadata is None
 
     def test_metadata_written(self, tmp_path) -> None:
         data_list = [torch.tensor([1, 2, 3])]
@@ -68,6 +83,91 @@ class TestSaveLoadGraphSequence:
         meta_path = tmp_path / "k.meta.json"
         assert meta_path.exists()
         assert json.loads(meta_path.read_text())["note"] == "test"
+
+    def test_validate_rejects_missing_metadata(self, tmp_path) -> None:
+        key = "missing_meta"
+        data_list = [Data(x=torch.randn(4, 2), edge_index=torch.randint(0, 4, (2, 4)))]
+        save_graph_sequence(data_list, tmp_path, key)
+        loaded, _, metadata = load_graph_sequence(tmp_path, key)
+        assert loaded is not None
+
+        with pytest.raises(ValueError, match="metadata is missing"):
+            validate_cache_entry(
+                loaded,
+                metadata,
+                expected_generator_fingerprint=key,
+                expected_generator_config={"num_planes": 4},
+            )
+
+    def test_validate_rejects_stale_schema_version(self, tmp_path) -> None:
+        key = "stale_schema"
+        data_list = [Data(x=torch.randn(4, 2), edge_index=torch.randint(0, 4, (2, 4)))]
+        metadata = make_cache_metadata(
+            generator_fingerprint=key,
+            generator_config={"num_planes": 4},
+        )
+        save_graph_sequence(data_list, tmp_path, key, metadata=metadata)
+        meta_path = tmp_path / f"{key}.meta.json"
+        parsed = json.loads(meta_path.read_text())
+        parsed["cache_schema_version"] = CACHE_SCHEMA_VERSION - 1
+        meta_path.write_text(json.dumps(parsed))
+
+        loaded, _, loaded_metadata = load_graph_sequence(tmp_path, key)
+        assert loaded is not None
+        with pytest.raises(ValueError, match="Unsupported cache schema version"):
+            validate_cache_entry(
+                loaded,
+                loaded_metadata,
+                expected_generator_fingerprint=key,
+                expected_generator_config={"num_planes": 4},
+            )
+
+    def test_validate_rejects_target_bound_payload(self, tmp_path) -> None:
+        key = "bound_payload"
+        data_list = [
+            Data(
+                x=torch.randn(4, 2),
+                edge_index=torch.randint(0, 4, (2, 4)),
+                y=torch.tensor([1.0]),
+            )
+        ]
+        metadata = make_cache_metadata(
+            generator_fingerprint=key,
+            generator_config={"num_planes": 4},
+        )
+        save_graph_sequence(data_list, tmp_path, key, metadata=metadata)
+        loaded, _, loaded_metadata = load_graph_sequence(tmp_path, key)
+        assert loaded is not None
+
+        with pytest.raises(ValueError, match="contains embedded labels"):
+            validate_cache_entry(
+                loaded,
+                loaded_metadata,
+                expected_generator_fingerprint=key,
+                expected_generator_config={"num_planes": 4},
+            )
+
+    def test_validate_rejects_legacy_label_payload_without_metadata(self, tmp_path) -> None:
+        key = "legacy_labeled"
+        data_list = [
+            Data(
+                x=torch.randn(4, 2),
+                edge_index=torch.randint(0, 4, (2, 4)),
+                y=torch.tensor([0.0]),
+            )
+        ]
+        save_graph_sequence(data_list, tmp_path, key)
+        loaded, _, loaded_metadata = load_graph_sequence(tmp_path, key)
+        assert loaded is not None
+        assert loaded_metadata is None
+
+        with pytest.raises(ValueError, match="Legacy cache artifact detected"):
+            validate_cache_entry(
+                loaded,
+                loaded_metadata,
+                expected_generator_fingerprint=key,
+                expected_generator_config={"num_planes": 4},
+            )
 
 
 class TestCacheTelemetry:

@@ -22,6 +22,7 @@ dependencies = [
 ml = [
     "torch>=2.0,<3.0",
     "torch-geometric>=2.4,<3.0",
+    "torch-geometric-temporal>=0.56,<1.0",
 ]
 dev = [
     "pytest>=8.0",

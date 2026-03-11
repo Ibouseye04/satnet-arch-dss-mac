@@ -6,7 +6,7 @@ IDs and compares rankings using correlation and overlap metrics.
 
 Usage:
     python tools/validate_proxy_rankings.py reference.csv proxy.csv
-    python tools/validate_proxy_rankings.py ref.csv proxy.csv --id-col config_hash --score-col predicted --top-k 10,20,50
+    python tools/validate_proxy_rankings.py ref.csv proxy.csv --id-col config_hash --score-col y_pred --top-k 10,20,50
     python tools/validate_proxy_rankings.py ref.csv proxy.csv --output report.json
 """
 
@@ -31,11 +31,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("reference", type=str, help="Path to reference scores CSV")
     parser.add_argument("proxy", type=str, help="Path to proxy scores CSV")
     parser.add_argument(
-        "--id-col", type=str, default="sample_idx",
+        "--id-col", type=str, default="config_hash",
         help="Column used to join the two files",
     )
     parser.add_argument(
-        "--score-col", type=str, default="predicted",
+        "--score-col", type=str, default="y_pred",
         help="Column containing the score to rank by",
     )
     parser.add_argument(
@@ -49,6 +49,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-csv", type=str, default=None,
         help="Optional CSV output path for the merged data",
+    )
+    parser.add_argument(
+        "--allow-partial",
+        action="store_true",
+        default=False,
+        help="Allow partial ID overlap between reference and proxy files",
     )
     return parser.parse_args()
 
@@ -135,14 +141,40 @@ def main() -> None:
                       f"Available: {list(df.columns)}")
                 sys.exit(1)
 
+    left_count = len(ref_df)
+    right_count = len(proxy_df)
+    left_duplicate_count = int(ref_df[id_col].duplicated().sum())
+    right_duplicate_count = int(proxy_df[id_col].duplicated().sum())
+
+    if left_duplicate_count > 0 or right_duplicate_count > 0:
+        print(
+            "ERROR: Join key is not unique. "
+            f"Duplicate counts -> left: {left_duplicate_count}, right: {right_duplicate_count}"
+        )
+        sys.exit(1)
+
     # Merge on shared IDs
     merged = ref_df[[id_col, score_col]].merge(
         proxy_df[[id_col, score_col]],
         on=id_col,
         suffixes=("_ref", "_proxy"),
     )
-    print(f"Merged: {len(merged)} shared IDs "
-          f"(ref={len(ref_df)}, proxy={len(proxy_df)})")
+    matched_count = len(merged)
+    dropped_left_count = left_count - matched_count
+    dropped_right_count = right_count - matched_count
+
+    print(
+        f"Merged: {matched_count} shared IDs "
+        f"(left={left_count}, right={right_count}, "
+        f"dropped_left={dropped_left_count}, dropped_right={dropped_right_count})"
+    )
+
+    if not args.allow_partial and (dropped_left_count > 0 or dropped_right_count > 0):
+        print(
+            "ERROR: Partial overlap detected. "
+            "Re-run with --allow-partial if this is intentional."
+        )
+        sys.exit(1)
 
     if len(merged) < 2:
         print("ERROR: Need at least 2 shared IDs to compute ranking metrics.")
@@ -177,7 +209,13 @@ def main() -> None:
 
     # ── print report ────────────────────────────────────────────
     report = {
-        "n_shared": len(merged),
+        "left_row_count": left_count,
+        "right_row_count": right_count,
+        "matched_row_count": matched_count,
+        "dropped_left_count": dropped_left_count,
+        "dropped_right_count": dropped_right_count,
+        "left_duplicate_key_count": left_duplicate_count,
+        "right_duplicate_key_count": right_duplicate_count,
         "spearman_rho": round(float(sp_corr), 4),
         "spearman_p": float(sp_p),
         "kendall_tau": round(float(kt_corr), 4),

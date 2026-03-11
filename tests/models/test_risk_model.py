@@ -96,3 +96,52 @@ class TestModelSerialization:
         save_model(model, model_path)
 
         assert model_path.exists()
+
+
+class TestRfPredictionSchema:
+    """Tests for stable RF prediction export fields."""
+
+    def test_train_rf_model_predictions_include_stable_columns(self, tmp_path) -> None:
+        from satnet.models.risk_model import RiskModelConfig, train_rf_model
+
+        rows = []
+        for i in range(20):
+            rows.append(
+                {
+                    "run_id": i,
+                    "config_hash": f"cfg-{i:04d}",
+                    "num_planes": 4 + (i % 3),
+                    "sats_per_plane": 6 + (i % 2),
+                    "total_satellites": 24 + i,
+                    "inclination_deg": 53.0 + (i % 5),
+                    "altitude_km": 550.0 + i,
+                    "node_failure_prob": 0.01 * (i % 4),
+                    "edge_failure_prob": 0.02 * (i % 3),
+                    "duration_minutes": 10,
+                    "step_seconds": 60,
+                    "partition_any": i % 2,
+                }
+            )
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+        cfg = RiskModelConfig(test_size=0.25, random_state=42, n_estimators=10)
+        _, _, predictions = train_rf_model(
+            csv_path=csv_path,
+            target_name="partition_any",
+            cfg=cfg,
+        )
+
+        required_columns = {
+            "config_hash",
+            "target_name",
+            "task_type",
+            "seed",
+            "split",
+            "sample_idx",
+            "y_true",
+            "y_pred",
+        }
+        assert required_columns.issubset(predictions.columns)
+        assert set(predictions["target_name"]) == {"partition_any"}
+        assert set(predictions["task_type"]) == {"classification"}

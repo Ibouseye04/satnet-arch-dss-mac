@@ -125,6 +125,10 @@ class SatelliteGNN(nn.Module):
 
     def predict_proba(self, data_list: List[Data]) -> torch.Tensor:
         """Get prediction probabilities (classification only)."""
+        if self.task_type != "classification":
+            raise RuntimeError(
+                "predict_proba() is only available when task_type='classification'."
+            )
         self.eval()
         with torch.no_grad():
             logits = self.forward(data_list)

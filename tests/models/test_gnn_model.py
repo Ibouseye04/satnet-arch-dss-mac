@@ -63,6 +63,20 @@ class TestSatelliteGNN:
         assert (probs >= 0).all()
         assert (probs <= 1).all()
 
+    def test_predict_proba_raises_for_regression(self, dummy_sequence) -> None:
+        """Regression models should reject predict_proba()."""
+        from satnet.models.gnn_model import SatelliteGNN
+
+        model = SatelliteGNN(
+            node_features=3,
+            hidden_channels=16,
+            out_channels=1,
+            task_type="regression",
+        )
+
+        with pytest.raises(RuntimeError, match="only available when task_type='classification'"):
+            model.predict_proba(dummy_sequence)
+
     def test_model_is_trainable(self, model, dummy_sequence) -> None:
         """Model can be trained with gradient descent."""
         import torch.nn.functional as F

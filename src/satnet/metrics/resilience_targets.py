@@ -13,7 +13,6 @@ The canonical targets are:
 - ``gcc_frac_min``        – minimum GCC fraction across steps
 - ``gcc_frac_mean``       – mean GCC fraction across steps
 - ``max_partition_streak``– longest consecutive run of partitioned steps
-- ``num_components_max``  – maximum number of connected components across steps
 """
 
 from __future__ import annotations
@@ -31,7 +30,6 @@ CONTINUOUS_TARGETS = frozenset({
     "gcc_frac_min",
     "gcc_frac_mean",
     "max_partition_streak",
-    "num_components_max",
 })
 ALL_TARGETS = BINARY_TARGETS | CONTINUOUS_TARGETS
 
@@ -74,12 +72,10 @@ def compute_resilience_targets(
             "gcc_frac_min": 0.0,
             "gcc_frac_mean": 0.0,
             "max_partition_streak": 0,
-            "num_components_max": 0,
         }
 
     gcc_fracs: list[float] = []
     partitioned_flags: list[int] = []
-    num_components_list: list[int] = []
 
     for step in step_metrics:
         gcc_frac = float(step["gcc_frac"])
@@ -90,8 +86,6 @@ def compute_resilience_targets(
         else:
             partitioned_flags.append(1 if gcc_frac < gcc_threshold else 0)
 
-        num_components_list.append(int(step.get("num_components", 1)))
-
     n = len(step_metrics)
     partition_count = sum(partitioned_flags)
 
@@ -101,5 +95,4 @@ def compute_resilience_targets(
         "gcc_frac_min": min(gcc_fracs),
         "gcc_frac_mean": sum(gcc_fracs) / n,
         "max_partition_streak": aggregate_partition_streaks(partitioned_flags),
-        "num_components_max": max(num_components_list),
     }

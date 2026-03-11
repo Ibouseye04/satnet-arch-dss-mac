@@ -6,6 +6,8 @@ Use pytest.importorskip to skip when ML deps are unavailable.
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 
@@ -111,3 +113,174 @@ class TestSatNetTemporalDataset:
 
         with pytest.raises(FileNotFoundError):
             SatNetTemporalDataset(root=str(tmp_path), csv_file="nonexistent.csv")
+
+
+class TestGnnDatasetCacheContract:
+    def _write_minimal_csv(self, csv_path) -> None:
+        pd = pytest.importorskip("pandas")
+        df = pd.DataFrame(
+            [
+                {
+                    "num_planes": 2,
+                    "sats_per_plane": 3,
+                    "inclination_deg": 53.0,
+                    "altitude_km": 550.0,
+                    "phasing_factor": 1,
+                    "duration_minutes": 1,
+                    "step_seconds": 60,
+                    "failed_nodes_json": "[]",
+                    "failed_edges_json": "[]",
+                    "seed": 42,
+                    "epoch_iso": "2025-01-01T00:00:00",
+                    "config_hash": "cfg-001",
+                    "partition_any": 1,
+                    "gcc_frac_min": 0.25,
+                }
+            ]
+        )
+        df.to_csv(csv_path, index=False)
+
+    def _install_fake_adapter(self, monkeypatch, module) -> None:
+        nx = pytest.importorskip("networkx")
+
+        class FakeAdapter:
+            def __init__(self, **kwargs):  # noqa: ANN003
+                self.kwargs = kwargs
+
+            def calculate_isls(self, duration_minutes: int, step_seconds: int) -> None:
+                self.duration_minutes = duration_minutes
+                self.step_seconds = step_seconds
+
+            def iter_graphs(self):
+                for t in (0, 60):
+                    graph = nx.Graph()
+                    for node_id in range(6):
+                        graph.add_node(
+                            node_id,
+                            plane=node_id // 3,
+                            sat_in_plane=node_id % 3,
+                        )
+                    graph.add_edge(
+                        0,
+                        1,
+                        distance_km=1000.0,
+                        margin_db=10.0,
+                        link_type="intra_plane",
+                        link_mode="optical",
+                    )
+                    graph.add_edge(
+                        3,
+                        4,
+                        distance_km=1100.0,
+                        margin_db=9.0,
+                        link_type="inter_plane",
+                        link_mode="optical",
+                    )
+                    yield t, graph
+
+        monkeypatch.setattr(module, "HypatiaAdapter", FakeAdapter)
+
+    def test_cache_reuses_structure_but_recomputes_target(self, tmp_path, monkeypatch) -> None:
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models import gnn_dataset as gnn_dataset_module
+
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        cache_dir = tmp_path / "cache"
+        self._write_minimal_csv(csv_path)
+        self._install_fake_adapter(monkeypatch, gnn_dataset_module)
+
+        writer_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="partition_any",
+            write_cache=True,
+            cache_dir=str(cache_dir),
+        )
+        writer_sample = writer_ds[0]
+        assert writer_sample[0].y.item() == pytest.approx(1.0)
+
+        # Ensure second dataset instance hits cache and does not regenerate.
+        class FailOnBuildAdapter:
+            def __init__(self, **kwargs):  # noqa: ANN003
+                raise AssertionError("Expected cache hit, not regeneration")
+
+        monkeypatch.setattr(gnn_dataset_module, "HypatiaAdapter", FailOnBuildAdapter)
+        reader_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="gcc_frac_min",
+            use_cache=True,
+            cache_dir=str(cache_dir),
+        )
+        reader_sample = reader_ds[0]
+
+        assert reader_sample[0].y.item() == pytest.approx(0.25)
+        assert reader_sample[1].y.item() == pytest.approx(0.25)
+
+    def test_cache_metadata_mismatch_rejected(self, tmp_path, monkeypatch) -> None:
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models import gnn_dataset as gnn_dataset_module
+
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        cache_dir = tmp_path / "cache"
+        self._write_minimal_csv(csv_path)
+        self._install_fake_adapter(monkeypatch, gnn_dataset_module)
+
+        writer_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="partition_any",
+            write_cache=True,
+            cache_dir=str(cache_dir),
+        )
+        _ = writer_ds[0]
+
+        meta_path = next(cache_dir.glob("*.meta.json"))
+        payload = json.loads(meta_path.read_text())
+        payload["generator_fingerprint"] = "broken-fingerprint"
+        meta_path.write_text(json.dumps(payload))
+
+        reader_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="partition_any",
+            use_cache=True,
+            cache_dir=str(cache_dir),
+        )
+
+        with pytest.raises(ValueError, match="fingerprint mismatch"):
+            _ = reader_ds[0]
+
+    def test_cache_stale_schema_rejected(self, tmp_path, monkeypatch) -> None:
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models import gnn_dataset as gnn_dataset_module
+
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        cache_dir = tmp_path / "cache"
+        self._write_minimal_csv(csv_path)
+        self._install_fake_adapter(monkeypatch, gnn_dataset_module)
+
+        writer_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="partition_any",
+            write_cache=True,
+            cache_dir=str(cache_dir),
+        )
+        _ = writer_ds[0]
+
+        meta_path = next(cache_dir.glob("*.meta.json"))
+        payload = json.loads(meta_path.read_text())
+        payload["cache_schema_version"] = 0
+        meta_path.write_text(json.dumps(payload))
+
+        reader_ds = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="partition_any",
+            use_cache=True,
+            cache_dir=str(cache_dir),
+        )
+
+        with pytest.raises(ValueError, match="Unsupported cache schema version"):
+            _ = reader_ds[0]

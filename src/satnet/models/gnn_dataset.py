@@ -31,7 +31,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 import pandas as pd
 import torch
@@ -42,6 +42,14 @@ from datetime import datetime
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
 from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO, Tier1FailureRealization
+from satnet.utils.graph_cache import (
+    extract_cache_key_config,
+    load_graph_sequence,
+    make_cache_metadata,
+    make_sample_cache_key,
+    save_graph_sequence,
+    validate_cache_entry,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -196,6 +204,26 @@ class SatNetTemporalDataset(Dataset):
         # default: artifacts/graph_cache relative to root
         return os.path.join(self.root, "..", "artifacts", "graph_cache")
 
+    def _materialize_sequence(
+        self,
+        structural_data_list: List[Data],
+        *,
+        label: float,
+        run_id: int,
+    ) -> List[Data]:
+        """Attach target-specific fields to a target-agnostic graph sequence."""
+        data_list: List[Data] = []
+        for structural_data in structural_data_list:
+            data = structural_data.clone()
+            data.y = torch.tensor([label], dtype=torch.float)
+            data.run_id = torch.tensor([run_id], dtype=torch.long)
+
+            if self.transform is not None:
+                data = self.transform(data)
+
+            data_list.append(data)
+        return data_list
+
     def get(self, idx: int) -> List[Data]:
         """
         Get the temporal graph sequence for a single run.
@@ -258,18 +286,29 @@ class SatNetTemporalDataset(Dataset):
 
         # ── cache lookup ────────────────────────────────────────────
         cache_key = None
+        generator_config: dict[str, Any] | None = None
+        expected_cache_metadata: dict[str, Any] | None = None
         if self.use_cache or self.write_cache:
-            from satnet.utils.graph_cache import (
-                load_graph_sequence,
-                make_sample_cache_key,
-                save_graph_sequence,
+            sample_config = row.to_dict()
+            generator_config = extract_cache_key_config(sample_config)
+            cache_key = make_sample_cache_key(sample_config)
+            expected_cache_metadata = make_cache_metadata(
+                generator_fingerprint=cache_key,
+                generator_config=generator_config,
             )
-            cache_key = make_sample_cache_key(row.to_dict())
 
         if self.use_cache and cache_key is not None:
-            cached, _ = load_graph_sequence(self._resolved_cache_dir, cache_key)
+            cached, _, cached_metadata = load_graph_sequence(
+                self._resolved_cache_dir, cache_key
+            )
             if cached is not None:
-                return cached
+                validate_cache_entry(
+                    cached,
+                    cached_metadata,
+                    expected_generator_fingerprint=cache_key,
+                    expected_generator_config=generator_config,
+                )
+                return self._materialize_sequence(cached, label=label, run_id=idx)
 
         # ── generate graphs (cache miss or caching disabled) ────────
         # Instantiate HypatiaAdapter with explicit epoch for reproducibility
@@ -289,7 +328,7 @@ class SatNetTemporalDataset(Dataset):
         )
 
         # Convert each time step to PyG Data
-        data_list = []
+        structural_data_list: List[Data] = []
 
         for time_step, G in adapter.iter_graphs():
             # Apply persistent failures (Step 3 contract)
@@ -301,33 +340,31 @@ class SatNetTemporalDataset(Dataset):
                     G_eff.remove_edge(u, v)
             data = self._networkx_to_pyg_data(
                 G=G_eff,
-                label=label,
-                run_id=idx,
                 time_step=time_step,
                 num_planes=num_planes,
                 sats_per_plane=sats_per_plane,
             )
-
-            # Apply transform if specified
-            if self.transform is not None:
-                data = self.transform(data)
-
-            data_list.append(data)
+            structural_data_list.append(data)
 
         # ── cache write ─────────────────────────────────────────────
         if self.write_cache and cache_key is not None:
-            save_graph_sequence(data_list, self._resolved_cache_dir, cache_key)
+            save_graph_sequence(
+                structural_data_list,
+                self._resolved_cache_dir,
+                cache_key,
+                metadata=expected_cache_metadata,
+            )
 
-        return data_list
+        return self._materialize_sequence(structural_data_list, label=label, run_id=idx)
     
     def _networkx_to_pyg_data(
         self,
         G,
-        label: float,
-        run_id: int,
         time_step: int,
         num_planes: int,
         sats_per_plane: int,
+        label: Optional[float] = None,
+        run_id: Optional[int] = None,
     ) -> Data:
         """Convert a NetworkX graph to a PyG Data object."""
         num_nodes = G.number_of_nodes()
@@ -400,17 +437,22 @@ class SatNetTemporalDataset(Dataset):
             edge_index = torch.zeros((2, 0), dtype=torch.long)
             edge_attr = torch.zeros((0, 4), dtype=torch.float)
         
-        # Create PyG Data object
-        data = Data(
+        data_kwargs = dict(
             x=x,
             edge_index=edge_index,
             edge_attr=edge_attr,
-            y=torch.tensor([label], dtype=torch.float),
-            run_id=torch.tensor([run_id], dtype=torch.long),
             time_step=torch.tensor([time_step], dtype=torch.long),
             num_nodes=num_nodes,
         )
-        
+
+        if label is not None:
+            data_kwargs["y"] = torch.tensor([label], dtype=torch.float)
+        if run_id is not None:
+            data_kwargs["run_id"] = torch.tensor([run_id], dtype=torch.long)
+
+        # Create PyG Data object
+        data = Data(**data_kwargs)
+
         return data
     
     def get_run_config(self, idx: int) -> dict:

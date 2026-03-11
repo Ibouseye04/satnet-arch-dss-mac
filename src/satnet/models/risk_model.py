@@ -535,7 +535,8 @@ def train_rf_model(
 
     Returns:
         Tuple of (model, metrics, predictions_df).
-        predictions_df has columns: sample_idx, true, predicted, split, seed.
+        predictions_df has stable identifiers and prediction columns:
+        config_hash, target_name, task_type, seed, split, sample_idx, y_true, y_pred.
     """
     from satnet.metrics.resilience_targets import infer_task_type
 
@@ -602,16 +603,34 @@ def train_rf_model(
 
     # Build predictions DataFrame
     preds_rows: list[dict] = []
-    for i, (idx, true, pred) in enumerate(zip(X_train.index, y_train, y_pred_train)):
-        preds_rows.append({
-            "sample_idx": int(idx), "true": float(true), "predicted": float(pred),
-            "split": "train", "seed": cfg.random_state,
-        })
-    for i, (idx, true, pred) in enumerate(zip(X_test.index, y_test, y_pred_test)):
-        preds_rows.append({
-            "sample_idx": int(idx), "true": float(true), "predicted": float(pred),
-            "split": "test", "seed": cfg.random_state,
-        })
+
+    def _build_row(split: str, idx: int, true: float, pred: float) -> dict:
+        source_row = df.iloc[int(idx)]
+        row: dict[str, Any] = {
+            "config_hash": (
+                None
+                if "config_hash" not in df.columns or pd.isna(source_row.get("config_hash"))
+                else str(source_row.get("config_hash"))
+            ),
+            "target_name": target_name,
+            "task_type": task_type,
+            "seed": cfg.random_state,
+            "split": split,
+            "sample_idx": int(idx),
+            "y_true": float(true),
+            "y_pred": float(pred),
+            "model_type": "RandomForest",
+            "data_path": str(csv_path),
+        }
+        if "run_id" in df.columns and not pd.isna(source_row.get("run_id")):
+            row["run_id"] = int(source_row["run_id"])
+        return row
+
+    for idx, true, pred in zip(X_train.index, y_train, y_pred_train):
+        preds_rows.append(_build_row("train", int(idx), float(true), float(pred)))
+    for idx, true, pred in zip(X_test.index, y_test, y_pred_test):
+        preds_rows.append(_build_row("test", int(idx), float(true), float(pred)))
+
     predictions_df = pd.DataFrame(preds_rows)
 
     return model, metrics, predictions_df

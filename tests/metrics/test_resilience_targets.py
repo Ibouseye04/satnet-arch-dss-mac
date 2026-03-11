@@ -20,7 +20,7 @@ class TestInferTaskType:
 
     def test_continuous_targets(self) -> None:
         for name in ("gcc_frac_min", "gcc_frac_mean", "partition_fraction",
-                      "max_partition_streak", "num_components_max"):
+                      "max_partition_streak"):
             assert infer_task_type(name) == "regression"
 
     def test_unknown_target(self) -> None:
@@ -43,7 +43,6 @@ class TestComputeResilienceTargets:
         assert result["gcc_frac_mean"] == 0.0
         assert result["partition_fraction"] == 0.0
         assert result["max_partition_streak"] == 0
-        assert result["num_components_max"] == 0
 
     def test_never_partitioned(self) -> None:
         steps = [_make_step(1.0), _make_step(0.95), _make_step(0.9)]
@@ -61,7 +60,6 @@ class TestComputeResilienceTargets:
         assert result["partition_fraction"] == pytest.approx(1.0)
         assert result["max_partition_streak"] == 3
         assert result["gcc_frac_min"] == pytest.approx(0.3)
-        assert result["num_components_max"] == 5
 
     def test_intermittent_partitioning(self) -> None:
         steps = [
@@ -86,7 +84,6 @@ class TestComputeResilienceTargets:
         assert result["max_partition_streak"] == 1
         assert result["gcc_frac_min"] == pytest.approx(0.3)
         assert result["gcc_frac_mean"] == pytest.approx(0.3)
-        assert result["num_components_max"] == 4
 
     def test_single_timestep_healthy(self) -> None:
         steps = [_make_step(0.95)]
