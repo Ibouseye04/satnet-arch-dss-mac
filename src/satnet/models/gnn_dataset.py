@@ -79,10 +79,13 @@ class SatNetTemporalDataset(Dataset):
         pre_transform: Optional[callable] = None,
         duration_minutes: int = 10,
         step_seconds: int = 60,
+        use_cache: bool = False,
+        write_cache: bool = False,
+        cache_dir: Optional[str] = None,
     ):
         """
         Initialize the SatNet Temporal Dataset.
-        
+
         Args:
             root: Root directory containing the CSV file.
             csv_file: Name of the CSV file within root (default: tier1_design_runs.csv).
@@ -90,13 +93,19 @@ class SatNetTemporalDataset(Dataset):
             pre_transform: Pre-transform (not used in on-the-fly mode).
             duration_minutes: Duration for ISL calculation (default: 10 min).
             step_seconds: Time step interval (default: 60 sec).
-        
+            use_cache: If True, attempt to load cached graph sequences.
+            write_cache: If True, write generated sequences to cache.
+            cache_dir: Directory for cached .pt files (default: artifacts/graph_cache).
+
         Raises:
             FileNotFoundError: If the CSV file does not exist at root/csv_file.
         """
         self.csv_file = csv_file
         self.duration_minutes = duration_minutes
         self.step_seconds = step_seconds
+        self.use_cache = use_cache
+        self.write_cache = write_cache
+        self._cache_dir = cache_dir
         
         # Validate that the CSV file exists before proceeding
         csv_path = os.path.join(root, csv_file)
@@ -177,20 +186,29 @@ class SatNetTemporalDataset(Dataset):
         """Return the number of runs in the dataset."""
         return len(self._df)
     
+    @property
+    def _resolved_cache_dir(self) -> str:
+        if self._cache_dir is not None:
+            return self._cache_dir
+        # default: artifacts/graph_cache relative to root
+        return os.path.join(self.root, "..", "artifacts", "graph_cache")
+
     def get(self, idx: int) -> List[Data]:
         """
         Get the temporal graph sequence for a single run.
-        
+
         This method:
         1. Reads row `idx` from the CSV to get constellation config
-        2. Instantiates HypatiaAdapter with those parameters
-        3. Calls calculate_isls() to generate temporal topology
-        4. Converts each time step's NetworkX graph to PyG Data
-        5. Returns a list of Data objects (one per time step)
-        
+        2. (Optional) Checks cache for a pre-built sequence
+        3. Instantiates HypatiaAdapter with those parameters
+        4. Calls calculate_isls() to generate temporal topology
+        5. Converts each time step's NetworkX graph to PyG Data
+        6. (Optional) Writes the sequence to cache
+        7. Returns a list of Data objects (one per time step)
+
         Args:
             idx: Index of the run (0-indexed)
-        
+
         Returns:
             List of PyG Data objects, one per time step. Each Data has:
                 - x: Node features [num_sats, num_features]
@@ -202,39 +220,55 @@ class SatNetTemporalDataset(Dataset):
         """
         if idx < 0 or idx >= len(self._df):
             raise IndexError(f"Index {idx} out of range [0, {len(self._df)})")
-        
+
         row = self._df.iloc[idx]
-        
+
         # Extract constellation parameters
         num_planes = int(row["num_planes"])
         sats_per_plane = int(row["sats_per_plane"])
         inclination_deg = float(row["inclination_deg"])
         altitude_km = float(row["altitude_km"])
-        
+
         # Optional parameters with defaults
         phasing_factor = int(row.get("phasing_factor", 1))
-        
+
         # Get the label
         label = int(row["partition_any"])
-        
+
         # Get seed if available (for reproducibility)
         seed = row.get("seed", None)
-        
+
         # Get epoch from CSV or use default (Tier 1 determinism requirement)
         epoch_iso = row.get("epoch_iso", DEFAULT_EPOCH_ISO)
         epoch = datetime.fromisoformat(str(epoch_iso))
-        
+
         # Get time parameters from CSV or use instance defaults
         duration_minutes = int(row.get("duration_minutes", self.duration_minutes))
         step_seconds = int(row.get("step_seconds", self.step_seconds))
-        
+
         # Get failure realization from CSV (Step 3 contract)
         failed_nodes_json = row.get("failed_nodes_json", "[]")
         failed_edges_json = row.get("failed_edges_json", "[]")
         failures = Tier1FailureRealization.from_json_strings(
             str(failed_nodes_json), str(failed_edges_json)
         )
-        
+
+        # ── cache lookup ────────────────────────────────────────────
+        cache_key = None
+        if self.use_cache or self.write_cache:
+            from satnet.utils.graph_cache import (
+                load_graph_sequence,
+                make_sample_cache_key,
+                save_graph_sequence,
+            )
+            cache_key = make_sample_cache_key(row.to_dict())
+
+        if self.use_cache and cache_key is not None:
+            cached, _ = load_graph_sequence(self._resolved_cache_dir, cache_key)
+            if cached is not None:
+                return cached
+
+        # ── generate graphs (cache miss or caching disabled) ────────
         # Instantiate HypatiaAdapter with explicit epoch for reproducibility
         adapter = HypatiaAdapter(
             num_planes=num_planes,
@@ -244,16 +278,16 @@ class SatNetTemporalDataset(Dataset):
             phasing_factor=phasing_factor,
             epoch=epoch,
         )
-        
+
         # Calculate ISLs for the specified duration
         adapter.calculate_isls(
             duration_minutes=duration_minutes,
             step_seconds=step_seconds,
         )
-        
+
         # Convert each time step to PyG Data
         data_list = []
-        
+
         for time_step, G in adapter.iter_graphs():
             # Apply persistent failures (Step 3 contract)
             G_eff = G.copy()
@@ -270,13 +304,17 @@ class SatNetTemporalDataset(Dataset):
                 num_planes=num_planes,
                 sats_per_plane=sats_per_plane,
             )
-            
+
             # Apply transform if specified
             if self.transform is not None:
                 data = self.transform(data)
-            
+
             data_list.append(data)
-        
+
+        # ── cache write ─────────────────────────────────────────────
+        if self.write_cache and cache_key is not None:
+            save_graph_sequence(data_list, self._resolved_cache_dir, cache_key)
+
         return data_list
     
     def _networkx_to_pyg_data(

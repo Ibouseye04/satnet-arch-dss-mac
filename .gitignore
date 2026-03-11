@@ -19,6 +19,9 @@ data/runs/
 data/**/*.csv
 data/**/*.parquet
 
+# Graph cache artifacts
+artifacts/graph_cache/
+
 # Models (optional)
 models/*.joblib
 models/*.pt

@@ -96,6 +96,24 @@ def parse_args() -> argparse.Namespace:
         default="auto",
         help="Device to use: 'cpu', 'cuda', 'mps', or 'auto' (default: auto)",
     )
+    parser.add_argument(
+        "--use-cache",
+        action="store_true",
+        default=False,
+        help="Load cached graph sequences when available",
+    )
+    parser.add_argument(
+        "--write-cache",
+        action="store_true",
+        default=False,
+        help="Write generated graph sequences to cache",
+    )
+    parser.add_argument(
+        "--cache-dir",
+        type=str,
+        default=None,
+        help="Directory for cached graph .pt files (default: artifacts/graph_cache)",
+    )
     return parser.parse_args()
 
 
@@ -280,7 +298,12 @@ def main():
     # Load dataset
     logger.info(f"Loading dataset from {data_dir}")
     try:
-        dataset = SatNetTemporalDataset(root=str(data_dir))
+        dataset = SatNetTemporalDataset(
+            root=str(data_dir),
+            use_cache=args.use_cache,
+            write_cache=args.write_cache,
+            cache_dir=args.cache_dir,
+        )
     except FileNotFoundError as e:
         logger.error(f"Dataset not found: {e}")
         logger.error("Please ensure tier1_design_runs.csv exists in the data directory.")
