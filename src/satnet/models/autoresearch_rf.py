@@ -26,7 +26,32 @@ SECONDARY_METRIC = "test_spearman_rho"
 TERTIARY_METRIC = "test_r2"
 INCUMBENT_SCHEMA_VERSION = "satnet_rf_autoresearch_incumbent_v1"
 SUMMARY_SCHEMA_VERSION = "satnet_rf_autoresearch_summary_v1"
+LAST_RUN_SCHEMA_VERSION = "satnet_rf_autoresearch_last_run_v1"
 POLICY_SCHEMA_VERSION = "satnet_rf_autoresearch_policy_v1"
+REQUIRED_MUTABLE_POLICY_FIELDS = ("target_name", "feature_mode", "n_estimators", "max_depth")
+REQUIRED_FIXED_POLICY_FIELDS = (
+    "dataset_path",
+    "custom_feature_columns",
+    "seed",
+    "experiment_type",
+    "notes",
+    "save_model_artifact",
+)
+REQUIRED_INCUMBENT_ENTRY_FIELDS = (
+    "scope_key",
+    "current_best_experiment_id",
+    "dataset_path",
+    "target_name",
+    "fidelity_tier",
+    "metrics",
+    "artifact_paths",
+)
+
+
+class RfAutoresearchCommandError(RuntimeError):
+    def __init__(self, message: str, *, last_run_payload: dict[str, Any]) -> None:
+        super().__init__(message)
+        self.last_run_payload = last_run_payload
 
 
 @dataclass(frozen=True)
@@ -102,6 +127,12 @@ class RfExperimentConfig:
             "notes",
             "save_model_artifact",
         }
+        unknown_keys = sorted(set(payload) - allowed_keys)
+        if unknown_keys:
+            raise ValueError(
+                "Unsupported config fields: "
+                + ", ".join(f"'{field_name}'" for field_name in unknown_keys)
+            )
         data = {key: value for key, value in payload.items() if key in allowed_keys}
         custom_columns = data.get("custom_feature_columns", ())
         if isinstance(custom_columns, list):
@@ -124,6 +155,7 @@ def run_rf_experiment(
     *,
     experiments_root: str | Path | None = None,
     parent_experiment_id: str | None = None,
+    command_mode: str | None = None,
 ) -> dict[str, Any]:
     cfg = config.validated()
     experiments_root_path = Path(experiments_root or DEFAULT_EXPERIMENTS_ROOT).expanduser().resolve()
@@ -238,28 +270,51 @@ def run_rf_experiment(
         "runtime_seconds": runtime_seconds,
     }
     summary = build_run_summary(result)
-    _write_json(summary_path, summary)
-    append_result_ledger(ledger_path, result)
-    _write_json(
-        last_run_path,
-        {
-            **summary,
-            "summary_path": str(summary_path),
-            "config_snapshot": cfg.to_dict(),
-        },
-    )
-    if prior_incumbent is None and ledger_incumbent is not None:
-        incumbent_registry = upsert_incumbent_entry(
-            incumbent_registry,
-            incumbent_entry_from_result(ledger_incumbent),
+    try:
+        _write_json(summary_path, summary)
+        append_result_ledger(ledger_path, result)
+        if prior_incumbent is None and ledger_incumbent is not None:
+            incumbent_registry = upsert_incumbent_entry(
+                incumbent_registry,
+                incumbent_entry_from_result(ledger_incumbent),
+            )
+        if status == "succeeded" and promotion_decision == "promoted":
+            incumbent_registry = upsert_incumbent_entry(
+                incumbent_registry,
+                incumbent_entry_from_result(result),
+            )
+        if incumbent_registry.get("incumbents"):
+            save_incumbent_registry(incumbent_path, incumbent_registry)
+        _write_json(
+            last_run_path,
+            build_last_run_record(
+                result,
+                mode=command_mode,
+                summary_path=str(summary_path),
+                config_snapshot=cfg.to_dict(),
+            ),
         )
-    if status == "succeeded" and promotion_decision == "promoted":
-        incumbent_registry = upsert_incumbent_entry(
-            incumbent_registry,
-            incumbent_entry_from_result(result),
+    except Exception as exc:
+        failure_reason = f"Post-run persistence failed with {exc.__class__.__name__}: {exc}"
+        failure_payload = build_last_run_record(
+            {
+                **result,
+                "status": "failed",
+                "promotion_decision": "failed",
+                "promotion_reason": failure_reason,
+            },
+            mode=command_mode,
+            summary_path=str(summary_path) if summary_path.exists() else None,
+            config_snapshot=cfg.to_dict(),
+            error_type=exc.__class__.__name__,
+            error_message=str(exc),
         )
-    if incumbent_registry.get("incumbents"):
-        save_incumbent_registry(incumbent_path, incumbent_registry)
+        failure_payload["summary_path"] = str(summary_path) if summary_path.exists() else None
+        _write_json(last_run_path, failure_payload)
+        raise RfAutoresearchCommandError(
+            failure_reason,
+            last_run_payload=failure_payload,
+        ) from exc
     return result
 
 
@@ -282,6 +337,7 @@ def run_rf_search_loop(
             candidate,
             experiments_root=experiments_root,
             parent_experiment_id=parent_experiment_id,
+            command_mode="search",
         )
         if index == 0:
             baseline_experiment_id = result["experiment_id"]
@@ -403,6 +459,22 @@ def validate_candidate_against_policy(
         )
     mutable_fields = policy.get("mutable_fields", {})
     fixed_fields = policy.get("fixed_fields", {})
+    missing_mutable_fields = [
+        field_name for field_name in REQUIRED_MUTABLE_POLICY_FIELDS if field_name not in mutable_fields
+    ]
+    if missing_mutable_fields:
+        raise ValueError(
+            "Mutation policy missing required mutable_fields: "
+            + ", ".join(f"'{field_name}'" for field_name in missing_mutable_fields)
+        )
+    missing_fixed_fields = [
+        field_name for field_name in REQUIRED_FIXED_POLICY_FIELDS if field_name not in fixed_fields
+    ]
+    if missing_fixed_fields:
+        raise ValueError(
+            "Mutation policy missing required fixed_fields: "
+            + ", ".join(f"'{field_name}'" for field_name in missing_fixed_fields)
+        )
     if cfg.target_name not in tuple(mutable_fields.get("target_name", ())):
         raise ValueError(f"target_name '{cfg.target_name}' is outside the approved mutation surface")
     if cfg.feature_mode not in tuple(mutable_fields.get("feature_mode", ())):
@@ -448,7 +520,11 @@ def run_agent_candidate(
         policy,
         required_fidelity_tier="screening",
     )
-    return run_rf_experiment(validated_config, experiments_root=experiments_root)
+    return run_rf_experiment(
+        validated_config,
+        experiments_root=experiments_root,
+        command_mode="candidate",
+    )
 
 
 def run_confirmatory_experiment(
@@ -458,7 +534,18 @@ def run_confirmatory_experiment(
     policy_path: str | Path = DEFAULT_MUTATION_POLICY_PATH,
 ) -> dict[str, Any]:
     experiments_root_path = Path(experiments_root or DEFAULT_EXPERIMENTS_ROOT).expanduser().resolve()
+    source_summary_path = experiments_root_path / source_experiment_id / "summary.json"
     source_config_path = experiments_root_path / source_experiment_id / "config.json"
+    with open(source_summary_path) as f:
+        source_summary = json.load(f)
+    if not isinstance(source_summary, dict):
+        raise ValueError("Confirmatory source summary must contain a JSON object.")
+    if source_summary.get("status") != "succeeded":
+        raise ValueError("Confirmatory reruns require a succeeded screening source run.")
+    if source_summary.get("promotion_decision") != "promoted":
+        raise ValueError("Confirmatory reruns require a promoted screening source run.")
+    if source_summary.get("fidelity_tier") != "screening":
+        raise ValueError("Confirmatory reruns must originate from a screening summary.")
     source_config = load_experiment_config(source_config_path)
     if source_config.fidelity_tier != "screening":
         raise ValueError(
@@ -480,6 +567,7 @@ def run_confirmatory_experiment(
         validated_config,
         experiments_root=experiments_root_path,
         parent_experiment_id=source_experiment_id,
+        command_mode="confirmatory",
     )
 
 
@@ -580,6 +668,94 @@ def build_run_summary(result: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_last_run_record(
+    result: dict[str, Any],
+    *,
+    mode: str | None,
+    summary_path: str | None = None,
+    config_snapshot: dict[str, Any] | None = None,
+    error_type: str | None = None,
+    error_message: str | None = None,
+) -> dict[str, Any]:
+    artifact_paths = dict(result.get("artifact_paths", {}) or {})
+    payload = {
+        "schema_version": LAST_RUN_SCHEMA_VERSION,
+        "mode": mode,
+        "experiment_id": result.get("experiment_id"),
+        "parent_experiment_id": result.get("parent_experiment_id"),
+        "status": result.get("status"),
+        "target_name": result.get("target_name"),
+        "task_type": result.get("task_type"),
+        "dataset_path": result.get("dataset_path"),
+        "fidelity_tier": result.get("fidelity_tier"),
+        "seed": result.get("seed"),
+        "model_family": result.get("model_family"),
+        "experiment_type": result.get("experiment_type"),
+        "metrics": dict(result.get("metrics", {}) or {}),
+        "incumbent_comparison": dict(
+            result.get("incumbent_comparison", {}) or _build_incumbent_comparison(None, None)
+        ),
+        "artifact_paths": artifact_paths,
+        "promotion_decision": result.get("promotion_decision"),
+        "promotion_reason": result.get("promotion_reason"),
+        "summary_path": summary_path if summary_path is not None else artifact_paths.get("summary"),
+        "incumbent_path": artifact_paths.get("incumbent"),
+        "last_run_path": artifact_paths.get("last_run"),
+        "timestamp": result.get("timestamp"),
+        "git_sha": result.get("git_sha"),
+        "config_snapshot": (
+            dict(config_snapshot)
+            if isinstance(config_snapshot, dict)
+            else dict(result.get("config", {})) if isinstance(result.get("config"), dict) else None
+        ),
+        "error_type": error_type,
+        "error_message": error_message,
+    }
+    return payload
+
+
+def build_command_failure_record(
+    *,
+    experiments_root: str | Path,
+    mode: str,
+    exc: BaseException,
+) -> dict[str, Any]:
+    if isinstance(exc, RfAutoresearchCommandError):
+        return dict(exc.last_run_payload)
+    experiments_root_path = Path(experiments_root).expanduser().resolve()
+    last_run_path = experiments_root_path / DEFAULT_LAST_RUN_PATH.name
+    failure_result = {
+        "experiment_id": None,
+        "parent_experiment_id": None,
+        "status": "failed",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "git_sha": None,
+        "model_family": "RandomForest",
+        "experiment_type": "rf_autoresearch_v1",
+        "target_name": None,
+        "task_type": None,
+        "dataset_path": None,
+        "fidelity_tier": _default_fidelity_tier_for_mode(mode),
+        "seed": None,
+        "config": {},
+        "metrics": {},
+        "incumbent_comparison": _build_incumbent_comparison(None, None),
+        "artifact_paths": _default_artifact_paths(experiments_root_path, last_run_path=last_run_path),
+        "promotion_decision": "failed",
+        "promotion_reason": f"{exc.__class__.__name__}: {exc}",
+    }
+    payload = build_last_run_record(
+        failure_result,
+        mode=mode,
+        summary_path=None,
+        config_snapshot=None,
+        error_type=exc.__class__.__name__,
+        error_message=str(exc),
+    )
+    payload["summary_path"] = None
+    return payload
+
+
 def load_incumbent_registry(incumbent_path: str | Path = DEFAULT_INCUMBENT_PATH) -> dict[str, Any]:
     path = Path(incumbent_path)
     if not path.exists():
@@ -595,8 +771,28 @@ def load_incumbent_registry(incumbent_path: str | Path = DEFAULT_INCUMBENT_PATH)
         payload = json.load(f)
     if not isinstance(payload, dict):
         raise ValueError("Incumbent registry must contain a JSON object")
+    if payload.get("schema_version") != INCUMBENT_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unexpected incumbent registry schema '{payload.get('schema_version')}'. "
+            f"Expected '{INCUMBENT_SCHEMA_VERSION}'."
+        )
     if "incumbents" not in payload or not isinstance(payload["incumbents"], list):
         raise ValueError("Incumbent registry must contain an 'incumbents' list")
+    for index, entry in enumerate(payload["incumbents"]):
+        if not isinstance(entry, dict):
+            raise ValueError(f"Incumbent entry {index} must contain a JSON object")
+        missing_fields = [
+            field_name for field_name in REQUIRED_INCUMBENT_ENTRY_FIELDS if field_name not in entry
+        ]
+        if missing_fields:
+            raise ValueError(
+                f"Incumbent entry {index} missing required fields: "
+                + ", ".join(f"'{field_name}'" for field_name in missing_fields)
+            )
+        if not isinstance(entry["metrics"], dict):
+            raise ValueError(f"Incumbent entry {index} must contain a 'metrics' object")
+        if not isinstance(entry["artifact_paths"], dict):
+            raise ValueError(f"Incumbent entry {index} must contain an 'artifact_paths' object")
     return payload
 
 
@@ -722,6 +918,34 @@ def _optional_float(value: Any) -> float | None:
 def _scope_key(dataset_path: str, target_name: str, fidelity_tier: str) -> str:
     canonical_dataset_path = str(Path(dataset_path).expanduser().resolve())
     return f"{canonical_dataset_path}::{target_name}::{fidelity_tier}"
+
+
+def _default_artifact_paths(
+    experiments_root_path: Path,
+    *,
+    last_run_path: Path | None = None,
+) -> dict[str, str | None]:
+    resolved_last_run_path = last_run_path or experiments_root_path / DEFAULT_LAST_RUN_PATH.name
+    return {
+        "experiment_dir": None,
+        "config": None,
+        "metrics": None,
+        "predictions": None,
+        "model": None,
+        "notes": None,
+        "summary": None,
+        "incumbent": str(experiments_root_path / DEFAULT_INCUMBENT_PATH.name),
+        "last_run": str(resolved_last_run_path),
+        "ledger": str(experiments_root_path / "results.jsonl"),
+    }
+
+
+def _default_fidelity_tier_for_mode(mode: str) -> str | None:
+    if mode == "candidate":
+        return "screening"
+    if mode == "confirmatory":
+        return "confirmatory"
+    return None
 
 
 def _tier1_feature_columns() -> list[str]:

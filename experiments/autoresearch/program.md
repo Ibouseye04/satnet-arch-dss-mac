@@ -64,13 +64,15 @@ python scripts/run_autoresearch_rf.py --mode confirmatory --source-experiment-id
 ```
 
 Use confirmatory only for a screening experiment that already achieved `promotion_decision = promoted`.
+In this RF-only v1 slice, confirmatory reuses the same RandomForest evaluation path with a separate `fidelity_tier` label.
+Treat it as workflow confirmation within the bounded loop, not as independent scientific confirmation from a new split, new seed, or stronger evaluator.
 
 ## Source of Truth
 Never use raw stdout or stderr as the scientific result.
 Read only JSON files.
 Primary read order:
 1. `experiments/autoresearch/last_run.json`
-2. the per-run `summary.json` path named inside `last_run.json`
+2. the per-run `summary.json` path named inside `last_run.json`, only when `summary_path` is not `null`
 3. `experiments/autoresearch/incumbent.json`
 
 ## Improvement Rule
@@ -97,7 +99,8 @@ If `last_run.json` shows:
 - or `promotion_decision = failed`
 
 then do not edit any history file.
-Read `promotion_reason` and the per-run `metrics.json` error fields.
+Read `promotion_reason`, `error_type`, and `error_message` from `last_run.json`.
+Only read per-run `metrics.json` when `summary_path` is present and points to a real experiment directory.
 Make at most one legal mutation in `candidate.json` and rerun.
 Stop after 2 consecutive failed runs.
 
@@ -113,7 +116,7 @@ Stop when any of these is true:
 1. Read `mutation_policy.json`, `candidate.json`, and `incumbent.json`.
 2. Make one legal mutation in `candidate.json`.
 3. Run the screening command.
-4. Read `last_run.json` and the per-run `summary.json`.
+4. Read `last_run.json`, then read the per-run `summary.json` only if `summary_path` is not `null`.
 5. If screening was promoted and confirmatory is warranted, run the confirmatory command using that screening experiment ID.
 6. Read `last_run.json` again.
 7. Stop or continue using the stop rules above.

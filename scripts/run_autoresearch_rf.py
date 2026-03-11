@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +20,7 @@ from satnet.models.autoresearch_rf import (  # noqa: E402
     DEFAULT_MUTATION_POLICY_PATH,
     RfExperimentConfig,
     SUPPORTED_SEARCH_TARGETS,
+    build_command_failure_record,
     load_experiment_config,
     run_agent_candidate,
     run_confirmatory_experiment,
@@ -257,19 +257,11 @@ def _write_command_failure_result(experiments_root: str, mode: str, exc: BaseExc
     experiments_root_path = Path(experiments_root).expanduser().resolve()
     experiments_root_path.mkdir(parents=True, exist_ok=True)
     last_run_path = experiments_root_path / DEFAULT_LAST_RUN_PATH.name
-    payload = {
-        "status": "failed",
-        "mode": mode,
-        "experiment_id": None,
-        "promotion_decision": "failed",
-        "promotion_reason": f"{exc.__class__.__name__}: {exc}",
-        "error_type": exc.__class__.__name__,
-        "error_message": str(exc),
-        "summary_path": None,
-        "incumbent_path": str(experiments_root_path / "incumbent.json"),
-        "last_run_path": str(last_run_path),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-    }
+    payload = build_command_failure_record(
+        experiments_root=experiments_root_path,
+        mode=mode,
+        exc=exc,
+    )
     with open(last_run_path, "w") as f:
         json.dump(payload, f, indent=2, default=str)
     return json.dumps(payload, indent=2, default=str)

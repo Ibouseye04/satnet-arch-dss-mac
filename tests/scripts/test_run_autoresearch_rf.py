@@ -82,3 +82,15 @@ def test_confirmatory_mode_requires_source_experiment_id(monkeypatch, tmp_path) 
         assert "--source-experiment-id is required" in str(exc)
     else:
         raise AssertionError("Expected SystemExit when confirmatory mode has no source experiment id")
+
+    last_run_path = Path(args.experiments_root) / "last_run.json"
+    payload = json.loads(last_run_path.read_text())
+
+    assert payload["schema_version"] == "satnet_rf_autoresearch_last_run_v1"
+    assert payload["status"] == "failed"
+    assert payload["mode"] == "confirmatory"
+    assert payload["experiment_id"] is None
+    assert payload["summary_path"] is None
+    assert payload["artifact_paths"]["summary"] is None
+    assert payload["fidelity_tier"] == "confirmatory"
+    assert payload["error_type"] == "SystemExit"
