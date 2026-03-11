@@ -3,15 +3,19 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import Any, List, Tuple, Union
 
 import joblib
+import numpy as np
 
 logger = logging.getLogger(__name__)
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import (
     accuracy_score,
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
     roc_auc_score,
     classification_report,
     confusion_matrix,
@@ -505,3 +509,149 @@ def train_tier1_v1_design_model(
     metrics["positive_rate"] = float(y.mean())
 
     return clf, metrics
+
+
+# ---------------------------------------------------------------------------
+# Unified RF Training with Target Selection (Phase 5/6)
+# ---------------------------------------------------------------------------
+
+
+def train_rf_model(
+    csv_path: Path,
+    target_name: str = "partition_any",
+    feature_columns: List[str] | None = None,
+    cfg: RiskModelConfig | None = None,
+) -> Tuple[Union[RandomForestClassifier, RandomForestRegressor], dict, pd.DataFrame]:
+    """Train a RandomForest model on any supported resilience target.
+
+    Automatically selects classification vs regression based on *target_name*.
+    Returns the model, metrics dict, and a predictions DataFrame.
+
+    Args:
+        csv_path: Path to the runs CSV file.
+        target_name: Column name for the target variable.
+        feature_columns: Feature columns to use. Defaults to TIER1_V1_FEATURE_COLUMNS.
+        cfg: Model configuration.
+
+    Returns:
+        Tuple of (model, metrics, predictions_df).
+        predictions_df has columns: sample_idx, true, predicted, split, seed.
+    """
+    from satnet.metrics.resilience_targets import infer_task_type
+
+    if cfg is None:
+        cfg = RiskModelConfig()
+
+    task_type = infer_task_type(target_name)
+
+    df = pd.read_csv(csv_path)
+    if feature_columns is None:
+        feature_columns = [c for c in TIER1_V1_FEATURE_COLUMNS if c in df.columns]
+
+    X = df[feature_columns].copy()
+    y = df[target_name].astype(float)
+
+    stratify = y.round().astype(int) if task_type == "classification" else None
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=cfg.test_size,
+        random_state=cfg.random_state,
+        stratify=stratify,
+    )
+
+    if task_type == "classification":
+        model: Any = RandomForestClassifier(
+            n_estimators=cfg.n_estimators,
+            max_depth=cfg.max_depth,
+            random_state=cfg.random_state,
+            n_jobs=-1,
+            class_weight="balanced",
+        )
+    else:
+        model = RandomForestRegressor(
+            n_estimators=cfg.n_estimators,
+            max_depth=cfg.max_depth,
+            random_state=cfg.random_state,
+            n_jobs=-1,
+        )
+
+    model.fit(X_train, y_train)
+
+    y_pred_train = model.predict(X_train)
+    y_pred_test = model.predict(X_test)
+
+    metrics: dict = {
+        "task_type": task_type,
+        "target_name": target_name,
+        "num_samples": len(y),
+        "train_size": len(y_train),
+        "test_size": len(y_test),
+        "seed": cfg.random_state,
+    }
+
+    if task_type == "classification":
+        metrics.update(_classification_metrics(y_test, y_pred_test, model))
+    else:
+        metrics.update(_regression_metrics(y_test, y_pred_test, prefix="test"))
+        metrics.update(_regression_metrics(y_train, y_pred_train, prefix="train"))
+
+    metrics["feature_importances"] = dict(
+        zip(feature_columns, model.feature_importances_.tolist())
+    )
+
+    # Build predictions DataFrame
+    preds_rows: list[dict] = []
+    for i, (idx, true, pred) in enumerate(zip(X_train.index, y_train, y_pred_train)):
+        preds_rows.append({
+            "sample_idx": int(idx), "true": float(true), "predicted": float(pred),
+            "split": "train", "seed": cfg.random_state,
+        })
+    for i, (idx, true, pred) in enumerate(zip(X_test.index, y_test, y_pred_test)):
+        preds_rows.append({
+            "sample_idx": int(idx), "true": float(true), "predicted": float(pred),
+            "split": "test", "seed": cfg.random_state,
+        })
+    predictions_df = pd.DataFrame(preds_rows)
+
+    return model, metrics, predictions_df
+
+
+def _classification_metrics(
+    y_true: Any, y_pred: Any, model: RandomForestClassifier,
+) -> dict:
+    metrics: dict = {}
+    metrics["accuracy"] = accuracy_score(y_true, y_pred)
+    try:
+        proba = model.predict_proba(y_true.values.reshape(-1, 1) if hasattr(y_true, 'values') else y_true)
+        # We can't call predict_proba on y_true; use the stored predictions
+    except Exception:
+        pass
+    metrics["confusion_matrix"] = confusion_matrix(
+        y_true.astype(int), np.round(y_pred).astype(int)
+    ).tolist()
+    metrics["classification_report"] = classification_report(
+        y_true.astype(int), np.round(y_pred).astype(int), output_dict=True,
+    )
+    return metrics
+
+
+def _regression_metrics(y_true: Any, y_pred: Any, prefix: str = "") -> dict:
+    from scipy.stats import kendalltau, spearmanr
+
+    pre = f"{prefix}_" if prefix else ""
+    mae = mean_absolute_error(y_true, y_pred)
+    rmse = float(np.sqrt(mean_squared_error(y_true, y_pred)))
+    r2 = r2_score(y_true, y_pred)
+    sp_corr, sp_p = spearmanr(y_true, y_pred)
+    kt_corr, kt_p = kendalltau(y_true, y_pred)
+
+    return {
+        f"{pre}mae": mae,
+        f"{pre}rmse": rmse,
+        f"{pre}r2": r2,
+        f"{pre}spearman_rho": float(sp_corr),
+        f"{pre}spearman_p": float(sp_p),
+        f"{pre}kendall_tau": float(kt_corr),
+        f"{pre}kendall_p": float(kt_p),
+    }

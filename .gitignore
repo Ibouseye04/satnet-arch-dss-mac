@@ -22,9 +22,14 @@ data/**/*.parquet
 # Graph cache artifacts
 artifacts/graph_cache/
 
+# Experiment logs
+experiments/
+
 # Models (optional)
 models/*.joblib
 models/*.pt
+models/*.csv
+models/*_metrics.json
 
 # OS
 .DS_Store
