@@ -24,6 +24,14 @@ artifacts/graph_cache/
 
 # Experiment logs
 experiments/
+!experiments/
+experiments/*
+!experiments/autoresearch/
+experiments/autoresearch/*
+!experiments/autoresearch/program.md
+!experiments/autoresearch/mutation_policy.json
+!experiments/autoresearch/candidate.json
+!experiments/autoresearch/incumbent.json
 
 # Models (optional)
 models/*.joblib

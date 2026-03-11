@@ -1,0 +1,8 @@
+{
+  "schema_version": "satnet_rf_autoresearch_incumbent_v1",
+  "updated_at": null,
+  "primary_metric_name": "test_rmse",
+  "secondary_metric_name": "test_spearman_rho",
+  "tertiary_metric_name": "test_r2",
+  "incumbents": []
+}

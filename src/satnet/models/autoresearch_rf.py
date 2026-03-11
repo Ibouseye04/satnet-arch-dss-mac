@@ -14,12 +14,19 @@ from satnet.metrics.resilience_targets import infer_task_type
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_EXPERIMENTS_ROOT = PROJECT_ROOT / "experiments" / "autoresearch"
+DEFAULT_MUTATION_POLICY_PATH = DEFAULT_EXPERIMENTS_ROOT / "mutation_policy.json"
+DEFAULT_CANDIDATE_PATH = DEFAULT_EXPERIMENTS_ROOT / "candidate.json"
+DEFAULT_INCUMBENT_PATH = DEFAULT_EXPERIMENTS_ROOT / "incumbent.json"
+DEFAULT_LAST_RUN_PATH = DEFAULT_EXPERIMENTS_ROOT / "last_run.json"
 SUPPORTED_SEARCH_TARGETS = ("gcc_frac_min", "partition_fraction")
 SUPPORTED_FEATURE_MODES = ("tier1_full", "design_only", "custom")
 SUPPORTED_FIDELITY_TIERS = ("screening", "confirmatory")
 PRIMARY_METRIC = "test_rmse"
 SECONDARY_METRIC = "test_spearman_rho"
 TERTIARY_METRIC = "test_r2"
+INCUMBENT_SCHEMA_VERSION = "satnet_rf_autoresearch_incumbent_v1"
+SUMMARY_SCHEMA_VERSION = "satnet_rf_autoresearch_summary_v1"
+POLICY_SCHEMA_VERSION = "satnet_rf_autoresearch_policy_v1"
 
 
 @dataclass(frozen=True)
@@ -53,7 +60,11 @@ class RfExperimentConfig:
                 f"Unsupported fidelity_tier '{self.fidelity_tier}'. "
                 f"Expected one of {SUPPORTED_FIDELITY_TIERS}."
             )
-        dataset_path = Path(self.dataset_path).expanduser().resolve()
+        dataset_path = Path(self.dataset_path).expanduser()
+        if not dataset_path.is_absolute():
+            dataset_path = (PROJECT_ROOT / dataset_path).resolve()
+        else:
+            dataset_path = dataset_path.resolve()
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset not found: {dataset_path}")
         if self.n_estimators <= 0:
@@ -118,6 +129,8 @@ def run_rf_experiment(
     experiments_root_path = Path(experiments_root or DEFAULT_EXPERIMENTS_ROOT).expanduser().resolve()
     experiments_root_path.mkdir(parents=True, exist_ok=True)
     ledger_path = experiments_root_path / "results.jsonl"
+    incumbent_path = experiments_root_path / DEFAULT_INCUMBENT_PATH.name
+    last_run_path = experiments_root_path / DEFAULT_LAST_RUN_PATH.name
 
     experiment_id = _make_experiment_id()
     experiment_dir = experiments_root_path / experiment_id
@@ -128,6 +141,7 @@ def run_rf_experiment(
     predictions_path = experiment_dir / "predictions.csv"
     model_path = experiment_dir / "model.joblib"
     notes_path = experiment_dir / "notes.txt"
+    summary_path = experiment_dir / "summary.json"
 
     config_payload = {
         "experiment_id": experiment_id,
@@ -142,6 +156,23 @@ def run_rf_experiment(
     timestamp = datetime.now(timezone.utc).isoformat()
     git_sha = _git_sha()
     started = time.monotonic()
+    incumbent_registry = load_incumbent_registry(incumbent_path)
+    prior_incumbent = find_incumbent_entry(
+        incumbent_registry,
+        dataset_path=cfg.dataset_path,
+        target_name=cfg.target_name,
+        fidelity_tier=cfg.fidelity_tier,
+    )
+    ledger_incumbent = None
+    if prior_incumbent is None:
+        ledger_incumbent = find_incumbent_result(
+            load_results_ledger(ledger_path),
+            dataset_path=cfg.dataset_path,
+            target_name=cfg.target_name,
+            fidelity_tier=cfg.fidelity_tier,
+        )
+        if ledger_incumbent is not None:
+            prior_incumbent = incumbent_entry_from_result(ledger_incumbent)
 
     artifact_paths: dict[str, str | None] = {
         "experiment_dir": str(experiment_dir),
@@ -150,6 +181,9 @@ def run_rf_experiment(
         "predictions": None,
         "model": None,
         "notes": str(notes_path) if cfg.notes.strip() else None,
+        "summary": str(summary_path),
+        "incumbent": str(incumbent_path),
+        "last_run": str(last_run_path),
         "ledger": str(ledger_path),
     }
 
@@ -157,6 +191,7 @@ def run_rf_experiment(
     metrics: dict[str, Any]
     promotion_decision = "rejected"
     promotion_reason = "Not evaluated"
+    incumbent_comparison = _build_incumbent_comparison(prior_incumbent, None)
 
     try:
         model, metrics, predictions = _train_rf_once(cfg)
@@ -167,13 +202,8 @@ def run_rf_experiment(
             _save_model_artifact(model, model_path)
             artifact_paths["model"] = str(model_path)
 
-        incumbent = find_incumbent_result(
-            load_results_ledger(ledger_path),
-            dataset_path=cfg.dataset_path,
-            target_name=cfg.target_name,
-            fidelity_tier=cfg.fidelity_tier,
-        )
-        promoted, promotion_reason = should_promote(metrics, incumbent)
+        incumbent_comparison = _build_incumbent_comparison(prior_incumbent, metrics)
+        promoted, promotion_reason = should_promote(metrics, prior_incumbent)
         promotion_decision = "promoted" if promoted else "rejected"
     except Exception as exc:
         status = "failed"
@@ -201,12 +231,35 @@ def run_rf_experiment(
         "seed": cfg.seed,
         "config": cfg.to_dict(),
         "metrics": metrics,
+        "incumbent_comparison": incumbent_comparison,
         "artifact_paths": artifact_paths,
         "promotion_decision": promotion_decision,
         "promotion_reason": promotion_reason,
         "runtime_seconds": runtime_seconds,
     }
+    summary = build_run_summary(result)
+    _write_json(summary_path, summary)
     append_result_ledger(ledger_path, result)
+    _write_json(
+        last_run_path,
+        {
+            **summary,
+            "summary_path": str(summary_path),
+            "config_snapshot": cfg.to_dict(),
+        },
+    )
+    if prior_incumbent is None and ledger_incumbent is not None:
+        incumbent_registry = upsert_incumbent_entry(
+            incumbent_registry,
+            incumbent_entry_from_result(ledger_incumbent),
+        )
+    if status == "succeeded" and promotion_decision == "promoted":
+        incumbent_registry = upsert_incumbent_entry(
+            incumbent_registry,
+            incumbent_entry_from_result(result),
+        )
+    if incumbent_registry.get("incumbents"):
+        save_incumbent_registry(incumbent_path, incumbent_registry)
     return result
 
 
@@ -323,6 +376,113 @@ def find_incumbent_result(
     return incumbent
 
 
+def load_mutation_policy(policy_path: str | Path = DEFAULT_MUTATION_POLICY_PATH) -> dict[str, Any]:
+    with open(policy_path) as f:
+        payload = json.load(f)
+    if not isinstance(payload, dict):
+        raise ValueError("Mutation policy file must contain a JSON object")
+    return payload
+
+
+def validate_candidate_against_policy(
+    config: RfExperimentConfig,
+    policy: dict[str, Any],
+    *,
+    required_fidelity_tier: str,
+) -> RfExperimentConfig:
+    cfg = config.validated()
+    if policy.get("schema_version") != POLICY_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unexpected mutation policy schema '{policy.get('schema_version')}'. "
+            f"Expected '{POLICY_SCHEMA_VERSION}'."
+        )
+    if cfg.fidelity_tier != required_fidelity_tier:
+        raise ValueError(
+            f"Candidate fidelity_tier must be '{required_fidelity_tier}', "
+            f"got '{cfg.fidelity_tier}'."
+        )
+    mutable_fields = policy.get("mutable_fields", {})
+    fixed_fields = policy.get("fixed_fields", {})
+    if cfg.target_name not in tuple(mutable_fields.get("target_name", ())):
+        raise ValueError(f"target_name '{cfg.target_name}' is outside the approved mutation surface")
+    if cfg.feature_mode not in tuple(mutable_fields.get("feature_mode", ())):
+        raise ValueError(f"feature_mode '{cfg.feature_mode}' is outside the approved mutation surface")
+    if cfg.n_estimators not in tuple(mutable_fields.get("n_estimators", ())):
+        raise ValueError(f"n_estimators '{cfg.n_estimators}' is outside the approved mutation surface")
+    if cfg.max_depth not in tuple(mutable_fields.get("max_depth", ())):
+        raise ValueError(f"max_depth '{cfg.max_depth}' is outside the approved mutation surface")
+    for field_name, expected_value in fixed_fields.items():
+        actual_value = getattr(cfg, field_name)
+        if field_name == "dataset_path":
+            actual_path = Path(str(actual_value)).expanduser()
+            expected_path = Path(str(expected_value)).expanduser()
+            if not actual_path.is_absolute():
+                actual_path = (PROJECT_ROOT / actual_path).resolve()
+            else:
+                actual_path = actual_path.resolve()
+            if not expected_path.is_absolute():
+                expected_path = (PROJECT_ROOT / expected_path).resolve()
+            else:
+                expected_path = expected_path.resolve()
+            actual_value = str(actual_path)
+            expected_value = str(expected_path)
+        if isinstance(actual_value, tuple) and isinstance(expected_value, list):
+            expected_value = tuple(expected_value)
+        if actual_value != expected_value:
+            raise ValueError(
+                f"{field_name} must remain fixed at '{expected_value}', got '{actual_value}'."
+            )
+    return cfg
+
+
+def run_agent_candidate(
+    *,
+    candidate_path: str | Path = DEFAULT_CANDIDATE_PATH,
+    policy_path: str | Path = DEFAULT_MUTATION_POLICY_PATH,
+    experiments_root: str | Path | None = None,
+) -> dict[str, Any]:
+    policy = load_mutation_policy(policy_path)
+    config = load_experiment_config(candidate_path)
+    validated_config = validate_candidate_against_policy(
+        config,
+        policy,
+        required_fidelity_tier="screening",
+    )
+    return run_rf_experiment(validated_config, experiments_root=experiments_root)
+
+
+def run_confirmatory_experiment(
+    source_experiment_id: str,
+    *,
+    experiments_root: str | Path | None = None,
+    policy_path: str | Path = DEFAULT_MUTATION_POLICY_PATH,
+) -> dict[str, Any]:
+    experiments_root_path = Path(experiments_root or DEFAULT_EXPERIMENTS_ROOT).expanduser().resolve()
+    source_config_path = experiments_root_path / source_experiment_id / "config.json"
+    source_config = load_experiment_config(source_config_path)
+    if source_config.fidelity_tier != "screening":
+        raise ValueError(
+            "Confirmatory reruns must originate from a screening experiment config."
+        )
+    confirmatory_config = RfExperimentConfig.from_dict(
+        {
+            **source_config.to_dict(),
+            "fidelity_tier": "confirmatory",
+        }
+    )
+    policy = load_mutation_policy(policy_path)
+    validated_config = validate_candidate_against_policy(
+        confirmatory_config,
+        policy,
+        required_fidelity_tier="confirmatory",
+    )
+    return run_rf_experiment(
+        validated_config,
+        experiments_root=experiments_root_path,
+        parent_experiment_id=source_experiment_id,
+    )
+
+
 def should_promote(candidate_metrics: dict[str, Any], incumbent: dict[str, Any] | None) -> tuple[bool, str]:
     candidate_rmse, candidate_spearman, candidate_r2 = _objective_tuple(candidate_metrics)
     if math.isinf(candidate_rmse):
@@ -332,7 +492,7 @@ def should_promote(candidate_metrics: dict[str, Any], incumbent: dict[str, Any] 
 
     incumbent_metrics = incumbent.get("metrics", {})
     incumbent_rmse, incumbent_spearman, incumbent_r2 = _objective_tuple(incumbent_metrics)
-    incumbent_id = incumbent.get("experiment_id")
+    incumbent_id = incumbent.get("experiment_id") or incumbent.get("current_best_experiment_id")
     tolerance = 1e-12
 
     if candidate_rmse < incumbent_rmse - tolerance:
@@ -400,6 +560,168 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(payload, f, indent=2, default=str)
+
+
+def build_run_summary(result: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": SUMMARY_SCHEMA_VERSION,
+        "experiment_id": result.get("experiment_id"),
+        "status": result.get("status"),
+        "target_name": result.get("target_name"),
+        "dataset_path": result.get("dataset_path"),
+        "fidelity_tier": result.get("fidelity_tier"),
+        "metrics": result.get("metrics", {}),
+        "incumbent_comparison": result.get("incumbent_comparison", {}),
+        "promotion_decision": result.get("promotion_decision"),
+        "promotion_reason": result.get("promotion_reason"),
+        "artifact_paths": result.get("artifact_paths", {}),
+        "timestamp": result.get("timestamp"),
+        "git_sha": result.get("git_sha"),
+    }
+
+
+def load_incumbent_registry(incumbent_path: str | Path = DEFAULT_INCUMBENT_PATH) -> dict[str, Any]:
+    path = Path(incumbent_path)
+    if not path.exists():
+        return {
+            "schema_version": INCUMBENT_SCHEMA_VERSION,
+            "updated_at": None,
+            "primary_metric_name": PRIMARY_METRIC,
+            "secondary_metric_name": SECONDARY_METRIC,
+            "tertiary_metric_name": TERTIARY_METRIC,
+            "incumbents": [],
+        }
+    with open(path) as f:
+        payload = json.load(f)
+    if not isinstance(payload, dict):
+        raise ValueError("Incumbent registry must contain a JSON object")
+    if "incumbents" not in payload or not isinstance(payload["incumbents"], list):
+        raise ValueError("Incumbent registry must contain an 'incumbents' list")
+    return payload
+
+
+def save_incumbent_registry(incumbent_path: str | Path, registry: dict[str, Any]) -> None:
+    payload = {
+        **registry,
+        "schema_version": INCUMBENT_SCHEMA_VERSION,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "primary_metric_name": PRIMARY_METRIC,
+        "secondary_metric_name": SECONDARY_METRIC,
+        "tertiary_metric_name": TERTIARY_METRIC,
+    }
+    _write_json(Path(incumbent_path), payload)
+
+
+def find_incumbent_entry(
+    registry: dict[str, Any],
+    *,
+    dataset_path: str,
+    target_name: str,
+    fidelity_tier: str,
+) -> dict[str, Any] | None:
+    scope_key = _scope_key(dataset_path, target_name, fidelity_tier)
+    for entry in registry.get("incumbents", []):
+        if entry.get("scope_key") == scope_key:
+            return entry
+    return None
+
+
+def upsert_incumbent_entry(registry: dict[str, Any], entry: dict[str, Any]) -> dict[str, Any]:
+    incumbents = list(registry.get("incumbents", []))
+    scope_key = entry["scope_key"]
+    filtered = [row for row in incumbents if row.get("scope_key") != scope_key]
+    filtered.append(entry)
+    return {
+        **registry,
+        "incumbents": sorted(filtered, key=lambda row: str(row.get("scope_key"))),
+    }
+
+
+def incumbent_entry_from_result(result: dict[str, Any]) -> dict[str, Any]:
+    metrics = dict(result.get("metrics", {}))
+    dataset_path = str(Path(str(result["dataset_path"])).expanduser().resolve())
+    target_name = str(result["target_name"])
+    fidelity_tier = str(result["fidelity_tier"])
+    return {
+        "scope_key": _scope_key(dataset_path, target_name, fidelity_tier),
+        "current_best_experiment_id": result.get("experiment_id"),
+        "dataset_path": dataset_path,
+        "target_name": target_name,
+        "fidelity_tier": fidelity_tier,
+        "primary_metric_name": PRIMARY_METRIC,
+        "primary_metric_value": _safe_float(metrics.get(PRIMARY_METRIC), math.inf),
+        "secondary_metric_name": SECONDARY_METRIC,
+        "secondary_metric_value": _safe_float(metrics.get(SECONDARY_METRIC), -math.inf),
+        "tertiary_metric_name": TERTIARY_METRIC,
+        "tertiary_metric_value": _safe_float(metrics.get(TERTIARY_METRIC), -math.inf),
+        "config_snapshot": result.get("config", {}),
+        "artifact_paths": result.get("artifact_paths", {}),
+        "timestamp": result.get("timestamp"),
+        "git_sha": result.get("git_sha"),
+        "metrics": metrics,
+        "status": result.get("status"),
+        "model_family": result.get("model_family"),
+        "experiment_type": result.get("experiment_type"),
+    }
+
+
+def _build_incumbent_comparison(
+    incumbent: dict[str, Any] | None,
+    candidate_metrics: dict[str, Any] | None,
+) -> dict[str, Any]:
+    comparison = {
+        "scope_key": None,
+        "incumbent_experiment_id": None,
+        "primary_metric_name": PRIMARY_METRIC,
+        "primary_metric_candidate": None,
+        "primary_metric_incumbent": None,
+        "secondary_metric_name": SECONDARY_METRIC,
+        "secondary_metric_candidate": None,
+        "secondary_metric_incumbent": None,
+        "tertiary_metric_name": TERTIARY_METRIC,
+        "tertiary_metric_candidate": None,
+        "tertiary_metric_incumbent": None,
+        "incumbent_summary_path": None,
+    }
+    if candidate_metrics is not None:
+        comparison["primary_metric_candidate"] = _optional_float(candidate_metrics.get(PRIMARY_METRIC))
+        comparison["secondary_metric_candidate"] = _optional_float(
+            candidate_metrics.get(SECONDARY_METRIC)
+        )
+        comparison["tertiary_metric_candidate"] = _optional_float(candidate_metrics.get(TERTIARY_METRIC))
+    if incumbent is None:
+        return comparison
+    incumbent_metrics = incumbent.get("metrics", {})
+    comparison["scope_key"] = incumbent.get("scope_key")
+    comparison["incumbent_experiment_id"] = (
+        incumbent.get("current_best_experiment_id") or incumbent.get("experiment_id")
+    )
+    comparison["primary_metric_incumbent"] = _optional_float(
+        incumbent_metrics.get(PRIMARY_METRIC, incumbent.get("primary_metric_value"))
+    )
+    comparison["secondary_metric_incumbent"] = _optional_float(
+        incumbent_metrics.get(SECONDARY_METRIC, incumbent.get("secondary_metric_value"))
+    )
+    comparison["tertiary_metric_incumbent"] = _optional_float(
+        incumbent_metrics.get(TERTIARY_METRIC, incumbent.get("tertiary_metric_value"))
+    )
+    comparison["incumbent_summary_path"] = incumbent.get("artifact_paths", {}).get("summary")
+    return comparison
+
+
+def _optional_float(value: Any) -> float | None:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    if math.isnan(parsed):
+        return None
+    return parsed
+
+
+def _scope_key(dataset_path: str, target_name: str, fidelity_tier: str) -> str:
+    canonical_dataset_path = str(Path(dataset_path).expanduser().resolve())
+    return f"{canonical_dataset_path}::{target_name}::{fidelity_tier}"
 
 
 def _tier1_feature_columns() -> list[str]:

@@ -1,0 +1,13 @@
+{
+  "dataset_path": "data/tier1_design_runs.csv",
+  "target_name": "gcc_frac_min",
+  "feature_mode": "tier1_full",
+  "custom_feature_columns": [],
+  "n_estimators": 300,
+  "max_depth": null,
+  "seed": 42,
+  "fidelity_tier": "screening",
+  "experiment_type": "rf_autoresearch_v1",
+  "notes": "",
+  "save_model_artifact": false
+}

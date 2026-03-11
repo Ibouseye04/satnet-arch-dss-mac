@@ -1,0 +1,47 @@
+{
+  "schema_version": "satnet_rf_autoresearch_policy_v1",
+  "model_family": "RandomForest",
+  "allowed_modes": {
+    "screening": {
+      "command_mode": "candidate",
+      "candidate_path": "experiments/autoresearch/candidate.json"
+    },
+    "confirmatory": {
+      "command_mode": "confirmatory"
+    }
+  },
+  "mutable_fields": {
+    "target_name": [
+      "gcc_frac_min",
+      "partition_fraction"
+    ],
+    "feature_mode": [
+      "tier1_full",
+      "design_only"
+    ],
+    "n_estimators": [
+      100,
+      300,
+      600
+    ],
+    "max_depth": [
+      null,
+      12,
+      20
+    ]
+  },
+  "fixed_fields": {
+    "dataset_path": "data/tier1_design_runs.csv",
+    "custom_feature_columns": [],
+    "seed": 42,
+    "experiment_type": "rf_autoresearch_v1",
+    "notes": "",
+    "save_model_artifact": false
+  },
+  "promotion_rule": {
+    "primary_metric": "test_rmse",
+    "secondary_metric": "test_spearman_rho",
+    "tertiary_metric": "test_r2",
+    "goal": "minimize_primary_then_maximize_secondary_then_maximize_tertiary"
+  }
+}
