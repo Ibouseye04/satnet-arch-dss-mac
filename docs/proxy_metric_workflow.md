@@ -4,13 +4,16 @@ Copy-pasteable commands for the proxy-metric / instrumentation pipeline.
 
 All commands assume you are in the repository root.
 
-Install ML extras before RF/GNN training:
+Install the dependencies needed for the workflow you actually plan to run:
 
 ```bash
+python -m pip install -e ".[dev]"
+python -m pip install scikit-learn scipy joblib
 python -m pip install -e ".[ml]"
 ```
 
-`[ml]` includes `torch-geometric-temporal`, required by the GNN path.
+`[ml]` covers the optional torch/PyG GNN stack.
+The RF training and proxy-ranking validation commands also require `scikit-learn`, `scipy`, and `joblib`; `.[ml]` alone is not sufficient for the full RF + GNN + proxy workflow.
 
 ---
 

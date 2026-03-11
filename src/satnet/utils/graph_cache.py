@@ -28,14 +28,15 @@ logger = logging.getLogger(__name__)
 DEFAULT_CACHE_DIR = "artifacts/graph_cache"
 
 # Backward-incompatible cache contract version.
-CACHE_SCHEMA_VERSION = 1
+CACHE_SCHEMA_VERSION = 2
 
 # Only target-agnostic payloads are supported.
 PAYLOAD_MODE_TARGET_AGNOSTIC = "target_agnostic"
 
 _REQUIRED_METADATA_FIELDS = (
     "cache_schema_version",
-    "generator_fingerprint",
+    "sample_cache_key",
+    "generator_provenance",
     "payload_mode",
     "generator_config",
 )
@@ -81,14 +82,16 @@ def make_sample_cache_key(sample_config: dict[str, Any]) -> str:
 
 def make_cache_metadata(
     *,
-    generator_fingerprint: str,
+    sample_cache_key: str,
+    generator_provenance: str,
     generator_config: dict[str, Any],
     payload_mode: str = PAYLOAD_MODE_TARGET_AGNOSTIC,
 ) -> dict[str, Any]:
     """Build metadata for a cache entry."""
     return {
         "cache_schema_version": CACHE_SCHEMA_VERSION,
-        "generator_fingerprint": generator_fingerprint,
+        "sample_cache_key": sample_cache_key,
+        "generator_provenance": generator_provenance,
         "payload_mode": payload_mode,
         "generator_config": generator_config,
     }
@@ -177,7 +180,8 @@ def validate_cache_entry(
     data_list: list[Any],
     metadata: dict[str, Any] | None,
     *,
-    expected_generator_fingerprint: str,
+    expected_sample_cache_key: str,
+    expected_generator_provenance: str,
     expected_generator_config: dict[str, Any] | None = None,
 ) -> None:
     """Validate cache metadata and payload contract."""
@@ -193,11 +197,10 @@ def validate_cache_entry(
             "with --write-cache."
         )
 
-    missing = [key for key in _REQUIRED_METADATA_FIELDS if key not in metadata]
-    if missing:
+    if "cache_schema_version" not in metadata:
         raise ValueError(
-            f"Cache metadata missing required fields: {missing}. Delete this cache "
-            "entry and regenerate with --write-cache."
+            "Cache metadata missing required field 'cache_schema_version'. Delete "
+            "this cache entry and regenerate with --write-cache."
         )
 
     schema_version = int(metadata["cache_schema_version"])
@@ -206,6 +209,13 @@ def validate_cache_entry(
             f"Unsupported cache schema version {schema_version}; expected "
             f"{CACHE_SCHEMA_VERSION}. Delete this cache entry and regenerate "
             "with --write-cache."
+        )
+
+    missing = [key for key in _REQUIRED_METADATA_FIELDS if key not in metadata]
+    if missing:
+        raise ValueError(
+            f"Cache metadata missing required fields: {missing}. Delete this cache "
+            "entry and regenerate with --write-cache."
         )
 
     payload_mode = str(metadata["payload_mode"])
@@ -222,10 +232,18 @@ def validate_cache_entry(
             "with --write-cache."
         )
 
-    actual_fingerprint = str(metadata["generator_fingerprint"])
-    if actual_fingerprint != expected_generator_fingerprint:
+    actual_sample_cache_key = str(metadata["sample_cache_key"])
+    if actual_sample_cache_key != expected_sample_cache_key:
         raise ValueError(
-            "Cache generator fingerprint mismatch. Delete this cache entry and "
+            "Cache sample cache key mismatch. Delete this cache entry and "
+            "regenerate with --write-cache."
+        )
+
+    actual_generator_provenance = str(metadata["generator_provenance"])
+    if actual_generator_provenance != expected_generator_provenance:
+        raise ValueError(
+            "Cache generator provenance mismatch. Structural graph generation "
+            "semantics changed or the cache is stale. Delete this cache entry and "
             "regenerate with --write-cache."
         )
 

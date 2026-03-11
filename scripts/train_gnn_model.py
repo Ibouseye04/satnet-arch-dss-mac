@@ -47,6 +47,36 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _validated_config_hash(config: dict[str, Any], *, row_idx: int) -> str:
+    if "config_hash" not in config:
+        raise ValueError(
+            "Prediction export requires `config_hash` for stable ranking joins. "
+            f"Dataset row {row_idx} is missing `config_hash`."
+        )
+    value = config["config_hash"]
+    if pd.isna(value):
+        raise ValueError(
+            "Prediction export requires non-null, non-empty `config_hash` values "
+            f"for stable ranking joins. Dataset row {row_idx} has an invalid "
+            "`config_hash`."
+        )
+    normalized = str(value).strip()
+    if not normalized:
+        raise ValueError(
+            "Prediction export requires non-null, non-empty `config_hash` values "
+            f"for stable ranking joins. Dataset row {row_idx} has an invalid "
+            "`config_hash`."
+        )
+    return normalized
+
+
+def _collect_prediction_join_keys(dataset: SatNetTemporalDataset) -> dict[int, str]:
+    return {
+        idx: _validated_config_hash(dataset.get_run_config(idx), row_idx=idx)
+        for idx in range(len(dataset))
+    }
+
+
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
@@ -382,6 +412,7 @@ def main():
         exp_log.set("resolved_cache_dir", dataset._resolved_cache_dir)
         num_samples = len(dataset)
         neg_count, pos_count = dataset.get_label_distribution()
+        prediction_join_keys = _collect_prediction_join_keys(dataset)
         logger.info(f"Dataset: {num_samples} samples (neg: {neg_count}, pos: {pos_count})")
         exp_log.set("num_samples", num_samples)
 
@@ -491,11 +522,7 @@ def main():
                     cfg = dataset.get_run_config(idx)
 
                     row: dict[str, Any] = {
-                        "config_hash": (
-                            None
-                            if pd.isna(cfg.get("config_hash"))
-                            else str(cfg.get("config_hash"))
-                        ),
+                        "config_hash": prediction_join_keys[int(idx)],
                         "target_name": args.target_name,
                         "task_type": task_type,
                         "seed": args.seed,

@@ -53,6 +53,10 @@ from satnet.utils.graph_cache import (
 
 logger = logging.getLogger(__name__)
 
+GRAPH_SEQUENCE_GENERATOR_PROVENANCE = (
+    "SatNetTemporalDataset:hypatia_temporal_graph_sequence:v1"
+)
+
 
 class SatNetTemporalDataset(Dataset):
     """
@@ -293,7 +297,8 @@ class SatNetTemporalDataset(Dataset):
             generator_config = extract_cache_key_config(sample_config)
             cache_key = make_sample_cache_key(sample_config)
             expected_cache_metadata = make_cache_metadata(
-                generator_fingerprint=cache_key,
+                sample_cache_key=cache_key,
+                generator_provenance=GRAPH_SEQUENCE_GENERATOR_PROVENANCE,
                 generator_config=generator_config,
             )
 
@@ -305,7 +310,8 @@ class SatNetTemporalDataset(Dataset):
                 validate_cache_entry(
                     cached,
                     cached_metadata,
-                    expected_generator_fingerprint=cache_key,
+                    expected_sample_cache_key=cache_key,
+                    expected_generator_provenance=GRAPH_SEQUENCE_GENERATOR_PROVENANCE,
                     expected_generator_config=generator_config,
                 )
                 return self._materialize_sequence(cached, label=label, run_id=idx)

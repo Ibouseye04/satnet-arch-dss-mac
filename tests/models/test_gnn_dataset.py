@@ -199,6 +199,13 @@ class TestGnnDatasetCacheContract:
         )
         writer_sample = writer_ds[0]
         assert writer_sample[0].y.item() == pytest.approx(1.0)
+        meta_path = next(cache_dir.glob("*.meta.json"))
+        payload = json.loads(meta_path.read_text())
+        assert payload["sample_cache_key"]
+        assert payload["generator_provenance"] == (
+            gnn_dataset_module.GRAPH_SEQUENCE_GENERATOR_PROVENANCE
+        )
+        assert payload["sample_cache_key"] != payload["generator_provenance"]
 
         # Ensure second dataset instance hits cache and does not regenerate.
         class FailOnBuildAdapter:
@@ -217,7 +224,7 @@ class TestGnnDatasetCacheContract:
         assert reader_sample[0].y.item() == pytest.approx(0.25)
         assert reader_sample[1].y.item() == pytest.approx(0.25)
 
-    def test_cache_metadata_mismatch_rejected(self, tmp_path, monkeypatch) -> None:
+    def test_cache_generator_provenance_mismatch_rejected(self, tmp_path, monkeypatch) -> None:
         pytest.importorskip("torch")
         pytest.importorskip("torch_geometric")
 
@@ -238,7 +245,7 @@ class TestGnnDatasetCacheContract:
 
         meta_path = next(cache_dir.glob("*.meta.json"))
         payload = json.loads(meta_path.read_text())
-        payload["generator_fingerprint"] = "broken-fingerprint"
+        payload["generator_provenance"] = "broken-provenance"
         meta_path.write_text(json.dumps(payload))
 
         reader_ds = gnn_dataset_module.SatNetTemporalDataset(
@@ -248,7 +255,7 @@ class TestGnnDatasetCacheContract:
             cache_dir=str(cache_dir),
         )
 
-        with pytest.raises(ValueError, match="fingerprint mismatch"):
+        with pytest.raises(ValueError, match="generator provenance mismatch"):
             _ = reader_ds[0]
 
     def test_cache_stale_schema_rejected(self, tmp_path, monkeypatch) -> None:

@@ -172,3 +172,89 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         "y_pred",
     }
     assert required_columns.issubset(df.columns)
+
+
+@pytest.mark.parametrize("bad_config_hash", [None, "", "   "])
+def test_prediction_export_rejects_invalid_config_hash(
+    tmp_path,
+    monkeypatch,
+    bad_config_hash,
+) -> None:
+    import scripts.train_gnn_model as train_gnn
+
+    class FakeDataset:
+        def __init__(
+            self,
+            root: str,
+            use_cache: bool,
+            write_cache: bool,
+            cache_dir: str | None,
+            target_name: str,
+        ) -> None:
+            self._resolved_cache_dir = cache_dir or "cache"
+            self.target_name = target_name
+            self._rows = [
+                {"config_hash": "cfg-0", "run_id": 0},
+                {"config_hash": bad_config_hash, "run_id": 1},
+                {"config_hash": "cfg-2", "run_id": 2},
+                {"config_hash": "cfg-3", "run_id": 3},
+            ]
+
+        def __len__(self) -> int:
+            return 4
+
+        def get_label_distribution(self):
+            return 2, 2
+
+        def __getitem__(self, idx: int):
+            return [
+                Data(
+                    x=torch.zeros((3, 3), dtype=torch.float),
+                    edge_index=torch.tensor([[0, 1], [1, 2]], dtype=torch.long),
+                    y=torch.tensor([float(idx % 2)], dtype=torch.float),
+                    time_step=torch.tensor([0], dtype=torch.long),
+                )
+            ]
+
+        def get_run_config(self, idx: int):
+            return self._rows[idx]
+
+    class FakeModel(nn.Module):
+        def __init__(
+            self,
+            node_features: int,
+            hidden_channels: int,
+            out_channels: int,
+            task_type: str,
+        ) -> None:
+            super().__init__()
+            self.task_type = task_type
+            self.layer = nn.Linear(1, 1)
+
+        def forward(self, data_list):
+            _ = data_list
+            return torch.tensor([[0.1, 0.9]], dtype=torch.float)
+
+    output_model = tmp_path / "models" / "gnn.pt"
+    args = Namespace(
+        data_dir=str(tmp_path),
+        epochs=1,
+        lr=0.01,
+        hidden_dim=16,
+        test_split=0.5,
+        seed=123,
+        output_model=str(output_model),
+        device="cpu",
+        use_cache=False,
+        write_cache=False,
+        cache_dir=str(tmp_path / "cache"),
+        target_name="partition_any",
+        experiment_log=str(tmp_path / "experiments" / "gnn_log.jsonl"),
+    )
+
+    monkeypatch.setattr(train_gnn, "parse_args", lambda: args)
+    monkeypatch.setattr(train_gnn, "SatNetTemporalDataset", FakeDataset)
+    monkeypatch.setattr(train_gnn, "SatelliteGNN", FakeModel)
+
+    with pytest.raises(ValueError, match="stable ranking joins"):
+        train_gnn.main()

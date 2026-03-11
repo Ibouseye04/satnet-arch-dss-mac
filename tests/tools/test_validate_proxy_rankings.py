@@ -83,3 +83,83 @@ def test_report_includes_match_and_drop_counts(tmp_path, monkeypatch) -> None:
     assert report["dropped_right_count"] == 1
     assert report["left_duplicate_key_count"] == 0
     assert report["right_duplicate_key_count"] == 0
+
+
+def test_null_join_keys_on_left_fail_loudly(tmp_path, monkeypatch, capsys) -> None:
+    ref_path = tmp_path / "ref.csv"
+    proxy_path = tmp_path / "proxy.csv"
+
+    pd.DataFrame(
+        [
+            {"config_hash": None, "y_pred": 0.1},
+            {"config_hash": "b", "y_pred": 0.2},
+        ]
+    ).to_csv(ref_path, index=False)
+    pd.DataFrame(
+        [
+            {"config_hash": "a", "y_pred": 0.3},
+            {"config_hash": "b", "y_pred": 0.4},
+        ]
+    ).to_csv(proxy_path, index=False)
+
+    with pytest.raises(SystemExit) as exc:
+        _run_tool(monkeypatch, [str(ref_path), str(proxy_path)])
+
+    assert exc.value.code == 1
+    output = capsys.readouterr().out
+    assert "null/NaN/empty values" in output
+    assert "reference: 1" in output
+    assert "proxy: 0" in output
+
+
+def test_null_join_keys_on_right_fail_loudly(tmp_path, monkeypatch, capsys) -> None:
+    ref_path = tmp_path / "ref.csv"
+    proxy_path = tmp_path / "proxy.csv"
+
+    pd.DataFrame(
+        [
+            {"config_hash": "a", "y_pred": 0.1},
+            {"config_hash": "b", "y_pred": 0.2},
+        ]
+    ).to_csv(ref_path, index=False)
+    pd.DataFrame(
+        [
+            {"config_hash": "a", "y_pred": 0.3},
+            {"config_hash": None, "y_pred": 0.4},
+        ]
+    ).to_csv(proxy_path, index=False)
+
+    with pytest.raises(SystemExit) as exc:
+        _run_tool(monkeypatch, [str(ref_path), str(proxy_path)])
+
+    assert exc.value.code == 1
+    output = capsys.readouterr().out
+    assert "null/NaN/empty values" in output
+    assert "reference: 0" in output
+    assert "proxy: 1" in output
+
+
+def test_whitespace_join_keys_fail_loudly(tmp_path, monkeypatch, capsys) -> None:
+    ref_path = tmp_path / "ref.csv"
+    proxy_path = tmp_path / "proxy.csv"
+
+    pd.DataFrame(
+        [
+            {"config_hash": "   ", "y_pred": 0.1},
+            {"config_hash": "b", "y_pred": 0.2},
+        ]
+    ).to_csv(ref_path, index=False)
+    pd.DataFrame(
+        [
+            {"config_hash": "a", "y_pred": 0.3},
+            {"config_hash": "b", "y_pred": 0.4},
+        ]
+    ).to_csv(proxy_path, index=False)
+
+    with pytest.raises(SystemExit) as exc:
+        _run_tool(monkeypatch, [str(ref_path), str(proxy_path)])
+
+    assert exc.value.code == 1
+    output = capsys.readouterr().out
+    assert "null/NaN/empty values" in output
+    assert "reference: 1" in output

@@ -116,6 +116,11 @@ def ndcg_at_k(ref_scores: np.ndarray, proxy_scores: np.ndarray, k: int) -> float
     return dcg_val / idcg_val
 
 
+def _invalid_join_key_mask(values: pd.Series) -> pd.Series:
+    normalized = values.astype("string").str.strip()
+    return values.isna() | normalized.fillna("").eq("")
+
+
 # ── main ────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -143,6 +148,20 @@ def main() -> None:
 
     left_count = len(ref_df)
     right_count = len(proxy_df)
+    left_invalid_mask = _invalid_join_key_mask(ref_df[id_col])
+    right_invalid_mask = _invalid_join_key_mask(proxy_df[id_col])
+    left_invalid_count = int(left_invalid_mask.sum())
+    right_invalid_count = int(right_invalid_mask.sum())
+    if left_invalid_count > 0 or right_invalid_count > 0:
+        left_rows = [int(idx) for idx in ref_df.index[left_invalid_mask][:5].tolist()]
+        right_rows = [int(idx) for idx in proxy_df.index[right_invalid_mask][:5].tolist()]
+        print(
+            f"ERROR: Join key column '{id_col}' contains null/NaN/empty values. "
+            "Stable thesis ranking joins require complete keys. "
+            f"Invalid counts -> reference: {left_invalid_count} rows={left_rows}, "
+            f"proxy: {right_invalid_count} rows={right_rows}"
+        )
+        sys.exit(1)
     left_duplicate_count = int(ref_df[id_col].duplicated().sum())
     right_duplicate_count = int(proxy_df[id_col].duplicated().sum())
 

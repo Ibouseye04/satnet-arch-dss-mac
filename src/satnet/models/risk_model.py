@@ -100,6 +100,29 @@ TIER1_FEATURE_COLUMNS: List[str] = [
 ]
 
 
+def _validated_prediction_config_hashes(
+    df: pd.DataFrame,
+    *,
+    source_name: Path,
+) -> pd.Series:
+    if "config_hash" not in df.columns:
+        raise ValueError(
+            "Prediction export requires a `config_hash` column for stable ranking "
+            f"joins. Source dataset '{source_name}' is missing `config_hash`."
+        )
+    normalized = df["config_hash"].astype("string").str.strip()
+    invalid_mask = df["config_hash"].isna() | normalized.fillna("").eq("")
+    if invalid_mask.any():
+        invalid_rows = [int(idx) for idx in df.index[invalid_mask][:5].tolist()]
+        raise ValueError(
+            "Prediction export requires non-null, non-empty `config_hash` values "
+            "for stable ranking joins. "
+            f"Found {int(invalid_mask.sum())} invalid row(s) in '{source_name}' "
+            f"(example row indices: {invalid_rows})."
+        )
+    return normalized
+
+
 def load_design_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(csv_path)
     X = df[DESIGN_FEATURE_COLUMNS].copy()
@@ -546,6 +569,7 @@ def train_rf_model(
     task_type = infer_task_type(target_name)
 
     df = pd.read_csv(csv_path)
+    config_hashes = _validated_prediction_config_hashes(df, source_name=csv_path)
     if feature_columns is None:
         feature_columns = [c for c in TIER1_V1_FEATURE_COLUMNS if c in df.columns]
 
@@ -605,13 +629,8 @@ def train_rf_model(
     preds_rows: list[dict] = []
 
     def _build_row(split: str, idx: int, true: float, pred: float) -> dict:
-        source_row = df.iloc[int(idx)]
         row: dict[str, Any] = {
-            "config_hash": (
-                None
-                if "config_hash" not in df.columns or pd.isna(source_row.get("config_hash"))
-                else str(source_row.get("config_hash"))
-            ),
+            "config_hash": str(config_hashes.iloc[int(idx)]),
             "target_name": target_name,
             "task_type": task_type,
             "seed": cfg.random_state,
@@ -622,6 +641,7 @@ def train_rf_model(
             "model_type": "RandomForest",
             "data_path": str(csv_path),
         }
+        source_row = df.iloc[int(idx)]
         if "run_id" in df.columns and not pd.isna(source_row.get("run_id")):
             row["run_id"] = int(source_row["run_id"])
         return row
