@@ -1,11 +1,29 @@
-# Unified Refactor Plan — Tier 1 Temporal Simulation + Satellite-only GCC Labels (v1) with v2+ Roadmap
+# Unified Refactor Plan — Tier 1 Temporal Simulation + Satellite-only GCC Labels (Historical Plan + Current Status)
 
 ## Purpose
 Create a single, executable plan that:
-- Solves the current repo problem: **eliminate the “Two Worlds” pipeline split** by making the **Tier 1 (Hypatia-based) temporal pipeline** the only supported simulation/data path in `src/`.
+- Solves the original repo problem: **eliminate the “Two Worlds” pipeline split** by making the **Tier 1 (Hypatia-based) temporal pipeline** the only supported simulation/data path in `src/`.
 - Keeps **strict v1 scope** (temporal satellite-only connectivity + GCC labels) so work can land quickly and safely.
 - Provides a **broader v2+ roadmap** (ground stations, correlated failures, probabilistic ISL availability, traffic/routing) in the same document.
 - Is written in **atomic steps** that a junior engineer can execute as small PRs.
+
+## Current implementation status on `main`
+
+This document started as the execution plan for the Tier 1 refactor. The
+historical baseline below is no longer the live repository state.
+
+Current branch state:
+- `src/` no longer imports `satnet.network.topology`.
+- Temporal rollout is implemented in `src/satnet/simulation/tier1_rollout.py`.
+- `HypatiaAdapter.iter_graphs()` exists and is used by the Tier 1 rollout.
+- `src/satnet/simulation/monte_carlo.py` is the Tier 1 temporal dataset generator.
+- Schema-validated runs/steps CSV export is implemented.
+- Legacy static-snapshot code is quarantined under `src/satnet/legacy/`.
+- RF and GNN training scripts, experiment logging, target auditing, and proxy-ranking validation are implemented on top of the Tier 1 dataset contract.
+
+Implementation status by step:
+- Steps 0-8: implemented on the current branch.
+- Step 9: effectively resolved by moving the old `SimulationEngine` out of `satnet.simulation` and into `satnet.legacy`.
 
 ## Scope
 
@@ -32,7 +50,7 @@ Create a single, executable plan that:
   - Export: schema-stable writer with validation
 - **Atomic steps**: each step is a small PR that compiles and has a verification check.
 
-## Baseline (current state)
+## Historical baseline (starting point before the refactor)
 - Tier 1 graph provider exists: `satnet.network.hypatia_adapter.HypatiaAdapter` supports `calculate_isls()` and `get_graph_at_step(t)`.
 - Current engine is effectively `t=0`: `satnet.simulation.engine.SimulationEngine` loads `get_graph_at_step(0)` into a static snapshot.
 - “Toy world” still exists: `satnet.network.topology` and `satnet.simulation.monte_carlo.py` depend on it.

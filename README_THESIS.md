@@ -90,6 +90,7 @@ This script is the canonical generator for the **Tier 1 temporal design dataset*
   - Design-time parameters (architecture + failure assumptions)
   - Temporal aggregate labels (e.g., `partition_any`, `gcc_frac_mean`, `max_partition_streak`)
   - `seed` and `config_hash` for reproducibility
+  - `failed_nodes_json` and `failed_edges_json` for graph reconstruction
   - `schema_version` and `dataset_version` for dataset stability
 
 - `data/tier1_design_steps.csv`
@@ -106,9 +107,10 @@ This script is the canonical generator for the **Tier 1 temporal design dataset*
 
 ### The Brain (`src/satnet/models/gnn_model.py`)
 
-This module implements the dissertation’s deep learning model:
+This module implements the dissertation’s deep learning model family:
 
-- `SatelliteGNN`: a **GCLSTM** (Graph Convolutional LSTM) classifier.
+- `SatelliteGNN`: a **GCLSTM** (Graph Convolutional LSTM) model used for
+  both classification and regression targets.
 
 **What it does**
 
@@ -117,9 +119,9 @@ This module implements the dissertation’s deep learning model:
   - local structural features (graph convolution)
   - temporal dynamics (recurrent hidden state)
 - Pools node embeddings to a graph-level embedding via **global mean pooling**.
-- Produces logits for binary classification:
-  - `0 = Robust`
-  - `1 = Partitioned`
+- Produces either:
+  - logits for binary classification (`partition_any`)
+  - a scalar regression output for continuous resilience targets
 
 **Why temporal recurrence captures “state decay”**
 
@@ -139,6 +141,10 @@ The temporal GNN training set is not stored as precomputed PyG tensors by defaul
 - It **regenerates temporal graphs on-the-fly** by reading `data/tier1_design_runs.csv`, instantiating `HypatiaAdapter`, and emitting `List[torch_geometric.data.Data]` (one per time step).
 
 This design avoids ballooning storage/RAM for large numbers of runs (e.g., 2,000+).
+
+The current dataset implementation also supports optional graph-sequence caching
+via `src/satnet/utils/graph_cache.py` so repeated experiments can skip
+reconstruction when the cache metadata matches.
 
 ---
 
@@ -162,20 +168,13 @@ These are pure functions operating on a NetworkX graph, including:
 
 ### 1) Environment Setup
 
-This repo does not currently ship a full `requirements.txt`. You will typically need:
-
-- Core simulation:
-  - `networkx`, `numpy`, `pandas`, `scikit-learn`
-  - `sgp4` (strongly recommended for Tier 1 orbital propagation)
-
-- GNN training (optional):
-  - See `requirements_ml.txt`
-
 Recommended installs:
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install networkx numpy pandas scikit-learn joblib sgp4
+python -m pip install -e ".[dev]"
+python -m pip install scikit-learn scipy joblib
+python -m pip install -e ".[ml]"
 python -m pip install -r requirements_ml.txt
 ```
 
@@ -209,9 +208,17 @@ Artifacts written:
 
 ### 3) Train Baseline (Random Forest)
 
-This baseline predicts partition risk from **pure design parameters only**:
+The current training CLI supports all canonical resilience targets:
 
-- `num_planes`, `sats_per_plane`, `inclination_deg`, `altitude_km`
+- `partition_any` (classification)
+- `partition_fraction` (regression)
+- `gcc_frac_min` (regression)
+- `gcc_frac_mean` (regression)
+- `max_partition_streak` (regression)
+
+The default script path uses the Tier 1 runs table columns present in
+`src/satnet/models/risk_model.py` and writes stable prediction exports keyed
+by `config_hash`.
 
 Run:
 
@@ -223,6 +230,8 @@ Artifacts written:
 
 - `models/design_risk_model_tier1.joblib`
 - `models/design_risk_model_tier1_metrics.json`
+- `models/design_risk_model_tier1_predictions.csv`
+- `experiments/rf_log.jsonl`
 
 ---
 
@@ -243,22 +252,21 @@ python scripts/train_gnn_model.py --epochs 20 --lr 0.01 --hidden-dim 64 --data-d
 Artifacts written:
 
 - `models/satellite_gnn.pt`
+- `models/satellite_gnn_predictions.csv`
+- `experiments/gnn_log.jsonl`
+
+The GNN training CLI also supports `--target-name`, `--use-cache`,
+`--write-cache`, and `--cache-dir`.
 
 ---
 
-## Key Findings (Dissertation Summary)
+## What the Code Guarantees
 
-These headline results summarize the empirical behavior observed in the dissertation evaluation.
-
-- **Random Forest (Design-only baseline):** ~**92% accuracy**
-  - Interpretation: *Density is King.*
-  - A strong classical model can exploit high-signal design parameters to estimate partition risk.
-
-- **Temporal GNN (GCLSTM):** ~**0.83 F1 score**
-  - Interpretation: *Topology Predicts Failure.*
-  - The temporal model captures connectivity dynamics that cannot be reduced to static scalar summaries.
-
-Important: exact numbers will vary with dataset seed, failure probability ranges, and evaluation split.
+- **Deterministic graph generation** through explicit seeds plus fixed epoch handling.
+- **Temporal evaluation** over `t = 0..T`, not a single snapshot.
+- **Schema-validated dataset export** for runs and steps tables.
+- **Stable prediction joins** through required `config_hash` values in RF and GNN prediction CSVs.
+- **Graph reconstruction contract** through `failed_nodes_json` and `failed_edges_json`.
 
 ---
 

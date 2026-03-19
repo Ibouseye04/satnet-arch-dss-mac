@@ -2,7 +2,7 @@
 
 **Satellite Network Architecture Decision Support System (DSS)**
 
-This repository is the **Tier 1** refactor: a physics-compliant, **time-evolving** LEO constellation connectivity simulator plus ML baselines for estimating **partition risk** under persistent failures.
+This repository is the **Tier 1** implementation: a physics-compliant, **time-evolving** LEO constellation connectivity simulator plus ML tooling for resilience-target prediction and proxy-metric analysis.
 
 For the advisor-facing architecture narrative and methodology framing, see `README_THESIS.md`.
 
@@ -15,32 +15,23 @@ For the advisor-facing architecture narrative and methodology framing, see `READ
 - **Satellite-to-satellite only**: no ground stations/gateways in Phase 1.
 - **Deterministic**: explicit `seed` + fixed epoch (`DEFAULT_EPOCH_ISO`) for reproducibility.
 
-## Current execution status (2026-02-17)
+## Current code state
 
-Phase 1 remains sat-to-sat by design, but active execution work is focused on
-closing Phase 1 and staging Phase 2 correctly:
-
-- Re-generated Tier 1 design dataset at 10k runs (`110k` temporal step rows)
-  on remote hardware for a clean post-refactor baseline.
-- Re-trained the Tier 1 RF baseline on the refreshed dataset and captured
-  reproducible metrics artifacts.
-- Started temporal GNN environment/training setup on remote hardware.
-- Last completed GNN smoke run metrics: acc=0.6155, prec=0.6615, rec=0.8648,
-  f1=0.7496 (TP=1151, FP=589, FN=180, TN=80).
-- Completed GNN full run (20 epochs, 10k dataset): best checkpoint at epoch 3
-  with test acc=0.7600, f1=0.8205, prec=0.8168, rec=0.8242.
-- Continued external dataset onboarding as a supporting/validation track
-  (not Phase 1 truth labels), to feed Phase 2 planning.
-
-For the detailed nightly handoff and Phase 2 entry gates, see:
-
-- `docs/advisor_meeting/2026-02-17_phase1_restart_execution_update.md`
+- The canonical simulation path is:
+  `HypatiaAdapter` -> `tier1_rollout` -> `monte_carlo` -> schema-validated runs/steps CSVs.
+- Legacy static-snapshot code is quarantined under `src/satnet/legacy/`.
+- Supported resilience targets are:
+  `partition_any`, `partition_fraction`, `gcc_frac_min`, `gcc_frac_mean`, and `max_partition_streak`.
+- `scripts/train_design_risk_model.py` trains RandomForest classification or regression models against those targets and writes prediction CSVs with stable `config_hash` join keys.
+- `scripts/train_gnn_model.py` reconstructs temporal graph sequences from `tier1_design_runs.csv`, supports cache read/write, and writes both model checkpoints and prediction CSVs.
+- Proxy-metric workflow docs live in:
+  `docs/proxy_metric_workflow.md` and `docs/proxy_metric_repo_map.md`.
 
 ## Architecture (three layers)
 
 - **Physics layer**: `src/satnet/network/hypatia_adapter.py`
 - **Simulation layer**: `src/satnet/simulation/tier1_rollout.py` and `src/satnet/simulation/monte_carlo.py`
-- **Metrics/labels layer (pure)**: `src/satnet/metrics/labels.py`
+- **Metrics/labels layer (pure)**: `src/satnet/metrics/labels.py` and `src/satnet/metrics/resilience_targets.py`
 
 ## Project structure
 
@@ -50,17 +41,24 @@ src/satnet/
   simulation/tier1_rollout.py     # Temporal rollout: failures + t=0..T evaluation
   simulation/monte_carlo.py       # Dataset generation + schema validation
   metrics/labels.py               # Pure GCC / partition labels
+  metrics/resilience_targets.py   # Canonical aggregate target computation
   models/
-    risk_model.py                 # RandomForest baselines (Tier 1 + legacy)
-    gnn_dataset.py                # PyG dataset (reconstruct graphs on-the-fly)
-    gnn_model.py                  # GCLSTM thesis model
+    risk_model.py                 # RandomForest training helpers (classification + regression)
+    gnn_dataset.py                # PyG dataset with graph reconstruction + cache support
+    gnn_model.py                  # GCLSTM-based temporal model
+  utils/
+    experiment_logger.py          # JSONL experiment logging
+    graph_cache.py                # Graph-sequence cache helpers
   legacy/                         # Quarantined Tier-0-era artifacts
 scripts/
   export_design_dataset.py        # Writes data/tier1_design_{runs,steps}.csv
   export_failure_dataset.py       # Writes data/tier1_failure_{runs,steps}.csv
   failure_sweep.py                # Quick aggregate sweep (Tier 1 pipeline)
-  train_design_risk_model.py      # Baseline RF on tier1_design_runs.csv
-  train_gnn_model.py              # Temporal GNN training (optional)
+  train_design_risk_model.py      # RF training on supported resilience targets
+  train_gnn_model.py              # Temporal GNN training on supported targets
+tools/
+  analyze_dataset_targets.py      # Dataset/target audits
+  validate_proxy_rankings.py      # Cross-target ranking validation
 docs/datasets/
   tier1_temporal_connectivity_v1_schema.md
 ```
@@ -74,23 +72,23 @@ python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 
-# Core + dev (pytest)
+# Core + dev tooling
 python -m pip install -e '.[dev]'
 
-# Baseline ML + proxy validation
+# RF/proxy workflow
 python -m pip install scikit-learn scipy joblib
 
-# Optional: temporal GNN dependencies
-python -m pip install -r requirements_ml.txt
+# Optional: GNN stack
+python -m pip install -e '.[ml]'
 
-# Optional: visualization helper
-python -m pip install matplotlib
+# Optional compatibility path for the same GNN stack
+python -m pip install -r requirements_ml.txt
 ```
 
 ## Verify
 
 ```bash
-pytest -q
+./.venv/bin/python -m pytest
 ```
 
 ## Quickstart: run a single Tier 1 rollout
@@ -147,6 +145,10 @@ Outputs:
 - `data/tier1_design_runs.csv`
 - `data/tier1_design_steps.csv`
 
+The runs table includes `config_hash`, `seed`, `epoch_iso`,
+`failed_nodes_json`, and `failed_edges_json` so graph sequences can be
+reconstructed deterministically for downstream ML.
+
 ### Failure dataset (same pipeline, different defaults)
 
 ```bash
@@ -160,7 +162,7 @@ Outputs:
 
 ## Train models
 
-### Baseline: design-time RandomForest
+### RandomForest
 
 ```bash
 python scripts/train_design_risk_model.py
@@ -170,6 +172,12 @@ Outputs:
 
 - `models/design_risk_model_tier1.joblib`
 - `models/design_risk_model_tier1_metrics.json`
+- `models/design_risk_model_tier1_predictions.csv`
+- `experiments/rf_log.jsonl`
+
+The default CLI target is `partition_any`. For continuous targets, pass
+`--target-name` with one of:
+`partition_fraction`, `gcc_frac_min`, `gcc_frac_mean`, `max_partition_streak`.
 
 ### Thesis model: temporal GNN (optional)
 
@@ -180,6 +188,16 @@ python scripts/train_gnn_model.py --data-dir data/ --device auto
 Output:
 
 - `models/satellite_gnn.pt`
+- `models/satellite_gnn_predictions.csv`
+- `experiments/gnn_log.jsonl`
+
+The GNN script also supports `--target-name`, `--use-cache`, `--write-cache`,
+and `--cache-dir` for repeated graph-sequence experiments.
+
+## Workflow references
+
+- `docs/proxy_metric_workflow.md` contains copy-pasteable dataset, RF, GNN, audit, and proxy-validation commands.
+- `docs/proxy_metric_repo_map.md` summarizes the current branch-level proxy-metric contracts and artifact formats.
 
 ## Legacy artifacts (kept for backward compatibility)
 
