@@ -31,7 +31,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 import pandas as pd
 import torch
@@ -42,8 +42,20 @@ from datetime import datetime
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
 from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO, Tier1FailureRealization
+from satnet.utils.graph_cache import (
+    extract_cache_key_config,
+    load_graph_sequence,
+    make_cache_metadata,
+    make_sample_cache_key,
+    save_graph_sequence,
+    validate_cache_entry,
+)
 
 logger = logging.getLogger(__name__)
+
+GRAPH_SEQUENCE_GENERATOR_PROVENANCE = (
+    "SatNetTemporalDataset:hypatia_temporal_graph_sequence:v1"
+)
 
 
 class SatNetTemporalDataset(Dataset):
@@ -79,10 +91,14 @@ class SatNetTemporalDataset(Dataset):
         pre_transform: Optional[callable] = None,
         duration_minutes: int = 10,
         step_seconds: int = 60,
+        use_cache: bool = False,
+        write_cache: bool = False,
+        cache_dir: Optional[str] = None,
+        target_name: str = "partition_any",
     ):
         """
         Initialize the SatNet Temporal Dataset.
-        
+
         Args:
             root: Root directory containing the CSV file.
             csv_file: Name of the CSV file within root (default: tier1_design_runs.csv).
@@ -90,13 +106,21 @@ class SatNetTemporalDataset(Dataset):
             pre_transform: Pre-transform (not used in on-the-fly mode).
             duration_minutes: Duration for ISL calculation (default: 10 min).
             step_seconds: Time step interval (default: 60 sec).
-        
+            use_cache: If True, attempt to load cached graph sequences.
+            write_cache: If True, write generated sequences to cache.
+            cache_dir: Directory for cached .pt files (default: artifacts/graph_cache).
+            target_name: Column name for the target variable (default: partition_any).
+
         Raises:
             FileNotFoundError: If the CSV file does not exist at root/csv_file.
         """
         self.csv_file = csv_file
         self.duration_minutes = duration_minutes
         self.step_seconds = step_seconds
+        self.use_cache = use_cache
+        self.write_cache = write_cache
+        self._cache_dir = cache_dir
+        self.target_name = target_name
         
         # Validate that the CSV file exists before proceeding
         csv_path = os.path.join(root, csv_file)
@@ -122,10 +146,10 @@ class SatNetTemporalDataset(Dataset):
         """Validate that required columns exist in the CSV."""
         required_cols = [
             "num_planes",
-            "sats_per_plane", 
+            "sats_per_plane",
             "inclination_deg",
             "altitude_km",
-            "partition_any",
+            self.target_name,
         ]
         missing = [c for c in required_cols if c not in self._df.columns]
         if missing:
@@ -177,20 +201,49 @@ class SatNetTemporalDataset(Dataset):
         """Return the number of runs in the dataset."""
         return len(self._df)
     
+    @property
+    def _resolved_cache_dir(self) -> str:
+        if self._cache_dir is not None:
+            return self._cache_dir
+        # default: artifacts/graph_cache relative to root
+        return os.path.join(self.root, "..", "artifacts", "graph_cache")
+
+    def _materialize_sequence(
+        self,
+        structural_data_list: List[Data],
+        *,
+        label: float,
+        run_id: int,
+    ) -> List[Data]:
+        """Attach target-specific fields to a target-agnostic graph sequence."""
+        data_list: List[Data] = []
+        for structural_data in structural_data_list:
+            data = structural_data.clone()
+            data.y = torch.tensor([label], dtype=torch.float)
+            data.run_id = torch.tensor([run_id], dtype=torch.long)
+
+            if self.transform is not None:
+                data = self.transform(data)
+
+            data_list.append(data)
+        return data_list
+
     def get(self, idx: int) -> List[Data]:
         """
         Get the temporal graph sequence for a single run.
-        
+
         This method:
         1. Reads row `idx` from the CSV to get constellation config
-        2. Instantiates HypatiaAdapter with those parameters
-        3. Calls calculate_isls() to generate temporal topology
-        4. Converts each time step's NetworkX graph to PyG Data
-        5. Returns a list of Data objects (one per time step)
-        
+        2. (Optional) Checks cache for a pre-built sequence
+        3. Instantiates HypatiaAdapter with those parameters
+        4. Calls calculate_isls() to generate temporal topology
+        5. Converts each time step's NetworkX graph to PyG Data
+        6. (Optional) Writes the sequence to cache
+        7. Returns a list of Data objects (one per time step)
+
         Args:
             idx: Index of the run (0-indexed)
-        
+
         Returns:
             List of PyG Data objects, one per time step. Each Data has:
                 - x: Node features [num_sats, num_features]
@@ -202,39 +255,68 @@ class SatNetTemporalDataset(Dataset):
         """
         if idx < 0 or idx >= len(self._df):
             raise IndexError(f"Index {idx} out of range [0, {len(self._df)})")
-        
+
         row = self._df.iloc[idx]
-        
+
         # Extract constellation parameters
         num_planes = int(row["num_planes"])
         sats_per_plane = int(row["sats_per_plane"])
         inclination_deg = float(row["inclination_deg"])
         altitude_km = float(row["altitude_km"])
-        
+
         # Optional parameters with defaults
         phasing_factor = int(row.get("phasing_factor", 1))
-        
-        # Get the label
-        label = int(row["partition_any"])
-        
+
+        # Get the label (supports any target column)
+        label = float(row[self.target_name])
+
         # Get seed if available (for reproducibility)
         seed = row.get("seed", None)
-        
+
         # Get epoch from CSV or use default (Tier 1 determinism requirement)
         epoch_iso = row.get("epoch_iso", DEFAULT_EPOCH_ISO)
         epoch = datetime.fromisoformat(str(epoch_iso))
-        
+
         # Get time parameters from CSV or use instance defaults
         duration_minutes = int(row.get("duration_minutes", self.duration_minutes))
         step_seconds = int(row.get("step_seconds", self.step_seconds))
-        
+
         # Get failure realization from CSV (Step 3 contract)
         failed_nodes_json = row.get("failed_nodes_json", "[]")
         failed_edges_json = row.get("failed_edges_json", "[]")
         failures = Tier1FailureRealization.from_json_strings(
             str(failed_nodes_json), str(failed_edges_json)
         )
-        
+
+        # ── cache lookup ────────────────────────────────────────────
+        cache_key = None
+        generator_config: dict[str, Any] | None = None
+        expected_cache_metadata: dict[str, Any] | None = None
+        if self.use_cache or self.write_cache:
+            sample_config = row.to_dict()
+            generator_config = extract_cache_key_config(sample_config)
+            cache_key = make_sample_cache_key(sample_config)
+            expected_cache_metadata = make_cache_metadata(
+                sample_cache_key=cache_key,
+                generator_provenance=GRAPH_SEQUENCE_GENERATOR_PROVENANCE,
+                generator_config=generator_config,
+            )
+
+        if self.use_cache and cache_key is not None:
+            cached, _, cached_metadata = load_graph_sequence(
+                self._resolved_cache_dir, cache_key
+            )
+            if cached is not None:
+                validate_cache_entry(
+                    cached,
+                    cached_metadata,
+                    expected_sample_cache_key=cache_key,
+                    expected_generator_provenance=GRAPH_SEQUENCE_GENERATOR_PROVENANCE,
+                    expected_generator_config=generator_config,
+                )
+                return self._materialize_sequence(cached, label=label, run_id=idx)
+
+        # ── generate graphs (cache miss or caching disabled) ────────
         # Instantiate HypatiaAdapter with explicit epoch for reproducibility
         adapter = HypatiaAdapter(
             num_planes=num_planes,
@@ -244,16 +326,16 @@ class SatNetTemporalDataset(Dataset):
             phasing_factor=phasing_factor,
             epoch=epoch,
         )
-        
+
         # Calculate ISLs for the specified duration
         adapter.calculate_isls(
             duration_minutes=duration_minutes,
             step_seconds=step_seconds,
         )
-        
+
         # Convert each time step to PyG Data
-        data_list = []
-        
+        structural_data_list: List[Data] = []
+
         for time_step, G in adapter.iter_graphs():
             # Apply persistent failures (Step 3 contract)
             G_eff = G.copy()
@@ -264,44 +346,33 @@ class SatNetTemporalDataset(Dataset):
                     G_eff.remove_edge(u, v)
             data = self._networkx_to_pyg_data(
                 G=G_eff,
-                label=label,
-                run_id=idx,
                 time_step=time_step,
                 num_planes=num_planes,
                 sats_per_plane=sats_per_plane,
             )
-            
-            # Apply transform if specified
-            if self.transform is not None:
-                data = self.transform(data)
-            
-            data_list.append(data)
-        
-        return data_list
+            structural_data_list.append(data)
+
+        # ── cache write ─────────────────────────────────────────────
+        if self.write_cache and cache_key is not None:
+            save_graph_sequence(
+                structural_data_list,
+                self._resolved_cache_dir,
+                cache_key,
+                metadata=expected_cache_metadata,
+            )
+
+        return self._materialize_sequence(structural_data_list, label=label, run_id=idx)
     
     def _networkx_to_pyg_data(
         self,
         G,
-        label: int,
-        run_id: int,
         time_step: int,
         num_planes: int,
         sats_per_plane: int,
+        label: Optional[float] = None,
+        run_id: Optional[int] = None,
     ) -> Data:
-        """
-        Convert a NetworkX graph to a PyG Data object.
-        
-        Args:
-            G: NetworkX graph from HypatiaAdapter
-            label: partition_any label (0 or 1)
-            run_id: Index of the run
-            time_step: Time step index
-            num_planes: Number of orbital planes
-            sats_per_plane: Satellites per plane
-        
-        Returns:
-            PyG Data object with node features, edge_index, and label
-        """
+        """Convert a NetworkX graph to a PyG Data object."""
         num_nodes = G.number_of_nodes()
 
         # Create mapping from original node IDs to contiguous indices [0, num_nodes)
@@ -372,17 +443,22 @@ class SatNetTemporalDataset(Dataset):
             edge_index = torch.zeros((2, 0), dtype=torch.long)
             edge_attr = torch.zeros((0, 4), dtype=torch.float)
         
-        # Create PyG Data object
-        data = Data(
+        data_kwargs = dict(
             x=x,
             edge_index=edge_index,
             edge_attr=edge_attr,
-            y=torch.tensor([label], dtype=torch.long),
-            run_id=torch.tensor([run_id], dtype=torch.long),
             time_step=torch.tensor([time_step], dtype=torch.long),
             num_nodes=num_nodes,
         )
-        
+
+        if label is not None:
+            data_kwargs["y"] = torch.tensor([label], dtype=torch.float)
+        if run_id is not None:
+            data_kwargs["run_id"] = torch.tensor([run_id], dtype=torch.long)
+
+        # Create PyG Data object
+        data = Data(**data_kwargs)
+
         return data
     
     def get_run_config(self, idx: int) -> dict:
@@ -401,13 +477,15 @@ class SatNetTemporalDataset(Dataset):
         return self._df.iloc[idx].to_dict()
     
     def get_label_distribution(self) -> Tuple[int, int]:
-        """
-        Get the distribution of partition_any labels.
-        
+        """Get the distribution of binary target labels.
+
         Returns:
-            Tuple of (num_negative, num_positive) counts
+            Tuple of (num_negative, num_positive) counts.
+            For continuous targets, thresholds at 0.5.
         """
-        counts = self._df["partition_any"].value_counts()
+        col = self.target_name if self.target_name in self._df.columns else "partition_any"
+        binary = (self._df[col] > 0.5).astype(int)
+        counts = binary.value_counts()
         return counts.get(0, 0), counts.get(1, 0)
 
 

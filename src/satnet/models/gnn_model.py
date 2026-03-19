@@ -1,20 +1,22 @@
 """
-GCLSTM Model for Satellite Network Temporal Graph Classification.
+GCLSTM Model for Satellite Network Temporal Graph Prediction.
 
 This module implements the "Thesis Model" - a Graph Convolutional LSTM Network
-that processes temporal sequences of satellite network graphs to predict partition risk.
+that processes temporal sequences of satellite network graphs.
+
+Supports both:
+    - Binary classification (out_channels=2, task_type="classification")
+    - Scalar regression    (out_channels=1, task_type="regression")
 
 Architecture:
     - GCLSTM: Combines GCN with LSTM for temporal graph learning
     - Global Mean Pooling: Aggregates node embeddings to graph-level
-    - Linear Classifier: Binary classification (Robust vs. Partitioned)
-
-Target: Predict `partition_any` label from temporal ISL connectivity patterns.
+    - Linear Head: Maps graph embedding to output logits/scalar
 """
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Literal, Optional, Union
 
 import torch
 import torch.nn as nn
@@ -26,47 +28,38 @@ from torch_geometric_temporal.nn.recurrent import GCLSTM
 
 class SatelliteGNN(nn.Module):
     """
-    GCLSTM model for satellite network graph classification.
-    
-    This model processes temporal sequences of graph snapshots and produces
-    a single graph-level prediction (binary classification).
-    
-    Architecture:
-        1. GCLSTM (recurrent): Combines GCN with LSTM for temporal learning
-        2. Global Mean Pool: Aggregates node embeddings to graph embedding
-        3. Linear: Maps graph embedding to class logits
-    
+    GCLSTM model for satellite network graph prediction.
+
+    Supports classification (out_channels=2) and regression (out_channels=1).
+
     Attributes:
         node_features: Dimension of input node features (default: 3)
         hidden_channels: Dimension of hidden state (default: 64)
-        out_channels: Number of output classes (default: 2)
+        out_channels: Output dimension (2 for classification, 1 for regression)
+        task_type: "classification" or "regression"
     """
-    
+
     def __init__(
         self,
         node_features: int = 3,
         hidden_channels: int = 64,
         out_channels: int = 2,
+        task_type: Literal["classification", "regression"] = "classification",
     ):
-        """
-        Initialize the SatelliteGNN model.
-        
-        Args:
-            node_features: Dimension of node features (sats_per_plane, altitude, inclination).
-            hidden_channels: Hidden dimension for GCLSTM output.
-            out_channels: Number of output classes (2 for binary classification).
-        """
         super().__init__()
-        
+
         self.node_features = node_features
         self.hidden_channels = hidden_channels
         self.out_channels = out_channels
-        
-        # GCLSTM: Graph Convolutional LSTM
-        # K=1 means 1-hop neighborhood (Chebyshev filter order)
+        self.task_type = task_type
+
+        if task_type == "regression" and out_channels != 1:
+            raise ValueError("Regression requires out_channels=1")
+
+        # GCLSTM: Graph Convolutional LSTM (K=1: 1-hop Chebyshev filter)
         self.recurrent = GCLSTM(in_channels=node_features, out_channels=hidden_channels, K=1)
-        
-        # Linear classifier: graph embedding -> class logits
+
+        # Linear head: graph embedding → class logits or scalar
         self.linear = nn.Linear(hidden_channels, out_channels)
     
     def forward(self, data_list: List[Data]) -> torch.Tensor:
@@ -116,31 +109,26 @@ class SatelliteGNN(nn.Module):
         
         return logits
     
-    def predict(self, data_list: List[Data]) -> int:
-        """
-        Make a prediction for a single graph sequence.
-        
-        Args:
-            data_list: List of PyG Data objects (temporal sequence).
-        
+    def predict(self, data_list: List[Data]) -> Union[int, float]:
+        """Make a prediction for a single graph sequence.
+
         Returns:
-            Predicted class (0 = Robust, 1 = Partitioned).
+            Classification: predicted class (int).
+            Regression: predicted scalar (float).
         """
         self.eval()
         with torch.no_grad():
-            logits = self.forward(data_list)
-            return logits.argmax(dim=1).item()
-    
+            out = self.forward(data_list)
+            if self.task_type == "regression":
+                return out.squeeze().item()
+            return out.argmax(dim=1).item()
+
     def predict_proba(self, data_list: List[Data]) -> torch.Tensor:
-        """
-        Get prediction probabilities for a single graph sequence.
-        
-        Args:
-            data_list: List of PyG Data objects (temporal sequence).
-        
-        Returns:
-            Probability tensor [1, out_channels] with softmax probabilities.
-        """
+        """Get prediction probabilities (classification only)."""
+        if self.task_type != "classification":
+            raise RuntimeError(
+                "predict_proba() is only available when task_type='classification'."
+            )
         self.eval()
         with torch.no_grad():
             logits = self.forward(data_list)

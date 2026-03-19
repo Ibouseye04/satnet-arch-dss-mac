@@ -77,8 +77,8 @@ python -m pip install --upgrade pip
 # Core + dev (pytest)
 python -m pip install -e '.[dev]'
 
-# Baseline ML (RandomForest)
-python -m pip install scikit-learn
+# Baseline ML + proxy validation
+python -m pip install scikit-learn scipy joblib
 
 # Optional: temporal GNN dependencies
 python -m pip install -r requirements_ml.txt
