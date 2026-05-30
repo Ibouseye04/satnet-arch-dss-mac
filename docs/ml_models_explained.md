@@ -37,6 +37,13 @@ Both models are deliberately built to be **interchangeable**: they read the
 same data, support the same prediction targets, and write predictions in the
 same format so their results can be compared head-to-head.
 
+![ML pipeline overview](diagrams/ml_pipeline_overview.png)
+
+*Figure 1 — The shared pipeline. Both models start from the same CSV of
+constellation runs, but the Random Forest sees a flat feature vector while the
+Temporal GNN sees a sequence of network graphs. Their predictions land in an
+identical CSV schema so they can be compared directly.*
+
 ---
 
 ## 2. Random Forest
@@ -62,6 +69,12 @@ Two useful properties make it a great fit for this project:
 2. **It tells you which inputs matter** via *feature importances* — e.g., the
    repo's trained model found that `node_failure_prob` was by far the most
    important predictor.
+
+![Random Forest architecture](diagrams/random_forest.png)
+
+*Figure 2 — Random Forest. Each design's feature vector is run through many
+independent decision trees; their votes are aggregated into one prediction. The
+box at the bottom shows what the repo's trained model actually learned.*
 
 ### 2.2 How it's used in this repo
 
@@ -260,6 +273,13 @@ This repo uses a specific architecture called **GCLSTM** = **G**raph
 So at each time step, the model looks at the current network topology *and*
 remembers what it saw at all previous steps. The repo's own docstring calls
 this the **"Thesis Model."**
+
+![Temporal GNN (GCLSTM) architecture](diagrams/temporal_gnn.png)
+
+*Figure 3 — Temporal GNN forward pass. The GCLSTM cell consumes one network
+snapshot at a time, carrying its memory `(h, c)` forward across time steps. The
+final node embeddings are pooled into a single graph summary, which the linear
+head turns into a prediction.*
 
 ### 3.2 How it's used in this repo
 
@@ -461,6 +481,7 @@ a core part of this project's methodology.
 | GNN node features | `src/satnet/models/gnn_dataset.py` | 383–397 |
 | GNN training script | `scripts/train_gnn_model.py` | — |
 | ML dependencies | `pyproject.toml` | 22–26 |
+| Diagram source | `docs/diagrams/generate_diagrams.py` | — |
 
 ---
 
