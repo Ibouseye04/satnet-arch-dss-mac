@@ -1,0 +1,10 @@
+feature,importance
+node_failure_prob,0.23846401337654893
+total_satellites,0.20614096940297735
+sats_per_plane,0.17754275782476875
+altitude_km,0.14283802607704957
+edge_failure_prob,0.120477760491603
+inclination_deg,0.11405216252623566
+num_planes,0.0004843103008167239
+duration_minutes,0.0
+step_seconds,0.0

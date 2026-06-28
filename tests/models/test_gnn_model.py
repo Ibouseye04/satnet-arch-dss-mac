@@ -10,6 +10,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 pytest.importorskip("torch_geometric")
+pytest.importorskip("torch_geometric_temporal")
 
 
 class TestSatelliteGNN:

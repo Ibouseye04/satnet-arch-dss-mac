@@ -60,12 +60,24 @@ def parse_args() -> argparse.Namespace:
         help="Fraction of data for testing",
     )
     parser.add_argument(
+        "--val-size", type=float, default=0.1,
+        help="Fraction of data for validation/model selection",
+    )
+    parser.add_argument(
         "--output-dir", type=str, default=None,
         help="Output directory for model/metrics/predictions (default: models/)",
     )
     parser.add_argument(
         "--experiment-log", type=str, default=None,
         help="JSONL experiment log path (default: experiments/rf_log.jsonl)",
+    )
+    parser.add_argument(
+        "--smoke", action="store_true", default=False,
+        help="Fast one-command demo mode with fewer trees and smoke artifact paths",
+    )
+    parser.add_argument(
+        "--no-plots", action="store_true", default=False,
+        help="Skip optional PNG artifact generation",
     )
     return parser.parse_args()
 
@@ -74,7 +86,10 @@ def main() -> None:
     args = parse_args()
 
     data_path = Path(args.data_path) if args.data_path else PROJECT_ROOT / "data" / "tier1_design_runs.csv"
-    out_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "models"
+    if args.smoke and args.output_dir is None:
+        out_dir = PROJECT_ROOT / "artifacts" / "smoke" / "rf"
+    else:
+        out_dir = Path(args.output_dir) if args.output_dir else PROJECT_ROOT / "models"
     log_path = Path(args.experiment_log) if args.experiment_log else PROJECT_ROOT / "experiments" / "rf_log.jsonl"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -86,10 +101,19 @@ def main() -> None:
     task_type = infer_task_type(args.target_name)
     print(f"Target: {args.target_name} ({task_type})")
 
+    n_estimators = args.n_estimators
+    test_size = args.test_size
+    val_size = args.val_size
+    if args.smoke:
+        n_estimators = min(n_estimators, 25)
+        test_size = max(test_size, 0.25)
+        val_size = max(val_size, 0.25)
+
     cfg = RiskModelConfig(
-        test_size=args.test_size,
+        test_size=test_size,
+        val_size=val_size,
         random_state=args.seed,
-        n_estimators=args.n_estimators,
+        n_estimators=n_estimators,
         max_depth=None,
     )
 
@@ -99,6 +123,7 @@ def main() -> None:
         exp_log.set("task_type", task_type)
         exp_log.set("seed", args.seed)
         exp_log.set("data_path", str(data_path))
+        exp_log.set("smoke", bool(args.smoke))
 
         exp_log.start_timer("training")
         model, metrics, predictions = train_rf_model(
@@ -109,20 +134,36 @@ def main() -> None:
         exp_log.stop_timer("training")
 
         if args.target_name == "partition_any":
-            model_path = out_dir / "design_risk_model_tier1.joblib"
-            save_model(model, model_path)
-            metrics_path = out_dir / "design_risk_model_tier1_metrics.json"
-            preds_path = out_dir / "design_risk_model_tier1_predictions.csv"
+            base_name = "design_risk_model_tier1"
         else:
             suffix = args.target_name.replace(".", "_")
-            model_path = out_dir / f"rf_{suffix}.joblib"
-            save_model(model, model_path)
-            metrics_path = out_dir / f"rf_{suffix}_metrics.json"
-            preds_path = out_dir / f"rf_{suffix}_predictions.csv"
+            base_name = f"rf_{suffix}"
+
+        model_path = out_dir / f"{base_name}.joblib"
+        metrics_path = out_dir / f"{base_name}_metrics.json"
+        preds_path = out_dir / f"{base_name}_predictions.csv"
+        feature_importance_path = out_dir / f"{base_name}_feature_importance.csv"
+        confusion_matrix_path = out_dir / f"{base_name}_confusion_matrix.png"
+        prediction_plot_path = out_dir / f"{base_name}_prediction_vs_actual.png"
+
+        save_model(model, model_path)
 
         # Save predictions using a stable schema from train_rf_model()
         predictions.to_csv(preds_path, index=False)
         print(f"Predictions saved to {preds_path}")
+        _write_feature_importance_csv(metrics, feature_importance_path)
+        print(f"Feature importances saved to {feature_importance_path}")
+
+        if not args.no_plots:
+            generated_plots = _write_rf_plots(
+                metrics=metrics,
+                predictions=predictions,
+                task_type=task_type,
+                confusion_matrix_path=confusion_matrix_path,
+                prediction_plot_path=prediction_plot_path,
+            )
+            for plot_path in generated_plots:
+                print(f"Plot saved to {plot_path}")
 
         if task_type == "classification":
             _print_classification_report(metrics)
@@ -132,6 +173,7 @@ def main() -> None:
         exp_log.set_metrics(metrics)
         exp_log.set("model_path", str(model_path))
         exp_log.set("prediction_path", str(preds_path))
+        exp_log.set("feature_importance_path", str(feature_importance_path))
 
     # Save metrics JSON
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -141,9 +183,77 @@ def main() -> None:
     print(f"Model saved to {model_path}")
 
 
+def _write_feature_importance_csv(metrics: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    feature_importances = metrics.get("feature_importances", {})
+    rows = sorted(feature_importances.items(), key=lambda kv: kv[1], reverse=True)
+    with path.open("w") as f:
+        f.write("feature,importance\n")
+        for feature, importance in rows:
+            f.write(f"{feature},{importance}\n")
+
+
+def _write_rf_plots(
+    *,
+    metrics: dict,
+    predictions,
+    task_type: str,
+    confusion_matrix_path: Path,
+    prediction_plot_path: Path,
+) -> list[Path]:
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("matplotlib not installed; skipping PNG plots")
+        return []
+
+    generated: list[Path] = []
+
+    if task_type == "classification" and "confusion_matrix" in metrics:
+        cm = metrics["confusion_matrix"]
+        fig, ax = plt.subplots(figsize=(4, 4))
+        image = ax.imshow(cm, cmap="Blues")
+        ax.set_title("Confusion Matrix")
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+        ax.set_xticks([0, 1])
+        ax.set_yticks([0, 1])
+        for i, row in enumerate(cm):
+            for j, value in enumerate(row):
+                ax.text(j, i, str(value), ha="center", va="center", color="black")
+        fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
+        confusion_matrix_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.tight_layout()
+        fig.savefig(confusion_matrix_path, dpi=160)
+        plt.close(fig)
+        generated.append(confusion_matrix_path)
+
+    test_predictions = predictions[predictions["split"] == "test"]
+    if len(test_predictions) > 0:
+        fig, ax = plt.subplots(figsize=(5, 4))
+        ax.scatter(test_predictions["y_true"], test_predictions["y_pred"], alpha=0.75)
+        ax.set_title("Prediction vs Actual")
+        ax.set_xlabel("Actual")
+        ax.set_ylabel("Predicted")
+        if task_type == "regression":
+            min_val = min(test_predictions["y_true"].min(), test_predictions["y_pred"].min())
+            max_val = max(test_predictions["y_true"].max(), test_predictions["y_pred"].max())
+            ax.plot([min_val, max_val], [min_val, max_val], color="black", linewidth=1)
+        prediction_plot_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.tight_layout()
+        fig.savefig(prediction_plot_path, dpi=160)
+        plt.close(fig)
+        generated.append(prediction_plot_path)
+
+    return generated
+
+
 def _print_classification_report(metrics: dict) -> None:
     print("\n=== Classification Metrics (test split) ===")
     print(f"Accuracy: {metrics.get('accuracy', 'N/A')}")
+    print(f"Precision: {metrics.get('precision', 'N/A')}")
+    print(f"Recall: {metrics.get('recall', 'N/A')}")
+    print(f"F1: {metrics.get('f1', 'N/A')}")
     if "classification_report" in metrics:
         cr = metrics["classification_report"]
         for label in ["0", "1"]:

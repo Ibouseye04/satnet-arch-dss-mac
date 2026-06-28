@@ -64,6 +64,26 @@ def test_regression_evaluate_returns_expected_metrics() -> None:
     assert "precision" not in metrics
 
 
+def test_make_run_splits_returns_disjoint_complete_run_indices() -> None:
+    import scripts.train_gnn_model as train_gnn
+
+    splits = train_gnn.make_run_splits(
+        20,
+        test_split=0.2,
+        val_split=0.2,
+        seed=123,
+    )
+
+    assert set(splits) == {"train", "val", "test"}
+    assert len(splits["train"]) > 0
+    assert len(splits["val"]) > 0
+    assert len(splits["test"]) > 0
+    assert set(splits["train"]).isdisjoint(splits["val"])
+    assert set(splits["train"]).isdisjoint(splits["test"])
+    assert set(splits["val"]).isdisjoint(splits["test"])
+    assert sorted(splits["train"] + splits["val"] + splits["test"]) == list(range(20))
+
+
 def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) -> None:
     import scripts.train_gnn_model as train_gnn
 
@@ -141,6 +161,7 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         lr=0.01,
         hidden_dim=16,
         test_split=0.5,
+        val_split=0.25,
         seed=123,
         output_model=str(output_model),
         device="cpu",
@@ -149,6 +170,9 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         cache_dir=str(tmp_path / "cache"),
         target_name="partition_any",
         experiment_log=str(tmp_path / "experiments" / "gnn_log.jsonl"),
+        metrics_output=None,
+        subset=None,
+        smoke=False,
     )
 
     monkeypatch.setattr(train_gnn, "parse_args", lambda: args)
@@ -172,6 +196,7 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         "y_pred",
     }
     assert required_columns.issubset(df.columns)
+    assert {"train", "val", "test"}.issubset(set(df["split"]))
 
 
 @pytest.mark.parametrize("bad_config_hash", [None, "", "   "])
@@ -242,6 +267,7 @@ def test_prediction_export_rejects_invalid_config_hash(
         lr=0.01,
         hidden_dim=16,
         test_split=0.5,
+        val_split=0.25,
         seed=123,
         output_model=str(output_model),
         device="cpu",
@@ -250,6 +276,9 @@ def test_prediction_export_rejects_invalid_config_hash(
         cache_dir=str(tmp_path / "cache"),
         target_name="partition_any",
         experiment_log=str(tmp_path / "experiments" / "gnn_log.jsonl"),
+        metrics_output=None,
+        subset=None,
+        smoke=False,
     )
 
     monkeypatch.setattr(train_gnn, "parse_args", lambda: args)

@@ -112,6 +112,36 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Output directory (default: PROJECT_ROOT/data)",
     )
+    parser.add_argument(
+        "--node-failure-min",
+        type=float,
+        default=0.0,
+        help="Minimum node failure probability",
+    )
+    parser.add_argument(
+        "--node-failure-max",
+        type=float,
+        default=0.2,
+        help="Maximum node failure probability",
+    )
+    parser.add_argument(
+        "--edge-failure-min",
+        type=float,
+        default=0.0,
+        help="Minimum edge failure probability",
+    )
+    parser.add_argument(
+        "--edge-failure-max",
+        type=float,
+        default=0.3,
+        help="Maximum edge failure probability",
+    )
+    parser.add_argument(
+        "--smoke",
+        action="store_true",
+        default=False,
+        help="Generate a tiny dataset suitable for end-to-end smoke tests",
+    )
 
     return parser.parse_args()
 
@@ -119,6 +149,19 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     """Generate diverse constellation designs with temporal labels."""
     args = parse_args()
+
+    if args.smoke:
+        args.num_runs = min(args.num_runs, 24)
+        args.planes_min = 4
+        args.planes_max = 6
+        args.sats_min = 5
+        args.sats_max = 8
+        args.duration = 1
+        args.step_seconds = 60
+        args.node_failure_min = 0.0
+        args.node_failure_max = 0.2
+        args.edge_failure_min = 0.0
+        args.edge_failure_max = 0.25
 
     cfg = Tier1MonteCarloConfig(
         num_runs=args.num_runs,
@@ -129,8 +172,8 @@ def main() -> None:
         duration_minutes=args.duration,
         step_seconds=args.step_seconds,
         gcc_threshold=0.8,
-        node_failure_prob_range=(0.0, 0.2),
-        edge_failure_prob_range=(0.0, 0.3),
+        node_failure_prob_range=(args.node_failure_min, args.node_failure_max),
+        edge_failure_prob_range=(args.edge_failure_min, args.edge_failure_max),
         seed=args.seed,
         sample_constellation=True,
     )
@@ -141,7 +184,12 @@ def main() -> None:
     print(f"  Altitude: {cfg.altitude_km_range[0]:.0f}-{cfg.altitude_km_range[1]:.0f} km")
     print(f"  Inclination: {cfg.inclination_deg_range[0]:.0f}-{cfg.inclination_deg_range[1]:.0f} deg")
     print(f"  Duration: {cfg.duration_minutes} min @ {cfg.step_seconds}s steps")
+    print(
+        "  Failure probabilities: "
+        f"node={cfg.node_failure_prob_range}, edge={cfg.edge_failure_prob_range}"
+    )
     print(f"  Seed: {cfg.seed}")
+    print(f"  Smoke mode: {args.smoke}")
     print("=" * 60)
 
     runs, steps = generate_tier1_temporal_dataset(cfg)

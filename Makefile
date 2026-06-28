@@ -9,10 +9,18 @@ PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python)
 dataset:
 	$(PYTHON) scripts/export_design_dataset.py --num-runs 500 --seed 42
 
+.PHONY: smoke-dataset
+smoke-dataset:
+	$(PYTHON) scripts/export_design_dataset.py --smoke --seed 42
+
 # ── RF training ─────────────────────────────────────────────────────
 .PHONY: train-rf-binary
 train-rf-binary:
 	$(PYTHON) scripts/train_design_risk_model.py --target-name partition_any
+
+.PHONY: smoke-rf
+smoke-rf:
+	$(PYTHON) scripts/train_design_risk_model.py --smoke --target-name partition_any --no-plots
 
 .PHONY: train-rf-gcc
 train-rf-gcc:
@@ -22,6 +30,13 @@ train-rf-gcc:
 .PHONY: train-gnn-binary
 train-gnn-binary:
 	$(PYTHON) scripts/train_gnn_model.py --target-name partition_any --epochs 20
+
+.PHONY: smoke-gnn
+smoke-gnn:
+	$(PYTHON) scripts/train_gnn_model.py --smoke --target-name partition_any --device cpu
+
+.PHONY: smoke
+smoke: smoke-dataset smoke-rf smoke-gnn
 
 .PHONY: train-gnn-gcc
 train-gnn-gcc:

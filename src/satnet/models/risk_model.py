@@ -13,9 +13,12 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import (
     accuracy_score,
+    f1_score,
     mean_absolute_error,
     mean_squared_error,
+    precision_score,
     r2_score,
+    recall_score,
     roc_auc_score,
     classification_report,
     confusion_matrix,
@@ -26,6 +29,7 @@ from sklearn.model_selection import train_test_split
 @dataclass
 class RiskModelConfig:
     test_size: float = 0.2
+    val_size: float = 0.1
     random_state: int = 42
     n_estimators: int = 200
     max_depth: int | None = None
@@ -121,6 +125,124 @@ def _validated_prediction_config_hashes(
             f"(example row indices: {invalid_rows})."
         )
     return normalized
+
+
+def _safe_classification_stratify(labels: pd.Series) -> pd.Series | None:
+    """Return labels for stratification only when the split can support it."""
+    counts = labels.value_counts(dropna=False)
+    if len(counts) < 2 or int(counts.min()) < 2:
+        return None
+    return labels
+
+
+def _run_level_split_indices(
+    df: pd.DataFrame,
+    y: pd.Series,
+    *,
+    task_type: str,
+    test_size: float,
+    val_size: float,
+    random_state: int,
+) -> dict[str, list[int]]:
+    """Create seeded train/validation/test splits without crossing run_ids.
+
+    The Tier 1 runs table has one row per simulation run, but this helper is
+    stricter than row splitting so future exports with repeated run rows cannot
+    leak a run across splits.
+    """
+    if not (0.0 < test_size < 1.0):
+        raise ValueError("test_size must be in the open interval (0, 1)")
+    if not (0.0 <= val_size < 1.0):
+        raise ValueError("val_size must be in the interval [0, 1)")
+    if test_size + val_size >= 1.0:
+        raise ValueError("test_size + val_size must be less than 1")
+
+    if "run_id" in df.columns:
+        group_series = df["run_id"]
+        group_name = "run_id"
+    else:
+        group_series = pd.Series(df.index, index=df.index, name="_row_index")
+        group_name = "_row_index"
+
+    split_frame = pd.DataFrame(
+        {
+            "_row_index": df.index,
+            "_group": group_series.values,
+            "_target": y.values,
+        },
+        index=df.index,
+    )
+
+    target_counts_per_group = split_frame.groupby("_group")["_target"].nunique(dropna=False)
+    inconsistent_groups = target_counts_per_group[target_counts_per_group > 1]
+    if len(inconsistent_groups) > 0:
+        examples = list(inconsistent_groups.index[:5])
+        raise ValueError(
+            f"Cannot split by {group_name}: target varies within group(s) {examples}. "
+            "Use a run-level dataset with one target per run."
+        )
+
+    group_frame = (
+        split_frame.sort_index()
+        .drop_duplicates("_group")
+        .loc[:, ["_group", "_target"]]
+        .reset_index(drop=True)
+    )
+
+    if len(group_frame) < 3:
+        raise ValueError(
+            "Need at least 3 unique runs/groups to create train/validation/test splits."
+        )
+
+    group_ids = group_frame["_group"]
+    if task_type == "classification":
+        group_labels = group_frame["_target"].round().astype(int)
+        if group_labels.nunique() < 2:
+            raise ValueError(
+                "Classification target has only one class. Generate a dataset with "
+                "both positive and negative runs or use a regression target."
+            )
+        stratify = _safe_classification_stratify(group_labels)
+    else:
+        stratify = None
+
+    train_val_groups, test_groups = train_test_split(
+        group_ids,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=stratify,
+    )
+
+    val_groups: pd.Series
+    if val_size > 0.0:
+        relative_val_size = val_size / (1.0 - test_size)
+        train_val_targets = group_frame.loc[group_frame["_group"].isin(train_val_groups)]
+        if task_type == "classification":
+            train_val_labels = train_val_targets["_target"].round().astype(int)
+            train_val_stratify = _safe_classification_stratify(train_val_labels)
+        else:
+            train_val_stratify = None
+
+        train_groups, val_groups = train_test_split(
+            train_val_targets["_group"],
+            test_size=relative_val_size,
+            random_state=random_state,
+            stratify=train_val_stratify,
+        )
+    else:
+        train_groups = train_val_groups
+        val_groups = pd.Series([], dtype=group_ids.dtype)
+
+    group_sets = {
+        "train": set(train_groups.tolist()),
+        "val": set(val_groups.tolist()),
+        "test": set(test_groups.tolist()),
+    }
+
+    return {
+        split: split_frame.index[split_frame["_group"].isin(groups)].tolist()
+        for split, groups in group_sets.items()
+    }
 
 
 def load_design_dataset(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series]:
@@ -574,16 +696,25 @@ def train_rf_model(
         feature_columns = [c for c in TIER1_V1_FEATURE_COLUMNS if c in df.columns]
 
     X = df[feature_columns].copy()
-    y = df[target_name].astype(float)
+    if task_type == "classification":
+        y = df[target_name].astype(int)
+    else:
+        y = df[target_name].astype(float)
 
-    stratify = y.round().astype(int) if task_type == "classification" else None
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y,
+    split_indices = _run_level_split_indices(
+        df,
+        y,
+        task_type=task_type,
         test_size=cfg.test_size,
+        val_size=cfg.val_size,
         random_state=cfg.random_state,
-        stratify=stratify,
     )
+    X_train = X.loc[split_indices["train"]]
+    y_train = y.loc[split_indices["train"]]
+    X_val = X.loc[split_indices["val"]]
+    y_val = y.loc[split_indices["val"]]
+    X_test = X.loc[split_indices["test"]]
+    y_test = y.loc[split_indices["test"]]
 
     if task_type == "classification":
         model: Any = RandomForestClassifier(
@@ -604,6 +735,7 @@ def train_rf_model(
     model.fit(X_train, y_train)
 
     y_pred_train = model.predict(X_train)
+    y_pred_val = model.predict(X_val) if len(X_val) else np.asarray([])
     y_pred_test = model.predict(X_test)
 
     metrics: dict = {
@@ -611,14 +743,43 @@ def train_rf_model(
         "target_name": target_name,
         "num_samples": len(y),
         "train_size": len(y_train),
+        "val_size": len(y_val),
         "test_size": len(y_test),
         "seed": cfg.random_state,
+        "split_strategy": "run_id_grouped" if "run_id" in df.columns else "row_index",
     }
 
     if task_type == "classification":
-        metrics.update(_classification_metrics(y_test, y_pred_test, model))
+        y_score_train = _positive_class_scores(model, X_train)
+        y_score_val = _positive_class_scores(model, X_val) if len(X_val) else None
+        y_score_test = _positive_class_scores(model, X_test)
+
+        train_metrics = _classification_metrics(
+            y_train, y_pred_train, y_score_train, prefix="train",
+        )
+        test_metrics = _classification_metrics(
+            y_test, y_pred_test, y_score_test, prefix="test",
+        )
+        metrics.update(train_metrics)
+        if len(X_val):
+            metrics.update(
+                _classification_metrics(y_val, y_pred_val, y_score_val, prefix="val")
+            )
+        metrics.update(test_metrics)
+
+        # Preserve the original top-level keys as aliases for test metrics.
+        metrics["accuracy"] = test_metrics["test_accuracy"]
+        metrics["precision"] = test_metrics["test_precision"]
+        metrics["recall"] = test_metrics["test_recall"]
+        metrics["f1"] = test_metrics["test_f1"]
+        if "test_roc_auc" in test_metrics:
+            metrics["roc_auc"] = test_metrics["test_roc_auc"]
+        metrics["confusion_matrix"] = test_metrics["test_confusion_matrix"]
+        metrics["classification_report"] = test_metrics["test_classification_report"]
     else:
         metrics.update(_regression_metrics(y_test, y_pred_test, prefix="test"))
+        if len(X_val):
+            metrics.update(_regression_metrics(y_val, y_pred_val, prefix="val"))
         metrics.update(_regression_metrics(y_train, y_pred_train, prefix="train"))
 
     metrics["feature_importances"] = dict(
@@ -648,6 +809,8 @@ def train_rf_model(
 
     for idx, true, pred in zip(X_train.index, y_train, y_pred_train):
         preds_rows.append(_build_row("train", int(idx), float(true), float(pred)))
+    for idx, true, pred in zip(X_val.index, y_val, y_pred_val):
+        preds_rows.append(_build_row("val", int(idx), float(true), float(pred)))
     for idx, true, pred in zip(X_test.index, y_test, y_pred_test):
         preds_rows.append(_build_row("test", int(idx), float(true), float(pred)))
 
@@ -656,22 +819,56 @@ def train_rf_model(
     return model, metrics, predictions_df
 
 
+def _positive_class_scores(
+    model: RandomForestClassifier,
+    X: pd.DataFrame,
+) -> np.ndarray:
+    """Return P(class=1) when available for binary classification metrics."""
+    proba = model.predict_proba(X)
+    if proba.shape[1] == 1:
+        only_class = int(model.classes_[0])
+        return np.ones(len(X)) if only_class == 1 else np.zeros(len(X))
+    class_to_col = {int(cls): i for i, cls in enumerate(model.classes_)}
+    return proba[:, class_to_col.get(1, proba.shape[1] - 1)]
+
+
 def _classification_metrics(
-    y_true: Any, y_pred: Any, model: RandomForestClassifier,
+    y_true: Any,
+    y_pred: Any,
+    y_score: Any | None = None,
+    prefix: str = "",
 ) -> dict:
-    metrics: dict = {}
-    metrics["accuracy"] = accuracy_score(y_true, y_pred)
-    try:
-        proba = model.predict_proba(y_true.values.reshape(-1, 1) if hasattr(y_true, 'values') else y_true)
-        # We can't call predict_proba on y_true; use the stored predictions
-    except Exception:
-        pass
-    metrics["confusion_matrix"] = confusion_matrix(
-        y_true.astype(int), np.round(y_pred).astype(int)
-    ).tolist()
-    metrics["classification_report"] = classification_report(
-        y_true.astype(int), np.round(y_pred).astype(int), output_dict=True,
-    )
+    pre = f"{prefix}_" if prefix else ""
+    y_true_int = pd.Series(y_true).astype(int)
+    y_pred_int = pd.Series(y_pred).round().astype(int)
+    labels = [0, 1] if set(y_true_int.unique()) | set(y_pred_int.unique()) <= {0, 1} else None
+
+    metrics: dict = {
+        f"{pre}accuracy": accuracy_score(y_true_int, y_pred_int),
+        f"{pre}precision": precision_score(
+            y_true_int, y_pred_int, zero_division=0,
+        ),
+        f"{pre}recall": recall_score(y_true_int, y_pred_int, zero_division=0),
+        f"{pre}f1": f1_score(y_true_int, y_pred_int, zero_division=0),
+        f"{pre}confusion_matrix": confusion_matrix(
+            y_true_int, y_pred_int, labels=labels,
+        ).tolist(),
+        f"{pre}classification_report": classification_report(
+            y_true_int,
+            y_pred_int,
+            labels=labels,
+            output_dict=True,
+            zero_division=0,
+        ),
+    }
+
+    if y_score is not None and y_true_int.nunique() > 1:
+        try:
+            metrics[f"{pre}roc_auc"] = roc_auc_score(y_true_int, y_score)
+        except ValueError as e:
+            logger.warning("ROC AUC computation failed: %s", e)
+            metrics[f"{pre}roc_auc"] = float("nan")
+
     return metrics
 
 

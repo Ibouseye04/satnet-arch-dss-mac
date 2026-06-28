@@ -32,10 +32,16 @@ from torch_geometric.data import Data
 # Add src to path for imports
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
+DEFAULT_OUTPUT_MODEL = "models/satellite_gnn.pt"
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from satnet.models.gnn_dataset import SatNetTemporalDataset
-from satnet.models.gnn_model import SatelliteGNN
+try:
+    from satnet.models.gnn_model import SatelliteGNN
+    GNN_MODEL_IMPORT_ERROR: ModuleNotFoundError | None = None
+except ModuleNotFoundError as exc:
+    SatelliteGNN = None  # type: ignore[assignment]
+    GNN_MODEL_IMPORT_ERROR = exc
 from satnet.metrics.resilience_targets import ALL_TARGETS, infer_task_type
 from satnet.utils.experiment_logger import ExperimentLogger
 
@@ -113,6 +119,12 @@ def parse_args() -> argparse.Namespace:
         help="Fraction of data for testing (default: 0.2)",
     )
     parser.add_argument(
+        "--val-split",
+        type=float,
+        default=0.1,
+        help="Fraction of data for validation/model selection (default: 0.1)",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=42,
@@ -121,7 +133,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-model",
         type=str,
-        default="models/satellite_gnn.pt",
+        default=DEFAULT_OUTPUT_MODEL,
         help="Path to save trained model (default: models/satellite_gnn.pt)",
     )
     parser.add_argument(
@@ -161,6 +173,24 @@ def parse_args() -> argparse.Namespace:
         default="experiments/gnn_log.jsonl",
         help="JSONL experiment log path (default: experiments/gnn_log.jsonl)",
     )
+    parser.add_argument(
+        "--metrics-output",
+        type=str,
+        default=None,
+        help="Optional path for metrics JSON (default: next to checkpoint)",
+    )
+    parser.add_argument(
+        "--subset",
+        type=int,
+        default=None,
+        help="Use at most this many complete runs after seeded shuffling",
+    )
+    parser.add_argument(
+        "--smoke",
+        action="store_true",
+        default=False,
+        help="Fast one-command demo mode: one epoch, small hidden dim, smoke paths",
+    )
     return parser.parse_args()
 
 
@@ -179,6 +209,50 @@ def get_device(device_arg: str) -> torch.device:
 def move_data_to_device(data_sequence: List[Data], device: torch.device) -> List[Data]:
     """Move a sequence of Data objects to the specified device."""
     return [data.to(device) for data in data_sequence]
+
+
+def make_run_splits(
+    num_samples: int,
+    *,
+    test_split: float,
+    val_split: float,
+    seed: int,
+    subset: int | None = None,
+) -> dict[str, List[int]]:
+    """Create seeded train/validation/test splits over complete run indices."""
+    if num_samples < 3:
+        raise ValueError("Need at least 3 complete runs for train/validation/test splits")
+    if not (0.0 < test_split < 1.0):
+        raise ValueError("test_split must be in the open interval (0, 1)")
+    if not (0.0 <= val_split < 1.0):
+        raise ValueError("val_split must be in the interval [0, 1)")
+    if test_split + val_split >= 1.0:
+        raise ValueError("test_split + val_split must be less than 1")
+
+    rng = np.random.default_rng(seed)
+    shuffled = rng.permutation(num_samples).tolist()
+    if subset is not None:
+        if subset < 3:
+            raise ValueError("subset must be at least 3 when provided")
+        shuffled = shuffled[: min(subset, num_samples)]
+
+    n = len(shuffled)
+    n_test = max(1, int(round(n * test_split)))
+    n_val = max(1, int(round(n * val_split))) if val_split > 0.0 else 0
+    if n_test + n_val >= n:
+        n_val = max(0, n - n_test - 1)
+    if n_test + n_val >= n:
+        raise ValueError("Split sizes leave no training samples")
+
+    test_indices = shuffled[:n_test]
+    val_indices = shuffled[n_test:n_test + n_val]
+    train_indices = shuffled[n_test + n_val:]
+
+    return {
+        "train": train_indices,
+        "val": val_indices,
+        "test": test_indices,
+    }
 
 
 def _safe_rank_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[float, float]:
@@ -341,9 +415,16 @@ def evaluate(
 
     accuracy = correct / total if total > 0 else 0.0
     metrics = {
+        "loss": float(avg_loss),
+        "accuracy": float(accuracy),
+        "n_samples": int(total),
         "precision": precision,
         "recall": recall,
         "f1": f1,
+        "confusion_matrix": [
+            [true_negatives, false_positives],
+            [false_negatives, true_positives],
+        ],
         "true_positives": true_positives,
         "false_positives": false_positives,
         "true_negatives": true_negatives,
@@ -356,6 +437,15 @@ def evaluate(
 def main():
     """Main training loop."""
     args = parse_args()
+
+    if args.smoke:
+        args.epochs = 1
+        args.hidden_dim = min(args.hidden_dim, 16)
+        args.subset = args.subset or 8
+        args.test_split = max(args.test_split, 0.25)
+        args.val_split = max(args.val_split, 0.25)
+        if args.output_model == DEFAULT_OUTPUT_MODEL:
+            args.output_model = "artifacts/smoke/gnn/satellite_gnn_smoke.pt"
 
     task_type = infer_task_type(args.target_name)
     is_regression = task_type == "regression"
@@ -375,6 +465,14 @@ def main():
         output_path = PROJECT_ROOT / output_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    if args.metrics_output is None:
+        metrics_path = output_path.parent / f"{output_path.stem}_metrics.json"
+    else:
+        metrics_path = Path(args.metrics_output)
+        if not metrics_path.is_absolute():
+            metrics_path = PROJECT_ROOT / metrics_path
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
+
     log_path = Path(args.experiment_log)
     if not log_path.is_absolute():
         log_path = PROJECT_ROOT / log_path
@@ -383,6 +481,14 @@ def main():
     device = get_device(args.device)
     logger.info(f"Using device: {device}")
     logger.info(f"Target: {args.target_name} ({task_type})")
+
+    if SatelliteGNN is None:
+        logger.error("Temporal GNN dependency unavailable: %s", GNN_MODEL_IMPORT_ERROR)
+        logger.error(
+            "Install the optional GNN stack, including torch-geometric-temporal, "
+            "before running this training script."
+        )
+        sys.exit(1)
 
     with ExperimentLogger(log_path) as exp_log:
         exp_log.set("model_type", "SatelliteGNN")
@@ -393,6 +499,8 @@ def main():
         exp_log.set("use_cache", bool(args.use_cache))
         exp_log.set("write_cache", bool(args.write_cache))
         exp_log.set("cache_dir", args.cache_dir)
+        exp_log.set("smoke", bool(args.smoke))
+        exp_log.set("subset", args.subset)
 
         # Load dataset
         logger.info(f"Loading dataset from {data_dir}")
@@ -416,12 +524,23 @@ def main():
         logger.info(f"Dataset: {num_samples} samples (neg: {neg_count}, pos: {pos_count})")
         exp_log.set("num_samples", num_samples)
 
-        # Split train/test
-        split_idx = int(num_samples * (1.0 - args.test_split))
-        train_indices = list(range(split_idx))
-        test_indices = list(range(split_idx, num_samples))
-        logger.info(f"Train/Test split: {len(train_indices)}/{len(test_indices)}")
+        # Split complete runs; each dataset index is one full graph sequence.
+        splits = make_run_splits(
+            num_samples,
+            test_split=args.test_split,
+            val_split=args.val_split,
+            seed=args.seed,
+            subset=args.subset,
+        )
+        train_indices = splits["train"]
+        val_indices = splits["val"]
+        test_indices = splits["test"]
+        logger.info(
+            "Train/Val/Test split: %d/%d/%d complete runs",
+            len(train_indices), len(val_indices), len(test_indices),
+        )
         exp_log.set("train_size", len(train_indices))
+        exp_log.set("val_size", len(val_indices))
         exp_log.set("test_size", len(test_indices))
 
         # Initialize model
@@ -450,66 +569,93 @@ def main():
         logger.info("-" * 60)
         exp_log.start_timer("training")
 
-        best_test_loss = float("inf")
+        best_val_loss = float("inf")
         best_epoch = 0
         best_metrics: dict[str, Any] = {}
-        final_metrics: dict[str, Any] = {}
-        final_test_loss = float("nan")
 
         for epoch in range(1, args.epochs + 1):
             train_loss, train_acc = train_epoch(
                 model, train_indices, dataset, optimizer, criterion, device
             )
-            test_loss, test_acc, metrics = evaluate(
-                model, test_indices, dataset, criterion, device
+            val_loss, val_acc, val_metrics = evaluate(
+                model, val_indices, dataset, criterion, device
             )
-            final_metrics = metrics
-            final_test_loss = test_loss
 
             if is_regression:
                 logger.info(
                     f"Epoch {epoch:3d}/{args.epochs} | "
                     f"Train Loss: {train_loss:.4f} | "
-                    f"Test Loss: {test_loss:.4f} | "
-                    f"MAE: {metrics['mae']:.4f} | RMSE: {metrics['rmse']:.4f}"
+                    f"Val Loss: {val_loss:.4f} | "
+                    f"Val MAE: {val_metrics['mae']:.4f} | "
+                    f"Val RMSE: {val_metrics['rmse']:.4f}"
                 )
             else:
                 logger.info(
                     f"Epoch {epoch:3d}/{args.epochs} | "
                     f"Train Loss: {train_loss:.4f} Acc: {train_acc:.4f} | "
-                    f"Test Loss: {test_loss:.4f} Acc: {test_acc:.4f} F1: {metrics['f1']:.4f}"
+                    f"Val Loss: {val_loss:.4f} Acc: {val_acc:.4f} "
+                    f"F1: {val_metrics['f1']:.4f}"
                 )
 
-            # Save best model (by lowest test loss)
-            if test_loss < best_test_loss:
-                best_test_loss = test_loss
+            # Save best model by validation loss. The test split is held out
+            # until after training to avoid using it for checkpoint selection.
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
                 best_epoch = epoch
-                best_metrics = dict(metrics)
+                best_metrics = dict(val_metrics)
                 torch.save({
                     "epoch": epoch,
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
                     "train_loss": train_loss,
-                    "test_loss": test_loss,
-                    "test_acc": test_acc,
-                    "metrics": metrics,
+                    "val_loss": val_loss,
+                    "val_acc": val_acc,
+                    "val_metrics": val_metrics,
                     "args": vars(args),
                     "task_type": task_type,
                     "target_name": args.target_name,
                 }, output_path)
 
         exp_log.stop_timer("training")
+
+        checkpoint = torch.load(output_path, map_location=device)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        test_loss, test_acc, test_metrics = evaluate(
+            model, test_indices, dataset, criterion, device
+        )
+
         logger.info("-" * 60)
         logger.info(
-            f"Training complete! Best test loss: {best_test_loss:.4f} at epoch {best_epoch}"
+            f"Training complete! Best val loss: {best_val_loss:.4f} at epoch {best_epoch}"
         )
+        if is_regression:
+            logger.info(
+                "Held-out test: loss=%.4f MAE=%.4f RMSE=%.4f R2=%.4f",
+                test_loss,
+                test_metrics["mae"],
+                test_metrics["rmse"],
+                test_metrics["r2"],
+            )
+        else:
+            logger.info(
+                "Held-out test: loss=%.4f acc=%.4f precision=%.4f recall=%.4f f1=%.4f",
+                test_loss,
+                test_acc,
+                test_metrics["precision"],
+                test_metrics["recall"],
+                test_metrics["f1"],
+            )
         logger.info(f"Model saved to: {output_path}")
 
         # Save per-sample predictions
         model.eval()
         preds_rows = []
         with torch.no_grad():
-            for split_name, indices in [("train", train_indices), ("test", test_indices)]:
+            for split_name, indices in [
+                ("train", train_indices),
+                ("val", val_indices),
+                ("test", test_indices),
+            ]:
                 for idx in indices:
                     data_seq = dataset[idx]
                     data_seq = move_data_to_device(data_seq, device)
@@ -541,13 +687,40 @@ def main():
         pd.DataFrame(preds_rows).to_csv(preds_path, index=False)
         logger.info(f"Predictions saved to: {preds_path}")
 
+        metrics_payload = {
+            "model_type": "SatelliteGNN",
+            "target_name": args.target_name,
+            "task_type": task_type,
+            "seed": args.seed,
+            "data_dir": str(data_dir),
+            "num_samples": int(num_samples),
+            "subset": args.subset,
+            "train_size": len(train_indices),
+            "val_size": len(val_indices),
+            "test_size": len(test_indices),
+            "split_strategy": "seeded_complete_run_indices",
+            "best_epoch": best_epoch,
+            "best_val_loss": float(best_val_loss),
+            "best_val_metrics": best_metrics,
+            "test_loss": float(test_loss),
+            "test_accuracy": float(test_acc),
+            "test_metrics": test_metrics,
+            "model_path": str(output_path),
+            "prediction_path": str(preds_path),
+        }
+        with metrics_path.open("w") as f:
+            import json
+            json.dump(metrics_payload, f, indent=2, default=str)
+        logger.info(f"Metrics saved to: {metrics_path}")
+
         exp_log.set("model_path", str(output_path))
         exp_log.set("prediction_path", str(preds_path))
+        exp_log.set("metrics_path", str(metrics_path))
         exp_log.set("best_epoch", best_epoch)
-        exp_log.set("best_test_loss", float(best_test_loss))
-        exp_log.set("final_test_loss", float(final_test_loss))
-        exp_log.set_metrics({f"best_{k}": v for k, v in best_metrics.items()})
-        exp_log.set_metrics({f"final_{k}": v for k, v in final_metrics.items()})
+        exp_log.set("best_val_loss", float(best_val_loss))
+        exp_log.set("test_loss", float(test_loss))
+        exp_log.set_metrics({f"best_val_{k}": v for k, v in best_metrics.items()})
+        exp_log.set_metrics({f"test_{k}": v for k, v in test_metrics.items()})
 
 
 if __name__ == "__main__":

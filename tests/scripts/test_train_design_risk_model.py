@@ -79,8 +79,11 @@ def test_partition_any_uses_same_path_logic_for_implicit_and_explicit_default(
             n_estimators=5,
             seed=42,
             test_size=0.2,
+            val_size=0.1,
             output_dir=str(project_root / "models"),
             experiment_log=str(project_root / "experiments" / "rf_log.jsonl"),
+            smoke=False,
+            no_plots=True,
         )
         monkeypatch.setattr(train_script, "parse_args", lambda: args)
         train_script.main()
