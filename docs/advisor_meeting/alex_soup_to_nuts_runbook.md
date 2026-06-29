@@ -821,6 +821,94 @@ Advisor talking point:
 
 ## 6. Temporal GNN Status
 
+Short answer: the GNN is partially built out. The architecture and training path
+exist in code, but it is not yet a reliable demo/result path because the optional
+PyTorch Geometric Temporal dependency stack is not installed cleanly in the
+audited environment.
+
+### Alex Windows Machine: Is It Sufficient?
+
+From the provided machine photo:
+
+```text
+CPU: AMD Ryzen 7 8700F
+RAM: 32 GB DDR5-5200
+GPU: NVIDIA GeForce RTX 4060
+Disk: 2 TB PCIe Gen4 NVMe SSD
+OS: Windows 11 Home
+```
+
+Assessment:
+
+| Question | Answer |
+|---|---|
+| RF smoke/full baseline | Yes. This machine is more than sufficient. |
+| Dataset generation | Yes for smoke and moderate runs. Large 10k+ runs are feasible but may take time. |
+| GNN smoke run | Hardware should be sufficient if the PyTorch/PyG Temporal stack installs correctly. |
+| Current repo GNN full run style | Likely sufficient for small-to-medium full runs because the trainer processes one complete run sequence at a time, not a giant batch. |
+| Dissertation-scale optimized temporal GNN experiments | Limited. The research plan recommends A100/V100-class GPUs with much more VRAM/RAM for large padded batches and final-scale experiments. |
+
+The main blocker is not the Windows hardware. The main blocker is software
+readiness:
+
+```text
+torch
+torch_geometric
+torch_geometric_temporal
+torch-sparse / PyG compiled dependencies
+CUDA visibility from PyTorch
+```
+
+The repo has historical evidence that GNN work was implemented and run:
+
+- `bc74c0c`: implemented the temporal GNN architecture/training pipeline.
+- `537e6c9`, `d7ddd92`, `91a0f93`: created and fixed the GNN dataset path.
+- `11917b9`: added graph sequence caching and regression-compatible GNN metrics.
+- `f3245fb`: documented a completed 20-epoch GNN run on a 10k dataset using CPU.
+- `docs/advisor_meeting/2026-02-17_phase1_restart_execution_update.md`: records
+  a completed Temporal GNN smoke test and full run from that phase.
+
+Important interpretation:
+
+> "The repo has implemented and historically executed the GNN path. For Alex's
+> Windows machine, the hardware is probably sufficient for smoke and moderate
+> GNN training. What we still need to verify is that the exact Windows Python,
+> PyTorch, CUDA, PyG, and PyG Temporal dependency stack is installed correctly."
+
+Run this readiness check on Alex's Windows machine before attempting GNN
+training:
+
+```powershell
+python tools/check_gnn_environment.py
+```
+
+If the check passes, try the GNN smoke run:
+
+```powershell
+python scripts/train_gnn_model.py --smoke --target-name partition_any --device auto
+```
+
+If CUDA is visible, `--device auto` should use the RTX 4060. If CUDA is not
+visible, the script will fall back to CPU when `--device auto` is used.
+
+What is implemented:
+
+- `src/satnet/models/gnn_dataset.py`: reconstructs one full graph sequence per
+  simulation run from `tier1_design_runs.csv`.
+- `src/satnet/models/gnn_dataset.py`: reapplies `failed_nodes_json` and
+  `failed_edges_json` so the graph sequence matches the generated labels.
+- `src/satnet/models/gnn_model.py`: defines the `SatelliteGNN` GCLSTM model.
+- `scripts/train_gnn_model.py`: supports classification/regression targets,
+  train/validation/test run splits, checkpoint saving, metrics JSON, and
+  prediction CSV output.
+- `scripts/train_gnn_model.py --smoke`: exists as a one-epoch smoke mode.
+
+What is not yet proven:
+
+- A successful end-to-end GNN smoke run on Alex's Windows machine.
+- Stable GNN training metrics that can be shown as research evidence.
+- Larger GNN runs with cached graph sequences and reproducible checkpoints.
+
 The intended GNN command is:
 
 ```bash
@@ -844,6 +932,8 @@ python scripts/train_gnn_model.py \
 
 Current audit finding:
 
+- This is not a design gap in the research methodology; it is currently an
+  implementation/dependency readiness gap.
 - The GNN code now splits by complete simulation run into train, validation,
   and test sets.
 - It saves a best-validation checkpoint and metrics JSON.
@@ -857,6 +947,10 @@ What Alex should say if asked:
 > blocker is environment packaging for the optional PyTorch Geometric Temporal
 > stack. I can demonstrate the RF pipeline tonight and explain the GNN path and
 > its dependency blocker honestly."
+
+Even shorter:
+
+> "The GNN path is coded, but not yet validated end to end on this machine."
 
 Do not claim GNN training metrics until that dependency is installed and the
 smoke command completes.
