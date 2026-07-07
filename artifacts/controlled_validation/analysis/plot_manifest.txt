@@ -1,0 +1,4 @@
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\analysis\plots\experiment_a_baseline_gcc_frac_min_hist.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\analysis\plots\experiment_a_design_gcc_frac_min_correlations.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\analysis\plots\experiment_b_threshold_positive_rate.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\analysis\plots\experiment_c_rf_feature_importance.png

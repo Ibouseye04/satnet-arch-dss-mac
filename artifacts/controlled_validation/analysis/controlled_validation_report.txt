@@ -1,0 +1,47 @@
+CONTROLLED VALIDATION EXPERIMENT RESULTS
+
+EXPERIMENT A DISTRIBUTION
+ partition_any  count  rate
+             1     67  0.67
+             0     33  0.33
+
+EXPERIMENT A STATS
+            metric  count     mean      std      min      25%  50%  75%  max
+partition_fraction  100.0 0.670000 0.472582 0.000000 0.000000  1.0  1.0  1.0
+      gcc_frac_min  100.0 0.444678 0.408774 0.031250 0.091146  0.2  1.0  1.0
+     gcc_frac_mean  100.0 0.446751 0.407057 0.037037 0.100000  0.2  1.0  1.0
+
+EXPERIMENT A CORRELATIONS
+         feature        target   pearson  spearman
+total_satellites partition_any -0.453047 -0.458378
+total_satellites  gcc_frac_min  0.525209  0.519556
+      num_planes partition_any -0.137127 -0.140628
+      num_planes  gcc_frac_min  0.109063  0.113024
+  sats_per_plane partition_any -0.435850 -0.431667
+  sats_per_plane  gcc_frac_min  0.555542  0.525357
+ inclination_deg partition_any -0.386505 -0.395264
+ inclination_deg  gcc_frac_min  0.330236  0.381339
+     altitude_km partition_any -0.466361 -0.465255
+     altitude_km  gcc_frac_min  0.538189  0.606131
+
+ZERO-FAILURE PARTITIONED RUNS: 67 / 100
+
+EXPERIMENT B THRESHOLD SENSITIVITY
+ gcc_threshold  positive_rate  partition_fraction_mean  partition_fraction_median
+           0.5           0.61                     0.61                        1.0
+           0.6           0.67                     0.67                        1.0
+           0.7           0.67                     0.67                        1.0
+           0.8           0.67                     0.67                        1.0
+           0.9           0.67                     0.67                        1.0
+
+EXPERIMENT C FAILURE FEATURE CORRELATIONS
+          feature  pearson_partition_any  spearman_partition_any  pearson_gcc_frac_min  spearman_gcc_frac_min
+ total_satellites              -0.306693               -0.312102              0.471963               0.406561
+node_failure_prob               0.203976                0.207150             -0.099543              -0.091633
+edge_failure_prob               0.145817                0.142500             -0.087141              -0.074068
+
+EXPERIMENT C COMBINED FEATURE RANKING
+          feature  rf_gini_importance  permutation_auc_mean  permutation_auc_std  mutual_information  standardized_logit_coef  abs_standardized_logit_coef  rf_gini_importance_rank  permutation_auc_mean_rank  mutual_information_rank  abs_standardized_logit_coef_rank  mean_rank
+ total_satellites            0.307984              0.219735             0.031539            0.018339                -0.855829                     0.855829                      3.0                        1.0                      1.0                               1.0       1.50
+node_failure_prob            0.362399              0.186379             0.024708            0.006593                 0.594617                     0.594617                      1.0                        2.0                      2.0                               2.0       1.75
+edge_failure_prob            0.329617              0.125045             0.018556            0.000000                 0.277060                     0.277060                      2.0                        3.0                      3.0                               3.0       2.75

@@ -123,9 +123,15 @@ class Tier1RunRow:
     # Temporal aggregate labels (computed from simulation)
     gcc_frac_min: float
     gcc_frac_mean: float
+    gcc_frac_min_original: float
+    gcc_frac_mean_original: float
+    gcc_frac_min_surviving: float
+    gcc_frac_mean_surviving: float
     partition_fraction: float
     partition_any: int
     max_partition_streak: int
+    max_partition_streak_seconds: int
+    max_partition_streak_fraction: float
 
     # Failure counts (for analysis, not features)
     num_failed_nodes: int
@@ -161,6 +167,8 @@ class Tier1StepRow:
     num_components: int
     gcc_size: int
     gcc_frac: float
+    gcc_frac_original: float
+    gcc_frac_surviving: float
     partitioned: int
 
 
@@ -258,9 +266,15 @@ def generate_tier1_temporal_dataset(
             num_steps=summary.num_steps,
             gcc_frac_min=summary.gcc_frac_min,
             gcc_frac_mean=summary.gcc_frac_mean,
+            gcc_frac_min_original=summary.gcc_frac_min_original,
+            gcc_frac_mean_original=summary.gcc_frac_mean_original,
+            gcc_frac_min_surviving=summary.gcc_frac_min_surviving,
+            gcc_frac_mean_surviving=summary.gcc_frac_mean_surviving,
             partition_fraction=summary.partition_fraction,
             partition_any=summary.partition_any,
             max_partition_streak=summary.max_partition_streak,
+            max_partition_streak_seconds=summary.max_partition_streak_seconds,
+            max_partition_streak_fraction=summary.max_partition_streak_fraction,
             num_failed_nodes=summary.num_failed_nodes,
             num_failed_edges=summary.num_failed_edges,
             failed_nodes_json=failed_nodes_json,
@@ -281,6 +295,8 @@ def generate_tier1_temporal_dataset(
                 num_components=step.num_components,
                 gcc_size=step.gcc_size,
                 gcc_frac=step.gcc_frac,
+                gcc_frac_original=step.gcc_frac_original,
+                gcc_frac_surviving=step.gcc_frac_surviving,
                 partitioned=step.partitioned,
             )
             steps_rows.append(step_row)
@@ -317,9 +333,15 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "num_steps",
     "gcc_frac_min",
     "gcc_frac_mean",
+    "gcc_frac_min_original",
+    "gcc_frac_mean_original",
+    "gcc_frac_min_surviving",
+    "gcc_frac_mean_surviving",
     "partition_fraction",
     "partition_any",
     "max_partition_streak",
+    "max_partition_streak_seconds",
+    "max_partition_streak_fraction",
     "num_failed_nodes",
     "num_failed_edges",
     "failed_nodes_json",
@@ -340,6 +362,8 @@ STEPS_REQUIRED_COLUMNS = frozenset([
     "num_components",
     "gcc_size",
     "gcc_frac",
+    "gcc_frac_original",
+    "gcc_frac_surviving",
     "partitioned",
 ])
 
@@ -374,7 +398,16 @@ def validate_runs_schema(runs_dicts: List[dict]) -> None:
     # Validate value ranges
     for i, row in enumerate(runs_dicts):
         # GCC fractions must be in [0, 1]
-        for col in ["gcc_frac_min", "gcc_frac_mean", "partition_fraction"]:
+        for col in [
+            "gcc_frac_min",
+            "gcc_frac_mean",
+            "gcc_frac_min_original",
+            "gcc_frac_mean_original",
+            "gcc_frac_min_surviving",
+            "gcc_frac_mean_surviving",
+            "partition_fraction",
+            "max_partition_streak_fraction",
+        ]:
             val = row.get(col)
             if val is not None and not (0.0 <= val <= 1.0):
                 raise SchemaValidationError(

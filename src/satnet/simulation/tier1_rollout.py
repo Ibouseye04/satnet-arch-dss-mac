@@ -60,7 +60,7 @@ class Tier1RolloutConfig:
         duration_minutes: Total simulation duration in minutes.
         step_seconds: Time step interval in seconds.
         max_isl_distance_km: Maximum ISL distance (optional, uses adapter default if None).
-        gcc_threshold: Threshold for partition detection (gcc_frac < threshold → partitioned).
+        gcc_threshold: Threshold for partition detection (gcc_frac_original < threshold → partitioned).
         node_failure_prob: Probability of node failure (sampled once per run).
         edge_failure_prob: Probability of edge failure (sampled once per run from t=0 edges).
         seed: Random seed for reproducibility.
@@ -80,6 +80,9 @@ class Tier1RolloutConfig:
 
     # ISL parameters
     max_isl_distance_km: Optional[float] = None
+    isl_policy: str = "grid_fixed"
+    adjacent_search_k: int = 1
+    max_inter_plane_links_per_sat: int = 1
 
     # Labeling parameters
     gcc_threshold: float = 0.8
@@ -140,8 +143,10 @@ class Tier1RolloutStep:
         num_edges: Number of edges in the effective graph at this step.
         num_components: Number of connected components.
         gcc_size: Size of the Giant Connected Component (node count).
-        gcc_frac: Fraction of nodes in the GCC (0.0 to 1.0).
-        partitioned: 1 if gcc_frac < threshold, 0 otherwise.
+        gcc_frac: Backward-compatible alias for gcc_frac_original.
+        gcc_frac_original: GCC size divided by the original constellation size.
+        gcc_frac_surviving: GCC size divided by surviving nodes in the effective graph.
+        partitioned: 1 if gcc_frac_original < threshold, 0 otherwise.
     """
 
     t: int
@@ -150,6 +155,8 @@ class Tier1RolloutStep:
     num_components: int
     gcc_size: int
     gcc_frac: float
+    gcc_frac_original: float
+    gcc_frac_surviving: float
     partitioned: int
 
 
@@ -202,12 +209,18 @@ class Tier1RolloutSummary:
     """Aggregated summary of a Tier 1 temporal rollout.
 
     Attributes:
-        gcc_frac_min: Minimum GCC fraction across all time steps.
-        gcc_frac_mean: Mean GCC fraction across all time steps.
-        partition_fraction: Fraction of time steps where network was partitioned.
-        partition_any: 1 if partitioned at any time step, 0 otherwise.
-        max_partition_streak: Longest consecutive run of partitioned steps.
-        num_steps: Total number of time steps in the rollout.
+        gcc_frac_min: Backward-compatible alias for gcc_frac_min_original.
+        gcc_frac_mean: Backward-compatible alias for gcc_frac_mean_original.
+        gcc_frac_min_original: Minimum original-denominator GCC fraction across all time steps.
+        gcc_frac_mean_original: Mean original-denominator GCC fraction across all time steps.
+        gcc_frac_min_surviving: Minimum surviving-node GCC fraction across all time steps.
+        gcc_frac_mean_surviving: Mean surviving-node GCC fraction across all time steps.
+        partition_fraction: Fraction of sampled states with threshold-based partition status.
+        partition_any: 1 if any sampled state breaches the partition threshold, 0 otherwise.
+        max_partition_streak: Longest consecutive run of threshold-breach sampled states.
+        max_partition_streak_seconds: Sampled-state streak converted to physical-time-equivalent seconds.
+        max_partition_streak_fraction: Longest threshold-breach sampled-state run divided by total sampled states.
+        num_steps: Total number of sampled states in the rollout.
         num_failed_nodes: Number of nodes that failed (persistent).
         num_failed_edges: Number of edges that failed (persistent, from t=0).
         schema_version: Schema version for dataset compatibility.
@@ -217,9 +230,15 @@ class Tier1RolloutSummary:
 
     gcc_frac_min: float
     gcc_frac_mean: float
+    gcc_frac_min_original: float
+    gcc_frac_mean_original: float
+    gcc_frac_min_surviving: float
+    gcc_frac_mean_surviving: float
     partition_fraction: float
     partition_any: int
     max_partition_streak: int
+    max_partition_streak_seconds: int
+    max_partition_streak_fraction: float
     num_steps: int
     num_failed_nodes: int = 0
     num_failed_edges: int = 0
@@ -293,6 +312,9 @@ def run_tier1_rollout(
     }
     if cfg.max_isl_distance_km is not None:
         isl_kwargs["max_isl_distance_km"] = cfg.max_isl_distance_km
+    isl_kwargs["isl_policy"] = cfg.isl_policy
+    isl_kwargs["adjacent_search_k"] = cfg.adjacent_search_k
+    isl_kwargs["max_inter_plane_links_per_sat"] = cfg.max_inter_plane_links_per_sat
 
     adapter.calculate_isls(**isl_kwargs)
 
@@ -339,8 +361,12 @@ def run_tier1_rollout(
         num_edges = G_eff.number_of_edges()
         num_components = compute_num_components(G_eff)
         gcc_size = compute_gcc_size(G_eff)
-        gcc_frac = compute_gcc_frac(G_eff)
-        partitioned = compute_partitioned(gcc_frac, cfg.gcc_threshold)
+        gcc_frac_surviving = compute_gcc_frac(G_eff)
+        gcc_frac_original = (
+            gcc_size / cfg.total_satellites if cfg.total_satellites > 0 else 0.0
+        )
+        gcc_frac = gcc_frac_original
+        partitioned = compute_partitioned(gcc_frac_original, cfg.gcc_threshold)
 
         step = Tier1RolloutStep(
             t=t,
@@ -349,35 +375,56 @@ def run_tier1_rollout(
             num_components=num_components,
             gcc_size=gcc_size,
             gcc_frac=gcc_frac,
+            gcc_frac_original=gcc_frac_original,
+            gcc_frac_surviving=gcc_frac_surviving,
             partitioned=partitioned,
         )
         steps.append(step)
         partitioned_flags.append(partitioned)
 
     # 5. Aggregate into summary
-    gcc_fracs = [s.gcc_frac for s in steps]
+    gcc_fracs_original = [s.gcc_frac_original for s in steps]
+    gcc_fracs_surviving = [s.gcc_frac_surviving for s in steps]
     num_steps = len(steps)
 
     if num_steps > 0:
-        gcc_frac_min = min(gcc_fracs)
-        gcc_frac_mean = sum(gcc_fracs) / num_steps
+        gcc_frac_min_original = min(gcc_fracs_original)
+        gcc_frac_mean_original = sum(gcc_fracs_original) / num_steps
+        gcc_frac_min_surviving = min(gcc_fracs_surviving)
+        gcc_frac_mean_surviving = sum(gcc_fracs_surviving) / num_steps
+        gcc_frac_min = gcc_frac_min_original
+        gcc_frac_mean = gcc_frac_mean_original
         partition_count = sum(partitioned_flags)
         partition_fraction = partition_count / num_steps
         partition_any = 1 if partition_count > 0 else 0
     else:
+        gcc_frac_min_original = 0.0
+        gcc_frac_mean_original = 0.0
+        gcc_frac_min_surviving = 0.0
+        gcc_frac_mean_surviving = 0.0
         gcc_frac_min = 0.0
         gcc_frac_mean = 0.0
         partition_fraction = 0.0
         partition_any = 0
 
     max_partition_streak = aggregate_partition_streaks(partitioned_flags)
+    max_partition_streak_seconds = max_partition_streak * cfg.step_seconds
+    max_partition_streak_fraction = (
+        max_partition_streak / num_steps if num_steps > 0 else 0.0
+    )
 
     summary = Tier1RolloutSummary(
         gcc_frac_min=gcc_frac_min,
         gcc_frac_mean=gcc_frac_mean,
+        gcc_frac_min_original=gcc_frac_min_original,
+        gcc_frac_mean_original=gcc_frac_mean_original,
+        gcc_frac_min_surviving=gcc_frac_min_surviving,
+        gcc_frac_mean_surviving=gcc_frac_mean_surviving,
         partition_fraction=partition_fraction,
         partition_any=partition_any,
         max_partition_streak=max_partition_streak,
+        max_partition_streak_seconds=max_partition_streak_seconds,
+        max_partition_streak_fraction=max_partition_streak_fraction,
         num_steps=num_steps,
         num_failed_nodes=len(failed_nodes),
         num_failed_edges=len(failed_edges),

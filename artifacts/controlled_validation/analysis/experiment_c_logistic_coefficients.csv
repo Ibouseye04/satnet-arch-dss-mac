@@ -1,0 +1,4 @@
+feature,standardized_logit_coef,abs_standardized_logit_coef
+total_satellites,-0.8558292255554888,0.8558292255554888
+node_failure_prob,0.594617184247875,0.594617184247875
+edge_failure_prob,0.2770595926592181,0.2770595926592181

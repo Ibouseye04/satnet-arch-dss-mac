@@ -88,7 +88,7 @@ This script is the canonical generator for the **Tier 1 temporal design dataset*
 
 - `data/tier1_design_runs.csv`
   - Design-time parameters (architecture + failure assumptions)
-  - Temporal aggregate labels (e.g., `partition_any`, `gcc_frac_mean`, `max_partition_streak`)
+  - Temporal aggregate labels (e.g., `partition_any`, `gcc_frac_mean`, `max_partition_streak`, `max_partition_streak_seconds`, `max_partition_streak_fraction`)
   - `seed` and `config_hash` for reproducibility
   - `failed_nodes_json` and `failed_edges_json` for graph reconstruction
   - `schema_version` and `dataset_version` for dataset stability
@@ -160,6 +160,8 @@ These are pure functions operating on a NetworkX graph, including:
 - `compute_partitioned(gcc_frac, threshold)`
 - `aggregate_partition_streaks([...])`
 
+`partitioned` is a threshold-based partition/resilience breach: `gcc_frac_original < gcc_threshold`. It is not strict graph-theoretic disconnectedness and does not mean `num_components > 1`. `max_partition_streak` is the longest consecutive run of threshold-breach sampled states, `max_partition_streak_seconds` converts that sampled-state run to physical-time-equivalent seconds using `step_seconds`, and `max_partition_streak_fraction` divides the longest run by the total sampled states.
+
 **Critical invariant:** labels are derived from **graph state only**.
 
 ---
@@ -215,6 +217,8 @@ The current training CLI supports all canonical resilience targets:
 - `gcc_frac_min` (regression)
 - `gcc_frac_mean` (regression)
 - `max_partition_streak` (regression)
+- `max_partition_streak_seconds` (regression)
+- `max_partition_streak_fraction` (regression)
 
 The default script path uses the Tier 1 runs table columns present in
 `src/satnet/models/risk_model.py` and writes stable prediction exports keyed

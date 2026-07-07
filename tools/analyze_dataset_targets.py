@@ -105,6 +105,12 @@ def make_design_signature(row: pd.Series, precision: int = 1) -> str:
     return hashlib.md5(raw.encode()).hexdigest()[:12]
 
 
+def ensure_parent_dir(output_path: str) -> None:
+    parent = Path(output_path).parent
+    if parent != Path("."):
+        parent.mkdir(parents=True, exist_ok=True)
+
+
 def check_duplicates(
     df: pd.DataFrame, precision: int = 1,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -172,6 +178,7 @@ def main() -> None:
         print()
 
         if args.output_corr:
+            ensure_parent_dir(args.output_corr)
             corr.to_csv(args.output_corr)
             print(f"Correlation matrix saved to {args.output_corr}")
 
@@ -194,6 +201,7 @@ def main() -> None:
 
     # ── save summary ────────────────────────────────────────────────
     if args.output:
+        ensure_parent_dir(args.output)
         summary.to_csv(args.output, index=False)
         print(f"Summary saved to {args.output}")
 

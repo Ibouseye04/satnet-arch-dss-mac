@@ -767,6 +767,9 @@ class ISLComputationStats:
     links_accepted: int = 0
     optical_links: int = 0
     rf_links: int = 0
+    accepted_intra_plane_links: int = 0
+    accepted_inter_plane_links: int = 0
+    adaptive_selection_examples: List[Dict[str, object]] = field(default_factory=list)
 
 
 def _compute_grid_plus_isls(
@@ -774,6 +777,10 @@ def _compute_grid_plus_isls(
     positions: List[SatellitePosition],
     link_budget: LinkBudgetEngine,
     max_isl_distance_km: float = 10000.0,  # Increased - let link budget decide
+    isl_policy: str = "grid_fixed",
+    adjacent_search_k: int = 1,
+    max_inter_plane_links_per_sat: int = 1,
+    collect_adaptive_examples: int = 0,
 ) -> Tuple[List[ISLLink], ISLComputationStats]:
     """
     Compute +Grid ISL pattern with Tier 1 physics:
@@ -796,7 +803,14 @@ def _compute_grid_plus_isls(
     Returns:
         Tuple of (links, stats) where stats contains rejection counts
     """
-    links = []
+    if isl_policy not in {"grid_fixed", "grid_adaptive"}:
+        raise ValueError("isl_policy must be 'grid_fixed' or 'grid_adaptive'")
+    if adjacent_search_k < 0:
+        raise ValueError("adjacent_search_k must be non-negative")
+    if max_inter_plane_links_per_sat not in {1, 2}:
+        raise ValueError("max_inter_plane_links_per_sat must be 1 or 2")
+
+    links: List[ISLLink] = []
     stats = ISLComputationStats()
     
     num_planes = config.num_planes
@@ -804,6 +818,87 @@ def _compute_grid_plus_isls(
     
     def sat_index(plane: int, sat: int) -> int:
         return plane * sats_per_plane + sat
+
+    def link_type_for_planes(plane_idx: int, next_plane: int) -> str:
+        if next_plane == 0 and plane_idx == num_planes - 1:
+            return "seam_link"
+        return "inter_plane"
+
+    def record_mode(mode: str) -> None:
+        if mode == "optical":
+            stats.optical_links += 1
+        else:
+            stats.rf_links += 1
+
+    def accepted_link(
+        sat_1: int,
+        sat_2: int,
+        dist: float,
+        link_type: str,
+        signal_dbm: float,
+        margin_db: float,
+        mode: str,
+    ) -> ISLLink:
+        return ISLLink(
+            sat_id_1=sat_1,
+            sat_id_2=sat_2,
+            distance_km=dist,
+            link_type=link_type,
+            signal_strength_dbm=signal_dbm,
+            margin_db=margin_db,
+            link_mode=mode,
+        )
+
+    def evaluate_candidate(
+        current_sat: int,
+        current_pos: SatellitePosition,
+        partner_sat: int,
+        partner_pos: SatellitePosition,
+        link_type: str,
+    ) -> Tuple[Optional[ISLLink], Dict[str, object]]:
+        stats.total_candidate_links += 1
+        dist = _compute_distance_km(current_pos, partner_pos)
+        los = bool(_check_line_of_sight(current_pos, partner_pos))
+        outcome: Dict[str, object] = {
+            "sat_id": partner_sat,
+            "plane": partner_sat // sats_per_plane,
+            "satellite": partner_sat % sats_per_plane,
+            "los": los,
+            "distance_km": dist,
+            "viable": False,
+            "margin_db": None,
+            "selected": False,
+        }
+        if not los:
+            stats.links_rejected_los += 1
+            return None, outcome
+        mode, signal_dbm, margin_db, viable = link_budget.evaluate_link(dist)
+        outcome["mode"] = mode
+        outcome["signal_strength_dbm"] = signal_dbm
+        outcome["margin_db"] = margin_db
+        outcome["viable"] = viable
+        if not viable:
+            stats.links_rejected_budget += 1
+            return None, outcome
+        link = accepted_link(
+            current_sat,
+            partner_sat,
+            dist,
+            link_type,
+            signal_dbm,
+            margin_db,
+            mode,
+        )
+        return link, outcome
+
+    def accept(link: ISLLink) -> None:
+        links.append(link)
+        stats.links_accepted += 1
+        if link.link_type == "intra_plane":
+            stats.accepted_intra_plane_links += 1
+        else:
+            stats.accepted_inter_plane_links += 1
+        record_mode(link.link_mode)
     
     added_links: Set[Tuple[int, int]] = set()
     
@@ -812,80 +907,121 @@ def _compute_grid_plus_isls(
             current_sat = sat_index(plane_idx, sat_in_plane)
             current_pos = positions[current_sat]
             
-            # Intra-plane link: next satellite in same plane
             next_in_plane = sat_index(plane_idx, (sat_in_plane + 1) % sats_per_plane)
             link_key = tuple(sorted([current_sat, next_in_plane]))
             if link_key not in added_links:
-                stats.total_candidate_links += 1
                 next_pos = positions[next_in_plane]
-                dist = _compute_distance_km(current_pos, next_pos)
-                
-                # Check 1: Earth obscuration (Geometry Engine)
-                if not _check_line_of_sight(current_pos, next_pos):
-                    stats.links_rejected_los += 1
-                else:
-                    # Check 2: Link budget (Link Budget Engine)
-                    mode, signal_dbm, margin_db, viable = link_budget.evaluate_link(dist)
-                    
-                    if not viable:
-                        stats.links_rejected_budget += 1
-                    else:
-                        links.append(ISLLink(
-                            sat_id_1=current_sat,
-                            sat_id_2=next_in_plane,
-                            distance_km=dist,
-                            link_type="intra_plane",
-                            signal_strength_dbm=signal_dbm,
-                            margin_db=margin_db,
-                            link_mode=mode,
-                        ))
-                        stats.links_accepted += 1
-                        if mode == "optical":
-                            stats.optical_links += 1
-                        else:
-                            stats.rf_links += 1
+                link, _ = evaluate_candidate(
+                    current_sat,
+                    current_pos,
+                    next_in_plane,
+                    next_pos,
+                    "intra_plane",
+                )
+                if link is not None:
+                    accept(link)
                 added_links.add(link_key)
             
-            # Inter-plane link: same position in next plane
             next_plane = (plane_idx + 1) % num_planes
-            partner_sat = sat_index(next_plane, sat_in_plane)
-            link_key = tuple(sorted([current_sat, partner_sat]))
-            if link_key not in added_links:
-                stats.total_candidate_links += 1
+            link_type = link_type_for_planes(plane_idx, next_plane)
+            offsets = [0]
+            if isl_policy == "grid_adaptive":
+                for delta in range(1, adjacent_search_k + 1):
+                    offsets.extend([-delta, delta])
+
+            if isl_policy == "grid_fixed":
+                partner_sat = sat_index(next_plane, sat_in_plane)
+                link_key = tuple(sorted([current_sat, partner_sat]))
+                if link_key not in added_links:
+                    partner_pos = positions[partner_sat]
+                    link, _ = evaluate_candidate(
+                        current_sat,
+                        current_pos,
+                        partner_sat,
+                        partner_pos,
+                        link_type,
+                    )
+                    if link is not None:
+                        accept(link)
+                    added_links.add(link_key)
+                continue
+
+            candidate_links: List[Tuple[ISLLink, Dict[str, object]]] = []
+            candidate_outcomes: List[Dict[str, object]] = []
+            seen_partner_sats: Set[int] = set()
+            for offset in offsets:
+                partner_idx = (sat_in_plane + offset) % sats_per_plane
+                partner_sat = sat_index(next_plane, partner_idx)
+                if partner_sat in seen_partner_sats:
+                    continue
+                seen_partner_sats.add(partner_sat)
+                link_key = tuple(sorted([current_sat, partner_sat]))
+                if link_key in added_links:
+                    continue
                 partner_pos = positions[partner_sat]
-                dist = _compute_distance_km(current_pos, partner_pos)
-                
-                # Check 1: Earth obscuration (Geometry Engine)
-                if not _check_line_of_sight(current_pos, partner_pos):
-                    stats.links_rejected_los += 1
-                else:
-                    # Check 2: Link budget (Link Budget Engine)
-                    mode, signal_dbm, margin_db, viable = link_budget.evaluate_link(dist)
-                    
-                    if not viable:
-                        stats.links_rejected_budget += 1
-                    else:
-                        # Tag seam links (last plane -> first plane)
-                        if next_plane == 0 and plane_idx == num_planes - 1:
-                            link_type = "seam_link"
-                        else:
-                            link_type = "inter_plane"
-                        
-                        links.append(ISLLink(
-                            sat_id_1=current_sat,
-                            sat_id_2=partner_sat,
-                            distance_km=dist,
-                            link_type=link_type,
-                            signal_strength_dbm=signal_dbm,
-                            margin_db=margin_db,
-                            link_mode=mode,
-                        ))
-                        stats.links_accepted += 1
-                        if mode == "optical":
-                            stats.optical_links += 1
-                        else:
-                            stats.rf_links += 1
+                link, outcome = evaluate_candidate(
+                    current_sat,
+                    current_pos,
+                    partner_sat,
+                    partner_pos,
+                    link_type,
+                )
+                candidate_outcomes.append(outcome)
+                if link is not None:
+                    candidate_links.append((link, outcome))
+
+            selected = sorted(
+                candidate_links,
+                key=lambda item: (item[0].distance_km, item[0].sat_id_2),
+            )[:max_inter_plane_links_per_sat]
+            selected_keys: Set[Tuple[int, int]] = set()
+            for link, outcome in selected:
+                outcome["selected"] = True
+                accept(link)
+                selected_keys.add(tuple(sorted([link.sat_id_1, link.sat_id_2])))
+
+            for link_key in selected_keys:
                 added_links.add(link_key)
+
+            if (
+                collect_adaptive_examples > 0
+                and len(stats.adaptive_selection_examples) < collect_adaptive_examples
+                and candidate_outcomes
+            ):
+                original_sat = sat_index(next_plane, sat_in_plane)
+                selected_records = [
+                    {
+                        "sat_id": link.sat_id_2,
+                        "plane": link.sat_id_2 // sats_per_plane,
+                        "satellite": link.sat_id_2 % sats_per_plane,
+                        "distance_km": link.distance_km,
+                        "margin_db": link.margin_db,
+                    }
+                    for link, _ in selected
+                ]
+                original_outcomes = [
+                    outcome for outcome in candidate_outcomes if outcome["sat_id"] == original_sat
+                ]
+                selected_sat_ids = {record["sat_id"] for record in selected_records}
+                if (
+                    original_outcomes
+                    and not bool(original_outcomes[0]["los"])
+                    and selected_records
+                    and original_sat not in selected_sat_ids
+                ):
+                    stats.adaptive_selection_examples.append({
+                        "sat_id": current_sat,
+                        "satellite": sat_in_plane,
+                        "plane": plane_idx,
+                        "original_adjacent_candidate": {
+                            "sat_id": original_sat,
+                            "plane": next_plane,
+                            "satellite": sat_in_plane,
+                        },
+                        "adaptive_candidates": candidate_outcomes,
+                        "selected": selected_records,
+                        "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+                    })
     
     return links, stats
 
@@ -1061,6 +1197,10 @@ class HypatiaAdapter:
         duration_minutes: int = 60,
         step_seconds: int = 60,
         max_isl_distance_km: float = 10000.0,
+        isl_policy: str = "grid_fixed",
+        adjacent_search_k: int = 1,
+        max_inter_plane_links_per_sat: int = 1,
+        collect_adaptive_examples: int = 0,
     ) -> Tuple[Path, ISLComputationStats]:
         """
         Compute Inter-Satellite Links over time using Tier 1 physics.
@@ -1126,6 +1266,10 @@ class HypatiaAdapter:
                     positions,
                     self.link_budget,
                     max_isl_distance_km,
+                    isl_policy,
+                    adjacent_search_k,
+                    max_inter_plane_links_per_sat,
+                    max(0, collect_adaptive_examples - len(total_stats.adaptive_selection_examples)),
                 )
                 
                 # Aggregate stats
@@ -1135,6 +1279,9 @@ class HypatiaAdapter:
                 total_stats.links_accepted += step_stats.links_accepted
                 total_stats.optical_links += step_stats.optical_links
                 total_stats.rf_links += step_stats.rf_links
+                total_stats.accepted_intra_plane_links += step_stats.accepted_intra_plane_links
+                total_stats.accepted_inter_plane_links += step_stats.accepted_inter_plane_links
+                total_stats.adaptive_selection_examples.extend(step_stats.adaptive_selection_examples)
                 
                 self._isl_data[step] = links
                 

@@ -6,6 +6,7 @@ without importing toy topology and that computed properties work correctly.
 
 from __future__ import annotations
 
+import networkx as nx
 import pytest
 
 from satnet.simulation.tier1_rollout import (
@@ -109,11 +110,15 @@ class TestTier1RolloutStep:
             num_components=1,
             gcc_size=100,
             gcc_frac=1.0,
+            gcc_frac_original=1.0,
+            gcc_frac_surviving=1.0,
             partitioned=0,
         )
         assert step.t == 0
         assert step.num_nodes == 100
         assert step.gcc_frac == 1.0
+        assert step.gcc_frac_original == 1.0
+        assert step.gcc_frac_surviving == 1.0
         assert step.partitioned == 0
 
     def test_partitioned_step(self) -> None:
@@ -125,10 +130,14 @@ class TestTier1RolloutStep:
             num_components=3,
             gcc_size=60,
             gcc_frac=0.6,
+            gcc_frac_original=0.6,
+            gcc_frac_surviving=0.75,
             partitioned=1,
         )
         assert step.num_components == 3
         assert step.gcc_frac == 0.6
+        assert step.gcc_frac_original == 0.6
+        assert step.gcc_frac_surviving == 0.75
         assert step.partitioned == 1
 
 
@@ -140,23 +149,39 @@ class TestTier1RolloutSummary:
         summary = Tier1RolloutSummary(
             gcc_frac_min=0.8,
             gcc_frac_mean=0.95,
+            gcc_frac_min_original=0.8,
+            gcc_frac_mean_original=0.95,
+            gcc_frac_min_surviving=0.9,
+            gcc_frac_mean_surviving=1.0,
             partition_fraction=0.1,
             partition_any=1,
             max_partition_streak=3,
+            max_partition_streak_seconds=180,
+            max_partition_streak_fraction=3 / 90,
             num_steps=90,
         )
         assert summary.gcc_frac_min == 0.8
+        assert summary.gcc_frac_min_original == 0.8
+        assert summary.gcc_frac_min_surviving == 0.9
         assert summary.partition_any == 1
         assert summary.max_partition_streak == 3
+        assert summary.max_partition_streak_seconds == 180
+        assert summary.max_partition_streak_fraction == pytest.approx(3 / 90)
 
     def test_default_schema_version(self) -> None:
         """Schema version defaults to current."""
         summary = Tier1RolloutSummary(
             gcc_frac_min=1.0,
             gcc_frac_mean=1.0,
+            gcc_frac_min_original=1.0,
+            gcc_frac_mean_original=1.0,
+            gcc_frac_min_surviving=1.0,
+            gcc_frac_mean_surviving=1.0,
             partition_fraction=0.0,
             partition_any=0,
             max_partition_streak=0,
+            max_partition_streak_seconds=0,
+            max_partition_streak_fraction=0.0,
             num_steps=10,
         )
         assert summary.schema_version == SCHEMA_VERSION
@@ -167,9 +192,15 @@ class TestTier1RolloutSummary:
         summary = Tier1RolloutSummary(
             gcc_frac_min=0.5,
             gcc_frac_mean=0.75,
+            gcc_frac_min_original=0.5,
+            gcc_frac_mean_original=0.75,
+            gcc_frac_min_surviving=0.8,
+            gcc_frac_mean_surviving=0.9,
             partition_fraction=0.2,
             partition_any=1,
             max_partition_streak=5,
+            max_partition_streak_seconds=300,
+            max_partition_streak_fraction=0.05,
             num_steps=100,
             num_failed_nodes=10,
             num_failed_edges=20,
@@ -177,7 +208,11 @@ class TestTier1RolloutSummary:
         )
         d = summary.to_dict()
         assert d["gcc_frac_min"] == 0.5
+        assert d["gcc_frac_min_original"] == 0.5
+        assert d["gcc_frac_min_surviving"] == 0.8
         assert d["num_failed_nodes"] == 10
+        assert d["max_partition_streak_seconds"] == 300
+        assert d["max_partition_streak_fraction"] == pytest.approx(0.05)
         assert d["config_hash"] == "abc123"
         assert d["schema_version"] == SCHEMA_VERSION
 
@@ -310,6 +345,28 @@ class TestRunTier1Rollout:
         assert len(steps) == 3
         assert summary.num_steps == 3
 
+    def test_rollout_inclusive_timestep_count_and_streak_fraction_denominator(self) -> None:
+        """Ten minutes at 60s samples 11 inclusive temporal states."""
+        from satnet.simulation.tier1_rollout import (
+            Tier1RolloutConfig,
+            run_tier1_rollout,
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=2,
+            sats_per_plane=3,
+            duration_minutes=10,
+            step_seconds=60,
+        )
+
+        steps, summary, _ = run_tier1_rollout(cfg)
+
+        assert len(steps) == 11
+        assert summary.num_steps == 11
+        assert summary.max_partition_streak_fraction == pytest.approx(
+            summary.max_partition_streak / len(steps)
+        )
+
     def test_rollout_gcc_frac_in_range(self) -> None:
         """GCC fraction is always between 0 and 1."""
         from satnet.simulation.tier1_rollout import (
@@ -328,9 +385,18 @@ class TestRunTier1Rollout:
 
         for step in steps:
             assert 0.0 <= step.gcc_frac <= 1.0
+            assert 0.0 <= step.gcc_frac_original <= 1.0
+            assert 0.0 <= step.gcc_frac_surviving <= 1.0
+            assert step.gcc_frac == step.gcc_frac_original
 
         assert 0.0 <= summary.gcc_frac_min <= 1.0
         assert 0.0 <= summary.gcc_frac_mean <= 1.0
+        assert 0.0 <= summary.gcc_frac_min_original <= 1.0
+        assert 0.0 <= summary.gcc_frac_mean_original <= 1.0
+        assert 0.0 <= summary.gcc_frac_min_surviving <= 1.0
+        assert 0.0 <= summary.gcc_frac_mean_surviving <= 1.0
+        assert summary.gcc_frac_min == summary.gcc_frac_min_original
+        assert summary.gcc_frac_mean == summary.gcc_frac_mean_original
 
     def test_rollout_no_failures_produces_valid_metrics(self) -> None:
         """With no failures, metrics are computed correctly."""
@@ -385,6 +451,116 @@ class TestRunTier1Rollout:
         # Node count should be less than total
         total_sats = cfg.total_satellites
         assert steps[0].num_nodes < total_sats
+
+    def test_rollout_uses_original_denominator_as_primary_gcc_fraction(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeRng:
+            def __init__(self, values: list[float]) -> None:
+                self._values = values
+                self._idx = 0
+
+            def random(self) -> float:
+                value = self._values[self._idx]
+                self._idx += 1
+                return value
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graph = nx.Graph()
+                self.graph.add_nodes_from(range(5))
+                self.graph.add_edges_from([(0, 1), (1, 2)])
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def get_graph_at_step(self, step: int) -> nx.Graph:
+                return self.graph.copy()
+
+            def iter_graphs(self):
+                yield 0, self.graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+        monkeypatch.setattr(
+            "random.Random",
+            lambda seed: FakeRng([0.9, 0.9, 0.9, 0.0, 0.0, 0.9, 0.9]),
+        )
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=5,
+            duration_minutes=0,
+            step_seconds=60,
+            node_failure_prob=0.5,
+            edge_failure_prob=0.5,
+        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_nodes == {3, 4}
+        assert steps[0].gcc_size == 3
+        assert steps[0].num_nodes == 3
+        assert steps[0].gcc_frac_surviving == pytest.approx(1.0)
+        assert steps[0].gcc_frac_original == pytest.approx(0.6)
+        assert steps[0].gcc_frac == pytest.approx(0.6)
+        assert summary.gcc_frac_min == pytest.approx(0.6)
+        assert summary.gcc_frac_mean == pytest.approx(0.6)
+        assert summary.gcc_frac_min_original == pytest.approx(0.6)
+        assert summary.gcc_frac_mean_original == pytest.approx(0.6)
+        assert summary.gcc_frac_min_surviving == pytest.approx(1.0)
+        assert summary.gcc_frac_mean_surviving == pytest.approx(1.0)
+        assert summary.partition_any == 1
+
+    def test_rollout_empty_effective_graph_gcc_fractions_are_zero(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graph = nx.Graph()
+                self.graph.add_nodes_from(range(5))
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def get_graph_at_step(self, step: int) -> nx.Graph:
+                return self.graph.copy()
+
+            def iter_graphs(self):
+                yield 0, self.graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=5,
+            duration_minutes=0,
+            step_seconds=60,
+            node_failure_prob=1.0,
+            edge_failure_prob=0.0,
+        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_nodes == {0, 1, 2, 3, 4}
+        assert steps[0].gcc_size == 0
+        assert steps[0].num_nodes == 0
+        assert steps[0].gcc_frac_surviving == 0.0
+        assert steps[0].gcc_frac_original == 0.0
+        assert steps[0].gcc_frac == 0.0
+        assert summary.gcc_frac_min == 0.0
+        assert summary.gcc_frac_mean == 0.0
+        assert summary.gcc_frac_min_original == 0.0
+        assert summary.gcc_frac_mean_original == 0.0
+        assert summary.gcc_frac_min_surviving == 0.0
+        assert summary.gcc_frac_mean_surviving == 0.0
 
     def test_rollout_with_edge_failures(self) -> None:
         """Edge failures are sampled from t=0 edges."""

@@ -44,13 +44,13 @@ def compute_gcc_size(G: nx.Graph) -> int:
 
 
 def compute_gcc_frac(G: nx.Graph) -> float:
-    """Compute the fraction of nodes in the Giant Connected Component.
+    """Compute the current-graph fraction of nodes in the Giant Connected Component.
 
     Args:
         G: A NetworkX graph.
 
     Returns:
-        Fraction of nodes in the GCC: |GCC| / |V|.
+        Fraction of current graph nodes in the GCC: |GCC| / |V_current|.
         Returns 0.0 for an empty graph (avoids division by zero).
     """
     n = G.number_of_nodes()
@@ -60,30 +60,33 @@ def compute_gcc_frac(G: nx.Graph) -> float:
 
 
 def compute_partitioned(gcc_frac: float, threshold: float) -> int:
-    """Determine if the network is partitioned based on GCC fraction.
+    """Determine threshold-based partition status from a GCC fraction.
 
-    A network is considered "partitioned" if the GCC fraction falls
-    below the specified threshold.
+    SATNET uses a resilience threshold breach definition: a state is
+    considered partitioned if the supplied GCC fraction falls below the
+    configured threshold. This is not strict graph-theoretic disconnectedness
+    and does not mean ``num_components > 1``.
 
     Args:
         gcc_frac: The GCC fraction (0.0 to 1.0).
         threshold: The threshold below which the network is partitioned.
 
     Returns:
-        1 if gcc_frac < threshold (partitioned), 0 otherwise.
+        1 if gcc_frac < threshold (threshold-based partition), 0 otherwise.
     """
     return 1 if gcc_frac < threshold else 0
 
 
 def aggregate_partition_streaks(partitioned: list[int]) -> int:
-    """Compute the maximum consecutive streak of partitioned time steps.
+    """Compute the maximum consecutive streak of partitioned sampled states.
 
     Args:
-        partitioned: A list of partition indicators (0 or 1) for each time step.
+        partitioned: A list of threshold-breach indicators (0 or 1) for each
+            sampled temporal state.
 
     Returns:
-        The length of the longest consecutive run of 1s.
-        Returns 0 if the list is empty or contains no partitions.
+        The length of the longest consecutive run of 1s, measured in sampled
+        states. Returns 0 if the list is empty or contains no partitions.
     """
     if not partitioned:
         return 0

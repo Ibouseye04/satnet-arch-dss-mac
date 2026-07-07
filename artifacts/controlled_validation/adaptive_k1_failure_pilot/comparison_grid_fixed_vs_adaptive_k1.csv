@@ -1,0 +1,3 @@
+policy,partition_any_positive_rate,partition_fraction_mean,partition_fraction_median,gcc_frac_min_mean,gcc_frac_min_median,gcc_frac_mean_mean,gcc_frac_mean_median,median_isolated_nodes,median_components,runtime_seconds
+grid_fixed,0.784,0.7613333333333334,1.0,0.37826597883597884,0.17638888888888885,0.3954499867724868,0.19388888888888883,6.0,11.0,1.9075073999702
+grid_adaptive_k1,0.648,0.6186666666666667,1.0,0.5064636243386244,0.41666666666666663,0.5222895811287477,0.4481481481481482,2.0,6.0,2.666815599950496

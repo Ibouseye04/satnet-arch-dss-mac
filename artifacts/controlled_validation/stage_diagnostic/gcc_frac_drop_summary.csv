@@ -1,0 +1,4 @@
+drop_stage,count,mean,std,min,25%,50%,75%,max
+drop_candidate_to_los,600.0,0.5532488756613756,0.40539806184540256,0.0,0.0,0.8,0.9,0.96875
+drop_los_to_link_viable,600.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+drop_link_viable_to_effective,600.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

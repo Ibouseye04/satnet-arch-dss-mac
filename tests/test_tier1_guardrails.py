@@ -429,7 +429,7 @@ class TestGraphReconstructionContract:
             Tier1FailureRealization,
         )
         from satnet.network.hypatia_adapter import HypatiaAdapter
-        from satnet.metrics.labels import compute_gcc_frac, compute_partitioned
+        from satnet.metrics.labels import compute_gcc_size, compute_partitioned
         from datetime import datetime
         
         # Generate a small dataset with failures
@@ -477,8 +477,10 @@ class TestGraphReconstructionContract:
                     if G_eff.has_edge(u, v):
                         G_eff.remove_edge(u, v)
                 
-                gcc_frac = compute_gcc_frac(G_eff)
-                if compute_partitioned(gcc_frac, 0.8):  # Default threshold
+                gcc_size = compute_gcc_size(G_eff)
+                total_satellites = row["num_planes"] * row["sats_per_plane"]
+                gcc_frac_original = gcc_size / total_satellites if total_satellites > 0 else 0.0
+                if compute_partitioned(gcc_frac_original, 0.8):  # Default threshold
                     partition_any_reconstructed = 1
                     break
             

@@ -1,0 +1,5 @@
+artifacts\controlled_validation\isl_policy_comparison\plots\partition_rate_by_policy.png
+artifacts\controlled_validation\isl_policy_comparison\plots\gcc_frac_min_by_policy.png
+artifacts\controlled_validation\isl_policy_comparison\plots\isolated_nodes_by_policy.png
+artifacts\controlled_validation\isl_policy_comparison\plots\edge_count_by_policy.png
+artifacts\controlled_validation\isl_policy_comparison\plots\runtime_by_policy.png

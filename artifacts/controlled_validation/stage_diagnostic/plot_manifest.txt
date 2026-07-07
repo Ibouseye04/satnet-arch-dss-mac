@@ -1,0 +1,7 @@
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\gcc_frac_drop_by_stage.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\gcc_frac_original_by_stage_boxplot.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\isolated_nodes_by_stage_boxplot.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\link_distance_distribution_by_outcome.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\margin_distribution_by_outcome.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\num_edges_by_stage_boxplot.png
+C:\Users\johns\Developer\satnet-arch-dss-mac\artifacts\controlled_validation\stage_diagnostic\plots\partition_any_rate_by_stage.png

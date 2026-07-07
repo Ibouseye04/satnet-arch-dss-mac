@@ -38,8 +38,8 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from satnet.models.gnn_dataset import SatNetTemporalDataset
 try:
     from satnet.models.gnn_model import SatelliteGNN
-    GNN_MODEL_IMPORT_ERROR: ModuleNotFoundError | None = None
-except ModuleNotFoundError as exc:
+    GNN_MODEL_IMPORT_ERROR: Exception | None = None
+except (ImportError, OSError) as exc:
     SatelliteGNN = None  # type: ignore[assignment]
     GNN_MODEL_IMPORT_ERROR = exc
 from satnet.metrics.resilience_targets import ALL_TARGETS, infer_task_type

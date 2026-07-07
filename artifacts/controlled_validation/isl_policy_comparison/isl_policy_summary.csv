@@ -1,0 +1,5 @@
+policy,num_runs,partition_rate,median_gcc_frac_min,median_degree,median_mean_degree,median_isolated_nodes,median_components,median_edge_count,median_accepted_inter_plane_links,median_accepted_intra_plane_links,median_los_rejected_links,median_budget_rejected_links,total_runtime_seconds,median_runtime_seconds
+grid_adaptive_k1,100,0.46,1.0,2.0,2.0,0.0,1.0,36.0,21.833333333333332,0.0,88.58333333333334,0.0,0.9665368004352786,0.009282000013627112
+grid_adaptive_k2,100,0.45,1.0,2.0,2.0,0.0,1.0,36.0,24.166666666666664,0.0,149.08333333333331,0.0,1.2188617999781854,0.011945050006033853
+grid_adaptive_k3,100,0.45,1.0,2.0,2.0,0.0,1.0,36.0,24.166666666666664,0.0,213.75,0.0,1.401277500030119,0.01383660000283271
+grid_fixed,100,0.67,0.2,1.375,1.2083333333333335,9.75,14.25,21.0,9.583333333333334,0.0,39.083333333333336,0.0,0.741554799489677,0.007037899980787188

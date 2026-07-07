@@ -1,0 +1,5 @@
+stage,stage_order,n_runs,partition_any_rate,median_gcc_frac_min,median_partition_fraction,median_num_edges,median_mean_degree,median_isolated_node_count,median_degree_one_count,median_num_components
+candidate,0,100,0.0,1.0,0.0,72.0,4.0,0.0,0.0,1.0
+los_passing,1,100,0.67,0.2,1.0,21.0,1.2083333333333335,9.75,3.5,14.25
+link_viable,2,100,0.67,0.2,1.0,21.0,1.2083333333333335,9.75,3.5,14.25
+effective_zero_failure,3,100,0.67,0.2,1.0,21.0,1.2083333333333335,9.75,3.5,14.25

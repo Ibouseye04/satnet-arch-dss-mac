@@ -135,10 +135,55 @@ class TestGnnDatasetCacheContract:
                     "config_hash": "cfg-001",
                     "partition_any": 1,
                     "gcc_frac_min": 0.25,
+                    "max_partition_streak_seconds": 120,
+                    "max_partition_streak_fraction": 0.5,
                 }
             ]
         )
         df.to_csv(csv_path, index=False)
+
+    def test_accepts_new_partition_persistence_target_when_column_exists(self, tmp_path, monkeypatch) -> None:
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models import gnn_dataset as gnn_dataset_module
+
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        self._write_minimal_csv(csv_path)
+        self._install_fake_adapter(monkeypatch, gnn_dataset_module)
+
+        dataset = gnn_dataset_module.SatNetTemporalDataset(
+            root=str(tmp_path),
+            target_name="max_partition_streak_seconds",
+        )
+
+        assert len(dataset) == 1
+        assert dataset[0][0].y.item() == 120
+
+    def test_missing_new_partition_persistence_target_fails_clearly(self, tmp_path) -> None:
+        pd = pytest.importorskip("pandas")
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models.gnn_dataset import SatNetTemporalDataset
+
+        pd.DataFrame(
+            [
+                {
+                    "num_planes": 2,
+                    "sats_per_plane": 3,
+                    "inclination_deg": 53.0,
+                    "altitude_km": 550.0,
+                    "partition_any": 1,
+                }
+            ]
+        ).to_csv(tmp_path / "tier1_design_runs.csv", index=False)
+
+        with pytest.raises(ValueError, match="max_partition_streak_seconds"):
+            SatNetTemporalDataset(
+                root=str(tmp_path),
+                target_name="max_partition_streak_seconds",
+            )
 
     def _install_fake_adapter(self, monkeypatch, module) -> None:
         nx = pytest.importorskip("networkx")

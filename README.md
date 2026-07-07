@@ -21,7 +21,7 @@ For the advisor-facing architecture narrative and methodology framing, see `READ
   `HypatiaAdapter` -> `tier1_rollout` -> `monte_carlo` -> schema-validated runs/steps CSVs.
 - Legacy static-snapshot code is quarantined under `src/satnet/legacy/`.
 - Supported resilience targets are:
-  `partition_any`, `partition_fraction`, `gcc_frac_min`, `gcc_frac_mean`, and `max_partition_streak`.
+  `partition_any`, `partition_fraction`, `gcc_frac_min`, `gcc_frac_mean`, `max_partition_streak`, `max_partition_streak_seconds`, and `max_partition_streak_fraction`.
 - `scripts/train_design_risk_model.py` trains RandomForest classification or regression models against those targets and writes prediction CSVs with stable `config_hash` join keys.
 - `scripts/train_gnn_model.py` reconstructs temporal graph sequences from `tier1_design_runs.csv`, supports cache read/write, and writes both model checkpoints and prediction CSVs.
 - Proxy-metric workflow docs live in:

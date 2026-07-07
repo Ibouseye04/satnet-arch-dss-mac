@@ -47,6 +47,9 @@ class TestFeatureColumns:
         assert "sats_per_plane" in TIER1_V1_FEATURE_COLUMNS
         assert "altitude_km" in TIER1_V1_FEATURE_COLUMNS
         assert "inclination_deg" in TIER1_V1_FEATURE_COLUMNS
+        assert "max_partition_streak" not in TIER1_V1_FEATURE_COLUMNS
+        assert "max_partition_streak_seconds" not in TIER1_V1_FEATURE_COLUMNS
+        assert "max_partition_streak_fraction" not in TIER1_V1_FEATURE_COLUMNS
 
     def test_tier1_v1_design_feature_columns(self) -> None:
         """TIER1_V1_DESIGN_FEATURE_COLUMNS excludes failure params."""
@@ -233,5 +236,39 @@ class TestRfPredictionSchema:
             train_rf_model(
                 csv_path=csv_path,
                 target_name="partition_any",
+                cfg=cfg,
+            )
+
+    def test_train_rf_model_old_target_works_but_missing_new_target_fails_clearly(self, tmp_path) -> None:
+        from satnet.models.risk_model import RiskModelConfig, train_rf_model
+
+        rows = []
+        for i in range(20):
+            rows.append(
+                {
+                    "run_id": i,
+                    "config_hash": f"cfg-{i:04d}",
+                    "num_planes": 4 + (i % 3),
+                    "sats_per_plane": 6 + (i % 2),
+                    "total_satellites": 24 + i,
+                    "inclination_deg": 53.0 + (i % 5),
+                    "altitude_km": 550.0 + i,
+                    "node_failure_prob": 0.01 * (i % 4),
+                    "edge_failure_prob": 0.02 * (i % 3),
+                    "duration_minutes": 10,
+                    "step_seconds": 60,
+                    "partition_any": i % 2,
+                }
+            )
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        pd.DataFrame(rows).to_csv(csv_path, index=False)
+
+        cfg = RiskModelConfig(test_size=0.25, random_state=42, n_estimators=10)
+        train_rf_model(csv_path=csv_path, target_name="partition_any", cfg=cfg)
+
+        with pytest.raises(ValueError, match="Missing target column 'max_partition_streak_seconds'"):
+            train_rf_model(
+                csv_path=csv_path,
+                target_name="max_partition_streak_seconds",
                 cfg=cfg,
             )

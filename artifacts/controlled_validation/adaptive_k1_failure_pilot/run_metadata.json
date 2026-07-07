@@ -1,0 +1,36 @@
+{
+  "num_runs": 250,
+  "seed": 42,
+  "duration_minutes": 5,
+  "step_seconds": 60,
+  "num_planes_range": [
+    4,
+    6
+  ],
+  "sats_per_plane_range": [
+    5,
+    10
+  ],
+  "altitude_km_range": [
+    300.0,
+    1200.0
+  ],
+  "inclination_deg_range": [
+    30.0,
+    98.0
+  ],
+  "node_failure_prob_range": [
+    0.0,
+    0.25
+  ],
+  "edge_failure_prob_range": [
+    0.0,
+    0.25
+  ],
+  "gcc_threshold": 0.8,
+  "isl_policy": "grid_adaptive",
+  "adjacent_search_k": 1,
+  "runtime_seconds": 2.823684500006493,
+  "runs_path": "artifacts\\controlled_validation\\adaptive_k1_failure_pilot\\tier1_design_runs.csv",
+  "steps_path": "artifacts\\controlled_validation\\adaptive_k1_failure_pilot\\tier1_design_steps.csv"
+}

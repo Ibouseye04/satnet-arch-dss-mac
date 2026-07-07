@@ -151,15 +151,15 @@ def main() -> None:
     args = parse_args()
 
     if args.smoke:
-        args.num_runs = min(args.num_runs, 24)
+        args.num_runs = min(args.num_runs, 25)
         args.planes_min = 4
         args.planes_max = 6
         args.sats_min = 5
-        args.sats_max = 8
-        args.duration = 1
+        args.sats_max = 10
+        args.duration = 5
         args.step_seconds = 60
         args.node_failure_min = 0.0
-        args.node_failure_max = 0.2
+        args.node_failure_max = 0.25
         args.edge_failure_min = 0.0
         args.edge_failure_max = 0.25
 

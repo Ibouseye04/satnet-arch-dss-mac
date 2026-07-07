@@ -1,0 +1,4 @@
+feature,rf_gini_importance
+node_failure_prob,0.36239902832199705
+edge_failure_prob,0.32961690450665687
+total_satellites,0.30798406717134613

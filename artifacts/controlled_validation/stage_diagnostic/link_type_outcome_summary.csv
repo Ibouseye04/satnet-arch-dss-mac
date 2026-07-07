@@ -1,0 +1,7 @@
+link_type,outcome,count,rate_within_link_type
+inter_plane,accepted_link_viable,4927,0.28007048658481126
+inter_plane,rejected_los,12665,0.7199295134151887
+intra_plane,accepted_link_viable,12276,0.5541711809317443
+intra_plane,rejected_los,9876,0.44582881906825567
+seam_link,accepted_link_viable,2486,0.5451754385964912
+seam_link,rejected_los,2074,0.4548245614035088

@@ -1,0 +1,2 @@
+default_max_isl_distance_km,candidate_link_records,over_default_max_isl_distance_count,over_default_max_isl_distance_rate,max_observed_candidate_distance_km,adapter_applies_max_distance_filter
+10000.0,44304,1465,0.033066991693752254,11824.842397438499,False

@@ -1,0 +1,44 @@
+BASELINE CONNECTIVITY STAGE DIAGNOSTIC
+
+STAGE SUMMARY
+                 stage  stage_order  n_runs  partition_any_rate  median_gcc_frac_min  median_partition_fraction  median_num_edges  median_mean_degree  median_isolated_node_count  median_degree_one_count  median_num_components
+             candidate            0     100                0.00                  1.0                        0.0              72.0            4.000000                        0.00                      0.0                   1.00
+           los_passing            1     100                0.67                  0.2                        1.0              21.0            1.208333                        9.75                      3.5                  14.25
+           link_viable            2     100                0.67                  0.2                        1.0              21.0            1.208333                        9.75                      3.5                  14.25
+effective_zero_failure            3     100                0.67                  0.2                        1.0              21.0            1.208333                        9.75                      3.5                  14.25
+
+EDGE RETENTION SUMMARY
+                                   metric      stat     value
+                          candidate_edges 72.000000 73.840000
+                                los_edges 21.000000 32.815000
+                        link_viable_edges 21.000000 32.815000
+                       rejected_los_edges 39.000000 41.025000
+                    rejected_budget_edges  0.000000  0.000000
+      over_default_max_isl_distance_edges  0.000000  2.441667
+                       los_retention_rate  0.305556  0.391640
+      link_viable_retention_from_los_rate  1.000000  0.993333
+link_viable_retention_from_candidate_rate  0.305556  0.391640
+
+GCC DROP SUMMARY
+                   drop_stage  count     mean      std  min  25%  50%  75%     max
+        drop_candidate_to_los  600.0 0.553249 0.405398  0.0  0.0  0.8  0.9 0.96875
+      drop_los_to_link_viable  600.0 0.000000 0.000000  0.0  0.0  0.0  0.0 0.00000
+drop_link_viable_to_effective  600.0 0.000000 0.000000  0.0  0.0  0.0  0.0 0.00000
+
+LINK DISTANCE AND MARGIN SUMMARY BY OUTCOME
+             outcome  count  distance_min  distance_p25  distance_median  distance_p75  distance_max  margin_min  margin_p25  margin_median  margin_p75  margin_max  over_default_max_isl_distance_rate
+accepted_link_viable  19689     52.060037   4288.287802      4839.288590   5528.981583   7922.129798   12.925578   16.049515      17.206787   18.256739   56.572328                            0.000000
+        rejected_los  24615   3384.283278   6168.183306      7315.499279   8560.979616  11824.842397    9.446510   12.251948      13.617538   15.099272   20.313083                            0.059517
+
+MAX ISL DISTANCE BINDING SUMMARY
+ default_max_isl_distance_km  candidate_link_records  over_default_max_isl_distance_count  over_default_max_isl_distance_rate  max_observed_candidate_distance_km  adapter_applies_max_distance_filter
+                     10000.0                   44304                                 1465                            0.033067                        11824.842397                                False
+
+LINK TYPE OUTCOME SUMMARY
+  link_type              outcome  count  rate_within_link_type
+inter_plane accepted_link_viable   4927               0.280070
+inter_plane         rejected_los  12665               0.719930
+intra_plane accepted_link_viable  12276               0.554171
+intra_plane         rejected_los   9876               0.445829
+  seam_link accepted_link_viable   2486               0.545175
+  seam_link         rejected_los   2074               0.454825

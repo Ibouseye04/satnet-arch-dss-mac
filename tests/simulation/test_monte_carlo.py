@@ -200,6 +200,13 @@ class TestConversionFunctions:
         assert all(isinstance(d, dict) for d in dicts)
         assert "run_id" in dicts[0]
         assert "gcc_frac_min" in dicts[0]
+        assert "gcc_frac_min_original" in dicts[0]
+        assert "gcc_frac_mean_original" in dicts[0]
+        assert "gcc_frac_min_surviving" in dicts[0]
+        assert "gcc_frac_mean_surviving" in dicts[0]
+        assert "max_partition_streak" in dicts[0]
+        assert "max_partition_streak_seconds" in dicts[0]
+        assert "max_partition_streak_fraction" in dicts[0]
 
     def test_steps_to_dicts(self) -> None:
         """steps_to_dicts converts to list of dicts."""
@@ -224,6 +231,8 @@ class TestConversionFunctions:
         assert all(isinstance(d, dict) for d in dicts)
         assert "run_id" in dicts[0]
         assert "gcc_frac" in dicts[0]
+        assert "gcc_frac_original" in dicts[0]
+        assert "gcc_frac_surviving" in dicts[0]
 
 
 class TestNoToyTopologyImport:
@@ -294,6 +303,7 @@ class TestSchemaValidation:
         row["gcc_frac_min"] = 1.5  # Invalid: > 1.0
         row["gcc_frac_mean"] = 0.5
         row["partition_fraction"] = 0.5
+        row["max_partition_streak_fraction"] = 0.5
         row["partition_any"] = 0
         row["schema_version"] = SCHEMA_VERSION
         row["dataset_version"] = DATASET_VERSION

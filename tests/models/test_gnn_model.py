@@ -10,7 +10,13 @@ import pytest
 
 torch = pytest.importorskip("torch")
 pytest.importorskip("torch_geometric")
-pytest.importorskip("torch_geometric_temporal")
+try:
+    pytest.importorskip("torch_geometric_temporal")
+except OSError as exc:
+    pytest.skip(
+        f"torch_geometric_temporal unavailable due to binary load failure: {exc}",
+        allow_module_level=True,
+    )
 
 
 class TestSatelliteGNN:

@@ -1,0 +1,10 @@
+metric,stat,value
+candidate_edges,72.0,73.84
+los_edges,21.0,32.815
+link_viable_edges,21.0,32.815
+rejected_los_edges,39.0,41.025
+rejected_budget_edges,0.0,0.0
+over_default_max_isl_distance_edges,0.0,2.441666666666667
+los_retention_rate,0.3055555555555556,0.39163995260141093
+link_viable_retention_from_los_rate,1.0,0.9933333333333333
+link_viable_retention_from_candidate_rate,0.3055555555555556,0.39163995260141093

@@ -692,6 +692,11 @@ def train_rf_model(
 
     df = pd.read_csv(csv_path)
     config_hashes = _validated_prediction_config_hashes(df, source_name=csv_path)
+    if target_name not in df.columns:
+        raise ValueError(
+            f"Missing target column '{target_name}' in {csv_path}. "
+            f"Available columns: {list(df.columns)}"
+        )
     if feature_columns is None:
         feature_columns = [c for c in TIER1_V1_FEATURE_COLUMNS if c in df.columns]
 

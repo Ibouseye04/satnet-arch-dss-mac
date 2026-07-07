@@ -1,0 +1,2242 @@
+[
+  {
+    "sat_id": 2,
+    "satellite": 2,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 7,
+      "plane": 1,
+      "satellite": 2
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 7,
+        "plane": 1,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 7099.3564502861645,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 6,
+        "plane": 1,
+        "satellite": 1,
+        "los": true,
+        "distance_km": 2845.040073798448,
+        "viable": true,
+        "margin_db": 21.82064969326177,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -23.17935030673823
+      },
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 12120.693528733918,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 6,
+        "plane": 1,
+        "satellite": 1,
+        "distance_km": 2845.040073798448,
+        "margin_db": 21.82064969326177
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 4,
+    "satellite": 4,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 9,
+      "plane": 1,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 9,
+        "plane": 1,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 5968.4298622474635,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 2220.8918950084935,
+        "viable": true,
+        "margin_db": 23.97186907026139,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -21.02813092973861
+      },
+      {
+        "sat_id": 5,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 11868.001853951839,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 3,
+        "distance_km": 2220.8918950084935,
+        "margin_db": 23.97186907026139
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 9,
+    "satellite": 4,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 14,
+      "plane": 2,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 14,
+        "plane": 2,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 6337.55345398922,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 13,
+        "plane": 2,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 1959.5782266998488,
+        "viable": true,
+        "margin_db": 25.059165348390593,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -19.940834651609407
+      },
+      {
+        "sat_id": 10,
+        "plane": 2,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 12031.563963066821,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 13,
+        "plane": 2,
+        "satellite": 3,
+        "distance_km": 1959.5782266998488,
+        "margin_db": 25.059165348390593
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 11,
+    "satellite": 1,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 16,
+      "plane": 3,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 16,
+        "plane": 3,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 5700.083164893995,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 15,
+        "plane": 3,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 2844.4862309158834,
+        "viable": true,
+        "margin_db": 21.822340736737942,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -23.177659263262058
+      },
+      {
+        "sat_id": 17,
+        "plane": 3,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 11656.246587831773,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 15,
+        "plane": 3,
+        "satellite": 0,
+        "distance_km": 2844.4862309158834,
+        "margin_db": 21.822340736737942
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 14,
+    "satellite": 4,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 19,
+      "plane": 3,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 19,
+        "plane": 3,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 6736.870488836689,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 18,
+        "plane": 3,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 2220.477634078711,
+        "viable": true,
+        "margin_db": 23.973489392418514,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -21.026510607581486
+      },
+      {
+        "sat_id": 15,
+        "plane": 3,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 12120.266371073336,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 18,
+        "plane": 3,
+        "satellite": 3,
+        "distance_km": 2220.477634078711,
+        "margin_db": 23.973489392418514
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 16,
+    "satellite": 1,
+    "plane": 3,
+    "original_adjacent_candidate": {
+      "sat_id": 21,
+      "plane": 4,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 21,
+        "plane": 4,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 5965.677841342819,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 20,
+        "plane": 4,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 2236.467595194035,
+        "viable": true,
+        "margin_db": 23.911165255007234,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -21.088834744992766
+      },
+      {
+        "sat_id": 22,
+        "plane": 4,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 11868.9489444847,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 20,
+        "plane": 4,
+        "satellite": 0,
+        "distance_km": 2236.467595194035,
+        "margin_db": 23.911165255007234
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 19,
+    "satellite": 4,
+    "plane": 3,
+    "original_adjacent_candidate": {
+      "sat_id": 24,
+      "plane": 4,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 24,
+        "plane": 4,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 7098.070689932191,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 23,
+        "plane": 4,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 2831.3097064402286,
+        "viable": true,
+        "margin_db": 21.86266989736373,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -23.13733010263627
+      },
+      {
+        "sat_id": 20,
+        "plane": 4,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 12120.43361913915,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 23,
+        "plane": 4,
+        "satellite": 3,
+        "distance_km": 2831.3097064402286,
+        "margin_db": 21.86266989736373
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 21,
+    "satellite": 1,
+    "plane": 4,
+    "original_adjacent_candidate": {
+      "sat_id": 26,
+      "plane": 5,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 26,
+        "plane": 5,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 6336.6093021752,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 25,
+        "plane": 5,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 1977.2754277291317,
+        "viable": true,
+        "margin_db": 24.98107406842496,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -20.01892593157504
+      },
+      {
+        "sat_id": 27,
+        "plane": 5,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 12032.43099741926,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 25,
+        "plane": 5,
+        "satellite": 0,
+        "distance_km": 1977.2754277291317,
+        "margin_db": 24.98107406842496
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 23,
+    "satellite": 3,
+    "plane": 4,
+    "original_adjacent_candidate": {
+      "sat_id": 28,
+      "plane": 5,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 28,
+        "plane": 5,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 5608.42777864145,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 27,
+        "plane": 5,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 3545.3187489799107,
+        "viable": true,
+        "margin_db": 19.909311706016297,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.090688293983703
+      },
+      {
+        "sat_id": 29,
+        "plane": 5,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 11429.147337452425,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 27,
+        "plane": 5,
+        "satellite": 2,
+        "distance_km": 3545.3187489799107,
+        "margin_db": 19.909311706016297
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 24,
+    "satellite": 4,
+    "plane": 4,
+    "original_adjacent_candidate": {
+      "sat_id": 29,
+      "plane": 5,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 29,
+        "plane": 5,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 7368.253073555306,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 28,
+        "plane": 5,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 3544.8045183160025,
+        "viable": true,
+        "margin_db": 19.910571642024365,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.089428357975635
+      },
+      {
+        "sat_id": 25,
+        "plane": 5,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 12031.993959483,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 28,
+        "plane": 5,
+        "satellite": 3,
+        "distance_km": 3544.8045183160025,
+        "margin_db": 19.910571642024365
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 0
+  },
+  {
+    "sat_id": 0,
+    "satellite": 0,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 10,
+      "plane": 1,
+      "satellite": 0
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 8020.68873975044,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 19,
+        "plane": 1,
+        "satellite": 9,
+        "los": true,
+        "distance_km": 4913.321762585076,
+        "viable": true,
+        "margin_db": 17.074913332761014,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.925086667238986
+      },
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 11072.759988579217,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 19,
+        "plane": 1,
+        "satellite": 9,
+        "distance_km": 4913.321762585076,
+        "margin_db": 17.074913332761014
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 1,
+    "satellite": 1,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 11,
+      "plane": 1,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 7533.781591632678,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 4791.195387326174,
+        "viable": true,
+        "margin_db": 17.293539814525843,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.706460185474157
+      },
+      {
+        "sat_id": 12,
+        "plane": 1,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 10561.118821413616,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 0,
+        "distance_km": 4791.195387326174,
+        "margin_db": 17.293539814525843
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 4,
+    "satellite": 4,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 14,
+      "plane": 1,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 7661.048651921505,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 13,
+        "plane": 1,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 3718.7911680417665,
+        "viable": true,
+        "margin_db": 19.494381636628816,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.505618363371184
+      },
+      {
+        "sat_id": 15,
+        "plane": 1,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 11126.833377280342,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 13,
+        "plane": 1,
+        "satellite": 3,
+        "distance_km": 3718.7911680417665,
+        "margin_db": 19.494381636628816
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 5,
+    "satellite": 5,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 15,
+      "plane": 1,
+      "satellite": 5
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 15,
+        "plane": 1,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 8022.201090937035,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 4,
+        "los": true,
+        "distance_km": 4914.625187367059,
+        "viable": true,
+        "margin_db": 17.072609412332497,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.927390587667503
+      },
+      {
+        "sat_id": 16,
+        "plane": 1,
+        "satellite": 6,
+        "los": false,
+        "distance_km": 11073.916829514723,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 4,
+        "distance_km": 4914.625187367059,
+        "margin_db": 17.072609412332497
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 9,
+    "satellite": 9,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 19,
+      "plane": 1,
+      "satellite": 9
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 19,
+        "plane": 1,
+        "satellite": 9,
+        "los": false,
+        "distance_km": 7661.607945210145,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 18,
+        "plane": 1,
+        "satellite": 8,
+        "los": true,
+        "distance_km": 3721.0997718291082,
+        "viable": true,
+        "margin_db": 19.488991160203682,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.511008839796318
+      },
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 11126.298686498021,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 18,
+        "plane": 1,
+        "satellite": 8,
+        "distance_km": 3721.0997718291082,
+        "margin_db": 19.488991160203682
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 10,
+    "satellite": 0,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 20,
+      "plane": 2,
+      "satellite": 0
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 20,
+        "plane": 2,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 7994.475969222003,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 29,
+        "plane": 2,
+        "satellite": 9,
+        "los": true,
+        "distance_km": 4995.611434456983,
+        "viable": true,
+        "margin_db": 16.93064443395548,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.06935556604452
+      },
+      {
+        "sat_id": 21,
+        "plane": 2,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 11005.015922930279,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 29,
+        "plane": 2,
+        "satellite": 9,
+        "distance_km": 4995.611434456983,
+        "margin_db": 16.93064443395548
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 14,
+    "satellite": 4,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 24,
+      "plane": 2,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 24,
+        "plane": 2,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 7773.980584649254,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 23,
+        "plane": 2,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 3978.502700317168,
+        "viable": true,
+        "margin_db": 18.90802431051077,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -26.09197568948923
+      },
+      {
+        "sat_id": 25,
+        "plane": 2,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 11163.5739370099,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 23,
+        "plane": 2,
+        "satellite": 3,
+        "distance_km": 3978.502700317168,
+        "margin_db": 18.90802431051077
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 15,
+    "satellite": 5,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 25,
+      "plane": 2,
+      "satellite": 5
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 25,
+        "plane": 2,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 7996.259171910807,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 24,
+        "plane": 2,
+        "satellite": 4,
+        "los": true,
+        "distance_km": 4997.09535909847,
+        "viable": true,
+        "margin_db": 16.92806471135816,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.07193528864184
+      },
+      {
+        "sat_id": 26,
+        "plane": 2,
+        "satellite": 6,
+        "los": false,
+        "distance_km": 11006.337053769741,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 24,
+        "plane": 2,
+        "satellite": 4,
+        "distance_km": 4997.09535909847,
+        "margin_db": 16.92806471135816
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 19,
+    "satellite": 9,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 29,
+      "plane": 2,
+      "satellite": 9
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 29,
+        "plane": 2,
+        "satellite": 9,
+        "los": false,
+        "distance_km": 7774.058807121382,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 28,
+        "plane": 2,
+        "satellite": 8,
+        "los": true,
+        "distance_km": 3979.767965131788,
+        "viable": true,
+        "margin_db": 18.905262416351263,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -26.094737583648737
+      },
+      {
+        "sat_id": 20,
+        "plane": 2,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 11162.928159867317,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 28,
+        "plane": 2,
+        "satellite": 8,
+        "distance_km": 3979.767965131788,
+        "margin_db": 18.905262416351263
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 20,
+    "satellite": 0,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 30,
+      "plane": 3,
+      "satellite": 0
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 30,
+        "plane": 3,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 7943.066387849297,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 39,
+        "plane": 3,
+        "satellite": 9,
+        "los": true,
+        "distance_km": 5037.130513806269,
+        "viable": true,
+        "margin_db": 16.858753379306336,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.141246620693664
+      },
+      {
+        "sat_id": 31,
+        "plane": 3,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 10925.543392619988,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 39,
+        "plane": 3,
+        "satellite": 9,
+        "distance_km": 5037.130513806269,
+        "margin_db": 16.858753379306336
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 1
+  },
+  {
+    "sat_id": 1,
+    "satellite": 1,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 7,
+      "plane": 1,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 7,
+        "plane": 1,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 10009.160786682525,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 6,
+        "plane": 1,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 5843.110101804091,
+        "viable": true,
+        "margin_db": 15.569536057717073,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -29.430463942282927
+      },
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 12941.918335600527,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 6,
+        "plane": 1,
+        "satellite": 0,
+        "distance_km": 5843.110101804091,
+        "margin_db": 15.569536057717073
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 2,
+    "satellite": 2,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 8,
+      "plane": 1,
+      "satellite": 2
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 10321.879579504264,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 7,
+        "plane": 1,
+        "satellite": 1,
+        "los": true,
+        "distance_km": 4108.319459444446,
+        "viable": true,
+        "margin_db": 18.62913332160906,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -26.37086667839094
+      },
+      {
+        "sat_id": 9,
+        "plane": 1,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 13825.793038664213,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 7,
+        "plane": 1,
+        "satellite": 1,
+        "distance_km": 4108.319459444446,
+        "margin_db": 18.62913332160906
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 4,
+    "satellite": 4,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 10,
+      "plane": 1,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 10017.101739657179,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 9,
+        "plane": 1,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 5849.913018838369,
+        "viable": true,
+        "margin_db": 15.559429279917367,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -29.440570720082633
+      },
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 12949.137027423913,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 9,
+        "plane": 1,
+        "satellite": 3,
+        "distance_km": 5849.913018838369,
+        "margin_db": 15.559429279917367
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 5,
+    "satellite": 5,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 11,
+      "plane": 1,
+      "satellite": 5
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 10325.775187603482,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 4,
+        "los": true,
+        "distance_km": 4121.986594973937,
+        "viable": true,
+        "margin_db": 18.60028595209201,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -26.39971404790799
+      },
+      {
+        "sat_id": 6,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 13826.39789691877,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 4,
+        "distance_km": 4121.986594973937,
+        "margin_db": 18.60028595209201
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 7,
+    "satellite": 1,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 13,
+      "plane": 2,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 13,
+        "plane": 2,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 9825.111116668648,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 12,
+        "plane": 2,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 5180.793336685023,
+        "viable": true,
+        "margin_db": 16.61449208374978,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.38550791625022
+      },
+      {
+        "sat_id": 14,
+        "plane": 2,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 13082.660681720965,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 12,
+        "plane": 2,
+        "satellite": 0,
+        "distance_km": 5180.793336685023,
+        "margin_db": 16.61449208374978
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 8,
+    "satellite": 2,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 14,
+      "plane": 2,
+      "satellite": 2
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 14,
+        "plane": 2,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 10670.48691110134,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 13,
+        "plane": 2,
+        "satellite": 1,
+        "los": true,
+        "distance_km": 4531.571812706687,
+        "viable": true,
+        "margin_db": 17.777440119137054,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.222559880862946
+      },
+      {
+        "sat_id": 15,
+        "plane": 2,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 13957.817136099051,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 13,
+        "plane": 2,
+        "satellite": 1,
+        "distance_km": 4531.571812706687,
+        "margin_db": 17.777440119137054
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 10,
+    "satellite": 4,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 16,
+      "plane": 2,
+      "satellite": 4
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 16,
+        "plane": 2,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9833.496214658308,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 15,
+        "plane": 2,
+        "satellite": 3,
+        "los": true,
+        "distance_km": 5190.611840995543,
+        "viable": true,
+        "margin_db": 16.598046391219498,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.401953608780502
+      },
+      {
+        "sat_id": 17,
+        "plane": 2,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 13088.575687242439,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 15,
+        "plane": 2,
+        "satellite": 3,
+        "distance_km": 5190.611840995543,
+        "margin_db": 16.598046391219498
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 11,
+    "satellite": 5,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 17,
+      "plane": 2,
+      "satellite": 5
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 17,
+        "plane": 2,
+        "satellite": 5,
+        "los": false,
+        "distance_km": 10672.306980474412,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 16,
+        "plane": 2,
+        "satellite": 4,
+        "los": true,
+        "distance_km": 4541.204991253247,
+        "viable": true,
+        "margin_db": 17.758995323465342,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.241004676534658
+      },
+      {
+        "sat_id": 12,
+        "plane": 2,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 13956.923221177341,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 16,
+        "plane": 2,
+        "satellite": 4,
+        "distance_km": 4541.204991253247,
+        "margin_db": 17.758995323465342
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 13,
+    "satellite": 1,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 19,
+      "plane": 3,
+      "satellite": 1
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 19,
+        "plane": 3,
+        "satellite": 1,
+        "los": false,
+        "distance_km": 9825.4515564555,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 18,
+        "plane": 3,
+        "satellite": 0,
+        "los": true,
+        "distance_km": 4529.839541236044,
+        "viable": true,
+        "margin_db": 17.78076108502478,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.21923891497522
+      },
+      {
+        "sat_id": 20,
+        "plane": 3,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 13322.706486053943,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 18,
+        "plane": 3,
+        "satellite": 0,
+        "distance_km": 4529.839541236044,
+        "margin_db": 17.78076108502478
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 14,
+    "satellite": 2,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 20,
+      "plane": 3,
+      "satellite": 2
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 20,
+        "plane": 3,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 10963.491040202376,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 19,
+        "plane": 3,
+        "satellite": 1,
+        "los": true,
+        "distance_km": 5183.065400895401,
+        "viable": true,
+        "margin_db": 16.610683676129042,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -28.389316323870958
+      },
+      {
+        "sat_id": 21,
+        "plane": 3,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 13958.508304374416,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 19,
+        "plane": 3,
+        "satellite": 1,
+        "distance_km": 5183.065400895401,
+        "margin_db": 16.610683676129042
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 2
+  },
+  {
+    "sat_id": 3,
+    "satellite": 3,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 11,
+      "plane": 1,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 5772.710839589728,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 3281.974180472153,
+        "viable": true,
+        "margin_db": 20.579714251713142,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -24.420285748286858
+      },
+      {
+        "sat_id": 12,
+        "plane": 1,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9576.378720368195,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 2,
+        "distance_km": 3281.974180472153,
+        "margin_db": 20.579714251713142
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 7,
+    "satellite": 7,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 15,
+      "plane": 1,
+      "satellite": 7
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 15,
+        "plane": 1,
+        "satellite": 7,
+        "los": false,
+        "distance_km": 5766.660597642378,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 6,
+        "los": true,
+        "distance_km": 3270.399116109895,
+        "viable": true,
+        "margin_db": 20.610402318963793,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -24.389597681036207
+      },
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 9572.554474608221,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 6,
+        "distance_km": 3270.399116109895,
+        "margin_db": 20.610402318963793
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 11,
+    "satellite": 3,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 19,
+      "plane": 2,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 19,
+        "plane": 2,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 6212.1136870858445,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 18,
+        "plane": 2,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 3936.052539089277,
+        "viable": true,
+        "margin_db": 19.00119971713127,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.99880028286873
+      },
+      {
+        "sat_id": 20,
+        "plane": 2,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9717.164978907735,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 18,
+        "plane": 2,
+        "satellite": 2,
+        "distance_km": 3936.052539089277,
+        "margin_db": 19.00119971713127
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 15,
+    "satellite": 7,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 23,
+      "plane": 2,
+      "satellite": 7
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 23,
+        "plane": 2,
+        "satellite": 7,
+        "los": false,
+        "distance_km": 6206.138873678383,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 22,
+        "plane": 2,
+        "satellite": 6,
+        "los": true,
+        "distance_km": 3924.8419988906194,
+        "viable": true,
+        "margin_db": 19.02597389022094,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.97402610977906
+      },
+      {
+        "sat_id": 16,
+        "plane": 2,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 9714.599064328488,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 22,
+        "plane": 2,
+        "satellite": 6,
+        "distance_km": 3924.8419988906194,
+        "margin_db": 19.02597389022094
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 19,
+    "satellite": 3,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 27,
+      "plane": 3,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 27,
+        "plane": 3,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 6581.029891069987,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 26,
+        "plane": 3,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 4556.012522764168,
+        "viable": true,
+        "margin_db": 17.730719271385965,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.269280728614035
+      },
+      {
+        "sat_id": 28,
+        "plane": 3,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9788.87866921539,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 26,
+        "plane": 3,
+        "satellite": 2,
+        "distance_km": 4556.012522764168,
+        "margin_db": 17.730719271385965
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 23,
+    "satellite": 7,
+    "plane": 2,
+    "original_adjacent_candidate": {
+      "sat_id": 31,
+      "plane": 3,
+      "satellite": 7
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 31,
+        "plane": 3,
+        "satellite": 7,
+        "los": false,
+        "distance_km": 6575.592981947982,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 30,
+        "plane": 3,
+        "satellite": 6,
+        "los": true,
+        "distance_km": 4545.320020644083,
+        "viable": true,
+        "margin_db": 17.751128136935222,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -27.248871863064778
+      },
+      {
+        "sat_id": 24,
+        "plane": 3,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 9787.695209145913,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 30,
+        "plane": 3,
+        "satellite": 6,
+        "distance_km": 4545.320020644083,
+        "margin_db": 17.751128136935222
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 34,
+    "satellite": 2,
+    "plane": 4,
+    "original_adjacent_candidate": {
+      "sat_id": 42,
+      "plane": 5,
+      "satellite": 2
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 42,
+        "plane": 5,
+        "satellite": 2,
+        "los": false,
+        "distance_km": 4754.212561206863,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 41,
+        "plane": 5,
+        "satellite": 1,
+        "los": true,
+        "distance_km": 2046.66091588812,
+        "viable": true,
+        "margin_db": 24.681499531250836,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -20.318500468749164
+      },
+      {
+        "sat_id": 43,
+        "plane": 5,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 9118.152725696791,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 41,
+        "plane": 5,
+        "satellite": 1,
+        "distance_km": 2046.66091588812,
+        "margin_db": 24.681499531250836
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 3,
+    "satellite": 3,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 11,
+      "plane": 1,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 11,
+        "plane": 1,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 6003.886544624947,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 3616.798800251757,
+        "viable": true,
+        "margin_db": 19.735930454521508,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.264069545478492
+      },
+      {
+        "sat_id": 12,
+        "plane": 1,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9656.208310429125,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 10,
+        "plane": 1,
+        "satellite": 2,
+        "distance_km": 3616.798800251757,
+        "margin_db": 19.735930454521508
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 7,
+    "satellite": 7,
+    "plane": 0,
+    "original_adjacent_candidate": {
+      "sat_id": 15,
+      "plane": 1,
+      "satellite": 7
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 15,
+        "plane": 1,
+        "satellite": 7,
+        "los": false,
+        "distance_km": 5997.812495898472,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 6,
+        "los": true,
+        "distance_km": 3605.3996093372302,
+        "viable": true,
+        "margin_db": 19.763349307023645,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -25.236650692976355
+      },
+      {
+        "sat_id": 8,
+        "plane": 1,
+        "satellite": 0,
+        "los": false,
+        "distance_km": 9653.002237549828,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 14,
+        "plane": 1,
+        "satellite": 6,
+        "distance_km": 3605.3996093372302,
+        "margin_db": 19.763349307023645
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  },
+  {
+    "sat_id": 11,
+    "satellite": 3,
+    "plane": 1,
+    "original_adjacent_candidate": {
+      "sat_id": 19,
+      "plane": 2,
+      "satellite": 3
+    },
+    "adaptive_candidates": [
+      {
+        "sat_id": 19,
+        "plane": 2,
+        "satellite": 3,
+        "los": false,
+        "distance_km": 6409.229497452747,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      },
+      {
+        "sat_id": 18,
+        "plane": 2,
+        "satellite": 2,
+        "los": true,
+        "distance_km": 4256.962977282059,
+        "viable": true,
+        "margin_db": 18.320419990931725,
+        "selected": true,
+        "mode": "optical",
+        "signal_strength_dbm": -26.679580009068275
+      },
+      {
+        "sat_id": 20,
+        "plane": 2,
+        "satellite": 4,
+        "los": false,
+        "distance_km": 9762.52673864743,
+        "viable": false,
+        "margin_db": null,
+        "selected": false
+      }
+    ],
+    "selected": [
+      {
+        "sat_id": 18,
+        "plane": 2,
+        "satellite": 2,
+        "distance_km": 4256.962977282059,
+        "margin_db": 18.320419990931725
+      }
+    ],
+    "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
+    "policy": "grid_adaptive_k1",
+    "run_id": 3
+  }
+]
