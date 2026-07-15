@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
+from satnet.metrics.resilience_targets import ALL_TARGETS
+from satnet.utils.split_manifest import validate_manifest_for_dataset
+
 import joblib
 import numpy as np
 
@@ -51,6 +54,69 @@ TIER1_V1_FEATURE_COLUMNS: List[str] = [
     "duration_minutes",
     "step_seconds",
 ]
+
+RF_FEATURE_SET_FULL = "full"
+RF_FEATURE_SET_ARCHITECTURE_ONLY = "architecture_only"
+RF_FEATURE_SET_NO_GEOMETRY = "no_geometry"
+RF_FEATURE_SET_REGISTRY: dict[str, list[str]] = {
+    RF_FEATURE_SET_FULL: list(TIER1_V1_FEATURE_COLUMNS),
+    RF_FEATURE_SET_ARCHITECTURE_ONLY: [
+        column
+        for column in TIER1_V1_FEATURE_COLUMNS
+        if column not in {"node_failure_prob", "edge_failure_prob"}
+    ],
+    RF_FEATURE_SET_NO_GEOMETRY: [
+        column
+        for column in TIER1_V1_FEATURE_COLUMNS
+        if column not in {"altitude_km", "inclination_deg"}
+    ],
+}
+RF_OUTCOME_FIELD_PREFIXES = (
+    "gcc_",
+    "partition",
+    "component",
+)
+RF_OUTCOME_FIELD_NAMES = frozenset(
+    {
+        "failed_nodes",
+        "failed_edges",
+        "failed_nodes_json",
+        "failed_edges_json",
+        "num_failed_nodes",
+        "num_failed_edges",
+        "largest_component_ratio",
+        "num_components",
+    }
+) | frozenset(ALL_TARGETS)
+
+
+def get_rf_feature_columns(feature_set: str = RF_FEATURE_SET_FULL) -> list[str]:
+    if feature_set not in RF_FEATURE_SET_REGISTRY:
+        raise ValueError(
+            f"Unknown RF feature set '{feature_set}'. "
+            f"Allowed values: {sorted(RF_FEATURE_SET_REGISTRY)}"
+        )
+    columns = list(RF_FEATURE_SET_REGISTRY[feature_set])
+    validate_rf_feature_columns(columns)
+    return columns
+
+
+def validate_rf_feature_columns(columns: list[str]) -> None:
+    if not columns:
+        raise ValueError("RF feature set cannot be empty")
+    leakage = [
+        column
+        for column in columns
+        if column in RF_OUTCOME_FIELD_NAMES
+        or any(column.startswith(prefix) for prefix in RF_OUTCOME_FIELD_PREFIXES)
+    ]
+    if leakage:
+        raise ValueError(f"RF feature set contains outcome/leakage fields: {leakage}")
+    unknown = [column for column in columns if column not in TIER1_V1_FEATURE_COLUMNS]
+    if unknown:
+        raise ValueError(
+            f"RF feature set contains unknown/non-approved feature columns: {unknown}"
+        )
 
 # Pure design features (no failure params) for design-time risk prediction
 TIER1_V1_DESIGN_FEATURE_COLUMNS: List[str] = [
@@ -666,6 +732,8 @@ def train_rf_model(
     target_name: str = "partition_any",
     feature_columns: List[str] | None = None,
     cfg: RiskModelConfig | None = None,
+    feature_set_name: str = RF_FEATURE_SET_FULL,
+    split_manifest: dict[str, Any] | None = None,
 ) -> Tuple[Union[RandomForestClassifier, RandomForestRegressor], dict, pd.DataFrame]:
     """Train a RandomForest model on any supported resilience target.
 
@@ -698,7 +766,11 @@ def train_rf_model(
             f"Available columns: {list(df.columns)}"
         )
     if feature_columns is None:
-        feature_columns = [c for c in TIER1_V1_FEATURE_COLUMNS if c in df.columns]
+        feature_columns = [c for c in get_rf_feature_columns(feature_set_name) if c in df.columns]
+    validate_rf_feature_columns(list(feature_columns))
+    missing_features = [column for column in feature_columns if column not in df.columns]
+    if missing_features:
+        raise ValueError(f"Dataset is missing requested RF feature columns: {missing_features}")
 
     X = df[feature_columns].copy()
     if task_type == "classification":
@@ -706,14 +778,24 @@ def train_rf_model(
     else:
         y = df[target_name].astype(float)
 
-    split_indices = _run_level_split_indices(
-        df,
-        y,
-        task_type=task_type,
-        test_size=cfg.test_size,
-        val_size=cfg.val_size,
-        random_state=cfg.random_state,
-    )
+    if split_manifest is not None:
+        split_indices = validate_manifest_for_dataset(
+            split_manifest,
+            csv_path=csv_path,
+            target_name=target_name,
+        )
+        split_strategy = split_manifest["split_strategy"]
+    else:
+        split_indices = _run_level_split_indices(
+            df,
+            y,
+            task_type=task_type,
+            test_size=cfg.test_size,
+            val_size=cfg.val_size,
+            random_state=cfg.random_state,
+        )
+        split_strategy = "run_id_grouped" if "run_id" in df.columns else "row_index"
+    active_sample_count = len(split_indices["train"]) + len(split_indices["val"]) + len(split_indices["test"])
     X_train = X.loc[split_indices["train"]]
     y_train = y.loc[split_indices["train"]]
     X_val = X.loc[split_indices["val"]]
@@ -738,6 +820,17 @@ def train_rf_model(
         )
 
     model.fit(X_train, y_train)
+    model.satnet_metadata_ = {
+        "model_type": "RandomForest",
+        "target_name": target_name,
+        "task_type": task_type,
+        "feature_set": feature_set_name,
+        "feature_columns": list(feature_columns),
+        "feature_count": len(feature_columns),
+        "seed": cfg.random_state,
+        "n_estimators": cfg.n_estimators,
+        "max_depth": cfg.max_depth,
+    }
 
     y_pred_train = model.predict(X_train)
     y_pred_val = model.predict(X_val) if len(X_val) else np.asarray([])
@@ -746,12 +839,23 @@ def train_rf_model(
     metrics: dict = {
         "task_type": task_type,
         "target_name": target_name,
-        "num_samples": len(y),
+        "num_samples": active_sample_count,
+        "dataset_num_samples": len(y),
         "train_size": len(y_train),
         "val_size": len(y_val),
         "test_size": len(y_test),
         "seed": cfg.random_state,
-        "split_strategy": "run_id_grouped" if "run_id" in df.columns else "row_index",
+        "split_strategy": split_strategy,
+        "feature_set": feature_set_name,
+        "feature_columns": list(feature_columns),
+        "feature_count": len(feature_columns),
+        "rf_n_estimators": cfg.n_estimators,
+        "rf_max_depth": cfg.max_depth,
+        "split_indices": {
+            "train": [int(i) for i in split_indices["train"]],
+            "val": [int(i) for i in split_indices["val"]],
+            "test": [int(i) for i in split_indices["test"]],
+        },
     }
 
     if task_type == "classification":
@@ -806,6 +910,7 @@ def train_rf_model(
             "y_pred": float(pred),
             "model_type": "RandomForest",
             "data_path": str(csv_path),
+            "feature_set": feature_set_name,
         }
         source_row = df.iloc[int(idx)]
         if "run_id" in df.columns and not pd.isna(source_row.get("run_id")):

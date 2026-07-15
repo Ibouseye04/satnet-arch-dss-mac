@@ -16,14 +16,36 @@ Architecture:
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import List, Literal, Optional, Union
+import importlib.util
+import sys
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import Data
 from torch_geometric.nn import global_mean_pool
-from torch_geometric_temporal.nn.recurrent import GCLSTM
+
+try:
+    from torch_geometric_temporal.nn.recurrent import GCLSTM
+except (ImportError, OSError):
+    _gclstm_path = next(
+        (
+            Path(path) / "torch_geometric_temporal" / "nn" / "recurrent" / "gc_lstm.py"
+            for path in sys.path
+            if (Path(path) / "torch_geometric_temporal" / "nn" / "recurrent" / "gc_lstm.py").exists()
+        ),
+        None,
+    )
+    if _gclstm_path is None:
+        raise
+    _gclstm_spec = importlib.util.spec_from_file_location("satnet_installed_gc_lstm", _gclstm_path)
+    if _gclstm_spec is None or _gclstm_spec.loader is None:
+        raise
+    _gclstm_module = importlib.util.module_from_spec(_gclstm_spec)
+    _gclstm_spec.loader.exec_module(_gclstm_module)
+    GCLSTM = _gclstm_module.GCLSTM
 
 
 class SatelliteGNN(nn.Module):
@@ -45,19 +67,23 @@ class SatelliteGNN(nn.Module):
         hidden_channels: int = 64,
         out_channels: int = 2,
         task_type: Literal["classification", "regression"] = "classification",
+        cheb_k: int = 2,
     ):
         super().__init__()
+
+        if cheb_k < 1:
+            raise ValueError("cheb_k must be at least 1")
 
         self.node_features = node_features
         self.hidden_channels = hidden_channels
         self.out_channels = out_channels
         self.task_type = task_type
+        self.cheb_k = int(cheb_k)
 
         if task_type == "regression" and out_channels != 1:
             raise ValueError("Regression requires out_channels=1")
 
-        # GCLSTM: Graph Convolutional LSTM (K=1: 1-hop Chebyshev filter)
-        self.recurrent = GCLSTM(in_channels=node_features, out_channels=hidden_channels, K=1)
+        self.recurrent = GCLSTM(in_channels=node_features, out_channels=hidden_channels, K=self.cheb_k)
 
         # Linear head: graph embedding → class logits or scalar
         self.linear = nn.Linear(hidden_channels, out_channels)

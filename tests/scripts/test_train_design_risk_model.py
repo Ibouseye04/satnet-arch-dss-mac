@@ -49,8 +49,10 @@ def test_partition_any_uses_same_path_logic_for_implicit_and_explicit_default(
 
     captured_csv_paths: list[Path] = []
 
-    def fake_train_rf_model(csv_path: Path, target_name: str, cfg):  # noqa: ANN001
+    def fake_train_rf_model(csv_path: Path, target_name: str, cfg, feature_set_name, split_manifest):  # noqa: ANN001
         captured_csv_paths.append(Path(csv_path))
+        assert feature_set_name == "full"
+        assert split_manifest is None
         predictions = pd.DataFrame(
             [
                 {
@@ -81,6 +83,9 @@ def test_partition_any_uses_same_path_logic_for_implicit_and_explicit_default(
             test_size=0.2,
             val_size=0.1,
             output_dir=str(project_root / "models"),
+            feature_set="full",
+            split_manifest=None,
+            config_output=None,
             experiment_log=str(project_root / "experiments" / "rf_log.jsonl"),
             smoke=False,
             no_plots=True,

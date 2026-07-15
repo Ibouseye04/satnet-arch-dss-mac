@@ -27,7 +27,9 @@ except ImportError:
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
     DEFAULT_EPOCH_ISO,
+    DEFAULT_FAILURE_MODEL,
     SCHEMA_VERSION,
+    SUPPORTED_FAILURE_MODELS,
     Tier1FailureRealization,
     Tier1RolloutConfig,
     Tier1RolloutStep,
@@ -55,7 +57,8 @@ class Tier1MonteCarloConfig:
         step_seconds: Time step interval.
         gcc_threshold: Threshold for partition detection.
         node_failure_prob_range: (min, max) range for node failure probability.
-        edge_failure_prob_range: (min, max) range for edge failure probability.
+        edge_failure_prob_range: (min, max) range for temporal-union edge failure probability.
+        failure_model: Edge-failure sampling semantics identifier.
         seed: Base random seed for reproducibility.
         sample_constellation: If True, sample constellation params per run.
                               If False, use midpoint of ranges for all runs.
@@ -73,12 +76,18 @@ class Tier1MonteCarloConfig:
     duration_minutes: int = 10
     step_seconds: int = 60
 
+    # ISL parameters
+    isl_policy: str = "grid_fixed"
+    adjacent_search_k: int = 1
+    max_inter_plane_links_per_sat: int = 1
+
     # Labeling
     gcc_threshold: float = 0.8
 
     # Failure parameter ranges
     node_failure_prob_range: Tuple[float, float] = (0.0, 0.1)
     edge_failure_prob_range: Tuple[float, float] = (0.0, 0.2)
+    failure_model: str = DEFAULT_FAILURE_MODEL
 
     # Reproducibility
     seed: int = 42
@@ -141,11 +150,19 @@ class Tier1RunRow:
     seed: int
     config_hash: str
 
+    # Failure semantics and realization (for graph reconstruction)
+    failure_model: str = DEFAULT_FAILURE_MODEL
+
     # Failure realization (for graph reconstruction)
     # JSON-encoded lists: failed_nodes_json = "[1, 5, 12]"
     # failed_edges_json = "[[0,1], [3,4]]" (sorted tuples)
     failed_nodes_json: str = "[]"
     failed_edges_json: str = "[]"
+
+    # ISL reconstruction configuration
+    isl_policy: str = "grid_fixed"
+    adjacent_search_k: int = 1
+    max_inter_plane_links_per_sat: int = 1
 
     # Metadata (with defaults)
     epoch_iso: str = DEFAULT_EPOCH_ISO
@@ -239,9 +256,13 @@ def generate_tier1_temporal_dataset(
             altitude_km=altitude_km,
             duration_minutes=cfg.duration_minutes,
             step_seconds=cfg.step_seconds,
+            isl_policy=cfg.isl_policy,
+            adjacent_search_k=cfg.adjacent_search_k,
+            max_inter_plane_links_per_sat=cfg.max_inter_plane_links_per_sat,
             gcc_threshold=cfg.gcc_threshold,
             node_failure_prob=node_failure_prob,
             edge_failure_prob=edge_failure_prob,
+            failure_model=cfg.failure_model,
             seed=run_seed,
         )
 
@@ -277,8 +298,12 @@ def generate_tier1_temporal_dataset(
             max_partition_streak_fraction=summary.max_partition_streak_fraction,
             num_failed_nodes=summary.num_failed_nodes,
             num_failed_edges=summary.num_failed_edges,
+            failure_model=summary.failure_model,
             failed_nodes_json=failed_nodes_json,
             failed_edges_json=failed_edges_json,
+            isl_policy=rollout_cfg.isl_policy,
+            adjacent_search_k=rollout_cfg.adjacent_search_k,
+            max_inter_plane_links_per_sat=rollout_cfg.max_inter_plane_links_per_sat,
             seed=run_seed,
             config_hash=summary.config_hash,
             epoch_iso=rollout_cfg.epoch_iso,
@@ -344,8 +369,12 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "max_partition_streak_fraction",
     "num_failed_nodes",
     "num_failed_edges",
+    "failure_model",
     "failed_nodes_json",
     "failed_edges_json",
+    "isl_policy",
+    "adjacent_search_k",
+    "max_inter_plane_links_per_sat",
     "seed",
     "config_hash",
     "epoch_iso",
@@ -419,6 +448,23 @@ def validate_runs_schema(runs_dicts: List[dict]) -> None:
             raise SchemaValidationError(
                 f"Row {i}: partition_any must be 0 or 1"
             )
+
+        if row.get("isl_policy") not in ("grid_fixed", "grid_adaptive"):
+            raise SchemaValidationError(
+                f"Row {i}: isl_policy must be grid_fixed or grid_adaptive"
+            )
+
+        if row.get("failure_model") not in SUPPORTED_FAILURE_MODELS:
+            raise SchemaValidationError(
+                f"Row {i}: failure_model must be one of {sorted(SUPPORTED_FAILURE_MODELS)}"
+            )
+
+        for col in ["adjacent_search_k", "max_inter_plane_links_per_sat"]:
+            val = row.get(col)
+            if not isinstance(val, int) or val < 1:
+                raise SchemaValidationError(
+                    f"Row {i}: {col} must be an integer >= 1"
+                )
 
         # Schema version must match
         if row.get("schema_version") != SCHEMA_VERSION:

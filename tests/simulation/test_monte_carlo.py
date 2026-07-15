@@ -18,6 +18,10 @@ class TestTier1MonteCarloConfig:
         cfg = Tier1MonteCarloConfig()
         assert cfg.num_runs == 100
         assert cfg.seed == 42
+        assert cfg.isl_policy == "grid_fixed"
+        assert cfg.adjacent_search_k == 1
+        assert cfg.max_inter_plane_links_per_sat == 1
+        assert cfg.failure_model == "persistent_temporal_union_edges_v1"
 
     def test_instantiation_custom(self) -> None:
         """Can instantiate with custom values."""
@@ -61,6 +65,26 @@ class TestGenerateTier1TemporalDataset:
         assert len(runs) == 2
         assert all(isinstance(r, Tier1RunRow) for r in runs)
         assert all(isinstance(s, Tier1StepRow) for s in steps)
+
+    def test_generated_runs_store_default_failure_model(self) -> None:
+        from satnet.simulation.monte_carlo import (
+            Tier1MonteCarloConfig,
+            generate_tier1_temporal_dataset,
+            runs_to_dicts,
+        )
+
+        cfg = Tier1MonteCarloConfig(
+            num_runs=1,
+            num_planes_range=(2, 2),
+            sats_per_plane_range=(3, 3),
+            duration_minutes=1,
+            step_seconds=60,
+        )
+
+        runs, _ = generate_tier1_temporal_dataset(cfg)
+        row = runs_to_dicts(runs)[0]
+
+        assert row["failure_model"] == "persistent_temporal_union_edges_v1"
 
     def test_run_ids_sequential(self) -> None:
         """Run IDs are sequential starting from 0."""
@@ -152,6 +176,31 @@ class TestGenerateTier1TemporalDataset:
             assert r.num_planes == 5
             assert r.sats_per_plane == 8
 
+    def test_run_rows_include_isl_policy_configuration(self) -> None:
+        from satnet.simulation.monte_carlo import (
+            Tier1MonteCarloConfig,
+            generate_tier1_temporal_dataset,
+            runs_to_dicts,
+        )
+
+        cfg = Tier1MonteCarloConfig(
+            num_runs=1,
+            num_planes_range=(2, 2),
+            sats_per_plane_range=(3, 3),
+            duration_minutes=1,
+            step_seconds=60,
+            isl_policy="grid_adaptive",
+            adjacent_search_k=1,
+            max_inter_plane_links_per_sat=1,
+        )
+
+        runs, _ = generate_tier1_temporal_dataset(cfg)
+        row = runs_to_dicts(runs)[0]
+
+        assert row["isl_policy"] == "grid_adaptive"
+        assert row["adjacent_search_k"] == 1
+        assert row["max_inter_plane_links_per_sat"] == 1
+
     def test_schema_version_in_rows(self) -> None:
         """Run rows include schema version."""
         from satnet.simulation.monte_carlo import (
@@ -207,6 +256,9 @@ class TestConversionFunctions:
         assert "max_partition_streak" in dicts[0]
         assert "max_partition_streak_seconds" in dicts[0]
         assert "max_partition_streak_fraction" in dicts[0]
+        assert "isl_policy" in dicts[0]
+        assert "adjacent_search_k" in dicts[0]
+        assert "max_inter_plane_links_per_sat" in dicts[0]
 
     def test_steps_to_dicts(self) -> None:
         """steps_to_dicts converts to list of dicts."""
@@ -310,6 +362,41 @@ class TestSchemaValidation:
         row["config_hash"] = "abc"
 
         with pytest.raises(SchemaValidationError, match="out of range"):
+            validate_runs_schema([row])
+
+    def test_validate_runs_schema_invalid_failure_model(self) -> None:
+        """Invalid failure_model raises SchemaValidationError."""
+        from satnet.simulation.monte_carlo import (
+            DATASET_VERSION,
+            RUNS_REQUIRED_COLUMNS,
+            SCHEMA_VERSION,
+            SchemaValidationError,
+            validate_runs_schema,
+        )
+
+        row = {col: 0 for col in RUNS_REQUIRED_COLUMNS}
+        row.update(
+            {
+                "gcc_frac_min": 0.5,
+                "gcc_frac_mean": 0.5,
+                "gcc_frac_min_original": 0.5,
+                "gcc_frac_mean_original": 0.5,
+                "gcc_frac_min_surviving": 0.5,
+                "gcc_frac_mean_surviving": 0.5,
+                "partition_fraction": 0.5,
+                "max_partition_streak_fraction": 0.5,
+                "partition_any": 0,
+                "isl_policy": "grid_fixed",
+                "failure_model": "not_a_supported_model",
+                "adjacent_search_k": 1,
+                "max_inter_plane_links_per_sat": 1,
+                "schema_version": SCHEMA_VERSION,
+                "dataset_version": DATASET_VERSION,
+                "config_hash": "abc",
+            }
+        )
+
+        with pytest.raises(SchemaValidationError, match="failure_model"):
             validate_runs_schema([row])
 
     def test_validate_steps_schema_valid(self) -> None:

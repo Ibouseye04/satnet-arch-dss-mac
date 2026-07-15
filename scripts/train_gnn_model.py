@@ -35,6 +35,12 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 DEFAULT_OUTPUT_MODEL = "models/satellite_gnn.pt"
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from satnet.models.gnn_ablation import (
+    TGNN_INPUT_MODE_FULL,
+    TGNN_INPUT_MODE_REGISTRY,
+    apply_tgnn_input_mode,
+    tgnn_input_mode_metadata,
+)
 from satnet.models.gnn_dataset import SatNetTemporalDataset
 try:
     from satnet.models.gnn_model import SatelliteGNN
@@ -44,6 +50,7 @@ except (ImportError, OSError) as exc:
     GNN_MODEL_IMPORT_ERROR = exc
 from satnet.metrics.resilience_targets import ALL_TARGETS, infer_task_type
 from satnet.utils.experiment_logger import ExperimentLogger
+from satnet.utils.split_manifest import read_split_manifest, validate_manifest_for_dataset
 
 logging.basicConfig(
     level=logging.INFO,
@@ -113,6 +120,12 @@ def parse_args() -> argparse.Namespace:
         help="Hidden dimension for GCLSTM (default: 64)",
     )
     parser.add_argument(
+        "--cheb-k",
+        type=int,
+        default=2,
+        help="Chebyshev filter order for GCLSTM graph convolutions (default: 2)",
+    )
+    parser.add_argument(
         "--test-split",
         type=float,
         default=0.2,
@@ -168,6 +181,25 @@ def parse_args() -> argparse.Namespace:
         help="Resilience target column (default: partition_any)",
     )
     parser.add_argument(
+        "--input-mode",
+        type=str,
+        default=TGNN_INPUT_MODE_FULL,
+        choices=sorted(TGNN_INPUT_MODE_REGISTRY),
+        help="Canonical TGNN ablation input mode",
+    )
+    parser.add_argument(
+        "--split-manifest",
+        type=str,
+        default=None,
+        help="Optional split manifest JSON to reuse exact train/validation/test rows",
+    )
+    parser.add_argument(
+        "--config-output",
+        type=str,
+        default=None,
+        help="Optional path for exact training configuration JSON",
+    )
+    parser.add_argument(
         "--experiment-log",
         type=str,
         default="experiments/gnn_log.jsonl",
@@ -209,6 +241,33 @@ def get_device(device_arg: str) -> torch.device:
 def move_data_to_device(data_sequence: List[Data], device: torch.device) -> List[Data]:
     """Move a sequence of Data objects to the specified device."""
     return [data.to(device) for data in data_sequence]
+
+
+def get_model_sequence(dataset: SatNetTemporalDataset, idx: int, input_mode: str) -> List[Data]:
+    return apply_tgnn_input_mode(dataset[idx], input_mode)
+
+
+def set_reproducibility_seeds(seed: int) -> dict[str, Any]:
+    import random
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    deterministic_enabled = False
+    try:
+        torch.use_deterministic_algorithms(True, warn_only=True)
+        deterministic_enabled = True
+    except Exception:
+        deterministic_enabled = False
+    return {
+        "python_seed": seed,
+        "numpy_seed": seed,
+        "torch_seed": seed,
+        "torch_deterministic_algorithms": deterministic_enabled,
+        "determinism_level": "best_effort_torch_deterministic_warn_only",
+    }
 
 
 def make_run_splits(
@@ -268,6 +327,13 @@ def _safe_rank_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> tuple[float, f
     return float(spearman_val), float(kendall_val)
 
 
+def normalize_regression_loss_tensors(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    return prediction.view(-1), target.view(-1).float()
+
+
 def _regression_metrics(y_true: List[float], y_pred: List[float], loss: float) -> dict[str, Any]:
     n_samples = len(y_true)
     metrics: dict[str, Any] = {
@@ -308,6 +374,7 @@ def train_epoch(
     optimizer: optim.Optimizer,
     criterion: nn.Module,
     device: torch.device,
+    input_mode: str = TGNN_INPUT_MODE_FULL,
 ) -> Tuple[float, float]:
     """Train for one epoch. Returns (avg_loss, accuracy).
 
@@ -320,7 +387,7 @@ def train_epoch(
     total = 0
 
     for idx in train_indices:
-        data_sequence = dataset[idx]
+        data_sequence = get_model_sequence(dataset, idx, input_mode)
         data_sequence = move_data_to_device(data_sequence, device)
         label = data_sequence[0].y.to(device)  # [1] float
 
@@ -328,7 +395,8 @@ def train_epoch(
         out = model(data_sequence)
 
         if is_regression:
-            loss = criterion(out.squeeze(), label)
+            pred_for_loss, target_for_loss = normalize_regression_loss_tensors(out, label)
+            loss = criterion(pred_for_loss, target_for_loss)
         else:
             loss = criterion(out, label.long())
 
@@ -355,6 +423,7 @@ def evaluate(
     dataset: SatNetTemporalDataset,
     criterion: nn.Module,
     device: torch.device,
+    input_mode: str = TGNN_INPUT_MODE_FULL,
 ) -> Tuple[float, float, dict]:
     """Evaluate the model. Returns (avg_loss, accuracy, metrics_dict)."""
     is_regression = model.task_type == "regression"
@@ -371,14 +440,15 @@ def evaluate(
     false_negatives = 0
 
     for idx in test_indices:
-        data_sequence = dataset[idx]
+        data_sequence = get_model_sequence(dataset, idx, input_mode)
         data_sequence = move_data_to_device(data_sequence, device)
         label = data_sequence[0].y.to(device)
 
         out = model(data_sequence)
 
         if is_regression:
-            loss = criterion(out.squeeze(), label)
+            pred_for_loss, target_for_loss = normalize_regression_loss_tensors(out, label)
+            loss = criterion(pred_for_loss, target_for_loss)
         else:
             loss = criterion(out, label.long())
 
@@ -450,10 +520,7 @@ def main():
     task_type = infer_task_type(args.target_name)
     is_regression = task_type == "regression"
 
-    # Set random seeds for reproducibility
-    torch.manual_seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+    seed_metadata = set_reproducibility_seeds(args.seed)
 
     # Resolve paths
     data_dir = Path(args.data_dir)
@@ -472,6 +539,11 @@ def main():
         if not metrics_path.is_absolute():
             metrics_path = PROJECT_ROOT / metrics_path
     metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path = Path(args.config_output) if args.config_output else output_path.parent / f"{output_path.stem}_config.json"
+    if not config_path.is_absolute():
+        config_path = PROJECT_ROOT / config_path
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    split_manifest = read_split_manifest(Path(args.split_manifest)) if args.split_manifest else None
 
     log_path = Path(args.experiment_log)
     if not log_path.is_absolute():
@@ -501,6 +573,11 @@ def main():
         exp_log.set("cache_dir", args.cache_dir)
         exp_log.set("smoke", bool(args.smoke))
         exp_log.set("subset", args.subset)
+        exp_log.set("input_mode", args.input_mode)
+        exp_log.set("cheb_k", int(args.cheb_k))
+        exp_log.set("split_manifest", str(args.split_manifest) if args.split_manifest else None)
+        for key, value in seed_metadata.items():
+            exp_log.set(key, value)
 
         # Load dataset
         logger.info(f"Loading dataset from {data_dir}")
@@ -524,14 +601,24 @@ def main():
         logger.info(f"Dataset: {num_samples} samples (neg: {neg_count}, pos: {pos_count})")
         exp_log.set("num_samples", num_samples)
 
-        # Split complete runs; each dataset index is one full graph sequence.
-        splits = make_run_splits(
-            num_samples,
-            test_split=args.test_split,
-            val_split=args.val_split,
-            seed=args.seed,
-            subset=args.subset,
-        )
+        if split_manifest is not None:
+            dataset_csv_path = data_dir / "tier1_design_runs.csv"
+            splits = validate_manifest_for_dataset(
+                split_manifest,
+                csv_path=dataset_csv_path,
+                target_name=args.target_name,
+            )
+            split_strategy = split_manifest["split_strategy"]
+        else:
+            # Split complete runs; each dataset index is one full graph sequence.
+            splits = make_run_splits(
+                num_samples,
+                test_split=args.test_split,
+                val_split=args.val_split,
+                seed=args.seed,
+                subset=args.subset,
+            )
+            split_strategy = "seeded_complete_run_indices"
         train_indices = splits["train"]
         val_indices = splits["val"]
         test_indices = splits["test"]
@@ -539,17 +626,32 @@ def main():
             "Train/Val/Test split: %d/%d/%d complete runs",
             len(train_indices), len(val_indices), len(test_indices),
         )
+        active_sample_count = len(train_indices) + len(val_indices) + len(test_indices)
+        exp_log.set("active_sample_count", active_sample_count)
         exp_log.set("train_size", len(train_indices))
         exp_log.set("val_size", len(val_indices))
         exp_log.set("test_size", len(test_indices))
+        exp_log.set("split_strategy", split_strategy)
+        baseline_sample = dataset[train_indices[0] if train_indices else 0]
+        baseline_feature_dim = int(baseline_sample[0].x.shape[1])
+        transformed_sample = apply_tgnn_input_mode(baseline_sample, args.input_mode)
+        transformed_feature_dim = int(transformed_sample[0].x.shape[1])
+        input_mode_metadata = tgnn_input_mode_metadata(
+            mode=args.input_mode,
+            baseline_feature_dim=baseline_feature_dim,
+            transformed_feature_dim=transformed_feature_dim,
+        )
+        for key, value in input_mode_metadata.items():
+            exp_log.set(key, value)
 
         # Initialize model
         out_channels = 1 if is_regression else 2
         model = SatelliteGNN(
-            node_features=3,
+            node_features=baseline_feature_dim,
             hidden_channels=args.hidden_dim,
             out_channels=out_channels,
             task_type=task_type,
+            cheb_k=args.cheb_k,
         )
         model = model.to(device)
 
@@ -575,10 +677,10 @@ def main():
 
         for epoch in range(1, args.epochs + 1):
             train_loss, train_acc = train_epoch(
-                model, train_indices, dataset, optimizer, criterion, device
+                model, train_indices, dataset, optimizer, criterion, device, args.input_mode
             )
             val_loss, val_acc, val_metrics = evaluate(
-                model, val_indices, dataset, criterion, device
+                model, val_indices, dataset, criterion, device, args.input_mode
             )
 
             if is_regression:
@@ -614,6 +716,15 @@ def main():
                     "args": vars(args),
                     "task_type": task_type,
                     "target_name": args.target_name,
+                    "input_mode": args.input_mode,
+                    "input_mode_metadata": input_mode_metadata,
+                    "cheb_k": int(args.cheb_k),
+                    "model_parameters": int(num_params),
+                    "split_indices": {
+                        "train": [int(i) for i in train_indices],
+                        "val": [int(i) for i in val_indices],
+                        "test": [int(i) for i in test_indices],
+                    },
                 }, output_path)
 
         exp_log.stop_timer("training")
@@ -621,7 +732,7 @@ def main():
         checkpoint = torch.load(output_path, map_location=device)
         model.load_state_dict(checkpoint["model_state_dict"])
         test_loss, test_acc, test_metrics = evaluate(
-            model, test_indices, dataset, criterion, device
+            model, test_indices, dataset, criterion, device, args.input_mode
         )
 
         logger.info("-" * 60)
@@ -657,7 +768,7 @@ def main():
                 ("test", test_indices),
             ]:
                 for idx in indices:
-                    data_seq = dataset[idx]
+                    data_seq = get_model_sequence(dataset, idx, args.input_mode)
                     data_seq = move_data_to_device(data_seq, device)
                     out = model(data_seq)
                     if is_regression:
@@ -678,6 +789,8 @@ def main():
                         "y_pred": pred_val,
                         "model_type": "SatelliteGNN",
                         "data_path": str(data_dir),
+                        "input_mode": args.input_mode,
+                        "cheb_k": int(args.cheb_k),
                     }
                     if "run_id" in cfg and not pd.isna(cfg.get("run_id")):
                         row["run_id"] = int(cfg["run_id"])
@@ -693,12 +806,24 @@ def main():
             "task_type": task_type,
             "seed": args.seed,
             "data_dir": str(data_dir),
-            "num_samples": int(num_samples),
+            "num_samples": int(active_sample_count),
+            "dataset_num_samples": int(num_samples),
             "subset": args.subset,
             "train_size": len(train_indices),
             "val_size": len(val_indices),
             "test_size": len(test_indices),
-            "split_strategy": "seeded_complete_run_indices",
+            "split_strategy": split_strategy,
+            "split_indices": {
+                "train": [int(i) for i in train_indices],
+                "val": [int(i) for i in val_indices],
+                "test": [int(i) for i in test_indices],
+            },
+            "input_mode": args.input_mode,
+            "input_mode_metadata": input_mode_metadata,
+            "cheb_k": int(args.cheb_k),
+            "model_parameters": int(num_params),
+            "split_manifest": str(args.split_manifest) if args.split_manifest else None,
+            "seed_metadata": seed_metadata,
             "best_epoch": best_epoch,
             "best_val_loss": float(best_val_loss),
             "best_val_metrics": best_metrics,
@@ -707,15 +832,43 @@ def main():
             "test_metrics": test_metrics,
             "model_path": str(output_path),
             "prediction_path": str(preds_path),
+            "config_path": str(config_path),
         }
         with metrics_path.open("w") as f:
             import json
             json.dump(metrics_payload, f, indent=2, default=str)
         logger.info(f"Metrics saved to: {metrics_path}")
 
+        config_payload = {
+            "model_type": "SatelliteGNN",
+            "target_name": args.target_name,
+            "task_type": task_type,
+            "seed": args.seed,
+            "data_dir": str(data_dir),
+            "epochs": args.epochs,
+            "lr": args.lr,
+            "hidden_dim": args.hidden_dim,
+            "cheb_k": int(args.cheb_k),
+            "input_mode": args.input_mode,
+            "input_mode_metadata": input_mode_metadata,
+            "model_parameters": int(num_params),
+            "split_strategy": split_strategy,
+            "split_indices": metrics_payload["split_indices"],
+            "split_manifest": str(args.split_manifest) if args.split_manifest else None,
+            "seed_metadata": seed_metadata,
+            "model_path": str(output_path),
+            "metrics_path": str(metrics_path),
+            "prediction_path": str(preds_path),
+        }
+        with config_path.open("w") as f:
+            import json
+            json.dump(config_payload, f, indent=2, default=str)
+        logger.info(f"Configuration saved to: {config_path}")
+
         exp_log.set("model_path", str(output_path))
         exp_log.set("prediction_path", str(preds_path))
         exp_log.set("metrics_path", str(metrics_path))
+        exp_log.set("config_path", str(config_path))
         exp_log.set("best_epoch", best_epoch)
         exp_log.set("best_val_loss", float(best_val_loss))
         exp_log.set("test_loss", float(test_loss))

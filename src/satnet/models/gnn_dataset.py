@@ -41,7 +41,11 @@ from torch_geometric.utils import from_networkx
 from datetime import datetime
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
-from satnet.simulation.tier1_rollout import DEFAULT_EPOCH_ISO, Tier1FailureRealization
+from satnet.simulation.tier1_rollout import (
+    DEFAULT_EPOCH_ISO,
+    FAILURE_MODEL_PERSISTENT_T0_EDGES_V1,
+    Tier1FailureRealization,
+)
 from satnet.utils.graph_cache import (
     extract_cache_key_config,
     load_graph_sequence,
@@ -56,6 +60,66 @@ logger = logging.getLogger(__name__)
 GRAPH_SEQUENCE_GENERATOR_PROVENANCE = (
     "SatNetTemporalDataset:hypatia_temporal_graph_sequence:v1"
 )
+
+
+def _format_temporal_value(value: Any) -> str:
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
+def _temporal_sort_key(value: Any) -> tuple[int, float | str]:
+    try:
+        return 0, float(value)
+    except (TypeError, ValueError):
+        return 1, str(value)
+
+
+def _format_temporal_values(values: list[Any]) -> str:
+    return "[" + ", ".join(_format_temporal_value(value) for value in values) + "]"
+
+
+def _unique_sorted_temporal_values(df: pd.DataFrame, column: str) -> list[Any]:
+    if column not in df.columns:
+        return []
+    values = {
+        int(value) if isinstance(value, float) and value.is_integer() else value
+        for value in df[column].dropna().tolist()
+    }
+    return sorted(values, key=_temporal_sort_key)
+
+
+def format_dataset_temporal_metadata_summary(
+    df: pd.DataFrame,
+    *,
+    fallback_duration_minutes: int,
+    fallback_step_seconds: int,
+) -> str:
+    durations = _unique_sorted_temporal_values(df, "duration_minutes")
+    steps = _unique_sorted_temporal_values(df, "step_seconds")
+    num_steps = _unique_sorted_temporal_values(df, "num_steps")
+
+    has_multiple_values = any(len(values) > 1 for values in (durations, steps, num_steps))
+    if has_multiple_values:
+        return (
+            f"multiple durations={_format_temporal_values(durations)}, "
+            f"steps={_format_temporal_values(steps)}, "
+            f"num_steps={_format_temporal_values(num_steps)}"
+        )
+
+    duration_text = (
+        f"duration={_format_temporal_value(durations[0])} min"
+        if durations else f"duration={fallback_duration_minutes} min fallback"
+    )
+    step_text = (
+        f"step={_format_temporal_value(steps[0])} s"
+        if steps else f"step={fallback_step_seconds} s fallback"
+    )
+    num_steps_text = (
+        f"num_steps={_format_temporal_value(num_steps[0])}"
+        if num_steps else "num_steps=unknown fallback"
+    )
+    return f"{duration_text}, {step_text}, {num_steps_text}"
 
 
 class SatNetTemporalDataset(Dataset):
@@ -137,9 +201,14 @@ class SatNetTemporalDataset(Dataset):
         self._df = pd.read_csv(self.raw_paths[0])
         self._validate_csv()
         
+        temporal_metadata_summary = format_dataset_temporal_metadata_summary(
+            self._df,
+            fallback_duration_minutes=duration_minutes,
+            fallback_step_seconds=step_seconds,
+        )
         logger.info(
-            "Loaded %d runs from %s (duration=%d min, step=%d s)",
-            len(self._df), self.raw_paths[0], duration_minutes, step_seconds,
+            "Loaded %d runs from %s (%s)",
+            len(self._df), self.raw_paths[0], temporal_metadata_summary,
         )
     
     def _validate_csv(self) -> None:
@@ -214,6 +283,7 @@ class SatNetTemporalDataset(Dataset):
         *,
         label: float,
         run_id: int,
+        failure_model: str | None = None,
     ) -> List[Data]:
         """Attach target-specific fields to a target-agnostic graph sequence."""
         data_list: List[Data] = []
@@ -221,6 +291,8 @@ class SatNetTemporalDataset(Dataset):
             data = structural_data.clone()
             data.y = torch.tensor([label], dtype=torch.float)
             data.run_id = torch.tensor([run_id], dtype=torch.long)
+            if failure_model is not None:
+                data.failure_model = failure_model
 
             if self.transform is not None:
                 data = self.transform(data)
@@ -281,6 +353,23 @@ class SatNetTemporalDataset(Dataset):
         duration_minutes = int(row.get("duration_minutes", self.duration_minutes))
         step_seconds = int(row.get("step_seconds", self.step_seconds))
 
+        isl_policy_value = row.get("isl_policy", "grid_fixed")
+        adjacent_search_k_value = row.get("adjacent_search_k", 1)
+        max_inter_plane_links_per_sat_value = row.get("max_inter_plane_links_per_sat", 1)
+        isl_policy = "grid_fixed" if pd.isna(isl_policy_value) else str(isl_policy_value)
+        adjacent_search_k = 1 if pd.isna(adjacent_search_k_value) else int(adjacent_search_k_value)
+        max_inter_plane_links_per_sat = (
+            1 if pd.isna(max_inter_plane_links_per_sat_value)
+            else int(max_inter_plane_links_per_sat_value)
+        )
+
+        failure_model_value = row.get("failure_model", FAILURE_MODEL_PERSISTENT_T0_EDGES_V1)
+        failure_model = (
+            FAILURE_MODEL_PERSISTENT_T0_EDGES_V1
+            if pd.isna(failure_model_value)
+            else str(failure_model_value)
+        )
+
         # Get failure realization from CSV (Step 3 contract)
         failed_nodes_json = row.get("failed_nodes_json", "[]")
         failed_edges_json = row.get("failed_edges_json", "[]")
@@ -294,6 +383,10 @@ class SatNetTemporalDataset(Dataset):
         expected_cache_metadata: dict[str, Any] | None = None
         if self.use_cache or self.write_cache:
             sample_config = row.to_dict()
+            sample_config["isl_policy"] = isl_policy
+            sample_config["adjacent_search_k"] = adjacent_search_k
+            sample_config["failure_model"] = failure_model
+            sample_config["max_inter_plane_links_per_sat"] = max_inter_plane_links_per_sat
             generator_config = extract_cache_key_config(sample_config)
             cache_key = make_sample_cache_key(sample_config)
             expected_cache_metadata = make_cache_metadata(
@@ -314,7 +407,12 @@ class SatNetTemporalDataset(Dataset):
                     expected_generator_provenance=GRAPH_SEQUENCE_GENERATOR_PROVENANCE,
                     expected_generator_config=generator_config,
                 )
-                return self._materialize_sequence(cached, label=label, run_id=idx)
+                return self._materialize_sequence(
+                    cached,
+                    label=label,
+                    run_id=idx,
+                    failure_model=failure_model,
+                )
 
         # ── generate graphs (cache miss or caching disabled) ────────
         # Instantiate HypatiaAdapter with explicit epoch for reproducibility
@@ -331,6 +429,9 @@ class SatNetTemporalDataset(Dataset):
         adapter.calculate_isls(
             duration_minutes=duration_minutes,
             step_seconds=step_seconds,
+            isl_policy=isl_policy,
+            adjacent_search_k=adjacent_search_k,
+            max_inter_plane_links_per_sat=max_inter_plane_links_per_sat,
         )
 
         # Convert each time step to PyG Data
@@ -350,6 +451,10 @@ class SatNetTemporalDataset(Dataset):
                 num_planes=num_planes,
                 sats_per_plane=sats_per_plane,
             )
+            data.isl_policy = isl_policy
+            data.adjacent_search_k = adjacent_search_k
+            data.max_inter_plane_links_per_sat = max_inter_plane_links_per_sat
+            data.failure_model = failure_model
             structural_data_list.append(data)
 
         # ── cache write ─────────────────────────────────────────────
@@ -361,7 +466,12 @@ class SatNetTemporalDataset(Dataset):
                 metadata=expected_cache_metadata,
             )
 
-        return self._materialize_sequence(structural_data_list, label=label, run_id=idx)
+        return self._materialize_sequence(
+            structural_data_list,
+            label=label,
+            run_id=idx,
+            failure_model=failure_model,
+        )
     
     def _networkx_to_pyg_data(
         self,

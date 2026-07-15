@@ -11,6 +11,8 @@ import pytest
 
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
+    FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1,
+    FAILURE_MODEL_PERSISTENT_T0_EDGES_V1,
     SCHEMA_VERSION,
     Tier1FailureRealization,
     Tier1RolloutConfig,
@@ -563,31 +565,257 @@ class TestRunTier1Rollout:
         assert summary.gcc_frac_mean_surviving == 0.0
 
     def test_rollout_with_edge_failures(self) -> None:
-        """Edge failures are sampled from t=0 edges."""
+        """Edge failures are sampled from the configured persistent failure universe."""
         from satnet.simulation.tier1_rollout import (
             Tier1RolloutConfig,
             run_tier1_rollout,
         )
 
-        # Use larger constellation to ensure edges exist
         cfg = Tier1RolloutConfig(
             num_planes=5,
             sats_per_plane=10,
             duration_minutes=1,
             step_seconds=60,
             node_failure_prob=0.0,
-            edge_failure_prob=0.5,  # High failure rate
+            edge_failure_prob=0.5,
             seed=42,
         )
 
         steps, summary, failures = run_tier1_rollout(cfg)
 
-        # With 50% edge failure prob on a larger constellation, expect some failures
-        # (only if edges exist at t=0 - depends on physics)
-        # Just verify the rollout completes and produces valid output
         assert summary.num_steps == 2
         assert 0.0 <= summary.gcc_frac_min <= 1.0
         assert len(failures.failed_edges) == summary.num_failed_edges
+        assert summary.failure_model == FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1
+
+    def test_later_only_edge_becomes_failure_eligible(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graphs = []
+                for edges in [[(0, 1)], [(0, 1), (2, 3)]]:
+                    graph = nx.Graph()
+                    graph.add_nodes_from(range(4))
+                    graph.add_edges_from(edges)
+                    self.graphs.append(graph)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                for idx, graph in enumerate(self.graphs):
+                    yield idx, graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=1.0,
+        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_edges == {(0, 1), (2, 3)}
+        assert summary.num_failed_edges == 2
+        assert steps[1].num_edges == 0
+
+    def test_failed_later_only_edge_removed_whenever_active(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graphs = []
+                for edges in [[(0, 1)], [(0, 1), (2, 3)], [(2, 3)]]:
+                    graph = nx.Graph()
+                    graph.add_nodes_from(range(4))
+                    graph.add_edges_from(edges)
+                    self.graphs.append(graph)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                for idx, graph in enumerate(self.graphs):
+                    yield idx, graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=2,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=1.0,
+        )
+
+        steps, _, failures = run_tier1_rollout(cfg)
+
+        assert (2, 3) in failures.failed_edges
+        assert [step.num_edges for step in steps] == [0, 0, 0]
+
+    def test_nonfailed_later_only_edge_remains_when_active(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graphs = []
+                for edges in [[(0, 1)], [(0, 1), (2, 3)]]:
+                    graph = nx.Graph()
+                    graph.add_nodes_from(range(4))
+                    graph.add_edges_from(edges)
+                    self.graphs.append(graph)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                for idx, graph in enumerate(self.graphs):
+                    yield idx, graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=0.0,
+        )
+
+        steps, _, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_edges == set()
+        assert steps[1].num_edges == 2
+
+    def test_failed_edges_are_undirected_normalized(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graph = nx.Graph()
+                self.graph.add_nodes_from(range(4))
+                self.graph.add_edge(3, 2)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                yield 0, self.graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=0,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=1.0,
+        )
+
+        steps, _, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_edges == {(2, 3)}
+        assert steps[0].num_edges == 0
+
+    def test_legacy_t0_failure_model_remains_available(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graphs = []
+                for edges in [[(0, 1)], [(0, 1), (2, 3)]]:
+                    graph = nx.Graph()
+                    graph.add_nodes_from(range(4))
+                    graph.add_edges_from(edges)
+                    self.graphs.append(graph)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                for idx, graph in enumerate(self.graphs):
+                    yield idx, graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=1,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=1.0,
+            failure_model=FAILURE_MODEL_PERSISTENT_T0_EDGES_V1,
+        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_edges == {(0, 1)}
+        assert steps[1].num_edges == 1
+        assert summary.failure_model == FAILURE_MODEL_PERSISTENT_T0_EDGES_V1
+
+    def test_edgeless_graph_sequence_has_empty_failed_edges(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from satnet.network import hypatia_adapter
+        from satnet.simulation.tier1_rollout import run_tier1_rollout
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graph = nx.Graph()
+                self.graph.add_nodes_from(range(4))
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                yield 0, self.graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
+        cfg = Tier1RolloutConfig(
+            num_planes=1,
+            sats_per_plane=4,
+            duration_minutes=0,
+            step_seconds=60,
+            node_failure_prob=0.0,
+            edge_failure_prob=1.0,
+        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert failures.failed_edges == set()
+        assert summary.num_failed_edges == 0
+        assert steps[0].num_edges == 0
 
     def test_rollout_deterministic_with_seed(self) -> None:
         """Same seed produces identical results."""

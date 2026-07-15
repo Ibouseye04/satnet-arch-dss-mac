@@ -11,21 +11,19 @@ Dataclasses defined here establish the contract between:
 No toy topology dependencies. No Hypatia imports in this module —
 these are pure data contracts.
 
-Failure Semantics (Step 4 - Tier 1 v1):
+Failure Semantics (Tier 1 temporal-union edges v1):
     Node Failures:
-        - Sampled once at t=0 from all nodes in the constellation.
+        - Sampled once from all designed satellites in the constellation.
         - Persistent: failed nodes are removed at every time step.
         - Interpretation: hardware failure of the satellite.
     
     Edge Failures:
-        - Sampled once at t=0 from edges present in G(t=0).
+        - Sampled once from the temporal union of accepted ISLs that appear at
+          least once during the simulated temporal window.
         - Persistent: if an edge (u,v) is marked failed, it is removed
           whenever it would otherwise exist at any time step.
-        - Interpretation: ISL terminal hardware failure (not atmospheric).
-        - Limitation: edges that don't exist at t=0 (due to Earth obscuration)
-          but appear later are implicitly immune to failure sampling.
-        - This is a known simplification for v1; future versions may sample
-          from the full +Grid neighbor set or use time-varying outage models.
+        - Interpretation: satellite-pair ISL unavailable for the run.
+        - Legacy datasets without failure_model used persistent_t0_edges_v1.
 """
 
 from __future__ import annotations
@@ -45,6 +43,15 @@ DEFAULT_EPOCH_ISO = "2000-01-01T12:00:00+00:00"
 # Dataset versioning constants
 DATASET_VERSION = "tier1_temporal_connectivity_v1"
 SCHEMA_VERSION = 1
+FAILURE_MODEL_PERSISTENT_T0_EDGES_V1 = "persistent_t0_edges_v1"
+FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1 = "persistent_temporal_union_edges_v1"
+DEFAULT_FAILURE_MODEL = FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1
+SUPPORTED_FAILURE_MODELS = frozenset(
+    {
+        FAILURE_MODEL_PERSISTENT_T0_EDGES_V1,
+        FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -62,7 +69,8 @@ class Tier1RolloutConfig:
         max_isl_distance_km: Maximum ISL distance (optional, uses adapter default if None).
         gcc_threshold: Threshold for partition detection (gcc_frac_original < threshold → partitioned).
         node_failure_prob: Probability of node failure (sampled once per run).
-        edge_failure_prob: Probability of edge failure (sampled once per run from t=0 edges).
+        edge_failure_prob: Probability that an accepted satellite-pair ISL appearing at least once during the run is persistently unavailable.
+        failure_model: Edge-failure sampling semantics identifier.
         seed: Random seed for reproducibility.
         epoch_iso: TLE epoch as ISO 8601 string for reproducibility (default: J2000.0).
     """
@@ -87,10 +95,11 @@ class Tier1RolloutConfig:
     # Labeling parameters
     gcc_threshold: float = 0.8
 
-    # Failure parameters (v1: persistent failures sampled at t=0)
+    # Failure parameters
     # See module docstring for detailed failure semantics.
     node_failure_prob: float = 0.0  # P(node fails) for each satellite
-    edge_failure_prob: float = 0.0  # P(edge fails) for each t=0 edge
+    edge_failure_prob: float = 0.0  # P(edge fails) for each temporal-union accepted ISL pair
+    failure_model: str = DEFAULT_FAILURE_MODEL
     seed: int = 42
 
     # Epoch for orbital propagation (ISO 8601 string for JSON serialization)
@@ -169,7 +178,7 @@ class Tier1FailureRealization:
     
     Attributes:
         failed_nodes: Set of node IDs that failed (persistent).
-        failed_edges: Set of (u, v) tuples that failed (from t=0, sorted).
+        failed_edges: Set of sorted (u, v) tuples that failed persistently.
     """
     failed_nodes: set[int]
     failed_edges: set[tuple[int, int]]
@@ -222,7 +231,8 @@ class Tier1RolloutSummary:
         max_partition_streak_fraction: Longest threshold-breach sampled-state run divided by total sampled states.
         num_steps: Total number of sampled states in the rollout.
         num_failed_nodes: Number of nodes that failed (persistent).
-        num_failed_edges: Number of edges that failed (persistent, from t=0).
+        num_failed_edges: Number of edges that failed persistently.
+        failure_model: Edge-failure sampling semantics identifier.
         schema_version: Schema version for dataset compatibility.
         dataset_version: Dataset version identifier.
         config_hash: Hash of the configuration for reproducibility.
@@ -242,6 +252,7 @@ class Tier1RolloutSummary:
     num_steps: int
     num_failed_nodes: int = 0
     num_failed_edges: int = 0
+    failure_model: str = field(default=DEFAULT_FAILURE_MODEL)
     schema_version: int = field(default=SCHEMA_VERSION)
     dataset_version: str = field(default=DATASET_VERSION)
     config_hash: str = ""
@@ -264,14 +275,14 @@ def run_tier1_rollout(
     This function:
     1. Constructs a HypatiaAdapter from constellation parameters
     2. Generates TLEs and calculates ISLs over time
-    3. Samples persistent failures from the t=0 graph
+    3. Samples persistent node failures and edge failures
     4. For each time step, applies failures and computes GCC metrics
     5. Aggregates results into a summary
 
     v1 Assumptions:
     - Node failures are persistent (sampled once, applied at all steps)
-    - Edge failures are sampled from edges present at t=0
-    - Edges that appear later are not eligible to fail
+    - Edge failures are persistent (sampled once, applied at all steps)
+    - Default edge-failure universe is the temporal union of accepted ISLs
 
     Args:
         cfg: Tier1RolloutConfig with constellation, time, and failure parameters.
@@ -318,34 +329,44 @@ def run_tier1_rollout(
 
     adapter.calculate_isls(**isl_kwargs)
 
-    # 3. Sample persistent failures from t=0 graph
-    # FAILURE SEMANTICS (Step 4 documentation):
-    # - Node failures: sampled from all nodes, persistent across all t.
-    # - Edge failures: sampled from G(t=0).edges() only.
-    #   Edges not visible at t=0 (Earth obscuration) are immune.
-    #   This is a v1 simplification; see module docstring.
-    rng = random.Random(cfg.seed)
-    G0 = adapter.get_graph_at_step(0)
+    if cfg.failure_model not in SUPPORTED_FAILURE_MODELS:
+        raise ValueError(
+            f"Unsupported failure_model '{cfg.failure_model}'. "
+            f"Expected one of {sorted(SUPPORTED_FAILURE_MODELS)}."
+        )
 
-    # Sample failed nodes (persistent hardware failure)
+    graph_steps = list(adapter.iter_graphs())
+    edge_union: set[tuple[int, int]] = set()
+    for _, G_t in graph_steps:
+        for u, v in G_t.edges():
+            edge_union.add((min(u, v), max(u, v)))
+
+    rng = random.Random(cfg.seed)
+
     failed_nodes: set[int] = set()
-    for node in G0.nodes():
+    for node in range(cfg.total_satellites):
         if rng.random() < cfg.node_failure_prob:
             failed_nodes.add(node)
 
-    # Sample failed edges from t=0 edge set only (ISL terminal failure)
-    # NOTE: Edges appearing only at t>0 are implicitly immune (v1 limitation)
+    if cfg.failure_model == FAILURE_MODEL_PERSISTENT_T0_EDGES_V1:
+        edge_failure_universe = (
+            sorted((min(u, v), max(u, v)) for u, v in graph_steps[0][1].edges())
+            if graph_steps
+            else []
+        )
+    else:
+        edge_failure_universe = sorted(edge_union)
+
     failed_edges: set[tuple[int, int]] = set()
-    for u, v in G0.edges():
+    for edge in edge_failure_universe:
         if rng.random() < cfg.edge_failure_prob:
-            # Store as sorted tuple for consistent lookup
-            failed_edges.add((min(u, v), max(u, v)))
+            failed_edges.add(edge)
 
     # 4. Loop over time steps, apply failures, compute metrics
     steps: list[Tier1RolloutStep] = []
     partitioned_flags: list[int] = []
 
-    for t, G_t in adapter.iter_graphs():
+    for t, G_t in graph_steps:
         # Apply persistent node failures
         G_eff = G_t.copy()
         nodes_to_remove = [n for n in failed_nodes if G_eff.has_node(n)]
@@ -428,6 +449,7 @@ def run_tier1_rollout(
         num_steps=num_steps,
         num_failed_nodes=len(failed_nodes),
         num_failed_edges=len(failed_edges),
+        failure_model=cfg.failure_model,
         config_hash=cfg.config_hash(),
     )
     

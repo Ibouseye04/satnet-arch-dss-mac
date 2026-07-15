@@ -44,6 +44,34 @@ class TestMakeSampleCacheKey:
         b = {"num_planes": 4, "extra_field": "ignored"}
         assert make_sample_cache_key(a) == make_sample_cache_key(b)
 
+    def test_isl_policy_changes_key(self) -> None:
+        fixed = {
+            "num_planes": 4,
+            "sats_per_plane": 6,
+            "duration_minutes": 1,
+            "step_seconds": 60,
+            "isl_policy": "grid_fixed",
+            "adjacent_search_k": 1,
+            "max_inter_plane_links_per_sat": 1,
+        }
+        adaptive = dict(fixed)
+        adaptive["isl_policy"] = "grid_adaptive"
+
+        assert make_sample_cache_key(fixed) != make_sample_cache_key(adaptive)
+
+    def test_failure_model_changes_key(self) -> None:
+        t0 = {
+            "num_planes": 4,
+            "sats_per_plane": 6,
+            "duration_minutes": 1,
+            "step_seconds": 60,
+            "failure_model": "persistent_t0_edges_v1",
+        }
+        temporal_union = dict(t0)
+        temporal_union["failure_model"] = "persistent_temporal_union_edges_v1"
+
+        assert make_sample_cache_key(t0) != make_sample_cache_key(temporal_union)
+
 
 class TestSaveLoadGraphSequence:
     def test_roundtrip(self, tmp_path) -> None:

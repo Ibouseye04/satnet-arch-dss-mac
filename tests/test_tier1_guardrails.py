@@ -343,7 +343,8 @@ class TestGraphReconstructionContract:
     
     The contract ensures that:
     1. Dataset exports include failure realization (failed_nodes_json, failed_edges_json)
-    2. Regenerated graphs with failures applied match original labels
+    2. Dataset exports include ISL policy reconstruction fields
+    3. Regenerated graphs with failures applied match original labels
     """
 
     def test_dataset_exports_failure_realization(self) -> None:
@@ -369,11 +370,23 @@ class TestGraphReconstructionContract:
         runs_dicts = runs_to_dicts(runs)
         
         # Verify failure realization columns exist
+        assert "failure_model" in runs_dicts[0], (
+            "Dataset must include failure_model for graph reconstruction semantics"
+        )
         assert "failed_nodes_json" in runs_dicts[0], (
             "Dataset must include failed_nodes_json for graph reconstruction"
         )
         assert "failed_edges_json" in runs_dicts[0], (
             "Dataset must include failed_edges_json for graph reconstruction"
+        )
+        assert "isl_policy" in runs_dicts[0], (
+            "Dataset must include isl_policy for graph reconstruction"
+        )
+        assert "adjacent_search_k" in runs_dicts[0], (
+            "Dataset must include adjacent_search_k for graph reconstruction"
+        )
+        assert "max_inter_plane_links_per_sat" in runs_dicts[0], (
+            "Dataset must include max_inter_plane_links_per_sat for graph reconstruction"
         )
 
     def test_failure_realization_matches_counts(self) -> None:
@@ -465,6 +478,9 @@ class TestGraphReconstructionContract:
             adapter.calculate_isls(
                 duration_minutes=row["duration_minutes"],
                 step_seconds=row["step_seconds"],
+                isl_policy=row.get("isl_policy", "grid_fixed"),
+                adjacent_search_k=row.get("adjacent_search_k", 1),
+                max_inter_plane_links_per_sat=row.get("max_inter_plane_links_per_sat", 1),
             )
             
             # Compute partition_any from reconstructed graphs
@@ -499,38 +515,53 @@ class TestGraphReconstructionContract:
 class TestFailureSemantics:
     """Verify failure semantics are explicit and documented (Step 4)."""
 
-    def test_edge_failures_sampled_from_t0_only(self) -> None:
-        """Edge failures are sampled from t=0 edges only (v1 semantics).
-        
-        This documents the current behavior: edges not present at t=0
-        are implicitly immune to failure sampling.
-        """
+    def test_edge_failures_sampled_from_temporal_union(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Edges absent at t=0 but present later are failure-eligible."""
+        import networkx as nx
+
+        from satnet.network import hypatia_adapter
         from satnet.simulation.tier1_rollout import (
+            FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1,
             Tier1RolloutConfig,
             run_tier1_rollout,
         )
-        
-        # Use larger constellation to ensure edges exist at t=0
+
+        class FakeAdapter:
+            def __init__(self, *args, **kwargs) -> None:
+                self.graphs = []
+                for edges in [[(0, 1)], [(0, 1), (2, 3)]]:
+                    graph = nx.Graph()
+                    graph.add_nodes_from(range(4))
+                    graph.add_edges_from(edges)
+                    self.graphs.append(graph)
+
+            def generate_tles(self) -> None:
+                return None
+
+            def calculate_isls(self, **kwargs) -> None:
+                return None
+
+            def iter_graphs(self):
+                for idx, graph in enumerate(self.graphs):
+                    yield idx, graph.copy()
+
+        monkeypatch.setattr(hypatia_adapter, "HypatiaAdapter", FakeAdapter)
+
         cfg = Tier1RolloutConfig(
-            num_planes=6,
-            sats_per_plane=10,
+            num_planes=1,
+            sats_per_plane=4,
             duration_minutes=1,
             step_seconds=60,
-            edge_failure_prob=1.0,  # 100% failure rate
+            edge_failure_prob=1.0,
             node_failure_prob=0.0,
             seed=42,
         )
-        
-        _, summary, failures = run_tier1_rollout(cfg)
-        
-        # With 100% edge failure prob, all t=0 edges should fail
-        # The number of failed edges should equal the t=0 edge count
-        assert summary.num_failed_edges == len(failures.failed_edges)
-        # Larger constellation should have edges at t=0
-        assert len(failures.failed_edges) > 0, (
-            "Expected edges at t=0 for 6x10 constellation. "
-            "If this fails, the constellation may be too sparse."
-        )
+
+        steps, summary, failures = run_tier1_rollout(cfg)
+
+        assert summary.failure_model == FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1
+        assert failures.failed_edges == {(0, 1), (2, 3)}
+        assert steps[1].num_edges == 0
 
     def test_node_failures_are_persistent(self) -> None:
         """Node failures persist across all time steps."""
@@ -567,7 +598,8 @@ class TestFailureSemantics:
         assert "Failure Semantics" in docstring
         assert "Node Failures" in docstring
         assert "Edge Failures" in docstring
-        assert "t=0" in docstring or "t=0" in docstring
+        assert "temporal union" in docstring
+        assert "persistent_t0_edges_v1" in docstring
 
 
 # ---------------------------------------------------------------------------

@@ -27,11 +27,13 @@ if str(SRC_PATH) not in sys.path:
 
 from satnet.metrics.resilience_targets import ALL_TARGETS, infer_task_type  # noqa: E402
 from satnet.models.risk_model import (  # noqa: E402
+    RF_FEATURE_SET_REGISTRY,
     RiskModelConfig,
     save_model,
     train_rf_model,
 )
 from satnet.utils.experiment_logger import ExperimentLogger  # noqa: E402
+from satnet.utils.split_manifest import read_split_manifest  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,6 +71,19 @@ def parse_args() -> argparse.Namespace:
         help="Output directory for model/metrics/predictions (default: models/)",
     )
     parser.add_argument(
+        "--feature-set", type=str, default="full",
+        choices=sorted(RF_FEATURE_SET_REGISTRY),
+        help="Canonical RF ablation feature set",
+    )
+    parser.add_argument(
+        "--split-manifest", type=str, default=None,
+        help="Optional split manifest JSON to reuse exact train/validation/test rows",
+    )
+    parser.add_argument(
+        "--config-output", type=str, default=None,
+        help="Optional path for exact training configuration JSON",
+    )
+    parser.add_argument(
         "--experiment-log", type=str, default=None,
         help="JSONL experiment log path (default: experiments/rf_log.jsonl)",
     )
@@ -101,6 +116,7 @@ def main() -> None:
 
     task_type = infer_task_type(args.target_name)
     print(f"Target: {args.target_name} ({task_type})")
+    split_manifest = read_split_manifest(Path(args.split_manifest)) if args.split_manifest else None
 
     n_estimators = args.n_estimators
     test_size = args.test_size
@@ -125,12 +141,16 @@ def main() -> None:
         exp_log.set("seed", args.seed)
         exp_log.set("data_path", str(data_path))
         exp_log.set("smoke", bool(args.smoke))
+        exp_log.set("feature_set", args.feature_set)
+        exp_log.set("split_manifest", str(args.split_manifest) if args.split_manifest else None)
 
         exp_log.start_timer("training")
         model, metrics, predictions = train_rf_model(
             csv_path=data_path,
             target_name=args.target_name,
             cfg=cfg,
+            feature_set_name=args.feature_set,
+            split_manifest=split_manifest,
         )
         exp_log.stop_timer("training")
 
@@ -146,6 +166,9 @@ def main() -> None:
         feature_importance_path = out_dir / f"{base_name}_feature_importance.csv"
         confusion_matrix_path = out_dir / f"{base_name}_confusion_matrix.png"
         prediction_plot_path = out_dir / f"{base_name}_prediction_vs_actual.png"
+        config_path = Path(args.config_output) if args.config_output else out_dir / f"{base_name}_config.json"
+        if not config_path.is_absolute():
+            config_path = PROJECT_ROOT / config_path
 
         save_model(model, model_path)
 
@@ -175,6 +198,32 @@ def main() -> None:
         exp_log.set("model_path", str(model_path))
         exp_log.set("prediction_path", str(preds_path))
         exp_log.set("feature_importance_path", str(feature_importance_path))
+        exp_log.set("config_path", str(config_path))
+
+    config_payload = {
+        "model_type": "RandomForest",
+        "target_name": args.target_name,
+        "task_type": task_type,
+        "seed": args.seed,
+        "data_path": str(data_path),
+        "feature_set": args.feature_set,
+        "feature_columns": metrics.get("feature_columns", []),
+        "feature_count": metrics.get("feature_count", 0),
+        "test_size": test_size,
+        "val_size": val_size,
+        "n_estimators": n_estimators,
+        "max_depth": cfg.max_depth,
+        "split_strategy": metrics.get("split_strategy"),
+        "split_indices": metrics.get("split_indices"),
+        "split_manifest": str(args.split_manifest) if args.split_manifest else None,
+        "model_path": str(model_path),
+        "metrics_path": str(metrics_path),
+        "prediction_path": str(preds_path),
+    }
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    with config_path.open("w") as f:
+        json.dump(config_payload, f, indent=2, default=str)
+    print(f"Configuration written to {config_path}")
 
     # Save metrics JSON
     out_dir.mkdir(parents=True, exist_ok=True)

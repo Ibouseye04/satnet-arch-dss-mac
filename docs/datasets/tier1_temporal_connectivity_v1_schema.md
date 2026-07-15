@@ -27,10 +27,13 @@ The dataset consists of two tables:
 | `inclination_deg` | float | ✓ | Orbital inclination in degrees |
 | `altitude_km` | float | ✓ | Orbital altitude in km |
 | `node_failure_prob` | float | ✓ | Node failure probability used for this run |
-| `edge_failure_prob` | float | ✓ | Edge failure probability used for this run |
+| `edge_failure_prob` | float | ✓ | Probability that an accepted undirected satellite-pair ISL appearing at least once during the run is persistently unavailable |
 | `duration_minutes` | int | ✓ | Simulation duration in minutes |
 | `step_seconds` | int | ✓ | Time step interval in seconds |
 | `num_steps` | int | ✓ | Number of time steps in this run |
+| `isl_policy` | str | ✓ | ISL topology policy used to generate this run (`grid_fixed` or `grid_adaptive`) |
+| `adjacent_search_k` | int | ✓ | Adjacent-plane satellite index search radius used by adaptive ISL construction |
+| `max_inter_plane_links_per_sat` | int | ✓ | Maximum accepted inter-plane links per satellite used by ISL construction |
 | `gcc_frac_min` | float | ✓ | Minimum GCC fraction across all time steps |
 | `gcc_frac_mean` | float | ✓ | Mean GCC fraction across all time steps |
 | `partition_fraction` | float | ✓ | Fraction of sampled states with threshold-based partition status |
@@ -39,7 +42,8 @@ The dataset consists of two tables:
 | `max_partition_streak_seconds` | int | ✓ | Sampled-state streak converted to physical-time-equivalent seconds using `step_seconds` |
 | `max_partition_streak_fraction` | float | ✓ | Longest threshold-breach sampled-state run divided by total sampled states |
 | `num_failed_nodes` | int | ✓ | Number of nodes that failed (persistent) |
-| `num_failed_edges` | int | ✓ | Number of edges that failed (from t=0) |
+| `num_failed_edges` | int | ✓ | Number of persistently failed edge pairs sampled from the configured failure universe |
+| `failure_model` | str | ✓ | Edge-failure sampling semantics (`persistent_temporal_union_edges_v1` for new datasets; legacy CSVs without this field are interpreted as `persistent_t0_edges_v1`) |
 | `failed_nodes_json` | str | ✓ | JSON array of failed node IDs, e.g. `"[1, 5, 12]"` |
 | `failed_edges_json` | str | ✓ | JSON array of failed edge tuples, e.g. `"[[0,1], [3,4]]"` |
 | `seed` | int | ✓ | Random seed used for this run |
@@ -64,7 +68,8 @@ The dataset consists of two tables:
 - `num_failed_nodes`, `num_failed_edges`
 
 **Graph Reconstruction Columns** (for ML pipeline):
-- `failed_nodes_json`, `failed_edges_json`
+- `failure_model`, `failed_nodes_json`, `failed_edges_json`
+- `isl_policy`, `adjacent_search_k`, `max_inter_plane_links_per_sat`
 
 **Metadata**:
 - `run_id`, `seed`, `config_hash`, `schema_version`, `dataset_version`
@@ -93,6 +98,8 @@ The dataset consists of two tables:
    - `gcc_frac`, `gcc_frac_min`, `gcc_frac_mean`: [0.0, 1.0]
    - `partition_fraction`, `max_partition_streak_fraction`: [0.0, 1.0]
    - `partition_any`, `partitioned`: {0, 1}
+   - `isl_policy`: `grid_fixed` or `grid_adaptive`
+   - `adjacent_search_k`, `max_inter_plane_links_per_sat`: integers ≥ 1
    - `num_steps`, `num_nodes`, `num_edges`: ≥ 0
 3. **Referential Integrity**: All `run_id` values in steps table must exist in runs table.
 4. **Schema Version**: Must equal 1 for this schema version.
@@ -104,6 +111,7 @@ The dataset consists of two tables:
 Each run is reproducible given:
 - `config_hash`: Deterministic hash of all configuration parameters
 - `seed`: Random seed used for failure sampling
+- `failure_model`: Edge-failure sampling semantics identifier
 - Code version (git SHA recommended)
 
 Rerunning with identical config + seed must produce bit-identical outputs.
@@ -116,7 +124,7 @@ To reconstruct the exact graph sequence for ML training:
 
 1. **Parse epoch**: Use `epoch_iso` (or `DEFAULT_EPOCH_ISO` if missing)
 2. **Create adapter**: `HypatiaAdapter(num_planes, sats_per_plane, inclination_deg, altitude_km, epoch=epoch)`
-3. **Calculate ISLs**: `adapter.calculate_isls(duration_minutes, step_seconds)`
+3. **Calculate ISLs**: `adapter.calculate_isls(duration_minutes, step_seconds, isl_policy=isl_policy, adjacent_search_k=adjacent_search_k, max_inter_plane_links_per_sat=max_inter_plane_links_per_sat)`
 4. **Parse failures**: `Tier1FailureRealization.from_json_strings(failed_nodes_json, failed_edges_json)`
 5. **Apply failures at each step**:
    ```python
@@ -128,6 +136,10 @@ To reconstruct the exact graph sequence for ML training:
                G_eff.remove_edge(u, v)
        # G_eff is now the effective graph at time t
    ```
+
+TGNN graph reconstruction uses the ISL policy fields stored in the run CSV so the graph sequence used as model input matches the topology policy used to compute the target. Old CSVs without these fields are treated as `grid_fixed`, `adjacent_search_k=1`, and `max_inter_plane_links_per_sat=1` by the TGNN loader for backward compatibility.
+
+Edge failures are realized during dataset generation and are not resampled during graph reconstruction. For new datasets, `persistent_temporal_union_edges_v1` means `failed_edges_json` was sampled from the temporal union of accepted graph edges across all sampled timesteps. Legacy CSVs without `failure_model` are interpreted as `persistent_t0_edges_v1`, where `failed_edges_json` was sampled only from accepted graph edges at `t=0`.
 
 This ensures regenerated graphs match the `partition_any` labels from simulation. SATNET samples inclusive temporal states at `t = 0, step_seconds, ..., duration_seconds`; `max_partition_streak_seconds` is derived from sampled-state spacing and is not reconstructed from exact continuous-time failure onset or recovery boundaries.
 
@@ -163,6 +175,8 @@ steps_dicts = steps_to_dicts(steps)
 
 ## Changelog
 
+- **v1.4** (2026-07): Added `failure_model` and changed newly generated datasets to persistent temporal-union edge failures (`persistent_temporal_union_edges_v1`); legacy CSVs without `failure_model` remain `persistent_t0_edges_v1`.
+- **v1.3** (2026-07): Added `isl_policy`, `adjacent_search_k`, and `max_inter_plane_links_per_sat` so TGNN graph reconstruction preserves the topology policy used to generate run-level targets.
 - **v1.2** (2026-07): Added `max_partition_streak_seconds` and `max_partition_streak_fraction` for physical-time-equivalent and normalized persistence targets.
 - **v1.1** (2026-01): Added `failed_nodes_json` and `failed_edges_json` for graph reconstruction contract (Step 3).
 - **v1** (2025-12): Initial schema for Tier 1 temporal connectivity with GCC-based labels.

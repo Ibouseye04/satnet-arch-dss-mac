@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_CACHE_DIR = "artifacts/graph_cache"
 
 # Backward-incompatible cache contract version.
-CACHE_SCHEMA_VERSION = 2
+CACHE_SCHEMA_VERSION = 4
 
 # Only target-agnostic payloads are supported.
 PAYLOAD_MODE_TARGET_AGNOSTIC = "target_agnostic"
@@ -55,8 +55,12 @@ _CACHE_KEY_FIELDS = (
     "duration_minutes",
     "step_seconds",
     "max_isl_distance_km",
+    "isl_policy",
+    "adjacent_search_k",
+    "max_inter_plane_links_per_sat",
     "node_failure_prob",
     "edge_failure_prob",
+    "failure_model",
     "seed",
     "epoch_iso",
     "failed_nodes_json",

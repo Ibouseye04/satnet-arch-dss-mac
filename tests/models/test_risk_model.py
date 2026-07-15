@@ -102,6 +102,49 @@ class TestModelSerialization:
         assert model_path.exists()
 
 
+class TestRfFeatureSets:
+    def test_full_feature_set_matches_canonical_allowlist(self) -> None:
+        from satnet.models.risk_model import TIER1_V1_FEATURE_COLUMNS, get_rf_feature_columns
+
+        assert get_rf_feature_columns("full") == TIER1_V1_FEATURE_COLUMNS
+
+    def test_architecture_only_excludes_failure_probabilities(self) -> None:
+        from satnet.models.risk_model import get_rf_feature_columns
+
+        columns = get_rf_feature_columns("architecture_only")
+        assert "node_failure_prob" not in columns
+        assert "edge_failure_prob" not in columns
+        assert "altitude_km" in columns
+        assert "inclination_deg" in columns
+
+    def test_no_geometry_excludes_altitude_and_inclination(self) -> None:
+        from satnet.models.risk_model import get_rf_feature_columns
+
+        columns = get_rf_feature_columns("no_geometry")
+        assert "altitude_km" not in columns
+        assert "inclination_deg" not in columns
+        assert "node_failure_prob" in columns
+        assert "edge_failure_prob" in columns
+
+    def test_feature_sets_contain_no_targets_or_outcome_fields(self) -> None:
+        from satnet.models.risk_model import RF_FEATURE_SET_REGISTRY, validate_rf_feature_columns
+
+        for columns in RF_FEATURE_SET_REGISTRY.values():
+            validate_rf_feature_columns(columns)
+
+    def test_unknown_feature_set_fails_clearly(self) -> None:
+        from satnet.models.risk_model import get_rf_feature_columns
+
+        with pytest.raises(ValueError, match="Unknown RF feature set"):
+            get_rf_feature_columns("bad")
+
+    def test_leakage_feature_validation_fails_clearly(self) -> None:
+        from satnet.models.risk_model import validate_rf_feature_columns
+
+        with pytest.raises(ValueError, match="outcome/leakage"):
+            validate_rf_feature_columns(["partition_any"])
+
+
 class TestRfPredictionSchema:
     """Tests for stable RF prediction export fields."""
 
@@ -130,7 +173,7 @@ class TestRfPredictionSchema:
         pd.DataFrame(rows).to_csv(csv_path, index=False)
 
         cfg = RiskModelConfig(test_size=0.25, random_state=42, n_estimators=10)
-        _, _, predictions = train_rf_model(
+        _, metrics, predictions = train_rf_model(
             csv_path=csv_path,
             target_name="partition_any",
             cfg=cfg,
@@ -150,6 +193,9 @@ class TestRfPredictionSchema:
         assert set(predictions["target_name"]) == {"partition_any"}
         assert set(predictions["task_type"]) == {"classification"}
         assert {"train", "val", "test"}.issubset(set(predictions["split"]))
+        assert metrics["feature_set"] == "full"
+        assert metrics["feature_columns"]
+        assert metrics["feature_count"] == len(metrics["feature_columns"])
 
         split_run_ids = {
             split: set(predictions.loc[predictions["split"] == split, "run_id"])

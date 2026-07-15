@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from argparse import Namespace
+import json
+import warnings
 
 import pandas as pd
 import pytest
@@ -33,6 +35,71 @@ class _DummyRegressionModel:
     def __call__(self, data_sequence):
         true_val = float(data_sequence[0].y.item())
         return torch.tensor([true_val + 0.05], dtype=torch.float)
+
+
+def test_normalize_regression_loss_tensors_handles_single_sample() -> None:
+    import scripts.train_gnn_model as train_gnn
+
+    prediction = torch.zeros((1, 1), dtype=torch.float)
+    target = torch.zeros((1,), dtype=torch.float)
+
+    pred_for_loss, target_for_loss = train_gnn.normalize_regression_loss_tensors(
+        prediction,
+        target,
+    )
+
+    assert pred_for_loss.shape == torch.Size([1])
+    assert target_for_loss.shape == torch.Size([1])
+    nn.SmoothL1Loss()(pred_for_loss, target_for_loss)
+
+
+def test_normalize_regression_loss_tensors_avoids_broadcast_warning() -> None:
+    import scripts.train_gnn_model as train_gnn
+
+    prediction = torch.zeros((1, 1), dtype=torch.float)
+    target = torch.zeros((1,), dtype=torch.float)
+    criterion = nn.SmoothL1Loss()
+
+    pred_for_loss, target_for_loss = train_gnn.normalize_regression_loss_tensors(
+        prediction,
+        target,
+    )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        criterion(pred_for_loss, target_for_loss)
+
+    assert not any("Using a target size" in str(item.message) for item in caught)
+
+
+def test_normalize_regression_loss_tensors_is_batch_compatible() -> None:
+    import scripts.train_gnn_model as train_gnn
+
+    prediction = torch.zeros((4, 1), dtype=torch.float)
+    target = torch.zeros((4,), dtype=torch.float)
+    criterion = nn.SmoothL1Loss()
+
+    pred_for_loss, target_for_loss = train_gnn.normalize_regression_loss_tensors(
+        prediction,
+        target,
+    )
+
+    assert pred_for_loss.shape == torch.Size([4])
+    assert target_for_loss.shape == torch.Size([4])
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        criterion(pred_for_loss, target_for_loss)
+
+    assert not any("Using a target size" in str(item.message) for item in caught)
+
+
+def test_classification_loss_shape_contract_remains_valid() -> None:
+    output = torch.zeros((1, 2), dtype=torch.float)
+    target = torch.tensor([1], dtype=torch.long)
+
+    assert output.shape == torch.Size([1, 2])
+    assert target.shape == torch.Size([1])
+    nn.CrossEntropyLoss()(output, target)
 
 
 def test_regression_evaluate_returns_expected_metrics() -> None:
@@ -129,8 +196,10 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
             hidden_channels: int,
             out_channels: int,
             task_type: str,
+            cheb_k: int,
         ) -> None:
             super().__init__()
+            assert cheb_k == 2
             self.task_type = task_type
             self.layer = nn.Linear(1, 1)
 
@@ -138,12 +207,14 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
             _ = data_list
             return torch.tensor([[0.1, 0.9]], dtype=torch.float)
 
-    def fake_train_epoch(model, train_indices, dataset, optimizer, criterion, device):  # noqa: ANN001
+    def fake_train_epoch(model, train_indices, dataset, optimizer, criterion, device, input_mode="full"):  # noqa: ANN001
         _ = (model, train_indices, dataset, optimizer, criterion, device)
+        assert input_mode == "full"
         return 0.1, 1.0
 
-    def fake_evaluate(model, test_indices, dataset, criterion, device):  # noqa: ANN001
+    def fake_evaluate(model, test_indices, dataset, criterion, device, input_mode="full"):  # noqa: ANN001
         _ = (model, test_indices, dataset, criterion, device)
+        assert input_mode == "full"
         return 0.1, 1.0, {
             "precision": 1.0,
             "recall": 1.0,
@@ -160,6 +231,7 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         epochs=1,
         lr=0.01,
         hidden_dim=16,
+        cheb_k=2,
         test_split=0.5,
         val_split=0.25,
         seed=123,
@@ -169,6 +241,9 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
         write_cache=False,
         cache_dir=str(tmp_path / "cache"),
         target_name="partition_any",
+        input_mode="full",
+        split_manifest=None,
+        config_output=None,
         experiment_log=str(tmp_path / "experiments" / "gnn_log.jsonl"),
         metrics_output=None,
         subset=None,
@@ -197,6 +272,14 @@ def test_prediction_export_schema_contains_stable_fields(tmp_path, monkeypatch) 
     }
     assert required_columns.issubset(df.columns)
     assert {"train", "val", "test"}.issubset(set(df["split"]))
+    assert set(df["cheb_k"]) == {2}
+
+    metrics = json.loads((output_model.parent / f"{output_model.stem}_metrics.json").read_text())
+    config = json.loads((output_model.parent / f"{output_model.stem}_config.json").read_text())
+    checkpoint = torch.load(output_model, map_location="cpu", weights_only=False)
+    assert metrics["cheb_k"] == 2
+    assert config["cheb_k"] == 2
+    assert checkpoint["cheb_k"] == 2
 
 
 @pytest.mark.parametrize("bad_config_hash", [None, "", "   "])
@@ -251,8 +334,10 @@ def test_prediction_export_rejects_invalid_config_hash(
             hidden_channels: int,
             out_channels: int,
             task_type: str,
+            cheb_k: int,
         ) -> None:
             super().__init__()
+            assert cheb_k == 2
             self.task_type = task_type
             self.layer = nn.Linear(1, 1)
 
@@ -266,6 +351,7 @@ def test_prediction_export_rejects_invalid_config_hash(
         epochs=1,
         lr=0.01,
         hidden_dim=16,
+        cheb_k=2,
         test_split=0.5,
         val_split=0.25,
         seed=123,
@@ -275,6 +361,9 @@ def test_prediction_export_rejects_invalid_config_hash(
         write_cache=False,
         cache_dir=str(tmp_path / "cache"),
         target_name="partition_any",
+        input_mode="full",
+        split_manifest=None,
+        config_output=None,
         experiment_log=str(tmp_path / "experiments" / "gnn_log.jsonl"),
         metrics_output=None,
         subset=None,

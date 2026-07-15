@@ -101,6 +101,25 @@ def parse_args() -> argparse.Namespace:
         help="Time step interval in seconds",
     )
     parser.add_argument(
+        "--isl-policy",
+        type=str,
+        choices=["grid_fixed", "grid_adaptive"],
+        default="grid_adaptive",
+        help="ISL topology policy",
+    )
+    parser.add_argument(
+        "--adjacent-search-k",
+        type=int,
+        default=1,
+        help="Adjacent-plane satellite index search radius for adaptive ISLs",
+    )
+    parser.add_argument(
+        "--max-inter-plane-links-per-sat",
+        type=int,
+        default=1,
+        help="Maximum accepted inter-plane links per satellite",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=42,
@@ -128,13 +147,13 @@ def parse_args() -> argparse.Namespace:
         "--edge-failure-min",
         type=float,
         default=0.0,
-        help="Minimum edge failure probability",
+        help="Minimum probability that an accepted satellite-pair ISL appearing at least once during the run is persistently unavailable",
     )
     parser.add_argument(
         "--edge-failure-max",
         type=float,
         default=0.3,
-        help="Maximum edge failure probability",
+        help="Maximum probability that an accepted satellite-pair ISL appearing at least once during the run is persistently unavailable",
     )
     parser.add_argument(
         "--smoke",
@@ -171,6 +190,9 @@ def main() -> None:
         altitude_km_range=(args.altitude_min, args.altitude_max),
         duration_minutes=args.duration,
         step_seconds=args.step_seconds,
+        isl_policy=args.isl_policy,
+        adjacent_search_k=args.adjacent_search_k,
+        max_inter_plane_links_per_sat=args.max_inter_plane_links_per_sat,
         gcc_threshold=0.8,
         node_failure_prob_range=(args.node_failure_min, args.node_failure_max),
         edge_failure_prob_range=(args.edge_failure_min, args.edge_failure_max),
@@ -184,6 +206,12 @@ def main() -> None:
     print(f"  Altitude: {cfg.altitude_km_range[0]:.0f}-{cfg.altitude_km_range[1]:.0f} km")
     print(f"  Inclination: {cfg.inclination_deg_range[0]:.0f}-{cfg.inclination_deg_range[1]:.0f} deg")
     print(f"  Duration: {cfg.duration_minutes} min @ {cfg.step_seconds}s steps")
+    print(
+        "  ISL policy: "
+        f"{cfg.isl_policy} "
+        f"(adjacent_search_k={cfg.adjacent_search_k}, "
+        f"max_inter_plane_links_per_sat={cfg.max_inter_plane_links_per_sat})"
+    )
     print(
         "  Failure probabilities: "
         f"node={cfg.node_failure_prob_range}, edge={cfg.edge_failure_prob_range}"
