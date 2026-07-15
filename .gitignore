@@ -37,3 +37,18 @@ Thumbs.db
 
 # Codex/agent artifacts
 .desloppify/
+
+# WSL environment
+.venv-wsl/
+
+# Generated experiment outputs
+artifacts/ablation/
+artifacts/validation/
+artifacts/frozen/
+artifacts/smoke/gnn/
+
+# PyTorch Geometric processed cache
+data/processed/
+
+# Generated smoke-test artifacts
+artifacts/smoke/
