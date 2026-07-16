@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import math
@@ -12,6 +13,17 @@ def canonical_float_string(value: float) -> str:
         raise ValueError("Canonical floats must be finite")
     normalized = 0.0 if value == 0.0 else value
     return format(normalized, ".17g")
+
+
+def canonical_utc_timestamp(value: datetime) -> str:
+    if not isinstance(value, datetime):
+        raise TypeError("Timestamp must be a datetime")
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("Timestamp must be timezone-aware")
+    if value.utcoffset() != timedelta(0):
+        raise ValueError("Timestamp must be normalized to UTC")
+    normalized = value.astimezone(timezone.utc)
+    return normalized.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 def canonical_station_name(value: str) -> str:
