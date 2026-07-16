@@ -63,6 +63,16 @@ from satnet.ground.selection import (
     build_region_balanced_order,
     select_ground_stations,
 )
+from satnet.ground.service_metrics import (
+    GroundServiceStepMetrics,
+    compute_ground_service_step,
+    validate_ground_service_step_context,
+)
+from satnet.ground.service_policy import (
+    GROUND_SERVICE_MODEL_VERSION,
+    GROUND_SERVICE_POLICY_VERSION,
+    GroundServicePolicy,
+)
 from satnet.ground.visibility import (
     GEOMETRY_TEST_ABS_TOL,
     MIN_VALID_SLANT_RANGE_KM,
@@ -90,6 +100,8 @@ __all__ = [
     "INTEGRATED_GRAPH_MODEL_VERSION",
     "INTEGRATED_GRAPH_SCHEMA_VERSION",
     "GROUND_DESIGN_SCHEMA_VERSION",
+    "GROUND_SERVICE_MODEL_VERSION",
+    "GROUND_SERVICE_POLICY_VERSION",
     "GROUND_STATION_SELECTION_VERSION",
     "GROUND_VISIBILITY_FRAME_CONTRACT_VERSION",
     "GROUND_VISIBILITY_MODEL_VERSION",
@@ -111,6 +123,8 @@ __all__ = [
     "GroundRunDesignRecord",
     "GroundSegmentDisabledConfig",
     "GroundSegmentEnabledConfig",
+    "GroundServicePolicy",
+    "GroundServiceStepMetrics",
     "GroundStation",
     "GroundStationCatalog",
     "GroundStationClass",
@@ -130,6 +144,7 @@ __all__ = [
     "build_region_balanced_order",
     "canonicalize_attributes",
     "calculate_topocentric_geometry",
+    "compute_ground_service_step",
     "create_integrated_graph_snapshot",
     "evaluate_ground_design_visibility",
     "evaluate_ground_design_visibility_sequence",
@@ -149,6 +164,7 @@ __all__ = [
     "select_ground_stations",
     "validate_manifest_against_satellite_runs",
     "validate_satellite_projection",
+    "validate_ground_service_step_context",
     "validate_visibility_edge_equality",
     "validate_visibility_records_against_sources",
     "validate_production_catalog_readiness",
