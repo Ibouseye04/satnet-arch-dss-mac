@@ -16,7 +16,7 @@ from satnet.experiments.integrated_ground_manifest import (
     read_pilot_design_manifest,
     read_pilot_run_manifest,
 )
-from satnet.ground.canonical import canonical_hash, canonical_json
+from satnet.ground.canonical import canonical_float_string, canonical_hash
 from satnet.ground.catalog import GroundStationCatalog, load_ground_station_catalog
 from satnet.ground.failure_policy import GroundFailurePolicy
 from satnet.ground.failure_service_persistence import (
@@ -103,6 +103,67 @@ RUNTIME_FIELDS = (
     "persistence_seconds",
     "total_generation_seconds",
 )
+CONFIG_FLOAT_FIELDS = frozenset(
+    {
+        "inclination_deg",
+        "altitude_km",
+        "max_isl_distance_km",
+        "gcc_threshold",
+        "node_failure_prob",
+        "edge_failure_prob",
+    }
+)
+STEP_FLOAT_FIELDS = frozenset(
+    {"gcc_frac", "gcc_frac_original", "gcc_frac_surviving"}
+)
+SUMMARY_FLOAT_FIELDS = frozenset(
+    {
+        "gcc_frac_min",
+        "gcc_frac_mean",
+        "gcc_frac_min_original",
+        "gcc_frac_mean_original",
+        "gcc_frac_min_surviving",
+        "gcc_frac_mean_surviving",
+        "partition_fraction",
+        "max_partition_streak_fraction",
+    }
+)
+
+
+def pilot_json(value: object) -> str:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+def _canonical_float_fields(
+    value: Mapping[str, object], float_fields: frozenset[str]
+) -> dict[str, object]:
+    return {
+        name: canonical_float_string(field_value)
+        if name in float_fields
+        else field_value
+        for name, field_value in value.items()
+    }
+
+
+def _parse_float_fields(
+    value: Mapping[str, object], float_fields: frozenset[str]
+) -> dict[str, object]:
+    result = dict(value)
+    for name in float_fields:
+        raw = result[name]
+        if not isinstance(raw, str):
+            raise TypeError(f"{name} must be a canonical float string")
+        parsed = float(raw)
+        if canonical_float_string(parsed) != raw:
+            raise ValueError(f"{name} is not a canonical float string")
+        result[name] = parsed
+    return result
 
 
 @dataclass(frozen=True)
@@ -154,14 +215,19 @@ class PilotSatelliteArtifact:
 
     def scientific_payload(self) -> dict[str, object]:
         return {
-            "config": asdict(self.config),
+            "config": _canonical_float_fields(asdict(self.config), CONFIG_FLOAT_FIELDS),
             "config_hash": self.config.config_hash(),
             "failed_edges": [list(edge) for edge in sorted(self.failure_realization.failed_edges)],
             "failed_nodes": sorted(self.failure_realization.failed_nodes),
             "identity_domain": PILOT_SATELLITE_ARTIFACT_DOMAIN,
             "identity_version": PILOT_SATELLITE_ARTIFACT_VERSION,
-            "steps": [asdict(step) for step in self.steps],
-            "summary": asdict(self.summary),
+            "steps": [
+                _canonical_float_fields(asdict(step), STEP_FLOAT_FIELDS)
+                for step in self.steps
+            ],
+            "summary": _canonical_float_fields(
+                asdict(self.summary), SUMMARY_FLOAT_FIELDS
+            ),
         }
 
     def to_manifest_object(self) -> dict[str, object]:
@@ -183,14 +249,16 @@ def make_pilot_satellite_artifact(
     failure_realization: Tier1FailureRealization,
 ) -> PilotSatelliteArtifact:
     values = {
-        "config": asdict(config),
+        "config": _canonical_float_fields(asdict(config), CONFIG_FLOAT_FIELDS),
         "config_hash": config.config_hash(),
         "failed_edges": [list(edge) for edge in sorted(failure_realization.failed_edges)],
         "failed_nodes": sorted(failure_realization.failed_nodes),
         "identity_domain": PILOT_SATELLITE_ARTIFACT_DOMAIN,
         "identity_version": PILOT_SATELLITE_ARTIFACT_VERSION,
-        "steps": [asdict(step) for step in steps],
-        "summary": asdict(summary),
+        "steps": [
+            _canonical_float_fields(asdict(step), STEP_FLOAT_FIELDS) for step in steps
+        ],
+        "summary": _canonical_float_fields(asdict(summary), SUMMARY_FLOAT_FIELDS),
     }
     artifact_hash = canonical_hash(values)
     record_hash = canonical_hash(
@@ -250,7 +318,7 @@ def write_pilot_satellite_artifact(
         raise ValueError("Satellite artifact must use .json")
     _atomic_write(
         output,
-        canonical_json(artifact.to_manifest_object()) + "\n",
+        pilot_json(artifact.to_manifest_object()) + "\n",
         overwrite=overwrite,
     )
 
@@ -304,7 +372,9 @@ def read_pilot_satellite_artifact(path: str | Path) -> PilotSatelliteArtifact:
     config_fields = {field.name for field in fields(Tier1RolloutConfig)}
     if not isinstance(payload["config"], dict) or set(payload["config"]) != config_fields:
         raise ValueError("Satellite config fields are invalid")
-    config = Tier1RolloutConfig(**payload["config"])
+    config = Tier1RolloutConfig(
+        **_parse_float_fields(payload["config"], CONFIG_FLOAT_FIELDS)
+    )
     if payload["config_hash"] != config.config_hash():
         raise ValueError("Satellite persisted config hash mismatch")
     step_fields = {field.name for field in fields(Tier1RolloutStep)}
@@ -314,11 +384,15 @@ def read_pilot_satellite_artifact(path: str | Path) -> PilotSatelliteArtifact:
     for source in payload["steps"]:
         if not isinstance(source, dict) or set(source) != step_fields:
             raise ValueError("Satellite step fields are invalid")
-        steps.append(Tier1RolloutStep(**source))
+        steps.append(
+            Tier1RolloutStep(**_parse_float_fields(source, STEP_FLOAT_FIELDS))
+        )
     summary_fields = {field.name for field in fields(Tier1RolloutSummary)}
     if not isinstance(payload["summary"], dict) or set(payload["summary"]) != summary_fields:
         raise ValueError("Satellite summary fields are invalid")
-    summary = Tier1RolloutSummary(**payload["summary"])
+    summary = Tier1RolloutSummary(
+        **_parse_float_fields(payload["summary"], SUMMARY_FLOAT_FIELDS)
+    )
     if not isinstance(payload["failed_nodes"], list) or any(
         type(item) is not int for item in payload["failed_nodes"]
     ):
@@ -748,13 +822,13 @@ def generate_pilot_run(
         for name in RUNTIME_FIELDS
     ):
         raise RuntimeError("Pilot generation produced invalid runtime evidence")
-    _atomic_write(paths["runtime"], canonical_json(runtime) + "\n")
+    _atomic_write(paths["runtime"], pilot_json(runtime) + "\n")
     _atomic_write(
         paths["log"],
-        "\n".join(canonical_json(value) for value in stage_events) + "\n",
+        "\n".join(pilot_json(value) for value in stage_events) + "\n",
     )
     inventory = _artifact_inventory(paths)
-    _atomic_write(paths["inventory"], canonical_json(inventory) + "\n")
+    _atomic_write(paths["inventory"], pilot_json(inventory) + "\n")
     summary = extract_run_summary(
         design=design,
         run=run,
@@ -767,7 +841,7 @@ def generate_pilot_run(
         runtime=runtime,
         artifact_bytes=inventory["canonical_artifact_bytes"],
     )
-    _atomic_write(paths["summary"], canonical_json(summary) + "\n")
+    _atomic_write(paths["summary"], pilot_json(summary) + "\n")
     return summary
 
 
@@ -855,7 +929,7 @@ def run_pilot_manifest(
             root.mkdir(parents=True, exist_ok=True)
             failure_path = root / "generation_failure.json"
             if not failure_path.exists():
-                _atomic_write(failure_path, canonical_json(failures[-1]) + "\n")
+                _atomic_write(failure_path, pilot_json(failures[-1]) + "\n")
     result = {
         "attempted_run_count": len(selected),
         "expected_manifest_run_count": len(runs),
@@ -875,5 +949,5 @@ def run_pilot_manifest(
         if not resume:
             raise FileExistsError(f"Generation summary already exists: {summary_path}")
     else:
-        _atomic_write(summary_path, canonical_json(result) + "\n")
+        _atomic_write(summary_path, pilot_json(result) + "\n")
     return result
