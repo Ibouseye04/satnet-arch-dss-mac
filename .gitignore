@@ -28,6 +28,12 @@ experiments/
 !docs/experiments/**
 !scripts/experiments/
 !scripts/experiments/**
+!src/satnet/experiments/
+!src/satnet/experiments/**
+!tests/experiments/
+!tests/experiments/**
+artifacts/integrated_ground_pilot_25/runs/
+artifacts/integrated_ground_pilot_25/repeats/
 
 # Models (optional)
 models/*.joblib
