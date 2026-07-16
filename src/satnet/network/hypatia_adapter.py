@@ -27,7 +27,7 @@ import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Literal, Optional, Set, Tuple
 
 import networkx as nx
 import numpy as np
@@ -43,7 +43,7 @@ try:
     SGP4_AVAILABLE = True
 except ImportError:
     SGP4_AVAILABLE = False
-    logger.warning("sgp4 not available. Using simplified Keplerian model.")
+    logger.warning("sgp4 not available. Canonical SGP4 propagation is unavailable.")
 
 # Try to import satgenpy modules
 try:
@@ -481,6 +481,31 @@ def _generate_tle_lines(
 # Satellite Position Computation (Tier 1 - SGP4 Orbital Engine)
 # ---------------------------------------------------------------------------
 
+OrbitalEngine = Literal["sgp4", "keplerian"]
+ORBITAL_ENGINE_SGP4: OrbitalEngine = "sgp4"
+ORBITAL_ENGINE_KEPLERIAN: OrbitalEngine = "keplerian"
+SUPPORTED_ORBITAL_ENGINES = frozenset({ORBITAL_ENGINE_SGP4, ORBITAL_ENGINE_KEPLERIAN})
+
+
+class OrbitalEngineUnavailableError(RuntimeError):
+    def __init__(self, orbital_engine: OrbitalEngine) -> None:
+        self.orbital_engine = orbital_engine
+        super().__init__(
+            f"Orbital engine '{orbital_engine}' is unavailable; canonical execution requires SGP4."
+        )
+
+
+class SGP4PropagationError(RuntimeError):
+    def __init__(self, sat_id: int, target_time: datetime, error_code: int) -> None:
+        self.sat_id = sat_id
+        self.target_time = target_time
+        self.error_code = error_code
+        super().__init__(
+            "SGP4 propagation failed for "
+            f"satellite {sat_id} at {target_time.isoformat()} with error code {error_code}."
+        )
+
+
 @dataclass
 class SatellitePosition:
     """3D position of a satellite in ECEF coordinates."""
@@ -512,7 +537,7 @@ def _compute_satellite_positions_sgp4(
         List of SatellitePosition objects in ECEF frame
     """
     if not SGP4_AVAILABLE:
-        raise RuntimeError("SGP4 library not available. Install with: pip install sgp4")
+        raise OrbitalEngineUnavailableError(ORBITAL_ENGINE_SGP4)
     
     positions = []
     
@@ -541,14 +566,11 @@ def _compute_satellite_positions_sgp4(
         error, r_teme, v_teme = satellite.sgp4(jd, fr)
         
         if error != 0:
-            # SGP4 propagation error - use fallback position at origin
-            # This shouldn't happen with valid TLEs
-            positions.append(SatellitePosition(
+            raise SGP4PropagationError(
                 sat_id=sat_id,
-                x_km=0.0, y_km=0.0, z_km=0.0,
-                lat_deg=0.0, lon_deg=0.0, alt_km=0.0,
-            ))
-            continue
+                target_time=target_time,
+                error_code=error,
+            )
         
         # Transform from TEME to ECEF
         x_ecef, y_ecef, z_ecef = _teme_to_ecef(
@@ -1054,6 +1076,7 @@ class HypatiaAdapter:
         output_dir: Optional[Path] = None,
         link_budget: Optional[LinkBudgetEngine] = None,
         epoch: Optional[datetime] = None,
+        orbital_engine: OrbitalEngine = ORBITAL_ENGINE_SGP4,
     ):
         """
         Initialize the Hypatia adapter with Walker Delta constellation parameters.
@@ -1067,7 +1090,18 @@ class HypatiaAdapter:
             output_dir: Directory for generated files (default: temp directory)
             link_budget: LinkBudgetEngine instance (default: creates one with defaults)
             epoch: TLE epoch datetime (default: J2000.0 for reproducibility)
+            orbital_engine: Explicit engine; SGP4 is canonical and Keplerian is noncanonical
         """
+        self._temp_dir: Optional[str] = None
+        if orbital_engine not in SUPPORTED_ORBITAL_ENGINES:
+            supported = ", ".join(sorted(SUPPORTED_ORBITAL_ENGINES))
+            raise ValueError(
+                f"Unsupported orbital_engine '{orbital_engine}'. Expected one of: {supported}."
+            )
+        if orbital_engine == ORBITAL_ENGINE_SGP4 and not SGP4_AVAILABLE:
+            raise OrbitalEngineUnavailableError(ORBITAL_ENGINE_SGP4)
+        self.orbital_engine = orbital_engine
+
         # Use provided epoch or fall back to J2000 for reproducibility
         effective_epoch = epoch if epoch is not None else J2000_EPOCH
         
@@ -1184,10 +1218,10 @@ class HypatiaAdapter:
         
         self._tle_file = tle_path
         logger.info(
-            "Generated TLEs for %d satellites: %s (SGP4: %s)",
+            "Generated TLEs for %d satellites: %s (orbital engine: %s)",
             self.total_satellites,
             tle_path,
-            "enabled" if SGP4_AVAILABLE else "disabled",
+            self.orbital_engine,
         )
         
         return tle_path
@@ -1208,7 +1242,7 @@ class HypatiaAdapter:
         Uses +Grid pattern: 2 intra-plane + 2 inter-plane links per satellite.
         
         Tier 1 Physics:
-        - SGP4 orbital propagation (WGS72) or Keplerian fallback
+        - Explicit SGP4 (canonical) or Keplerian (noncanonical) orbital propagation
         - Link budget analysis (Optical 1550nm / RF Ka-Band 28GHz)
         - Earth obscuration (grazing height) checks
         - Seam link tagging
@@ -1238,59 +1272,67 @@ class HypatiaAdapter:
         # Aggregate stats across all time steps
         total_stats = ISLComputationStats()
         
-        with open(isl_path, 'w') as f:
-            f.write(f"# ISL data for Walker Delta constellation (Tier 1 Fidelity)\n")
-            f.write(f"# Planes: {self.config.num_planes}, Sats/plane: {self.config.sats_per_plane}\n")
-            f.write(f"# Duration: {duration_minutes} min, Step: {step_seconds} s\n")
-            f.write(f"# Orbital Engine: {'SGP4 (WGS72)' if SGP4_AVAILABLE else 'Keplerian'}\n")
-            f.write(f"# Format: time_step sat1 sat2 distance_km link_type mode margin_db\n")
-            
-            for step in range(num_steps):
-                time_offset = step * step_seconds
+        pending_isl_path = self.output_dir / "isls.txt.pending"
+        pending_isl_path.unlink(missing_ok=True)
+        try:
+            with open(pending_isl_path, 'w') as f:
+                f.write(f"# ISL data for Walker Delta constellation (Tier 1 Fidelity)\n")
+                f.write(f"# Planes: {self.config.num_planes}, Sats/plane: {self.config.sats_per_plane}\n")
+                f.write(f"# Duration: {duration_minutes} min, Step: {step_seconds} s\n")
+                engine_label = "SGP4 (WGS72)" if self.orbital_engine == ORBITAL_ENGINE_SGP4 else "Keplerian (noncanonical)"
+                f.write(f"# Orbital Engine: {engine_label}\n")
+                f.write(f"# Format: time_step sat1 sat2 distance_km link_type mode margin_db\n")
                 
-                # Compute positions using SGP4 or Keplerian fallback
-                if SGP4_AVAILABLE and self._tle_lines:
-                    positions = _compute_satellite_positions_sgp4(
-                        self._tle_lines,
-                        self.config.epoch,
-                        time_offset,
+                for step in range(num_steps):
+                    time_offset = step * step_seconds
+
+                    if self.orbital_engine == ORBITAL_ENGINE_SGP4:
+                        positions = _compute_satellite_positions_sgp4(
+                            self._tle_lines,
+                            self.config.epoch,
+                            time_offset,
+                        )
+                    else:
+                        positions = _compute_satellite_positions_keplerian(
+                            self.config, time_offset
+                        )
+
+                    # Compute ISLs with Link Budget Engine
+                    links, step_stats = _compute_grid_plus_isls(
+                        self.config,
+                        positions,
+                        self.link_budget,
+                        max_isl_distance_km,
+                        isl_policy,
+                        adjacent_search_k,
+                        max_inter_plane_links_per_sat,
+                        max(0, collect_adaptive_examples - len(total_stats.adaptive_selection_examples)),
                     )
-                else:
-                    positions = _compute_satellite_positions_keplerian(
-                        self.config, time_offset
-                    )
-                
-                # Compute ISLs with Link Budget Engine
-                links, step_stats = _compute_grid_plus_isls(
-                    self.config,
-                    positions,
-                    self.link_budget,
-                    max_isl_distance_km,
-                    isl_policy,
-                    adjacent_search_k,
-                    max_inter_plane_links_per_sat,
-                    max(0, collect_adaptive_examples - len(total_stats.adaptive_selection_examples)),
-                )
-                
-                # Aggregate stats
-                total_stats.total_candidate_links += step_stats.total_candidate_links
-                total_stats.links_rejected_los += step_stats.links_rejected_los
-                total_stats.links_rejected_budget += step_stats.links_rejected_budget
-                total_stats.links_accepted += step_stats.links_accepted
-                total_stats.optical_links += step_stats.optical_links
-                total_stats.rf_links += step_stats.rf_links
-                total_stats.accepted_intra_plane_links += step_stats.accepted_intra_plane_links
-                total_stats.accepted_inter_plane_links += step_stats.accepted_inter_plane_links
-                total_stats.adaptive_selection_examples.extend(step_stats.adaptive_selection_examples)
-                
-                self._isl_data[step] = links
-                
-                for link in links:
-                    f.write(
-                        f"{step} {link.sat_id_1} {link.sat_id_2} "
-                        f"{link.distance_km:.2f} {link.link_type} "
-                        f"{link.link_mode} {link.margin_db:.1f}\n"
-                    )
+
+                    # Aggregate stats
+                    total_stats.total_candidate_links += step_stats.total_candidate_links
+                    total_stats.links_rejected_los += step_stats.links_rejected_los
+                    total_stats.links_rejected_budget += step_stats.links_rejected_budget
+                    total_stats.links_accepted += step_stats.links_accepted
+                    total_stats.optical_links += step_stats.optical_links
+                    total_stats.rf_links += step_stats.rf_links
+                    total_stats.accepted_intra_plane_links += step_stats.accepted_intra_plane_links
+                    total_stats.accepted_inter_plane_links += step_stats.accepted_inter_plane_links
+                    total_stats.adaptive_selection_examples.extend(step_stats.adaptive_selection_examples)
+
+                    self._isl_data[step] = links
+
+                    for link in links:
+                        f.write(
+                            f"{step} {link.sat_id_1} {link.sat_id_2} "
+                            f"{link.distance_km:.2f} {link.link_type} "
+                            f"{link.link_mode} {link.margin_db:.1f}\n"
+                        )
+        except Exception:
+            self._isl_data.clear()
+            pending_isl_path.unlink(missing_ok=True)
+            raise
+        os.replace(pending_isl_path, isl_path)
         
         logger.info(
             "Calculated ISLs for %d steps (%d min @ %ds): %s",
@@ -1455,7 +1497,7 @@ class HypatiaAdapter:
         """
         Get satellite positions at a specific time step.
         
-        Uses SGP4 propagation if available, otherwise Keplerian fallback.
+        Uses the explicitly selected orbital engine.
         
         Args:
             time_step: The time step index (0-based)
@@ -1465,14 +1507,13 @@ class HypatiaAdapter:
         """
         time_offset = time_step * self._step_seconds
         
-        if SGP4_AVAILABLE and self._tle_lines:
+        if self.orbital_engine == ORBITAL_ENGINE_SGP4:
             return _compute_satellite_positions_sgp4(
                 self._tle_lines,
                 self.config.epoch,
                 time_offset,
             )
-        else:
-            return _compute_satellite_positions_keplerian(self.config, time_offset)
+        return _compute_satellite_positions_keplerian(self.config, time_offset)
     
     def summary(self) -> str:
         """Return a summary of the constellation configuration."""
