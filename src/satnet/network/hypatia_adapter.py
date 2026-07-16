@@ -784,6 +784,7 @@ def _check_line_of_sight(pos1: SatellitePosition, pos2: SatellitePosition) -> bo
 class ISLComputationStats:
     """Statistics from ISL computation for diagnostics."""
     total_candidate_links: int = 0
+    links_rejected_distance: int = 0
     links_rejected_los: int = 0  # Line of sight (Earth obscuration)
     links_rejected_budget: int = 0  # Link budget insufficient
     links_accepted: int = 0
@@ -798,7 +799,7 @@ def _compute_grid_plus_isls(
     config: WalkerDeltaConfig,
     positions: List[SatellitePosition],
     link_budget: LinkBudgetEngine,
-    max_isl_distance_km: float = 10000.0,  # Increased - let link budget decide
+    max_isl_distance_km: float = 10000.0,
     isl_policy: str = "grid_fixed",
     adjacent_search_k: int = 1,
     max_inter_plane_links_per_sat: int = 1,
@@ -820,11 +821,13 @@ def _compute_grid_plus_isls(
         config: Walker Delta constellation configuration
         positions: List of satellite positions in ECEF
         link_budget: LinkBudgetEngine instance for link analysis
-        max_isl_distance_km: Maximum geometric distance (soft limit)
+        max_isl_distance_km: Hard inclusive geometric feasibility limit
     
     Returns:
         Tuple of (links, stats) where stats contains rejection counts
     """
+    if not math.isfinite(max_isl_distance_km) or max_isl_distance_km < 0.0:
+        raise ValueError("max_isl_distance_km must be finite and non-negative")
     if isl_policy not in {"grid_fixed", "grid_adaptive"}:
         raise ValueError("isl_policy must be 'grid_fixed' or 'grid_adaptive'")
     if adjacent_search_k < 0:
@@ -880,17 +883,22 @@ def _compute_grid_plus_isls(
     ) -> Tuple[Optional[ISLLink], Dict[str, object]]:
         stats.total_candidate_links += 1
         dist = _compute_distance_km(current_pos, partner_pos)
-        los = bool(_check_line_of_sight(current_pos, partner_pos))
         outcome: Dict[str, object] = {
             "sat_id": partner_sat,
             "plane": partner_sat // sats_per_plane,
             "satellite": partner_sat % sats_per_plane,
-            "los": los,
+            "los": None,
             "distance_km": dist,
+            "within_max_distance": dist <= max_isl_distance_km,
             "viable": False,
             "margin_db": None,
             "selected": False,
         }
+        if dist > max_isl_distance_km:
+            stats.links_rejected_distance += 1
+            return None, outcome
+        los = bool(_check_line_of_sight(current_pos, partner_pos))
+        outcome["los"] = los
         if not los:
             stats.links_rejected_los += 1
             return None, outcome
@@ -1278,7 +1286,7 @@ class HypatiaAdapter:
         Args:
             duration_minutes: Simulation duration in minutes
             step_seconds: Time step in seconds
-            max_isl_distance_km: Maximum geometric distance (soft limit)
+            max_isl_distance_km: Hard inclusive geometric feasibility limit
         
         Returns:
             Tuple of (path to ISL data file, aggregated computation stats)
@@ -1339,6 +1347,7 @@ class HypatiaAdapter:
 
                     # Aggregate stats
                     total_stats.total_candidate_links += step_stats.total_candidate_links
+                    total_stats.links_rejected_distance += step_stats.links_rejected_distance
                     total_stats.links_rejected_los += step_stats.links_rejected_los
                     total_stats.links_rejected_budget += step_stats.links_rejected_budget
                     total_stats.links_accepted += step_stats.links_accepted
@@ -1367,9 +1376,10 @@ class HypatiaAdapter:
             num_steps, duration_minutes, step_seconds, isl_path,
         )
         logger.debug(
-            "ISL stats: candidates=%d, accepted=%d, rejected_los=%d, rejected_budget=%d, optical=%d, rf=%d",
+            "ISL stats: candidates=%d, accepted=%d, rejected_distance=%d, rejected_los=%d, rejected_budget=%d, optical=%d, rf=%d",
             total_stats.total_candidate_links,
             total_stats.links_accepted,
+            total_stats.links_rejected_distance,
             total_stats.links_rejected_los,
             total_stats.links_rejected_budget,
             total_stats.optical_links,
