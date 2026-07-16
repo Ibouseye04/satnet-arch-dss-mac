@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import subprocess
 import sys
@@ -23,6 +24,17 @@ from satnet.utils.split_manifest import build_split_manifest, write_split_manife
 RF_CONDITIONS = ("full", "architecture_only", "no_geometry")
 TGNN_CONDITIONS = ("full", "topology_only", "node_state_only")
 DEFAULT_TARGETS = ("partition_any", "gcc_frac_min_original")
+EXPERIMENT_IDENTITY_SCHEMA_VERSION = 1
+_NONSCIENTIFIC_COMMAND_OPTIONS = frozenset(
+    {
+        "--config-output",
+        "--experiment-log",
+        "--metrics-output",
+        "--output-dir",
+        "--output-model",
+    }
+)
+_CONDITION_COMMAND_OPTIONS = frozenset({"--feature-set", "--input-mode"})
 
 
 @dataclass(frozen=True)
@@ -84,6 +96,108 @@ def _tgnn_base_name(target: str, condition: str) -> str:
 
 def _smoke_subset(smoke: bool) -> int | None:
     return 8 if smoke else None
+
+
+def _sha256_file(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _command_option_value(command: list[str], option: str) -> str | None:
+    if option not in command:
+        return None
+    index = command.index(option)
+    return command[index + 1] if index + 1 < len(command) else None
+
+
+def _dataset_path_from_command(command: list[str]) -> Path | None:
+    data_path = _command_option_value(command, "--data-path")
+    if data_path is not None:
+        return Path(data_path)
+    data_dir = _command_option_value(command, "--data-dir")
+    return Path(data_dir) / "tier1_design_runs.csv" if data_dir is not None else None
+
+
+def _normalized_comparison_command(command: list[str]) -> list[str]:
+    excluded = _NONSCIENTIFIC_COMMAND_OPTIONS | _CONDITION_COMMAND_OPTIONS
+    normalized: list[str] = []
+    index = 0
+    while index < len(command):
+        token = command[index]
+        if token in excluded:
+            index += 2
+            continue
+        normalized.append(token)
+        index += 1
+    return normalized
+
+
+def _identity_hash(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode()).hexdigest()
+
+
+def build_experiment_identity(spec: ExperimentSpec) -> dict[str, Any]:
+    dataset_path = _dataset_path_from_command(spec.command)
+    shared = {
+        "schema_version": EXPERIMENT_IDENTITY_SCHEMA_VERSION,
+        "model": spec.model,
+        "target": spec.target,
+        "dataset_sha256": _sha256_file(dataset_path) if dataset_path is not None else None,
+        "split_sha256": _sha256_file(spec.split_manifest_path),
+    }
+    condition_payload = {
+        **shared,
+        "condition": spec.condition,
+        "command": spec.command,
+    }
+    comparison_payload = {
+        **shared,
+        "command": _normalized_comparison_command(spec.command),
+    }
+    return {
+        **condition_payload,
+        "condition_identity": _identity_hash(condition_payload),
+        "comparison_identity": _identity_hash(comparison_payload),
+    }
+
+
+def _identity_path(spec: ExperimentSpec) -> Path:
+    return spec.output_dir / "experiment_identity.json"
+
+
+def write_experiment_identity(spec: ExperimentSpec) -> Path:
+    path = _identity_path(spec)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        **build_experiment_identity(spec),
+        "metrics_sha256": _sha256_file(spec.metrics_path),
+    }
+    path.write_text(json.dumps(payload, indent=2))
+    return path
+
+
+def _require_matching_experiment_identity(spec: ExperimentSpec) -> dict[str, Any]:
+    path = _identity_path(spec)
+    if not path.exists():
+        raise ValueError(
+            f"Existing metrics lack experiment identity for "
+            f"{spec.model}/{spec.target}/{spec.condition}; use a new output directory."
+        )
+    stored = _read_json(path)
+    expected = build_experiment_identity(spec)
+    if stored.get("condition_identity") != expected["condition_identity"]:
+        raise ValueError(
+            f"Existing experiment identity mismatch for "
+            f"{spec.model}/{spec.target}/{spec.condition}; use a new output directory."
+        )
+    if stored.get("metrics_sha256") != _sha256_file(spec.metrics_path):
+        raise ValueError(
+            f"Existing metrics content mismatch for "
+            f"{spec.model}/{spec.target}/{spec.condition}; use a new output directory."
+        )
+    return stored
 
 
 def _split_sizes(args: argparse.Namespace) -> tuple[float, float]:
@@ -283,6 +397,9 @@ def build_experiment_specs(args: argparse.Namespace) -> list[ExperimentSpec]:
 
 
 def write_run_manifest(*, specs: list[ExperimentSpec], args: argparse.Namespace, output_dir: Path) -> Path:
+    for spec in specs:
+        if spec.metrics_path.exists():
+            _require_matching_experiment_identity(spec)
     payload = {
         "seed": args.seed,
         "targets": list(args.targets),
@@ -302,6 +419,8 @@ def write_run_manifest(*, specs: list[ExperimentSpec], args: argparse.Namespace,
                 "config_path": str(spec.config_path),
                 "split_manifest_path": str(spec.split_manifest_path),
                 "command": spec.command,
+                "condition_identity": build_experiment_identity(spec)["condition_identity"],
+                "comparison_identity": build_experiment_identity(spec)["comparison_identity"],
             }
             for spec in specs
         ],
@@ -316,6 +435,7 @@ def write_run_manifest(*, specs: list[ExperimentSpec], args: argparse.Namespace,
 def run_specs(specs: list[ExperimentSpec], *, overwrite: bool) -> None:
     for spec in specs:
         if spec.metrics_path.exists() and not overwrite:
+            _require_matching_experiment_identity(spec)
             continue
         spec.output_dir.mkdir(parents=True, exist_ok=True)
         result = subprocess.run(
@@ -335,6 +455,12 @@ def run_specs(specs: list[ExperimentSpec], *, overwrite: bool) -> None:
                 f"Ablation condition failed: {spec.model}/{spec.target}/{spec.condition}. "
                 f"See {spec.output_dir}"
             )
+        if not spec.metrics_path.exists():
+            raise RuntimeError(
+                f"Ablation condition completed without metrics: "
+                f"{spec.model}/{spec.target}/{spec.condition}"
+            )
+        write_experiment_identity(spec)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -359,8 +485,25 @@ def collect_results(specs: list[ExperimentSpec], output_dir: Path) -> None:
     for spec in specs:
         if not spec.metrics_path.exists():
             continue
+        identity = _require_matching_experiment_identity(spec)
         metrics = _read_json(spec.metrics_path)
+        metrics["_comparison_identity"] = identity["comparison_identity"]
         metrics_by_key[(spec.model, spec.target, spec.condition)] = metrics
+
+    grouped_metrics: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for (model, target, _), metrics in metrics_by_key.items():
+        grouped_metrics.setdefault((model, target), []).append(metrics)
+    for group, group_metrics in grouped_metrics.items():
+        comparison_ids = {metrics["_comparison_identity"] for metrics in group_metrics}
+        if len(comparison_ids) != 1:
+            raise ValueError(f"Mixed experiment comparison identities for {group}")
+        for field in ("dataset_sha256", "split_sha256", "seed"):
+            values = {metrics[field] for metrics in group_metrics if field in metrics}
+            if values and (
+                len(values) != 1
+                or any(field not in metrics for metrics in group_metrics)
+            ):
+                raise ValueError(f"Mixed metric provenance field '{field}' for {group}")
 
     for spec in specs:
         metrics = metrics_by_key.get((spec.model, spec.target, spec.condition))
@@ -474,11 +617,11 @@ def main() -> None:
     args = parse_args()
     output_dir = _resolve_path(args.output_dir)
     specs = build_experiment_specs(args)
-    write_run_manifest(specs=specs, args=args, output_dir=output_dir)
     if args.dry_run:
         print(json.dumps([spec.__dict__ | {"command": spec.command} for spec in specs], indent=2, default=str))
         return
     run_specs(specs, overwrite=args.overwrite)
+    write_run_manifest(specs=specs, args=args, output_dir=output_dir)
     collect_results(specs, output_dir)
 
 

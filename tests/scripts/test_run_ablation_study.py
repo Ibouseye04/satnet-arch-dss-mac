@@ -79,6 +79,8 @@ def test_dry_run_builds_all_expected_specs(tmp_path) -> None:
     }
     assert all(str(s.output_dir).endswith(s.condition) for s in specs)
     assert all("--cheb-k" in s.command for s in specs if s.model == "tgnn")
+    assert all(runner.build_experiment_identity(spec)["condition_identity"] for spec in specs)
+    assert all(runner.build_experiment_identity(spec)["comparison_identity"] for spec in specs)
 
 
 def test_failed_condition_raises_nonzero_runner_failure(tmp_path, monkeypatch) -> None:
@@ -118,6 +120,7 @@ def test_comparison_deltas_have_expected_direction(tmp_path) -> None:
             "f1": 0.75 if spec.condition == "full" else 0.5,
         }
         spec.metrics_path.write_text(json.dumps(metrics))
+        runner.write_experiment_identity(spec)
 
     runner.collect_results(specs, tmp_path / "artifacts" / "ablation")
     df = pd.read_csv(tmp_path / "artifacts" / "ablation" / "comparison" / "classification_results.csv")
