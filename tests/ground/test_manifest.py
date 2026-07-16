@@ -279,6 +279,18 @@ def test_ground_design_hash_is_run_and_satellite_independent() -> None:
     assert first.selection_hash == second.selection_hash
 
 
+def test_wrong_persisted_count_fails_closed() -> None:
+    record = enabled_record()
+    with pytest.raises(ValueError, match="civilian_count"):
+        replace(record, civilian_count=record.civilian_count + 1)
+
+
+def test_selection_hash_mismatch_fails_closed() -> None:
+    record = enabled_record()
+    with pytest.raises(ValueError, match="ground_design_hash"):
+        replace(record, selection_hash="c" * 64)
+
+
 def test_invalid_schema_and_hashes_fail() -> None:
     record = enabled_record()
     with pytest.raises(ValueError, match="schema"):
