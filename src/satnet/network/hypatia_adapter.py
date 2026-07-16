@@ -86,6 +86,7 @@ RF_TX_POWER_DBM = 30.0  # 1W default
 RF_ANTENNA_GAIN_DBI = 40.0  # Typical Ka-band antenna
 RF_SENSITIVITY_DBM = -90.0  # Receiver sensitivity
 RF_RAIN_MARGIN_DB = 10.0  # Default rain margin
+PHYSICS_MODEL_VERSION = "tier1_space_segment_physics_v2"
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +183,19 @@ class LinkBudgetEngine:
             (math.pi * self.optical_aperture_m / self.optical_wavelength_m) ** 2 * eta
         )
         self._optical_gain_dbi = 10 * math.log10(self._optical_gain_linear)
+
+    def to_config(self) -> Dict[str, float]:
+        return {
+            "optical_tx_power_dbm": self.optical_tx_power_dbm,
+            "optical_aperture_m": self.optical_aperture_m,
+            "optical_sensitivity_dbm": self.optical_sensitivity_dbm,
+            "optical_wavelength_m": self.optical_wavelength_m,
+            "rf_tx_power_dbm": self.rf_tx_power_dbm,
+            "rf_antenna_gain_dbi": self.rf_antenna_gain_dbi,
+            "rf_sensitivity_dbm": self.rf_sensitivity_dbm,
+            "rf_frequency_hz": self.rf_frequency_hz,
+            "rf_rain_margin_db": self.rf_rain_margin_db,
+        }
     
     def compute_optical_fspl_db(self, distance_km: float) -> float:
         """

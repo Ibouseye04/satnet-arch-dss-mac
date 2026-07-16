@@ -6,84 +6,111 @@ import json
 
 import pytest
 
+import satnet.utils.graph_cache as graph_cache
 from satnet.utils.graph_cache import (
     CACHE_SCHEMA_VERSION,
+    cache_exists,
+    load_graph_sequence,
     make_cache_metadata,
+    make_cache_telemetry,
     make_sample_cache_key,
+    save_graph_sequence,
     validate_cache_entry,
 )
 
 torch = pytest.importorskip("torch")
 Data = pytest.importorskip("torch_geometric.data").Data
 
-from satnet.utils.graph_cache import (  # noqa: E402
-    cache_exists,
-    load_graph_sequence,
-    make_cache_telemetry,
-    save_graph_sequence,
-)
+BASE_CACHE_CONFIG = {
+    "num_planes": 4,
+    "sats_per_plane": 6,
+    "inclination_deg": 53.0,
+    "altitude_km": 550.0,
+    "phasing_factor": 1,
+    "duration_minutes": 2,
+    "step_seconds": 60,
+    "num_steps": 3,
+    "max_isl_distance_km": 10000.0,
+    "isl_policy": "grid_adaptive",
+    "adjacent_search_k": 1,
+    "max_inter_plane_links_per_sat": 1,
+    "node_failure_prob": 0.01,
+    "edge_failure_prob": 0.02,
+    "failure_model": "persistent_temporal_union_edges_v1",
+    "seed": 42,
+    "epoch_iso": "2000-01-01T12:00:00+00:00",
+    "failed_nodes_json": "[]",
+    "failed_edges_json": "[]",
+    "schema_version": 2,
+    "dataset_version": "tier1_temporal_connectivity_v2",
+    "orbital_engine": "sgp4",
+    "physics_model_version": "physics-v2",
+    "link_budget_config": {"optical_wavelength_m": 1550e-9},
+}
+
+
+def _cache_config(**updates):
+    config = dict(BASE_CACHE_CONFIG)
+    config.update(updates)
+    return config
+
+
+def _structural_graph(time_step: int) -> Data:
+    return Data(
+        x=torch.randn(5, 3),
+        edge_index=torch.zeros((2, 0), dtype=torch.long),
+        edge_attr=torch.zeros((0, 4), dtype=torch.float),
+        time_step=torch.tensor([time_step], dtype=torch.long),
+        num_nodes=5,
+        isl_policy="grid_adaptive",
+        adjacent_search_k=1,
+        max_inter_plane_links_per_sat=1,
+        failure_model="persistent_temporal_union_edges_v1",
+    )
 
 
 class TestMakeSampleCacheKey:
     def test_deterministic(self) -> None:
-        cfg = {"num_planes": 4, "sats_per_plane": 6, "altitude_km": 550.0}
+        cfg = _cache_config()
         assert make_sample_cache_key(cfg) == make_sample_cache_key(cfg)
 
     def test_key_order_independent(self) -> None:
-        a = {"num_planes": 4, "altitude_km": 550.0}
-        b = {"altitude_km": 550.0, "num_planes": 4}
+        a = _cache_config()
+        b = dict(reversed(list(a.items())))
         assert make_sample_cache_key(a) == make_sample_cache_key(b)
 
     def test_different_values_differ(self) -> None:
-        a = {"num_planes": 4, "sats_per_plane": 6}
-        b = {"num_planes": 5, "sats_per_plane": 6}
-        assert make_sample_cache_key(a) != make_sample_cache_key(b)
+        assert make_sample_cache_key(_cache_config(num_planes=4)) != make_sample_cache_key(
+            _cache_config(num_planes=5)
+        )
 
     def test_ignores_unknown_fields(self) -> None:
-        a = {"num_planes": 4}
-        b = {"num_planes": 4, "extra_field": "ignored"}
+        a = _cache_config()
+        b = _cache_config(extra_field="ignored")
         assert make_sample_cache_key(a) == make_sample_cache_key(b)
 
     def test_isl_policy_changes_key(self) -> None:
-        fixed = {
-            "num_planes": 4,
-            "sats_per_plane": 6,
-            "duration_minutes": 1,
-            "step_seconds": 60,
-            "isl_policy": "grid_fixed",
-            "adjacent_search_k": 1,
-            "max_inter_plane_links_per_sat": 1,
-        }
-        adaptive = dict(fixed)
-        adaptive["isl_policy"] = "grid_adaptive"
-
+        fixed = _cache_config(isl_policy="grid_fixed")
+        adaptive = _cache_config(isl_policy="grid_adaptive")
         assert make_sample_cache_key(fixed) != make_sample_cache_key(adaptive)
 
     def test_failure_model_changes_key(self) -> None:
-        t0 = {
-            "num_planes": 4,
-            "sats_per_plane": 6,
-            "duration_minutes": 1,
-            "step_seconds": 60,
-            "failure_model": "persistent_t0_edges_v1",
-        }
-        temporal_union = dict(t0)
-        temporal_union["failure_model"] = "persistent_temporal_union_edges_v1"
-
+        t0 = _cache_config(failure_model="persistent_t0_edges_v1")
+        temporal_union = _cache_config(
+            failure_model="persistent_temporal_union_edges_v1"
+        )
         assert make_sample_cache_key(t0) != make_sample_cache_key(temporal_union)
 
 
 class TestSaveLoadGraphSequence:
     def test_roundtrip(self, tmp_path) -> None:
-        data_list = [
-            Data(x=torch.randn(5, 3), edge_index=torch.randint(0, 5, (2, 8)))
-            for _ in range(3)
-        ]
+        data_list = [_structural_graph(time_step) for time_step in range(3)]
         key = "test_key_abc123"
+        generator_config = _cache_config()
         metadata = make_cache_metadata(
             sample_cache_key=key,
             generator_provenance="test-generator:v1",
-            generator_config={"num_planes": 4},
+            generator_config=generator_config,
         )
         wt = save_graph_sequence(data_list, tmp_path, key, metadata=metadata)
         assert wt >= 0.0
@@ -98,7 +125,7 @@ class TestSaveLoadGraphSequence:
             loaded_metadata,
             expected_sample_cache_key=key,
             expected_generator_provenance="test-generator:v1",
-            expected_generator_config={"num_planes": 4},
+            expected_generator_config=generator_config,
         )
 
     def test_miss_returns_none(self, tmp_path) -> None:
@@ -113,6 +140,31 @@ class TestSaveLoadGraphSequence:
         meta_path = tmp_path / "k.meta.json"
         assert meta_path.exists()
         assert json.loads(meta_path.read_text())["note"] == "test"
+
+    def test_failed_write_leaves_no_partial_entry(self, tmp_path, monkeypatch) -> None:
+        key = "failed_write"
+        metadata = make_cache_metadata(
+            sample_cache_key=key,
+            generator_provenance="test-generator:v1",
+            generator_config=_cache_config(),
+        )
+
+        def fail_dump(*args, **kwargs):
+            raise RuntimeError("simulated metadata write failure")
+
+        monkeypatch.setattr(graph_cache.json, "dump", fail_dump)
+        with pytest.raises(RuntimeError, match="simulated metadata write failure"):
+            save_graph_sequence(
+                [_structural_graph(time_step) for time_step in range(3)],
+                tmp_path,
+                key,
+                metadata=metadata,
+            )
+
+        assert not (tmp_path / f"{key}.pt").exists()
+        assert not (tmp_path / f"{key}.meta.json").exists()
+        assert not (tmp_path / f"{key}.pt.pending").exists()
+        assert not (tmp_path / f"{key}.meta.json.pending").exists()
 
     def test_metadata_distinguishes_sample_identity_and_generator_provenance(self) -> None:
         metadata = make_cache_metadata(

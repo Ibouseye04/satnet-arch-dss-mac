@@ -40,7 +40,11 @@ from torch_geometric.utils import from_networkx
 
 from datetime import datetime
 
-from satnet.network.hypatia_adapter import HypatiaAdapter
+from satnet.network.hypatia_adapter import (
+    PHYSICS_MODEL_VERSION,
+    HypatiaAdapter,
+    LinkBudgetEngine,
+)
 from satnet.simulation.tier1_rollout import (
     DATASET_VERSION,
     SCHEMA_VERSION,
@@ -402,6 +406,8 @@ class SatNetTemporalDataset(Dataset):
             sample_config["adjacent_search_k"] = adjacent_search_k
             sample_config["failure_model"] = failure_model
             sample_config["max_inter_plane_links_per_sat"] = max_inter_plane_links_per_sat
+            sample_config["physics_model_version"] = PHYSICS_MODEL_VERSION
+            sample_config["link_budget_config"] = LinkBudgetEngine().to_config()
             generator_config = extract_cache_key_config(sample_config)
             cache_key = make_sample_cache_key(sample_config)
             expected_cache_metadata = make_cache_metadata(

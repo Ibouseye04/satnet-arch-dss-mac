@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_CACHE_DIR = "artifacts/graph_cache"
 
 # Backward-incompatible cache contract version.
-CACHE_SCHEMA_VERSION = 4
+CACHE_SCHEMA_VERSION = 5
 
 # Only target-agnostic payloads are supported.
 PAYLOAD_MODE_TARGET_AGNOSTIC = "target_agnostic"
@@ -54,6 +55,7 @@ _CACHE_KEY_FIELDS = (
     "phasing_factor",
     "duration_minutes",
     "step_seconds",
+    "num_steps",
     "max_isl_distance_km",
     "isl_policy",
     "adjacent_search_k",
@@ -65,16 +67,20 @@ _CACHE_KEY_FIELDS = (
     "epoch_iso",
     "failed_nodes_json",
     "failed_edges_json",
+    "schema_version",
+    "dataset_version",
+    "orbital_engine",
+    "physics_model_version",
+    "link_budget_config",
 )
 
 
 def extract_cache_key_config(sample_config: dict[str, Any]) -> dict[str, Any]:
     """Return cache-identity fields from a sample configuration."""
-    return {
-        key: sample_config[key]
-        for key in _CACHE_KEY_FIELDS
-        if key in sample_config
-    }
+    missing = sorted(set(_CACHE_KEY_FIELDS) - set(sample_config))
+    if missing:
+        raise ValueError(f"Cache identity missing required scientific fields: {missing}")
+    return {key: sample_config[key] for key in _CACHE_KEY_FIELDS}
 
 
 def make_sample_cache_key(sample_config: dict[str, Any]) -> str:
@@ -124,13 +130,25 @@ def save_graph_sequence(
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     pt_path = cache_dir / f"{cache_key}.pt"
+    pending_pt_path = cache_dir / f"{cache_key}.pt.pending"
+    meta_path = _meta_path(cache_dir, cache_key)
+    pending_meta_path = cache_dir / f"{cache_key}.meta.json.pending"
+    pending_pt_path.unlink(missing_ok=True)
+    pending_meta_path.unlink(missing_ok=True)
     t0 = time.monotonic()
-    torch.save(data_list, pt_path)
+    try:
+        torch.save(data_list, pending_pt_path)
+        if metadata is not None:
+            with open(pending_meta_path, "w") as f:
+                json.dump(metadata, f, indent=2)
+        os.replace(pending_pt_path, pt_path)
+        if metadata is not None:
+            os.replace(pending_meta_path, meta_path)
+    except Exception:
+        pending_pt_path.unlink(missing_ok=True)
+        pending_meta_path.unlink(missing_ok=True)
+        raise
     write_time = time.monotonic() - t0
-
-    if metadata is not None:
-        with open(_meta_path(cache_dir, cache_key), "w") as f:
-            json.dump(metadata, f, indent=2)
 
     logger.debug("Cache write %.3fs -> %s", write_time, pt_path)
     return write_time
@@ -178,6 +196,59 @@ def _payload_contains_labels(data_list: list[Any]) -> bool:
         if getattr(item, "y", None) is not None:
             return True
     return False
+
+
+def _validate_graph_payload(
+    data_list: list[Any],
+    expected_generator_config: dict[str, Any] | None,
+) -> None:
+    torch = _import_torch()
+    if not isinstance(data_list, list):
+        raise ValueError("Cache payload must be a list of temporal graph Data objects")
+    if expected_generator_config is not None:
+        expected_count = int(expected_generator_config["num_steps"])
+        if len(data_list) != expected_count:
+            raise ValueError(
+                "Cache payload graph count mismatch: "
+                f"expected {expected_count}, got {len(data_list)}"
+            )
+    required_attributes = (
+        "x",
+        "edge_index",
+        "edge_attr",
+        "time_step",
+        "num_nodes",
+        "isl_policy",
+        "adjacent_search_k",
+        "max_inter_plane_links_per_sat",
+        "failure_model",
+    )
+    for index, item in enumerate(data_list):
+        missing = [name for name in required_attributes if not hasattr(item, name)]
+        if missing:
+            raise ValueError(
+                f"Cache payload graph {index} missing required attributes: {missing}"
+            )
+        if not isinstance(item.x, torch.Tensor) or item.x.ndim != 2:
+            raise ValueError(f"Cache payload graph {index} has invalid x tensor")
+        if not isinstance(item.edge_index, torch.Tensor) or item.edge_index.ndim != 2:
+            raise ValueError(f"Cache payload graph {index} has invalid edge_index tensor")
+        if item.edge_index.shape[0] != 2:
+            raise ValueError(f"Cache payload graph {index} edge_index must have shape [2, E]")
+        if not isinstance(item.edge_attr, torch.Tensor) or item.edge_attr.ndim != 2:
+            raise ValueError(f"Cache payload graph {index} has invalid edge_attr tensor")
+        if item.edge_attr.shape[0] != item.edge_index.shape[1]:
+            raise ValueError(f"Cache payload graph {index} edge_attr row count mismatch")
+        num_nodes = int(item.num_nodes)
+        if num_nodes != int(item.x.shape[0]):
+            raise ValueError(f"Cache payload graph {index} num_nodes does not match x")
+        if item.edge_index.numel() > 0:
+            if int(item.edge_index.min()) < 0 or int(item.edge_index.max()) >= num_nodes:
+                raise ValueError(f"Cache payload graph {index} edge_index is out of bounds")
+        if not isinstance(item.time_step, torch.Tensor) or item.time_step.numel() != 1:
+            raise ValueError(f"Cache payload graph {index} has invalid time_step")
+        if int(item.time_step.item()) != index:
+            raise ValueError(f"Cache payload graph {index} has noncontiguous time_step")
 
 
 def validate_cache_entry(
@@ -258,6 +329,8 @@ def validate_cache_entry(
                 "Cache generator configuration mismatch. Delete this cache entry "
                 "and regenerate with --write-cache."
             )
+
+    _validate_graph_payload(data_list, expected_generator_config)
 
 
 # ── telemetry record ────────────────────────────────────────────────

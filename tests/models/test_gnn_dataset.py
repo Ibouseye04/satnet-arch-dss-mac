@@ -197,6 +197,8 @@ class TestGnnDatasetCacheContract:
             "failed_edges_json": failed_edges_json,
             "num_failed_nodes": 0,
             "num_failed_edges": len(json.loads(failed_edges_json)),
+            "node_failure_prob": 0.0,
+            "edge_failure_prob": 0.0,
             "failure_model": failure_model or "persistent_temporal_union_edges_v1",
             "seed": 42,
             "epoch_iso": "2025-01-01T00:00:00",
@@ -504,6 +506,13 @@ class TestGnnDatasetCacheContract:
         assert payload["sample_cache_key"] != payload["generator_provenance"]
         assert payload["generator_config"]["failure_model"] == (
             "persistent_temporal_union_edges_v1"
+        )
+        assert payload["generator_config"]["orbital_engine"] == "sgp4"
+        assert payload["generator_config"]["physics_model_version"] == (
+            gnn_dataset_module.PHYSICS_MODEL_VERSION
+        )
+        assert payload["generator_config"]["link_budget_config"] == (
+            gnn_dataset_module.LinkBudgetEngine().to_config()
         )
 
         # Ensure second dataset instance hits cache and does not regenerate.
