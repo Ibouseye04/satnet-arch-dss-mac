@@ -24,6 +24,10 @@ from satnet.ground.graph_attributes import (
     attributes_to_dict,
     canonicalize_attributes,
 )
+from satnet.ground.integrated_builder import (
+    build_integrated_ground_graph,
+    validate_visibility_edge_equality,
+)
 from satnet.ground.integrated_graph import (
     INTEGRATED_GRAPH_MODEL_VERSION,
     INTEGRATED_GRAPH_SCHEMA_VERSION,
@@ -122,6 +126,7 @@ __all__ = [
     "OperationalSatellitePositionSnapshot",
     "SatelliteGroundLinkObservation",
     "attributes_to_dict",
+    "build_integrated_ground_graph",
     "build_region_balanced_order",
     "canonicalize_attributes",
     "calculate_topocentric_geometry",
@@ -144,6 +149,7 @@ __all__ = [
     "select_ground_stations",
     "validate_manifest_against_satellite_runs",
     "validate_satellite_projection",
+    "validate_visibility_edge_equality",
     "validate_visibility_records_against_sources",
     "validate_production_catalog_readiness",
     "write_ground_design_manifest",

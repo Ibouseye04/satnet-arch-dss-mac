@@ -19,7 +19,7 @@ def _validate_satellite_id(value: object, total_satellites: int, field_name: str
     return value
 
 
-def _validate_failure_realization(
+def validate_failure_realization(
     failure_realization: Tier1FailureRealization,
     *,
     total_satellites: int,
@@ -53,7 +53,7 @@ def reconstruct_operational_satellite_position_sequence(
         raise ValueError("Satellite rollout epoch must be timezone-aware")
     if epoch.utcoffset().total_seconds() != 0.0:
         raise ValueError("Satellite rollout epoch must be normalized to UTC")
-    _validate_failure_realization(
+    validate_failure_realization(
         failure_realization,
         total_satellites=satellite_config.total_satellites,
     )
