@@ -48,6 +48,15 @@ from satnet.ground.visibility import (
     evaluate_ground_visibility,
     evaluate_ground_visibility_sequence,
 )
+from satnet.ground.visibility_persistence import (
+    GROUND_VISIBILITY_SCHEMA_VERSION,
+    GroundVisibilityRecord,
+    make_ground_visibility_record,
+    read_ground_visibility_manifest,
+    replay_ground_visibility_records,
+    validate_visibility_records_against_sources,
+    write_ground_visibility_manifest,
+)
 
 __all__ = [
     "CATALOG_IDENTITY_VERSION",
@@ -55,6 +64,7 @@ __all__ = [
     "GROUND_STATION_SELECTION_VERSION",
     "GROUND_VISIBILITY_FRAME_CONTRACT_VERSION",
     "GROUND_VISIBILITY_MODEL_VERSION",
+    "GROUND_VISIBILITY_SCHEMA_VERSION",
     "GROUND_WGS84_MODEL_VERSION",
     "GEOMETRY_TEST_ABS_TOL",
     "MIN_VALID_SLANT_RANGE_KM",
@@ -71,6 +81,7 @@ __all__ = [
     "GroundStationClass",
     "GroundStationSelection",
     "GroundVisibilityPolicy",
+    "GroundVisibilityRecord",
     "GroundVisibilitySnapshot",
     "OperationalSatellitePositionSnapshot",
     "SatelliteGroundLinkObservation",
@@ -82,12 +93,17 @@ __all__ = [
     "evaluate_ground_visibility_sequence",
     "ground_station_to_ecef",
     "load_ground_station_catalog",
+    "make_ground_visibility_record",
     "make_disabled_ground_design_record",
     "make_enabled_ground_design_record",
     "read_ground_design_manifest",
+    "read_ground_visibility_manifest",
     "reconstruct_ground_selection",
+    "replay_ground_visibility_records",
     "select_ground_stations",
     "validate_manifest_against_satellite_runs",
+    "validate_visibility_records_against_sources",
     "validate_production_catalog_readiness",
     "write_ground_design_manifest",
+    "write_ground_visibility_manifest",
 ]

@@ -183,6 +183,9 @@ class GroundVisibilitySnapshot:
         station_ids = [entry[0] for entry in self.visible_satellite_ids_by_station]
         if station_ids != sorted(station_ids) or len(station_ids) != len(set(station_ids)):
             raise ValueError("Station visibility mappings must use unique canonical station order")
+        observation_station_ids = {observation.station_id for observation in self.link_observations}
+        if not observation_station_ids.issubset(set(station_ids)):
+            raise ValueError("Station visibility mappings omit an observed station")
         visible_by_station = {
             station_id: tuple(
                 observation.satellite_id
