@@ -340,7 +340,10 @@ def artifact_size_diagnostics(
 
 
 def _read_verified_rows(
-    *, output_root: Path, runs: Sequence[IntegratedPilotRun]
+    *,
+    output_root: Path,
+    runs: Sequence[IntegratedPilotRun],
+    catalog_hash: str,
 ) -> tuple[dict[str, object], ...]:
     replay_summary = _read_single_json(output_root / "summaries" / "replay_summary.json")
     if not isinstance(replay_summary, dict):
@@ -366,6 +369,10 @@ def _read_verified_rows(
         if replay["satellite_artifact_hash"] != value["satellite_artifact_hash"]:
             raise ValueError("Replay and summary satellite identities differ")
         row = dict(value)
+        row["catalog_hash"] = catalog_hash
+        row["satellite_rollout_seed"] = run.satellite_rollout_seed
+        row["ground_station_selection_seed"] = run.ground_station_selection_seed
+        row["ground_failure_seed"] = run.ground_failure_seed
         row["replay_status"] = "success"
         row["replay_runtime_seconds"] = replay["replay_runtime_seconds"]
         row["total_run_seconds"] = (
@@ -519,7 +526,11 @@ def analyze_pilot(output_root: str | Path) -> dict[str, object]:
     catalog = load_ground_station_catalog(input_root / "pilot_catalog.csv")
     if len(runs) != PILOT_EXPECTED_RUN_COUNT:
         raise ValueError("Analysis requires the complete 25-run manifest")
-    rows = _read_verified_rows(output_root=root, runs=runs)
+    rows = _read_verified_rows(
+        output_root=root,
+        runs=runs,
+        catalog_hash=catalog.catalog_hash,
+    )
     classification = classification_diagnostics(rows)
     regression = regression_diagnostics(rows)
     bottleneck = bottleneck_diagnostics(rows)

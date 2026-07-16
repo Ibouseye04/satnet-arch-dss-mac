@@ -34,6 +34,9 @@ experiments/
 !tests/experiments/**
 artifacts/integrated_ground_pilot_25/runs/
 artifacts/integrated_ground_pilot_25/repeats/
+src/satnet/experiments/__pycache__/
+scripts/experiments/__pycache__/
+tests/experiments/__pycache__/
 
 # Models (optional)
 models/*.joblib
