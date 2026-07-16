@@ -71,12 +71,14 @@ class Tier1MonteCarloConfig:
     sats_per_plane_range: Tuple[int, int] = (4, 8)
     inclination_deg_range: Tuple[float, float] = (30.0, 98.0)
     altitude_km_range: Tuple[float, float] = (300.0, 1200.0)
+    phasing_factor: int = 1
 
     # Time parameters
     duration_minutes: int = 10
     step_seconds: int = 60
 
     # ISL parameters
+    max_isl_distance_km: float = 10000.0
     isl_policy: str = "grid_fixed"
     adjacent_search_k: int = 1
     max_inter_plane_links_per_sat: int = 1
@@ -91,6 +93,7 @@ class Tier1MonteCarloConfig:
 
     # Reproducibility
     seed: int = 42
+    orbital_engine: str = "sgp4"
 
     # Sampling mode
     sample_constellation: bool = True
@@ -119,6 +122,7 @@ class Tier1RunRow:
     total_satellites: int
     inclination_deg: float
     altitude_km: float
+    phasing_factor: int
 
     # Design-time features (failure assumptions)
     node_failure_prob: float
@@ -128,6 +132,8 @@ class Tier1RunRow:
     duration_minutes: int
     step_seconds: int
     num_steps: int
+    max_isl_distance_km: float
+    orbital_engine: str
 
     # Temporal aggregate labels (computed from simulation)
     gcc_frac_min: float
@@ -254,8 +260,10 @@ def generate_tier1_temporal_dataset(
             sats_per_plane=sats_per_plane,
             inclination_deg=inclination_deg,
             altitude_km=altitude_km,
+            phasing_factor=cfg.phasing_factor,
             duration_minutes=cfg.duration_minutes,
             step_seconds=cfg.step_seconds,
+            max_isl_distance_km=cfg.max_isl_distance_km,
             isl_policy=cfg.isl_policy,
             adjacent_search_k=cfg.adjacent_search_k,
             max_inter_plane_links_per_sat=cfg.max_inter_plane_links_per_sat,
@@ -264,6 +272,7 @@ def generate_tier1_temporal_dataset(
             edge_failure_prob=edge_failure_prob,
             failure_model=cfg.failure_model,
             seed=run_seed,
+            orbital_engine=cfg.orbital_engine,
         )
 
         # Execute rollout
@@ -280,11 +289,14 @@ def generate_tier1_temporal_dataset(
             total_satellites=num_planes * sats_per_plane,
             inclination_deg=inclination_deg,
             altitude_km=altitude_km,
+            phasing_factor=rollout_cfg.phasing_factor,
             node_failure_prob=node_failure_prob,
             edge_failure_prob=edge_failure_prob,
             duration_minutes=cfg.duration_minutes,
             step_seconds=cfg.step_seconds,
             num_steps=summary.num_steps,
+            max_isl_distance_km=rollout_cfg.max_isl_distance_km,
+            orbital_engine=rollout_cfg.orbital_engine,
             gcc_frac_min=summary.gcc_frac_min,
             gcc_frac_mean=summary.gcc_frac_mean,
             gcc_frac_min_original=summary.gcc_frac_min_original,
@@ -343,7 +355,7 @@ def steps_to_dicts(steps: List[Tier1StepRow]) -> List[dict]:
 # Schema Validation
 # ---------------------------------------------------------------------------
 
-# Required columns for runs table (v1 schema)
+# Required columns for runs table (v2 schema)
 RUNS_REQUIRED_COLUMNS = frozenset([
     "run_id",
     "num_planes",
@@ -351,11 +363,14 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "total_satellites",
     "inclination_deg",
     "altitude_km",
+    "phasing_factor",
     "node_failure_prob",
     "edge_failure_prob",
     "duration_minutes",
     "step_seconds",
     "num_steps",
+    "max_isl_distance_km",
+    "orbital_engine",
     "gcc_frac_min",
     "gcc_frac_mean",
     "gcc_frac_min_original",
@@ -382,7 +397,7 @@ RUNS_REQUIRED_COLUMNS = frozenset([
     "dataset_version",
 ])
 
-# Required columns for steps table (v1 schema)
+# Required columns for steps table (v2 schema)
 STEPS_REQUIRED_COLUMNS = frozenset([
     "run_id",
     "t",
@@ -403,7 +418,7 @@ class SchemaValidationError(ValueError):
 
 
 def validate_runs_schema(runs_dicts: List[dict]) -> None:
-    """Validate that runs data conforms to v1 schema.
+    """Validate that runs data conforms to v2 schema.
 
     Args:
         runs_dicts: List of run row dictionaries.
@@ -471,10 +486,14 @@ def validate_runs_schema(runs_dicts: List[dict]) -> None:
             raise SchemaValidationError(
                 f"Row {i}: schema_version={row.get('schema_version')}, expected {SCHEMA_VERSION}"
             )
+        if row.get("dataset_version") != DATASET_VERSION:
+            raise SchemaValidationError(
+                f"Row {i}: dataset_version={row.get('dataset_version')}, expected {DATASET_VERSION}"
+            )
 
 
 def validate_steps_schema(steps_dicts: List[dict]) -> None:
-    """Validate that steps data conforms to v1 schema.
+    """Validate that steps data conforms to v2 schema.
 
     Args:
         steps_dicts: List of step row dictionaries.
@@ -534,7 +553,7 @@ def write_tier1_dataset_csv(
         steps_path: Path for steps CSV output.
 
     Raises:
-        SchemaValidationError: If data does not conform to v1 schema.
+        SchemaValidationError: If data does not conform to v2 schema.
     """
     import csv
     from pathlib import Path

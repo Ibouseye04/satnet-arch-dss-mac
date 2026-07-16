@@ -6,7 +6,7 @@ from the tier1_design_runs.csv configuration file using the HypatiaAdapter.
 
 Graph Reconstruction Contract (Step 3):
     This dataset implements the Tier 1 graph reconstruction contract:
-    1. Uses epoch_iso from CSV (or DEFAULT_EPOCH_ISO) for deterministic propagation
+    1. Requires epoch_iso and all graph-defining metadata from schema v2
     2. Uses duration_minutes and step_seconds from CSV for temporal iteration
     3. Applies failed_nodes_json and failed_edges_json to match original labels
     
@@ -42,8 +42,8 @@ from datetime import datetime
 
 from satnet.network.hypatia_adapter import HypatiaAdapter
 from satnet.simulation.tier1_rollout import (
-    DEFAULT_EPOCH_ISO,
-    FAILURE_MODEL_PERSISTENT_T0_EDGES_V1,
+    DATASET_VERSION,
+    SCHEMA_VERSION,
     Tier1FailureRealization,
 )
 from satnet.utils.graph_cache import (
@@ -58,7 +58,32 @@ from satnet.utils.graph_cache import (
 logger = logging.getLogger(__name__)
 
 GRAPH_SEQUENCE_GENERATOR_PROVENANCE = (
-    "SatNetTemporalDataset:hypatia_temporal_graph_sequence:v1"
+    "SatNetTemporalDataset:hypatia_temporal_graph_sequence:v2"
+)
+RECONSTRUCTION_REQUIRED_COLUMNS = frozenset(
+    {
+        "num_planes",
+        "sats_per_plane",
+        "inclination_deg",
+        "altitude_km",
+        "phasing_factor",
+        "duration_minutes",
+        "step_seconds",
+        "num_steps",
+        "max_isl_distance_km",
+        "orbital_engine",
+        "epoch_iso",
+        "isl_policy",
+        "adjacent_search_k",
+        "max_inter_plane_links_per_sat",
+        "failure_model",
+        "failed_nodes_json",
+        "failed_edges_json",
+        "num_failed_nodes",
+        "num_failed_edges",
+        "schema_version",
+        "dataset_version",
+    }
 )
 
 
@@ -213,29 +238,35 @@ class SatNetTemporalDataset(Dataset):
     
     def _validate_csv(self) -> None:
         """Validate that required columns exist in the CSV."""
-        required_cols = [
-            "num_planes",
-            "sats_per_plane",
-            "inclination_deg",
-            "altitude_km",
-            self.target_name,
-        ]
-        missing = [c for c in required_cols if c not in self._df.columns]
+        required_cols = set(RECONSTRUCTION_REQUIRED_COLUMNS)
+        required_cols.add(self.target_name)
+        missing = sorted(required_cols - set(self._df.columns))
         if missing:
             raise ValueError(
-                f"CSV missing required columns: {missing}. "
+                f"CSV missing required reconstruction columns: {missing}. "
                 f"Available columns: {list(self._df.columns)}"
             )
-        
-        # Check for graph reconstruction columns (Step 3 contract)
-        reconstruction_cols = ["failed_nodes_json", "failed_edges_json"]
-        has_reconstruction = all(c in self._df.columns for c in reconstruction_cols)
-        if not has_reconstruction:
-            logger.warning(
-                "CSV missing failure realization columns (%s). "
-                "Graphs will be regenerated without failures applied. "
-                "Labels may not match regenerated graph metrics.",
-                reconstruction_cols,
+
+        null_columns = sorted(
+            column for column in required_cols if self._df[column].isna().any()
+        )
+        if null_columns:
+            raise ValueError(
+                f"CSV contains null reconstruction metadata: {null_columns}"
+            )
+
+        schema_versions = {int(value) for value in self._df["schema_version"].tolist()}
+        if schema_versions != {SCHEMA_VERSION}:
+            raise ValueError(
+                f"CSV schema_version must be {SCHEMA_VERSION}; found {sorted(schema_versions)}"
+            )
+        dataset_versions = {
+            str(value) for value in self._df["dataset_version"].tolist()
+        }
+        if dataset_versions != {DATASET_VERSION}:
+            raise ValueError(
+                f"CSV dataset_version must be '{DATASET_VERSION}'; "
+                f"found {sorted(dataset_versions)}"
             )
     
     @property
@@ -336,46 +367,30 @@ class SatNetTemporalDataset(Dataset):
         inclination_deg = float(row["inclination_deg"])
         altitude_km = float(row["altitude_km"])
 
-        # Optional parameters with defaults
-        phasing_factor = int(row.get("phasing_factor", 1))
+        phasing_factor = int(row["phasing_factor"])
 
         # Get the label (supports any target column)
         label = float(row[self.target_name])
 
-        # Get seed if available (for reproducibility)
-        seed = row.get("seed", None)
+        epoch = datetime.fromisoformat(str(row["epoch_iso"]))
+        duration_minutes = int(row["duration_minutes"])
+        step_seconds = int(row["step_seconds"])
+        expected_num_steps = int(row["num_steps"])
+        max_isl_distance_km = float(row["max_isl_distance_km"])
+        orbital_engine = str(row["orbital_engine"])
+        isl_policy = str(row["isl_policy"])
+        adjacent_search_k = int(row["adjacent_search_k"])
+        max_inter_plane_links_per_sat = int(row["max_inter_plane_links_per_sat"])
+        failure_model = str(row["failure_model"])
 
-        # Get epoch from CSV or use default (Tier 1 determinism requirement)
-        epoch_iso = row.get("epoch_iso", DEFAULT_EPOCH_ISO)
-        epoch = datetime.fromisoformat(str(epoch_iso))
-
-        # Get time parameters from CSV or use instance defaults
-        duration_minutes = int(row.get("duration_minutes", self.duration_minutes))
-        step_seconds = int(row.get("step_seconds", self.step_seconds))
-
-        isl_policy_value = row.get("isl_policy", "grid_fixed")
-        adjacent_search_k_value = row.get("adjacent_search_k", 1)
-        max_inter_plane_links_per_sat_value = row.get("max_inter_plane_links_per_sat", 1)
-        isl_policy = "grid_fixed" if pd.isna(isl_policy_value) else str(isl_policy_value)
-        adjacent_search_k = 1 if pd.isna(adjacent_search_k_value) else int(adjacent_search_k_value)
-        max_inter_plane_links_per_sat = (
-            1 if pd.isna(max_inter_plane_links_per_sat_value)
-            else int(max_inter_plane_links_per_sat_value)
-        )
-
-        failure_model_value = row.get("failure_model", FAILURE_MODEL_PERSISTENT_T0_EDGES_V1)
-        failure_model = (
-            FAILURE_MODEL_PERSISTENT_T0_EDGES_V1
-            if pd.isna(failure_model_value)
-            else str(failure_model_value)
-        )
-
-        # Get failure realization from CSV (Step 3 contract)
-        failed_nodes_json = row.get("failed_nodes_json", "[]")
-        failed_edges_json = row.get("failed_edges_json", "[]")
         failures = Tier1FailureRealization.from_json_strings(
-            str(failed_nodes_json), str(failed_edges_json)
+            str(row["failed_nodes_json"]),
+            str(row["failed_edges_json"]),
         )
+        if len(failures.failed_nodes) != int(row["num_failed_nodes"]):
+            raise ValueError("failed_nodes_json does not match num_failed_nodes")
+        if len(failures.failed_edges) != int(row["num_failed_edges"]):
+            raise ValueError("failed_edges_json does not match num_failed_edges")
 
         # ── cache lookup ────────────────────────────────────────────
         cache_key = None
@@ -423,12 +438,14 @@ class SatNetTemporalDataset(Dataset):
             altitude_km=altitude_km,
             phasing_factor=phasing_factor,
             epoch=epoch,
+            orbital_engine=orbital_engine,
         )
 
         # Calculate ISLs for the specified duration
         adapter.calculate_isls(
             duration_minutes=duration_minutes,
             step_seconds=step_seconds,
+            max_isl_distance_km=max_isl_distance_km,
             isl_policy=isl_policy,
             adjacent_search_k=adjacent_search_k,
             max_inter_plane_links_per_sat=max_inter_plane_links_per_sat,
@@ -456,6 +473,12 @@ class SatNetTemporalDataset(Dataset):
             data.max_inter_plane_links_per_sat = max_inter_plane_links_per_sat
             data.failure_model = failure_model
             structural_data_list.append(data)
+
+        if len(structural_data_list) != expected_num_steps:
+            raise ValueError(
+                "Reconstructed graph sequence length does not match num_steps: "
+                f"expected {expected_num_steps}, got {len(structural_data_list)}"
+            )
 
         # ── cache write ─────────────────────────────────────────────
         if self.write_cache and cache_key is not None:

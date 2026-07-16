@@ -177,7 +177,7 @@ class TestGnnDatasetCacheContract:
         self,
         csv_path,
         *,
-        include_isl_policy: bool = False,
+        include_isl_policy: bool = True,
         failure_model: str | None = None,
         failed_edges_json: str = "[]",
     ) -> None:
@@ -190,18 +190,24 @@ class TestGnnDatasetCacheContract:
             "phasing_factor": 1,
             "duration_minutes": 1,
             "step_seconds": 60,
+            "num_steps": 2,
+            "max_isl_distance_km": 10000.0,
+            "orbital_engine": "sgp4",
             "failed_nodes_json": "[]",
             "failed_edges_json": failed_edges_json,
+            "num_failed_nodes": 0,
+            "num_failed_edges": len(json.loads(failed_edges_json)),
+            "failure_model": failure_model or "persistent_temporal_union_edges_v1",
             "seed": 42,
             "epoch_iso": "2025-01-01T00:00:00",
             "config_hash": "cfg-001",
+            "schema_version": 2,
+            "dataset_version": "tier1_temporal_connectivity_v2",
             "partition_any": 1,
             "gcc_frac_min": 0.25,
             "max_partition_streak_seconds": 120,
             "max_partition_streak_fraction": 0.5,
         }
-        if failure_model is not None:
-            row["failure_model"] = failure_model
         if include_isl_policy:
             row.update(
                 {
@@ -212,6 +218,46 @@ class TestGnnDatasetCacheContract:
             )
         df = pd.DataFrame([row])
         df.to_csv(csv_path, index=False)
+
+    @pytest.mark.parametrize(
+        "missing_column",
+        [
+            "adjacent_search_k",
+            "dataset_version",
+            "duration_minutes",
+            "epoch_iso",
+            "failed_edges_json",
+            "failed_nodes_json",
+            "failure_model",
+            "max_inter_plane_links_per_sat",
+            "max_isl_distance_km",
+            "num_failed_edges",
+            "num_failed_nodes",
+            "num_steps",
+            "orbital_engine",
+            "phasing_factor",
+            "schema_version",
+            "step_seconds",
+        ],
+    )
+    def test_reconstruction_rejects_missing_required_metadata(
+        self,
+        tmp_path,
+        missing_column,
+    ) -> None:
+        pd = pytest.importorskip("pandas")
+        pytest.importorskip("torch")
+        pytest.importorskip("torch_geometric")
+
+        from satnet.models import gnn_dataset as gnn_dataset_module
+
+        csv_path = tmp_path / "tier1_design_runs.csv"
+        self._write_minimal_csv(csv_path)
+        incomplete = pd.read_csv(csv_path).drop(columns=[missing_column])
+        incomplete.to_csv(csv_path, index=False)
+
+        with pytest.raises(ValueError, match=missing_column):
+            gnn_dataset_module.SatNetTemporalDataset(root=str(tmp_path))
 
     def test_accepts_new_partition_persistence_target_when_column_exists(self, tmp_path, monkeypatch) -> None:
         pytest.importorskip("torch")
@@ -271,7 +317,8 @@ class TestGnnDatasetCacheContract:
                 self.step_seconds = kwargs["step_seconds"]
 
             def iter_graphs(self):
-                for t in (0, 60):
+                num_steps = self.duration_minutes * 60 // self.step_seconds + 1
+                for t in range(num_steps):
                     graph = nx.Graph()
                     for node_id in range(6):
                         graph.add_node(
@@ -320,24 +367,17 @@ class TestGnnDatasetCacheContract:
         assert sample[0].adjacent_search_k == 1
         assert sample[0].max_inter_plane_links_per_sat == 1
 
-    def test_reconstruction_defaults_legacy_csv_to_grid_fixed(self, tmp_path, monkeypatch) -> None:
+    def test_reconstruction_rejects_legacy_csv_without_policy_metadata(self, tmp_path) -> None:
         pytest.importorskip("torch")
         pytest.importorskip("torch_geometric")
 
         from satnet.models import gnn_dataset as gnn_dataset_module
 
         csv_path = tmp_path / "tier1_design_runs.csv"
-        self._write_minimal_csv(csv_path)
-        fake_adapter = self._install_fake_adapter(monkeypatch, gnn_dataset_module)
+        self._write_minimal_csv(csv_path, include_isl_policy=False)
 
-        dataset = gnn_dataset_module.SatNetTemporalDataset(root=str(tmp_path))
-        sample = dataset[0]
-
-        assert fake_adapter.calculate_kwargs["isl_policy"] == "grid_fixed"
-        assert fake_adapter.calculate_kwargs["adjacent_search_k"] == 1
-        assert fake_adapter.calculate_kwargs["max_inter_plane_links_per_sat"] == 1
-        assert sample[0].isl_policy == "grid_fixed"
-        assert sample[0].failure_model == "persistent_t0_edges_v1"
+        with pytest.raises(ValueError, match="adjacent_search_k.*isl_policy"):
+            gnn_dataset_module.SatNetTemporalDataset(root=str(tmp_path))
 
     def test_reconstruction_preserves_new_failure_model_metadata(self, tmp_path, monkeypatch) -> None:
         pytest.importorskip("torch")
@@ -462,7 +502,9 @@ class TestGnnDatasetCacheContract:
             gnn_dataset_module.GRAPH_SEQUENCE_GENERATOR_PROVENANCE
         )
         assert payload["sample_cache_key"] != payload["generator_provenance"]
-        assert payload["generator_config"]["failure_model"] == "persistent_t0_edges_v1"
+        assert payload["generator_config"]["failure_model"] == (
+            "persistent_temporal_union_edges_v1"
+        )
 
         # Ensure second dataset instance hits cache and does not regenerate.
         class FailOnBuildAdapter:

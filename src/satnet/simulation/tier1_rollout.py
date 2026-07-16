@@ -32,7 +32,6 @@ import hashlib
 import json
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Optional
 
 
 # Fixed epoch for reproducibility (J2000.0 epoch: 2000-01-01T12:00:00Z)
@@ -41,8 +40,8 @@ DEFAULT_EPOCH_ISO = "2000-01-01T12:00:00+00:00"
 
 
 # Dataset versioning constants
-DATASET_VERSION = "tier1_temporal_connectivity_v1"
-SCHEMA_VERSION = 1
+DATASET_VERSION = "tier1_temporal_connectivity_v2"
+SCHEMA_VERSION = 2
 FAILURE_MODEL_PERSISTENT_T0_EDGES_V1 = "persistent_t0_edges_v1"
 FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1 = "persistent_temporal_union_edges_v1"
 DEFAULT_FAILURE_MODEL = FAILURE_MODEL_PERSISTENT_TEMPORAL_UNION_EDGES_V1
@@ -66,7 +65,7 @@ class Tier1RolloutConfig:
         phasing_factor: Walker Delta phasing factor (F parameter).
         duration_minutes: Total simulation duration in minutes.
         step_seconds: Time step interval in seconds.
-        max_isl_distance_km: Maximum ISL distance (optional, uses adapter default if None).
+        max_isl_distance_km: Hard inclusive maximum ISL distance.
         gcc_threshold: Threshold for partition detection (gcc_frac_original < threshold → partitioned).
         node_failure_prob: Probability of node failure (sampled once per run).
         edge_failure_prob: Probability that an accepted satellite-pair ISL appearing at least once during the run is persistently unavailable.
@@ -87,7 +86,7 @@ class Tier1RolloutConfig:
     step_seconds: int = 60
 
     # ISL parameters
-    max_isl_distance_km: Optional[float] = None
+    max_isl_distance_km: float = 10000.0
     isl_policy: str = "grid_fixed"
     adjacent_search_k: int = 1
     max_inter_plane_links_per_sat: int = 1
@@ -105,6 +104,7 @@ class Tier1RolloutConfig:
     # Epoch for orbital propagation (ISO 8601 string for JSON serialization)
     # Default is J2000.0 epoch for reproducibility
     epoch_iso: str = DEFAULT_EPOCH_ISO
+    orbital_engine: str = "sgp4"
 
     @property
     def epoch(self) -> datetime:
@@ -312,6 +312,7 @@ def run_tier1_rollout(
         altitude_km=cfg.altitude_km,
         phasing_factor=cfg.phasing_factor,
         epoch=cfg.epoch,
+        orbital_engine=cfg.orbital_engine,
     )
 
     # 2. Generate TLEs and calculate ISLs
@@ -320,9 +321,8 @@ def run_tier1_rollout(
     isl_kwargs = {
         "duration_minutes": cfg.duration_minutes,
         "step_seconds": cfg.step_seconds,
+        "max_isl_distance_km": cfg.max_isl_distance_km,
     }
-    if cfg.max_isl_distance_km is not None:
-        isl_kwargs["max_isl_distance_km"] = cfg.max_isl_distance_km
     isl_kwargs["isl_policy"] = cfg.isl_policy
     isl_kwargs["adjacent_search_k"] = cfg.adjacent_search_k
     isl_kwargs["max_inter_plane_links_per_sat"] = cfg.max_inter_plane_links_per_sat
