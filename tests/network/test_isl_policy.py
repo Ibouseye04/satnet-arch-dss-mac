@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Counter
+
 import pytest
 
 from satnet.network.hypatia_adapter import (
@@ -48,7 +50,7 @@ def test_grid_fixed_default_matches_explicit_policy() -> None:
     assert default_stats.links_accepted == fixed_stats.links_accepted
 
 
-def test_grid_adaptive_selects_nearest_viable_adjacent_candidate() -> None:
+def test_grid_adaptive_selects_highest_ranked_viable_candidates_globally() -> None:
     config = WalkerDeltaConfig(num_planes=2, sats_per_plane=3)
     positions = _positions_for_adaptive_selection()
 
@@ -58,7 +60,7 @@ def test_grid_adaptive_selects_nearest_viable_adjacent_candidate() -> None:
         AlwaysViableBudget(),
         isl_policy="grid_adaptive",
         adjacent_search_k=1,
-        max_inter_plane_links_per_sat=1,
+        max_inter_plane_links_per_sat=2,
         collect_adaptive_examples=3,
     )
     edges = _edge_set(links)
@@ -74,6 +76,32 @@ def test_grid_adaptive_selects_nearest_viable_adjacent_candidate() -> None:
         "satellite": 0,
     }
     assert first_example["selected"][0]["sat_id"] == 4
+
+
+def test_grid_adaptive_enforces_total_incident_inter_plane_capacity() -> None:
+    config = WalkerDeltaConfig(num_planes=2, sats_per_plane=3)
+    positions = _positions_for_adaptive_selection()
+
+    links, _ = _compute_grid_plus_isls(
+        config,
+        positions,
+        AlwaysViableBudget(),
+        isl_policy="grid_adaptive",
+        adjacent_search_k=1,
+        max_inter_plane_links_per_sat=1,
+    )
+    inter_plane_degree: Counter[int] = Counter()
+    total_degree: Counter[int] = Counter()
+    for link in links:
+        total_degree[link.sat_id_1] += 1
+        total_degree[link.sat_id_2] += 1
+        if link.link_type != "intra_plane":
+            inter_plane_degree[link.sat_id_1] += 1
+            inter_plane_degree[link.sat_id_2] += 1
+
+    assert inter_plane_degree
+    assert max(inter_plane_degree.values()) <= 1
+    assert max(total_degree.values()) > 1
 
 
 def test_grid_adaptive_can_select_two_inter_plane_links_per_sat() -> None:

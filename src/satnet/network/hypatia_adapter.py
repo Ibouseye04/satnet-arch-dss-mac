@@ -923,12 +923,16 @@ def _compute_grid_plus_isls(
         record_mode(link.link_mode)
     
     added_links: Set[Tuple[int, int]] = set()
-    
+    adaptive_candidate_keys: Set[Tuple[int, int]] = set()
+    adaptive_candidates: List[Tuple[ISLLink, Dict[str, object]]] = []
+    adaptive_outcomes_by_source: Dict[int, List[Dict[str, object]]] = {}
+    adaptive_source_context: Dict[int, Tuple[int, int, int, int]] = {}
+
     for plane_idx in range(num_planes):
         for sat_in_plane in range(sats_per_plane):
             current_sat = sat_index(plane_idx, sat_in_plane)
             current_pos = positions[current_sat]
-            
+
             next_in_plane = sat_index(plane_idx, (sat_in_plane + 1) % sats_per_plane)
             link_key = tuple(sorted([current_sat, next_in_plane]))
             if link_key not in added_links:
@@ -943,7 +947,7 @@ def _compute_grid_plus_isls(
                 if link is not None:
                     accept(link)
                 added_links.add(link_key)
-            
+
             next_plane = (plane_idx + 1) % num_planes
             link_type = link_type_for_planes(plane_idx, next_plane)
             offsets = [0]
@@ -968,8 +972,14 @@ def _compute_grid_plus_isls(
                     added_links.add(link_key)
                 continue
 
-            candidate_links: List[Tuple[ISLLink, Dict[str, object]]] = []
             candidate_outcomes: List[Dict[str, object]] = []
+            adaptive_outcomes_by_source[current_sat] = candidate_outcomes
+            adaptive_source_context[current_sat] = (
+                plane_idx,
+                sat_in_plane,
+                next_plane,
+                sat_index(next_plane, sat_in_plane),
+            )
             seen_partner_sats: Set[int] = set()
             for offset in offsets:
                 partner_idx = (sat_in_plane + offset) % sats_per_plane
@@ -978,8 +988,9 @@ def _compute_grid_plus_isls(
                     continue
                 seen_partner_sats.add(partner_sat)
                 link_key = tuple(sorted([current_sat, partner_sat]))
-                if link_key in added_links:
+                if link_key in adaptive_candidate_keys:
                     continue
+                adaptive_candidate_keys.add(link_key)
                 partner_pos = positions[partner_sat]
                 link, outcome = evaluate_candidate(
                     current_sat,
@@ -990,61 +1001,78 @@ def _compute_grid_plus_isls(
                 )
                 candidate_outcomes.append(outcome)
                 if link is not None:
-                    candidate_links.append((link, outcome))
+                    adaptive_candidates.append((link, outcome))
 
-            selected = sorted(
-                candidate_links,
-                key=lambda item: (item[0].distance_km, item[0].sat_id_2),
-            )[:max_inter_plane_links_per_sat]
-            selected_keys: Set[Tuple[int, int]] = set()
-            for link, outcome in selected:
-                outcome["selected"] = True
-                accept(link)
-                selected_keys.add(tuple(sorted([link.sat_id_1, link.sat_id_2])))
-
-            for link_key in selected_keys:
-                added_links.add(link_key)
-
+    if isl_policy == "grid_adaptive":
+        incident_inter_plane_degree: Dict[int, int] = {
+            sat_id: 0 for sat_id in range(config.total_satellites)
+        }
+        selected_by_source: Dict[int, List[ISLLink]] = {}
+        ranked_candidates = sorted(
+            adaptive_candidates,
+            key=lambda item: (
+                -item[0].margin_db,
+                item[0].distance_km,
+                min(item[0].sat_id_1, item[0].sat_id_2),
+                max(item[0].sat_id_1, item[0].sat_id_2),
+            ),
+        )
+        for link, outcome in ranked_candidates:
+            sat_1 = link.sat_id_1
+            sat_2 = link.sat_id_2
             if (
-                collect_adaptive_examples > 0
-                and len(stats.adaptive_selection_examples) < collect_adaptive_examples
-                and candidate_outcomes
+                incident_inter_plane_degree[sat_1] >= max_inter_plane_links_per_sat
+                or incident_inter_plane_degree[sat_2] >= max_inter_plane_links_per_sat
             ):
-                original_sat = sat_index(next_plane, sat_in_plane)
-                selected_records = [
-                    {
-                        "sat_id": link.sat_id_2,
-                        "plane": link.sat_id_2 // sats_per_plane,
-                        "satellite": link.sat_id_2 % sats_per_plane,
-                        "distance_km": link.distance_km,
-                        "margin_db": link.margin_db,
-                    }
-                    for link, _ in selected
-                ]
-                original_outcomes = [
-                    outcome for outcome in candidate_outcomes if outcome["sat_id"] == original_sat
-                ]
-                selected_sat_ids = {record["sat_id"] for record in selected_records}
-                if (
-                    original_outcomes
-                    and not bool(original_outcomes[0]["los"])
-                    and selected_records
-                    and original_sat not in selected_sat_ids
-                ):
-                    stats.adaptive_selection_examples.append({
-                        "sat_id": current_sat,
+                continue
+            outcome["selected"] = True
+            accept(link)
+            added_links.add(tuple(sorted([sat_1, sat_2])))
+            incident_inter_plane_degree[sat_1] += 1
+            incident_inter_plane_degree[sat_2] += 1
+            selected_by_source.setdefault(sat_1, []).append(link)
+
+        for current_sat in sorted(adaptive_outcomes_by_source):
+            if len(stats.adaptive_selection_examples) >= collect_adaptive_examples:
+                break
+            candidate_outcomes = adaptive_outcomes_by_source[current_sat]
+            if not candidate_outcomes:
+                continue
+            plane_idx, sat_in_plane, next_plane, original_sat = adaptive_source_context[current_sat]
+            selected_records = [
+                {
+                    "sat_id": link.sat_id_2,
+                    "plane": link.sat_id_2 // sats_per_plane,
+                    "satellite": link.sat_id_2 % sats_per_plane,
+                    "distance_km": link.distance_km,
+                    "margin_db": link.margin_db,
+                }
+                for link in selected_by_source.get(current_sat, [])
+            ]
+            original_outcomes = [
+                outcome for outcome in candidate_outcomes if outcome["sat_id"] == original_sat
+            ]
+            selected_sat_ids = {record["sat_id"] for record in selected_records}
+            if (
+                original_outcomes
+                and not bool(original_outcomes[0]["los"])
+                and selected_records
+                and original_sat not in selected_sat_ids
+            ):
+                stats.adaptive_selection_examples.append({
+                    "sat_id": current_sat,
+                    "satellite": sat_in_plane,
+                    "plane": plane_idx,
+                    "original_adjacent_candidate": {
+                        "sat_id": original_sat,
+                        "plane": next_plane,
                         "satellite": sat_in_plane,
-                        "plane": plane_idx,
-                        "original_adjacent_candidate": {
-                            "sat_id": original_sat,
-                            "plane": next_plane,
-                            "satellite": sat_in_plane,
-                        },
-                        "adaptive_candidates": candidate_outcomes,
-                        "selected": selected_records,
-                        "selection_reason": "Nearest LOS-valid adjacent satellite after link-budget viability.",
-                    })
-    
+                    },
+                    "adaptive_candidates": candidate_outcomes,
+                    "selected": selected_records,
+                    "selection_reason": "Highest-margin viable link subject to total incident endpoint capacity.",
+                })
+
     return links, stats
 
 
