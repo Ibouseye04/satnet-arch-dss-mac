@@ -8,6 +8,16 @@ from satnet.ground.catalog import (
     load_ground_station_catalog,
     validate_production_catalog_readiness,
 )
+from satnet.ground.persistence import (
+    GROUND_DESIGN_SCHEMA_VERSION,
+    GroundRunDesignRecord,
+    make_disabled_ground_design_record,
+    make_enabled_ground_design_record,
+    read_ground_design_manifest,
+    reconstruct_ground_selection,
+    validate_manifest_against_satellite_runs,
+    write_ground_design_manifest,
+)
 from satnet.ground.selection import (
     GROUND_STATION_SELECTION_VERSION,
     GroundSegmentDisabledConfig,
@@ -19,9 +29,11 @@ from satnet.ground.selection import (
 
 __all__ = [
     "CATALOG_IDENTITY_VERSION",
+    "GROUND_DESIGN_SCHEMA_VERSION",
     "GROUND_STATION_SELECTION_VERSION",
     "MAX_SUPPORTED_GROUND_ALTITUDE_M",
     "MIN_SUPPORTED_GROUND_ALTITUDE_M",
+    "GroundRunDesignRecord",
     "GroundSegmentDisabledConfig",
     "GroundSegmentEnabledConfig",
     "GroundStation",
@@ -30,6 +42,12 @@ __all__ = [
     "GroundStationSelection",
     "build_region_balanced_order",
     "load_ground_station_catalog",
+    "make_disabled_ground_design_record",
+    "make_enabled_ground_design_record",
+    "read_ground_design_manifest",
+    "reconstruct_ground_selection",
     "select_ground_stations",
+    "validate_manifest_against_satellite_runs",
     "validate_production_catalog_readiness",
+    "write_ground_design_manifest",
 ]
