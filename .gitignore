@@ -24,6 +24,10 @@ artifacts/graph_cache/
 
 # Experiment logs
 experiments/
+!docs/experiments/
+!docs/experiments/**
+!scripts/experiments/
+!scripts/experiments/**
 
 # Models (optional)
 models/*.joblib
