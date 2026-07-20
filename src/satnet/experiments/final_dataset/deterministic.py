@@ -16,6 +16,22 @@ from satnet.ground.canonical import canonical_float_string, canonical_json
 T = TypeVar("T")
 
 
+def parse_canonical_float(value: object, field_name: str) -> float:
+    if not isinstance(value, str):
+        raise TypeError(f"{field_name} must be a canonical float string")
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} is not a valid float string") from exc
+    if not math.isfinite(parsed):
+        raise ValueError(f"{field_name} must be finite")
+    if parsed == 0.0 and value.startswith("-"):
+        raise ValueError(f"{field_name} must use positive zero")
+    if canonical_float_string(parsed) != value:
+        raise ValueError(f"{field_name} is not canonical")
+    return parsed
+
+
 def canonical_digest(payload: dict[str, Any]) -> bytes:
     return hashlib.sha256(canonical_json(payload).encode("utf-8")).digest()
 
