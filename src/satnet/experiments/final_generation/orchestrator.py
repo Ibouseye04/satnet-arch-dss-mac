@@ -160,10 +160,11 @@ def _validate_published_attempt(
 ) -> None:
     expected = attempt_input_identity(mapping)
     attempts = _attempt_records(output_root, mapping.run_id)
+    for record in attempts:
+        _validate_attempt_identity(record, expected)
     successful = [record for record in attempts if record.get("state") == "succeeded"]
     if len(successful) != 1:
         raise ValueError("Published run must have exactly one successful attempt")
-    _validate_attempt_identity(successful[0], expected)
     if successful[0].get("published_result_hash") != result["run_result_hash"]:
         raise ValueError("Published attempt result hash mismatch")
     state = read_canonical_json(_current_state_path(output_root, mapping.run_id))
@@ -176,10 +177,16 @@ def _validate_published_attempt(
 
 
 def _validate_resume_certificate(
-    *, mapping: FinalRunMapping, replay_root: Path, result_hash: str
+    *,
+    mapping: FinalRunMapping,
+    replay_root: Path,
+    result_hash: str,
+    generation_mode: str,
 ) -> None:
+    replay_mode = "production_replay" if generation_mode == "production" else "qualification_replay"
+    verified_root = ensure_mode_root(replay_root, replay_mode, create=False)
     report = read_canonical_json(
-        run_directory(replay_root, mapping.run_id) / "replay_report.json"
+        run_directory(verified_root, mapping.run_id) / "replay_report.json"
     )
     required_stages = [
         "satellite", "g1", "g2", "g3", "g4", "g5", "target", "inventory", "result"
@@ -229,6 +236,7 @@ def generate_run(
             mapping=mapping,
             replay_root=Path(resume_replay_root),
             result_hash=result["run_result_hash"],
+            generation_mode=mode,
         )
         return result
     attempt_number = _attempt_number(root, mapping.run_id)

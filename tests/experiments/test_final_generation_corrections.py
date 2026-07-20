@@ -509,8 +509,12 @@ def test_resume_certificate_rejects_missing_stage(tmp_path: Path) -> None:
     root, ledger = _replay_fixture(tmp_path, mapping)
     report = ledger["records"][0]
     report["per_stage_comparison"] = report["per_stage_comparison"][:-1]
+    atomic_write_json(root / "execution_mode.json", mode_marker("qualification_replay"))
     atomic_write_json(root / "run_000" / "replay_report.json", report, overwrite=True)
     with pytest.raises(ValueError, match="certificate mismatch"):
         _validate_resume_certificate(
-            mapping=mapping, replay_root=root, result_hash="3" * 64
+            mapping=mapping,
+            replay_root=root,
+            result_hash="3" * 64,
+            generation_mode="qualification",
         )
