@@ -10,7 +10,8 @@ from satnet.experiments.final_generation.acceptance import (
     validate_qualification,
 )
 from satnet.experiments.final_generation.constants import QUALIFICATION_RUN_IDS
-from satnet.experiments.final_generation.contract import validate_frozen_contract
+from satnet.experiments.final_generation.contract import ensure_mode_root, validate_frozen_contract
+from satnet.experiments.final_generation.io import atomic_write_json
 from satnet.experiments.final_generation.mapping import map_all_runs
 
 
@@ -38,31 +39,30 @@ def test_qualification_subset_passes_without_claiming_production(
     selected = tuple(_mappings()[run_id] for run_id in QUALIFICATION_RUN_IDS)
     monkeypatch.setattr(
         acceptance_module,
-        "validate_completed_run",
-        lambda **kwargs: {"run_result_hash": f"{kwargs['mapping'].run_id:064x}"},
-    )
-    monkeypatch.setattr(
-        acceptance_module,
         "ensure_mode_root",
         lambda root, mode, create: Path(root),
     )
-
-    def read_evidence(path: Path):
-        if path.name == "generation_ledger.json":
-            return {
-                "distinct_frozen_run_submission_count": 15,
-                "successful_generation_count": 15,
-            }
-        if path.name == "replay_ledger.json":
-            return {"replay_submission_count": 15, "successful_replay_count": 15}
-        return {
-            "expected_result_hash": f"{int(path.parent.name[-3:]):064x}",
-            "input_tree_unchanged": True,
-            "replay_state": "succeeded",
-        }
-
-    monkeypatch.setattr(acceptance_module, "read_canonical_json", read_evidence)
-    monkeypatch.setattr(acceptance_module, "_target_values", lambda path: _target(int(path.parents[1].name[-3:])))
+    monkeypatch.setattr(
+        acceptance_module,
+        "read_canonical_json",
+        lambda path: {"records": []},
+    )
+    monkeypatch.setattr(acceptance_module, "validate_catalog", lambda: object())
+    results = {
+        mapping.run_id: {"run_result_hash": f"{mapping.run_id:064x}"}
+        for mapping in selected
+    }
+    targets = {mapping.run_id: _target(mapping.run_id) for mapping in selected}
+    monkeypatch.setattr(
+        acceptance_module,
+        "validate_generation_evidence",
+        lambda **kwargs: (targets, results),
+    )
+    monkeypatch.setattr(
+        acceptance_module,
+        "validate_replay_evidence",
+        lambda **kwargs: {},
+    )
     monkeypatch.setattr(acceptance_module, "_validate_ground_consistency", lambda *args: None)
     result = validate_qualification(
         mappings=selected,
@@ -83,7 +83,7 @@ def test_qualification_rejects_wrong_subset(tmp_path: Path) -> None:
         )
 
 
-def test_production_acceptance_uses_frozen_gates_and_rejects_missing_counts(
+def test_production_acceptance_rejects_forged_counts_without_records(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     mappings = _mappings()
@@ -93,17 +93,34 @@ def test_production_acceptance_uses_frozen_gates_and_rejects_missing_counts(
         "validate_frozen_contract",
         lambda **kwargs: original_contract,
     )
-    generation = {
-        "distinct_frozen_run_submission_count": 499,
-        "successful_generation_count": 500,
-    }
-    replay = {"replay_submission_count": 500, "successful_replay_count": 500}
-    with pytest.raises(ValueError, match="submission"):
+    generation_root = tmp_path / "generation"
+    replay_root = tmp_path / "replay"
+    ensure_mode_root(generation_root, "production", create=True)
+    ensure_mode_root(replay_root, "production_replay", create=True)
+    atomic_write_json(
+        generation_root / "operational" / "generation_ledger.json",
+        {
+            "contract_spec_hash": original_contract["contract_spec_hash"],
+            "distinct_frozen_run_submission_count": 500,
+            "operational_attempt_event_count": 500,
+            "records": [],
+            "successful_generation_count": 500,
+        },
+    )
+    atomic_write_json(
+        replay_root / "replay_ledger.json",
+        {
+            "contract_spec_hash": original_contract["contract_spec_hash"],
+            "records": [],
+            "replay_submission_count": 500,
+            "successful_replay_count": 500,
+        },
+    )
+    with pytest.raises(ValueError, match="generation run set mismatch"):
         validate_production_acceptance(
             mappings=mappings,
-            generation_ledger=generation,
-            replay_ledger=replay,
-            generation_root=tmp_path,
+            generation_root=generation_root,
+            replay_root=replay_root,
             protected_science_diff_empty=True,
         )
 
@@ -113,16 +130,10 @@ def test_production_acceptance_rejects_protected_diff(
 ) -> None:
     contract = validate_frozen_contract(compare_tag_blobs=False)
     monkeypatch.setattr(acceptance_module, "validate_frozen_contract", lambda **kwargs: contract)
-    generation = {
-        "distinct_frozen_run_submission_count": 500,
-        "successful_generation_count": 500,
-    }
-    replay = {"replay_submission_count": 500, "successful_replay_count": 500}
     with pytest.raises(ValueError, match="Protected-science"):
         validate_production_acceptance(
             mappings=_mappings(),
-            generation_ledger=generation,
-            replay_ledger=replay,
-            generation_root=tmp_path,
+            generation_root=tmp_path / "generation",
+            replay_root=tmp_path / "replay",
             protected_science_diff_empty=False,
         )

@@ -14,6 +14,20 @@ PROTECTED_PATHS = (
     "src/satnet/models/risk_model.py",
     "src/satnet/utils/graph_cache.py",
 )
+ALLOWED_EXACT_PATHS = frozenset({".gitattributes"})
+ALLOWED_PREFIXES = (
+    "artifacts/final_integrated_dataset_contract/",
+    "artifacts/final_integrated_dataset_generation_qualification/",
+    "docs/experiments/final_integrated_dataset_",
+    "src/satnet/experiments/final_dataset/",
+    "src/satnet/experiments/final_generation/",
+    "tests/experiments/test_final_dataset_",
+    "tests/experiments/test_final_generation_",
+)
+
+
+def _is_approved_path(path: str) -> bool:
+    return path in ALLOWED_EXACT_PATHS or path.startswith(ALLOWED_PREFIXES)
 
 
 def test_protected_science_diff_is_empty() -> None:
@@ -36,14 +50,13 @@ def test_contract_changes_are_confined_to_approved_surfaces() -> None:
         text=True,
     )
     paths = tuple(line for line in result.stdout.splitlines() if line)
-    allowed_prefixes = (
-        "artifacts/final_integrated_dataset_contract/",
-        "docs/experiments/final_integrated_dataset_",
-        "src/satnet/experiments/final_dataset/",
-        "tests/experiments/test_final_dataset_",
-    )
     assert paths
-    assert all(path.startswith(allowed_prefixes) for path in paths)
+    assert all(_is_approved_path(path) for path in paths)
+
+
+def test_contract_change_allowlist_rejects_unauthorized_path() -> None:
+    assert not _is_approved_path("src/satnet/network/unauthorized_change.py")
+    assert not _is_approved_path("tests/experiments/unrelated_test.py")
 
 
 def test_contract_artifact_root_contains_no_scientific_run_evidence() -> None:
