@@ -88,6 +88,81 @@ def _schema_hash(schema: dict[str, Any], field_name: str) -> str:
     return value
 
 
+def build_later_generation_acceptance_gates() -> dict[str, Any]:
+    return {
+        "expected_run_count": 500,
+        "required_generation_attempt_count": 500,
+        "required_successful_generation_count": 500,
+        "required_authoritative_replay_count": 500,
+        "required_successful_replay_count": 500,
+        "allow_seed_substitution": False,
+        "allow_run_omission": False,
+        "allow_replacement_runs": False,
+        "require_failure_evidence_preservation": True,
+        "require_all_numeric_targets_finite": True,
+        "require_all_target_fractions_in_unit_interval": True,
+        "require_primary_classification_both_classes_per_split": True,
+        "require_primary_regression_nonzero_standard_deviation_per_split": True,
+        "require_primary_regression_minimum_unique_values_per_split": 5,
+        "allow_outcome_driven_split_reshuffle": False,
+        "require_frozen_split_manifest": True,
+        "require_all_five_realizations_colocated_by_design": True,
+        "require_zero_missing_stage_artifacts": True,
+        "require_zero_duplicate_run_ids": True,
+        "require_zero_duplicate_design_realization_pairs": True,
+        "require_exact_g1_g5_replay": True,
+        "require_protected_science_diff_empty": True,
+        "count_semantics": {
+            "expected_run_count": "records_in_frozen_run_manifest",
+            "required_generation_attempt_count": "frozen_runs_submitted_to_generation",
+            "required_successful_generation_count": "frozen_runs_successfully_generated",
+            "required_authoritative_replay_count": "frozen_runs_submitted_to_authoritative_replay",
+            "required_successful_replay_count": "frozen_runs_successfully_replayed",
+        },
+        "failure_behavior": {
+            "preserve_failed_run_evidence": True,
+            "keep_frozen_run_manifest_unchanged": True,
+            "dataset_status_on_any_failure": "incomplete",
+            "retry_requires_same_run_id_and_frozen_seeds": True,
+        },
+        "numeric_target_validity": {
+            "reject_nan": True,
+            "reject_positive_infinity": True,
+            "reject_negative_infinity": True,
+            "fraction_interval": ["0", "1"],
+            "fraction_interval_closed": True,
+        },
+        "primary_classification_gate": {
+            "target_field": "overall_threshold_breach_any",
+            "required_splits": ["train", "validation", "test"],
+            "required_values_per_split": [False, True],
+            "failure_action": "dataset_acceptance_failed_pending_explicit_contract_version_review",
+            "allow_threshold_tuning": False,
+        },
+        "primary_regression_gate": {
+            "target_field": "failure_adjusted_overall_service_fraction_mean",
+            "required_splits": ["train", "validation", "test"],
+            "standard_deviation_semantics": "population_standard_deviation_over_finite_binary64_values",
+            "require_nonzero_standard_deviation": True,
+            "unique_value_semantics": "exact_binary64_equality_after_finite_parse",
+            "minimum_unique_values_per_split": 5,
+        },
+        "split_immutability": {
+            "selected_candidate_id": 164,
+            "outcomes_or_labels_may_modify_assignments": False,
+            "all_realizations_grouped_by_design": True,
+        },
+        "required_stage_artifacts": [
+            "satellite_rollout",
+            "G1",
+            "G2",
+            "G3",
+            "G4",
+            "G5",
+        ],
+    }
+
+
 def build_contract_specification() -> dict[str, Any]:
     target_schema = build_target_schema()
     rf_schema = build_rf_schema()
@@ -403,7 +478,7 @@ def build_contract_specification() -> dict[str, Any]:
             "contract_bundle_hash": "binds_spec_schema_catalog_design_run_and_split_hashes",
             "generated_records_reference_contract_bundle_hash": False,
         },
-        "acceptance_gates": {
+        "contract_phase_validation_gates": {
             "manifest_counts": {"designs": 100, "runs": 500},
             "split_design_counts": {"train": 70, "validation": 15, "test": 15},
             "all_realizations_colocated": True,
@@ -414,6 +489,7 @@ def build_contract_specification() -> dict[str, Any]:
             "complete_tests_pass": True,
             "simulation_artifacts_required": False,
         },
+        "later_generation_acceptance_gates": build_later_generation_acceptance_gates(),
     }
     result = deepcopy(payload)
     result["contract_spec_hash"] = canonical_hash(payload)
@@ -429,6 +505,10 @@ def validate_contract_specification(specification: dict[str, Any]) -> None:
     payload = {key: item for key, item in specification.items() if key != "contract_spec_hash"}
     if canonical_hash(payload) != value:
         raise ValueError("contract_spec_hash does not match specification payload")
+    if specification.get(
+        "later_generation_acceptance_gates"
+    ) != build_later_generation_acceptance_gates():
+        raise ValueError("Later-generation acceptance gates differ from the frozen contract")
 
 
 def materialize_machine_specification(output_root: str | Path, *, overwrite: bool = False) -> dict[str, str]:
