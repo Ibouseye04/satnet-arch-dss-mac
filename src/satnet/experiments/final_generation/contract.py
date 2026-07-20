@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 from pathlib import Path
 import subprocess
 from typing import Any, Iterable
@@ -78,6 +79,15 @@ _EXPECTED_UNTRACKED_ENTRIES = frozenset(
         "docs/refactor_plans/2026-07-15_tier1_validity_remediation_atomic_gameplan.md",
         "docs/validation/tier1_defect_verification.md",
     }
+)
+_PROTECTED_SCIENCE_PATHS = (
+    "src/satnet/ground",
+    "src/satnet/network",
+    "src/satnet/simulation/tier1_rollout.py",
+    "src/satnet/models/gnn_dataset.py",
+    "src/satnet/models/gnn_model.py",
+    "src/satnet/models/risk_model.py",
+    "src/satnet/utils/graph_cache.py",
 )
 
 
@@ -243,6 +253,12 @@ def runtime_preflight(expected_tooling_sha: str) -> dict[str, Any]:
     return {"head": head, "frozen_commit": tag, "contract_spec_hash": CONTRACT_SPEC_HASH}
 
 
+def protected_science_isolation_passes() -> bool:
+    committed = _git("diff", "--name-only", FROZEN_COMMIT, "HEAD", "--", *_PROTECTED_SCIENCE_PATHS)
+    status = _git("status", "--porcelain", "--", *_PROTECTED_SCIENCE_PATHS)
+    return not committed and not status
+
+
 def validate_initial_untracked_entries(entries: Iterable[str]) -> None:
     normalized: set[str] = set()
     for entry in entries:
@@ -255,18 +271,68 @@ def validate_initial_untracked_entries(entries: Iterable[str]) -> None:
 
 
 def resolved_path(value: str | Path) -> Path:
-    return Path(value).expanduser().resolve(strict=False)
+    expanded = Path(value).expanduser().absolute()
+    return Path(os.path.realpath(expanded))
+
+
+def _normalized_path(value: str | Path) -> str:
+    return os.path.normcase(str(resolved_path(value)))
 
 
 def paths_intersect(left: Path, right: Path) -> bool:
-    return left == right or left in right.parents or right in left.parents
+    left_value = _normalized_path(left)
+    right_value = _normalized_path(right)
+    try:
+        common = os.path.commonpath((left_value, right_value))
+    except ValueError:
+        return False
+    return common == left_value or common == right_value
+
+
+def repository_worktree_roots() -> tuple[Path, ...]:
+    output = _git("worktree", "list", "--porcelain").decode("utf-8")
+    roots = [
+        resolved_path(line.removeprefix("worktree "))
+        for line in output.splitlines()
+        if line.startswith("worktree ")
+    ]
+    current = resolved_path(repository_root())
+    if current not in roots:
+        roots.append(current)
+    return tuple(sorted(set(roots), key=lambda path: _normalized_path(path)))
+
+
+def git_common_directory() -> Path:
+    value = _git("rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()
+    return resolved_path(value)
+
+
+def repository_family_protected_paths() -> tuple[Path, ...]:
+    relatives = (
+        "artifacts/final_integrated_dataset_contract",
+        "data",
+        "docs/refactor_plans/2026-07-15_tier1_validity_remediation_atomic_gameplan.md",
+        "docs/validation/tier1_defect_verification.md",
+        "src/satnet/ground",
+        "src/satnet/network",
+        "src/satnet/simulation/tier1_rollout.py",
+        "src/satnet/models/gnn_dataset.py",
+        "src/satnet/models/gnn_model.py",
+        "src/satnet/models/risk_model.py",
+        "src/satnet/utils/graph_cache.py",
+    )
+    protected: set[Path] = {git_common_directory()}
+    for worktree in repository_worktree_roots():
+        protected.add(worktree)
+        protected.update(resolved_path(worktree / relative) for relative in relatives)
+    return tuple(sorted(protected, key=lambda path: _normalized_path(path)))
 
 
 def validate_output_root(root: str | Path, *, other_roots: Iterable[str | Path] = ()) -> Path:
     resolved = resolved_path(root)
-    repo = repository_root().resolve()
-    if paths_intersect(resolved, repo):
-        raise ValueError("Execution root intersects repository root")
+    for prohibited in repository_family_protected_paths():
+        if paths_intersect(resolved, prohibited):
+            raise ValueError(f"Execution root intersects protected repository-family path: {prohibited}")
     for other in other_roots:
         if paths_intersect(resolved, resolved_path(other)):
             raise ValueError("Execution roots intersect")

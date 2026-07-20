@@ -6,10 +6,11 @@ from typing import Any, Sequence
 
 from satnet.ground.canonical import canonical_json
 
-from .acceptance import validate_qualification
+from .acceptance import validate_production_acceptance, validate_qualification
 from .constants import CONTRACT_SPEC_HASH, QUALIFICATION_RUN_IDS
 from .contract import (
     ensure_mode_root,
+    protected_science_isolation_passes,
     runtime_preflight,
     validate_catalog,
     validate_frozen_contract,
@@ -45,6 +46,15 @@ def _selection(mappings: Sequence[FinalRunMapping], run_ids: Sequence[int]) -> t
 
 def _print(value: dict[str, Any]) -> None:
     print(canonical_json(value))
+
+
+def _confirm_production(args: argparse.Namespace) -> None:
+    if not args.confirm_production:
+        raise ValueError("Production requires --confirm-production")
+    if args.confirm_contract_spec_hash != CONTRACT_SPEC_HASH:
+        raise ValueError("Production contract confirmation mismatch")
+    if args.confirm_run_count != 500:
+        raise ValueError("Production run-count confirmation must equal 500")
 
 
 def command_preflight(args: argparse.Namespace) -> None:
@@ -104,6 +114,7 @@ def command_qualify(args: argparse.Namespace) -> None:
         mode=expected_mode,
         retry=args.retry,
         verified_resume=args.verified_resume,
+        resume_replay_root=args.resume_replay_root,
     )
     _print(result)
 
@@ -125,13 +136,23 @@ def command_qualify_design(args: argparse.Namespace) -> None:
 def command_qualify_set(args: argparse.Namespace) -> None:
     _, mappings = _load(runtime_sha=args.expected_tooling_sha)
     selected = _selection(mappings, QUALIFICATION_RUN_IDS)
+    catalog = validate_catalog()
     results = generate_runs(
         mappings=selected,
-        catalog=validate_catalog(),
+        catalog=catalog,
         output_root=args.output_root,
         mode="qualification",
     )
-    _print({"result_hashes": [value["run_result_hash"] for value in results], "run_ids": list(QUALIFICATION_RUN_IDS)})
+    ledger = materialize_generation_ledger(
+        output_root=args.output_root, mappings=selected, catalog=catalog
+    )
+    _print(
+        {
+            "generation_ledger": ledger,
+            "result_hashes": [value["run_result_hash"] for value in results],
+            "run_ids": list(QUALIFICATION_RUN_IDS),
+        }
+    )
 
 
 def command_replay(args: argparse.Namespace) -> None:
@@ -154,13 +175,24 @@ def command_replay_set(args: argparse.Namespace) -> None:
         input_root=args.input_root,
         replay_output_root=args.replay_output_root,
     )
-    _print({"run_ids": [value["run_id"] for value in reports], "successful_replays": len(reports)})
+    ledger = materialize_replay_ledger(
+        replay_root=args.replay_output_root, mappings=selected
+    )
+    _print(
+        {
+            "replay_ledger": ledger,
+            "run_ids": [value["run_id"] for value in reports],
+            "successful_replays": len(reports),
+        }
+    )
 
 
 def command_materialize_ledgers(args: argparse.Namespace) -> None:
     _, mappings = _load(runtime_sha=None)
     selected = _selection(mappings, QUALIFICATION_RUN_IDS if args.qualification else range(500))
-    generation = materialize_generation_ledger(output_root=args.input_root, mappings=selected)
+    generation = materialize_generation_ledger(
+        output_root=args.input_root, mappings=selected, catalog=validate_catalog()
+    )
     result: dict[str, Any] = {"generation_ledger": generation}
     if args.replay_root:
         result["replay_ledger"] = materialize_replay_ledger(
@@ -185,22 +217,73 @@ def command_compare_repeat(args: argparse.Namespace) -> None:
     _print(compare_repeat(primary_root=args.input_root, repeat_root=args.repeat_root, run_id=200))
 
 
-def command_production(args: argparse.Namespace) -> None:
-    if not args.confirm_production:
-        raise ValueError("Production requires --confirm-production")
-    if args.confirm_contract_spec_hash != CONTRACT_SPEC_HASH:
-        raise ValueError("Production contract confirmation mismatch")
-    if args.confirm_run_count != 500:
-        raise ValueError("Production run-count confirmation must equal 500")
+def command_generate_production(args: argparse.Namespace) -> None:
+    _confirm_production(args)
     _, mappings = _load(runtime_sha=args.expected_tooling_sha)
     ensure_mode_root(args.output_root, "production", create=True)
-    results = generate_runs(
+    catalog = validate_catalog()
+    results = tuple(
+        generate_run(
+            mapping=mapping,
+            catalog=catalog,
+            output_root=args.output_root,
+            mode="production",
+            retry=args.retry,
+            verified_resume=args.verified_resume,
+            resume_replay_root=args.resume_replay_root,
+        )
+        for mapping in mappings
+    )
+    ledger = materialize_generation_ledger(
+        output_root=args.output_root, mappings=mappings, catalog=catalog
+    )
+    _print(
+        {
+            "generation_ledger": ledger,
+            "production_generation_count": len(results),
+        }
+    )
+
+
+def command_replay_production(args: argparse.Namespace) -> None:
+    _confirm_production(args)
+    _, mappings = _load(runtime_sha=args.expected_tooling_sha)
+    reports = replay_runs_read_only(
         mappings=mappings,
         catalog=validate_catalog(),
-        output_root=args.output_root,
-        mode="production",
+        input_root=args.input_root,
+        replay_output_root=args.replay_output_root,
+        input_mode="production",
+        output_mode="production_replay",
     )
-    _print({"production_generation_count": len(results)})
+    ledger = materialize_replay_ledger(
+        replay_root=args.replay_output_root, mappings=mappings
+    )
+    _print(
+        {
+            "production_replay_count": len(reports),
+            "replay_ledger": ledger,
+        }
+    )
+
+
+def command_validate_production(args: argparse.Namespace) -> None:
+    _confirm_production(args)
+    _, mappings = _load(runtime_sha=args.expected_tooling_sha)
+    report = validate_production_acceptance(
+        mappings=mappings,
+        generation_root=args.input_root,
+        replay_root=args.replay_root,
+        protected_science_diff_empty=protected_science_isolation_passes(),
+    )
+    report_path = Path(args.acceptance_report)
+    validate_output_root(report_path.parent)
+    atomic_write_json(report_path, report)
+    _print(report)
+
+
+def command_production(args: argparse.Namespace) -> None:
+    command_generate_production(args)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -225,6 +308,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualify.add_argument("--expected-tooling-sha", required=True)
     qualify.add_argument("--retry", action="store_true")
     qualify.add_argument("--verified-resume", action="store_true")
+    qualify.add_argument("--resume-replay-root", type=Path)
     qualify.add_argument("--repeat", action="store_true")
     qualify.set_defaults(handler=command_qualify)
 
@@ -268,13 +352,40 @@ def build_parser() -> argparse.ArgumentParser:
     repeat.add_argument("--repeat-root", type=Path, required=True)
     repeat.set_defaults(handler=command_compare_repeat)
 
+    def add_production_confirmations(command: argparse.ArgumentParser) -> None:
+        command.add_argument("--confirm-production", action="store_true")
+        command.add_argument("--confirm-contract-spec-hash", required=True)
+        command.add_argument("--confirm-run-count", type=int, required=True)
+        command.add_argument("--expected-tooling-sha", required=True)
+
     production = subparsers.add_parser("production")
     production.add_argument("--output-root", type=Path, required=True)
-    production.add_argument("--confirm-production", action="store_true")
-    production.add_argument("--confirm-contract-spec-hash", required=True)
-    production.add_argument("--confirm-run-count", type=int, required=True)
-    production.add_argument("--expected-tooling-sha", required=True)
+    production.add_argument("--retry", action="store_true")
+    production.add_argument("--verified-resume", action="store_true")
+    production.add_argument("--resume-replay-root", type=Path)
+    add_production_confirmations(production)
     production.set_defaults(handler=command_production)
+
+    generate_production = subparsers.add_parser("generate-production")
+    generate_production.add_argument("--output-root", type=Path, required=True)
+    generate_production.add_argument("--retry", action="store_true")
+    generate_production.add_argument("--verified-resume", action="store_true")
+    generate_production.add_argument("--resume-replay-root", type=Path)
+    add_production_confirmations(generate_production)
+    generate_production.set_defaults(handler=command_generate_production)
+
+    replay_production = subparsers.add_parser("replay-production")
+    replay_production.add_argument("--input-root", type=Path, required=True)
+    replay_production.add_argument("--replay-output-root", type=Path, required=True)
+    add_production_confirmations(replay_production)
+    replay_production.set_defaults(handler=command_replay_production)
+
+    validate_production = subparsers.add_parser("validate-production")
+    validate_production.add_argument("--input-root", type=Path, required=True)
+    validate_production.add_argument("--replay-root", type=Path, required=True)
+    validate_production.add_argument("--acceptance-report", type=Path, required=True)
+    add_production_confirmations(validate_production)
+    validate_production.set_defaults(handler=command_validate_production)
     return parser
 
 

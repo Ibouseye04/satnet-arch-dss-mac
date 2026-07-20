@@ -7,7 +7,7 @@ from pathlib import Path, PurePosixPath
 import tempfile
 from typing import Any
 
-from satnet.ground.canonical import canonical_float_string, canonical_json
+from satnet.ground.canonical import canonical_float_string, canonical_hash, canonical_json
 
 
 def pairs_without_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -90,3 +90,11 @@ def tree_inventory(root: str | Path) -> tuple[tuple[str, int, str], ...]:
         (path.relative_to(base).as_posix(), *file_identity(path))
         for path in sorted(item for item in base.rglob("*") if item.is_file())
     )
+
+
+def tree_inventory_hash(root: str | Path) -> str:
+    records = [
+        {"byte_length": length, "path": path, "sha256": digest}
+        for path, length, digest in tree_inventory(root)
+    ]
+    return canonical_hash({"files": records})

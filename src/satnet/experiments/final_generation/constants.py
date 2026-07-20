@@ -29,7 +29,13 @@ FROZEN_ARTIFACTS = (
     "doe_evidence.json",
 )
 SUPPORTED_MODES = frozenset(
-    {"qualification", "qualification_replay", "qualification_repeat", "production"}
+    {
+        "production",
+        "production_replay",
+        "qualification",
+        "qualification_repeat",
+        "qualification_replay",
+    }
 )
 QUALIFICATION_RUN_IDS = (0, 1, 2, 3, 4, 35, 36, 37, 38, 39, 200, 201, 202, 203, 204)
 TARGET_FIELDS = (

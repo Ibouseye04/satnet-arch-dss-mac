@@ -44,7 +44,6 @@ from .artifacts import (
     make_scientific_inventory,
     make_target_artifact,
     validate_run_result,
-    validate_scientific_inventory,
     validate_target_artifact,
     write_satellite_artifact,
 )
@@ -52,6 +51,7 @@ from .constants import CONTRACT_SPEC_HASH, RUN_FILES
 from .contract import ensure_mode_root
 from .io import atomic_write_json, file_identity, read_canonical_json
 from .mapping import FinalRunMapping
+from .run_validation import validate_run_authoritatively
 
 
 def run_directory(output_root: str | Path, run_id: int) -> Path:
@@ -72,6 +72,47 @@ def _timestamp() -> str:
 def _attempt_number(output_root: Path, run_id: int) -> int:
     root = output_root / "operational" / "attempts" / f"run_{run_id:03d}"
     return len(tuple(root.glob("attempt_*.json"))) + 1 if root.exists() else 1
+
+
+def attempt_input_identity(mapping: FinalRunMapping) -> dict[str, Any]:
+    return {
+        "contract_spec_hash": mapping.run["contract_spec_hash"],
+        "design_id": mapping.design["design_id"],
+        "design_index": mapping.design["design_index"],
+        "design_record_hash": mapping.design["design_record_hash"],
+        "ground_design_hash": mapping.design["ground_design_hash"],
+        "ground_failure_seed": mapping.run["ground_failure_seed"],
+        "ground_selection_hash": mapping.design["ground_selection_hash"],
+        "ground_selection_seed": mapping.run["ground_selection_seed"],
+        "realization_id": mapping.run["realization_id"],
+        "realization_index": mapping.run["realization_index"],
+        "run_id": mapping.run_id,
+        "run_key": mapping.run_key,
+        "run_record_hash": mapping.run["run_record_hash"],
+        "satellite_seed": mapping.run["satellite_seed"],
+        "split": mapping.run["split_assignment"],
+    }
+
+
+def _attempt_records(output_root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
+    root = output_root / "operational" / "attempts" / f"run_{run_id:03d}"
+    if not root.exists():
+        return ()
+    return tuple(read_canonical_json(path) for path in sorted(root.glob("attempt_*.json")))
+
+
+def _validate_attempt_identity(record: dict[str, Any], expected: dict[str, Any]) -> None:
+    actual = record.get("attempt_input_identity")
+    if actual != expected:
+        raise ValueError("Attempt input identity differs from frozen run identity")
+    if record.get("attempt_input_identity_hash") != canonical_hash(expected):
+        raise ValueError("Attempt input identity hash mismatch")
+
+
+def _validate_retry_identities(output_root: Path, mapping: FinalRunMapping) -> None:
+    expected = attempt_input_identity(mapping)
+    for record in _attempt_records(output_root, mapping.run_id):
+        _validate_attempt_identity(record, expected)
 
 
 def _attempt_path(output_root: Path, run_id: int, number: int) -> Path:
@@ -104,28 +145,63 @@ def _sanitize_message(error: Exception) -> str:
 
 
 def validate_completed_run(
-    *, mapping: FinalRunMapping, run_root: str | Path
+    *,
+    mapping: FinalRunMapping,
+    catalog: GroundStationCatalog,
+    run_root: str | Path,
 ) -> dict[str, Any]:
-    root = Path(run_root)
-    paths = artifact_paths(root)
-    for path in paths.values():
-        if not path.is_file():
-            raise ValueError(f"Completed run is missing artifact: {path.name}")
-    target = read_canonical_json(paths["target"])
-    validate_target_artifact(target)
-    inventory = read_canonical_json(paths["inventory"])
-    validate_scientific_inventory(root, inventory)
-    result = read_canonical_json(paths["result"])
-    validate_run_result(result)
-    expected = make_run_result(
-        design=mapping.design,
-        run=mapping.run,
-        inventory=inventory,
-        target=target,
+    return validate_run_authoritatively(
+        mapping=mapping, catalog=catalog, run_root=run_root
+    )["result"]
+
+
+def _validate_published_attempt(
+    *, output_root: Path, mapping: FinalRunMapping, result: dict[str, Any]
+) -> None:
+    expected = attempt_input_identity(mapping)
+    attempts = _attempt_records(output_root, mapping.run_id)
+    successful = [record for record in attempts if record.get("state") == "succeeded"]
+    if len(successful) != 1:
+        raise ValueError("Published run must have exactly one successful attempt")
+    _validate_attempt_identity(successful[0], expected)
+    if successful[0].get("published_result_hash") != result["run_result_hash"]:
+        raise ValueError("Published attempt result hash mismatch")
+    state = read_canonical_json(_current_state_path(output_root, mapping.run_id))
+    if (
+        state.get("state") != "succeeded"
+        or state.get("run_record_hash") != mapping.run["run_record_hash"]
+        or state.get("published_result_hash") != result["run_result_hash"]
+    ):
+        raise ValueError("Published generation state mismatch")
+
+
+def _validate_resume_certificate(
+    *, mapping: FinalRunMapping, replay_root: Path, result_hash: str
+) -> None:
+    report = read_canonical_json(
+        run_directory(replay_root, mapping.run_id) / "replay_report.json"
     )
-    if result != expected:
-        raise ValueError("Completed run result does not match frozen identities")
-    return result
+    required_stages = [
+        "satellite", "g1", "g2", "g3", "g4", "g5", "target", "inventory", "result"
+    ]
+    if (
+        report.get("run_id") != mapping.run_id
+        or report.get("run_key") != mapping.run_key
+        or report.get("run_record_hash") != mapping.run["run_record_hash"]
+        or report.get("replay_state") != "succeeded"
+        or report.get("input_result_hash") != result_hash
+        or report.get("recomputed_result_hash") != result_hash
+        or not report.get("input_tree_unchanged")
+        or report.get("before_input_tree_inventory_hash")
+        != report.get("after_input_tree_inventory_hash")
+        or [record.get("stage") for record in report.get("per_stage_comparison", [])]
+        != required_stages
+        or any(
+            record.get("state") != "matched"
+            for record in report.get("per_stage_comparison", [])
+        )
+    ):
+        raise ValueError("Verified-resume replay certificate mismatch")
 
 
 def generate_run(
@@ -136,20 +212,36 @@ def generate_run(
     mode: str,
     retry: bool = False,
     verified_resume: bool = False,
+    resume_replay_root: str | Path | None = None,
 ) -> dict[str, Any]:
     root = ensure_mode_root(output_root, mode, create=True)
     final_root = run_directory(root, mapping.run_id)
     if final_root.exists():
         if not verified_resume:
             raise FileExistsError(f"Completed run already exists: run_{mapping.run_id:03d}")
-        return validate_completed_run(mapping=mapping, run_root=final_root)
+        result = validate_completed_run(
+            mapping=mapping, catalog=catalog, run_root=final_root
+        )
+        _validate_published_attempt(output_root=root, mapping=mapping, result=result)
+        if resume_replay_root is None:
+            raise ValueError("Verified resume requires an authoritative replay certificate")
+        _validate_resume_certificate(
+            mapping=mapping,
+            replay_root=Path(resume_replay_root),
+            result_hash=result["run_result_hash"],
+        )
+        return result
     attempt_number = _attempt_number(root, mapping.run_id)
-    if attempt_number > 1 and not retry:
-        raise ValueError("A retry requires explicit retry=True")
+    if attempt_number > 1:
+        if not retry:
+            raise ValueError("A retry requires explicit retry=True")
+        _validate_retry_identities(root, mapping)
     temporary = Path(tempfile.mkdtemp(dir=root, prefix=f".run_{mapping.run_id:03d}.in_progress."))
     completed: list[str] = []
     stage = "input"
     attempt_id = f"run_{mapping.run_id:03d}-attempt_{attempt_number:03d}"
+    input_identity = attempt_input_identity(mapping)
+    input_identity_hash = canonical_hash(input_identity)
     try:
         atomic_write_json(temporary / "input" / "design_record.json", mapping.design)
         atomic_write_json(temporary / "input" / "run_record.json", mapping.run)
@@ -280,8 +372,11 @@ def generate_run(
         completed.append(stage)
         attempt = {
             "attempt_id": attempt_id,
+            "attempt_input_identity": input_identity,
+            "attempt_input_identity_hash": input_identity_hash,
             "completed_stages": completed,
             "contract_spec_hash": CONTRACT_SPEC_HASH,
+            "published_result_hash": result["run_result_hash"],
             "run_id": mapping.run_id,
             "run_key": mapping.run_key,
             "run_record_hash": mapping.run["run_record_hash"],
@@ -306,6 +401,8 @@ def generate_run(
     except Exception as error:
         failure = {
             "attempt_id": attempt_id,
+            "attempt_input_identity": input_identity,
+            "attempt_input_identity_hash": input_identity_hash,
             "completed_stage_inventory": _completed_stage_inventory(temporary),
             "completed_stages": completed,
             "contract_spec_hash": CONTRACT_SPEC_HASH,

@@ -3,10 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Sequence
 
+from satnet.ground.catalog import GroundStationCatalog
+
 from .constants import CONTRACT_SPEC_HASH
 from .io import atomic_write_json, read_canonical_json
 from .mapping import FinalRunMapping
-from .orchestrator import artifact_paths, run_directory, validate_completed_run
+from .orchestrator import artifact_paths, attempt_input_identity, run_directory, validate_completed_run
 
 
 def _attempt_records(root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
@@ -17,7 +19,10 @@ def _attempt_records(root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
 
 
 def materialize_generation_ledger(
-    *, output_root: str | Path, mappings: Sequence[FinalRunMapping]
+    *,
+    output_root: str | Path,
+    mappings: Sequence[FinalRunMapping],
+    catalog: GroundStationCatalog,
 ) -> dict[str, Any]:
     root = Path(output_root)
     records: list[dict[str, Any]] = []
@@ -30,37 +35,57 @@ def materialize_generation_ledger(
         if attempts:
             distinct_submissions += 1
         result_hash: str | None = None
+        inventory_hash: str | None = None
+        target_hash: str | None = None
         state = "not_started"
         final_root = run_directory(root, mapping.run_id)
         if final_root.exists():
-            result = validate_completed_run(mapping=mapping, run_root=final_root)
+            result = validate_completed_run(
+                mapping=mapping, catalog=catalog, run_root=final_root
+            )
             result_hash = result["run_result_hash"]
+            inventory = read_canonical_json(artifact_paths(final_root)["inventory"])
+            target = read_canonical_json(artifact_paths(final_root)["target"])
+            inventory_hash = inventory["scientific_inventory_hash"]
+            target_hash = target["target_artifact_hash"]
             state = "succeeded"
             successful += 1
         elif attempts:
             state = attempts[-1]["state"]
+        identity = attempt_input_identity(mapping)
         records.append(
             {
                 "attempt_count": len(attempts),
-                "design_id": mapping.design["design_id"],
+                "contract_spec_hash": identity["contract_spec_hash"],
+                "design_id": identity["design_id"],
+                "design_index": identity["design_index"],
+                "design_record_hash": identity["design_record_hash"],
                 "failure_evidence_hashes": [
                     record.get("failure_evidence_hash")
                     for record in attempts
                     if record["state"] == "failed" and record.get("failure_evidence_hash")
                 ],
+                "ground_design_hash": identity["ground_design_hash"],
+                "ground_failure_seed": identity["ground_failure_seed"],
+                "ground_selection_hash": identity["ground_selection_hash"],
+                "ground_selection_seed": identity["ground_selection_seed"],
                 "published_result_hash": result_hash,
-                "realization_id": mapping.run["realization_id"],
-                "run_id": mapping.run_id,
-                "run_key": mapping.run_key,
-                "run_record_hash": mapping.run["run_record_hash"],
-                "split": mapping.run["split_assignment"],
+                "realization_id": identity["realization_id"],
+                "realization_index": identity["realization_index"],
+                "run_id": identity["run_id"],
+                "run_key": identity["run_key"],
+                "run_record_hash": identity["run_record_hash"],
+                "satellite_seed": identity["satellite_seed"],
+                "scientific_inventory_hash": inventory_hash,
+                "split": identity["split"],
                 "state": state,
+                "target_artifact_hash": target_hash,
             }
         )
     ledger = {
         "contract_spec_hash": CONTRACT_SPEC_HASH,
         "distinct_frozen_run_submission_count": distinct_submissions,
-        "generation_ledger_schema_version": "1",
+        "generation_ledger_schema_version": "2",
         "operational_attempt_event_count": attempt_events,
         "records": records,
         "successful_generation_count": successful,
@@ -84,7 +109,7 @@ def materialize_replay_ledger(
     ledger = {
         "contract_spec_hash": CONTRACT_SPEC_HASH,
         "records": records,
-        "replay_ledger_schema_version": "1",
+        "replay_ledger_schema_version": "2",
         "replay_submission_count": len(records),
         "successful_replay_count": sum(
             record["replay_state"] == "succeeded" for record in records
