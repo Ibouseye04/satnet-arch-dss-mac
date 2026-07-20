@@ -3,7 +3,7 @@ from __future__ import annotations
 from itertools import product
 import math
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from satnet.experiments.final_dataset.deterministic import (
     allocate_ground_classes,
@@ -35,10 +35,37 @@ from satnet.simulation.tier1_rollout import Tier1RolloutConfig
 DESIGN_RECORD_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_design_record"
 DESIGN_RECORD_IDENTITY_VERSION = "1"
 RUN_RECORD_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_run_record"
-RUN_RECORD_IDENTITY_VERSION = "1"
+RUN_RECORD_IDENTITY_VERSION = "2"
 DESIGN_MANIFEST_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_design_manifest"
+DESIGN_MANIFEST_IDENTITY_VERSION = "1"
 RUN_MANIFEST_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_run_manifest"
-MANIFEST_IDENTITY_VERSION = "1"
+RUN_MANIFEST_IDENTITY_VERSION = "2"
+REALIZATIONS_PER_DESIGN = 5
+FINAL_DESIGN_COUNT = 100
+FINAL_RUN_COUNT = FINAL_DESIGN_COUNT * REALIZATIONS_PER_DESIGN
+RUN_RECORD_FIELDS = frozenset(
+    {
+        "contract_spec_hash",
+        "run_id",
+        "run_key",
+        "design_id",
+        "design_index",
+        "design_group_id",
+        "design_record_hash",
+        "realization_id",
+        "realization_index",
+        "split_assignment",
+        "satellite_seed_purpose",
+        "satellite_seed",
+        "ground_failure_seed_purpose",
+        "ground_failure_seed",
+        "ground_selection_seed",
+        "ground_selection_hash",
+        "ground_design_hash",
+        "expected_satellite_config_hash",
+        "run_record_hash",
+    }
+)
 
 
 def _c(value: float) -> str:
@@ -484,7 +511,7 @@ def design_manifest_hash(records: Iterable[dict[str, Any]]) -> str:
         {
             "designs": list(normalized),
             "identity_domain": DESIGN_MANIFEST_IDENTITY_DOMAIN,
-            "identity_version": MANIFEST_IDENTITY_VERSION,
+            "identity_version": DESIGN_MANIFEST_IDENTITY_VERSION,
         }
     )
 
@@ -512,27 +539,35 @@ def _satellite_config(record: dict[str, Any], seed: int) -> Tier1RolloutConfig:
     )
 
 
-def build_run_records(designs: Iterable[dict[str, Any]]) -> tuple[dict[str, Any], ...]:
+def build_run_records(
+    designs: Iterable[dict[str, Any]], *, design_split: Mapping[str, str]
+) -> tuple[dict[str, Any], ...]:
     normalized = tuple(designs)
+    if set(design_split) != {design["design_id"] for design in normalized}:
+        raise ValueError("Design split mapping does not cover exactly the final designs")
     records: list[dict[str, Any]] = []
     for design in normalized:
-        for realization_index in range(1, 6):
+        design_index = design["design_index"]
+        design_id = design["design_id"]
+        for realization_index in range(REALIZATIONS_PER_DESIGN):
             realization_id = f"R{realization_index:02d}"
-            satellite_seed = derived_seed(
-                satellite_seed_payload(design["design_id"], realization_id)
-            )
+            run_id = design_index * REALIZATIONS_PER_DESIGN + realization_index
+            run_key = f"{design_id}-{realization_id}"
+            satellite_seed = derived_seed(satellite_seed_payload(design_id, realization_id))
             ground_failure_seed = derived_seed(
-                ground_failure_seed_payload(design["design_id"], realization_id)
+                ground_failure_seed_payload(design_id, realization_id)
             )
-            run_index = design["design_index"] * 5 + realization_index - 1
             record: dict[str, Any] = {
                 "contract_spec_hash": design["contract_spec_hash"],
-                "run_id": f"{design['design_id']}-{realization_id}",
-                "run_index": run_index,
-                "design_id": design["design_id"],
+                "run_id": run_id,
+                "run_key": run_key,
+                "design_id": design_id,
+                "design_index": design_index,
                 "design_group_id": design["design_group_id"],
                 "design_record_hash": design["design_record_hash"],
                 "realization_id": realization_id,
+                "realization_index": realization_index,
+                "split_assignment": design_split[design_id],
                 "satellite_seed_purpose": "satellite_rollout_and_failure",
                 "satellite_seed": satellite_seed,
                 "ground_failure_seed_purpose": "ground_failure_realization",
@@ -559,20 +594,83 @@ def validate_run_records(
     records: Iterable[dict[str, Any]], *, designs: Iterable[dict[str, Any]]
 ) -> None:
     normalized = tuple(records)
-    design_by_id = {design["design_id"]: design for design in designs}
-    if len(normalized) != 500 or [record["run_index"] for record in normalized] != list(range(500)):
-        raise ValueError("Final run manifest must contain ordered run indices 0 through 499")
-    if len({record["run_id"] for record in normalized}) != 500:
-        raise ValueError("Run IDs must be unique")
+    normalized_designs = tuple(designs)
+    design_by_id = {design["design_id"]: design for design in normalized_designs}
+    if len(design_by_id) != FINAL_DESIGN_COUNT:
+        raise ValueError("Final run manifest requires exactly 100 unique designs")
+    if len(normalized) != FINAL_RUN_COUNT:
+        raise ValueError("Final run manifest requires exactly 500 runs")
     for record in normalized:
+        if set(record) != RUN_RECORD_FIELDS:
+            raise ValueError("Run record fields do not match the authoritative schema")
+        if type(record.get("run_id")) is not int:
+            raise TypeError("run_id must be an exact integer")
+        if not 0 <= record["run_id"] < FINAL_RUN_COUNT:
+            raise ValueError("run_id must be within 0 through 499")
+        if not isinstance(record.get("run_key"), str):
+            raise TypeError("run_key must be a string")
+        if type(record.get("design_index")) is not int:
+            raise TypeError("design_index must be an exact integer")
+        if type(record.get("realization_index")) is not int:
+            raise TypeError("realization_index must be an exact integer")
+    run_ids = [record["run_id"] for record in normalized]
+    if run_ids != list(range(FINAL_RUN_COUNT)) or set(run_ids) != set(range(FINAL_RUN_COUNT)):
+        raise ValueError("Run IDs must cover ordered integers 0 through 499")
+    run_keys = [record["run_key"] for record in normalized]
+    if len(run_keys) != len(set(run_keys)):
+        raise ValueError("Run keys must be unique")
+    design_realizations = [
+        (record["design_id"], record["realization_id"]) for record in normalized
+    ]
+    if len(design_realizations) != len(set(design_realizations)):
+        raise ValueError("Design-realization pairs must be unique")
+    for record in normalized:
+        if record["design_id"] not in design_by_id:
+            raise ValueError("Run references an unknown design")
         design = design_by_id[record["design_id"]]
+        if record["design_index"] != design["design_index"]:
+            raise ValueError("Run design index differs from its design")
+        realization_index = record["realization_index"]
+        if not 0 <= realization_index < REALIZATIONS_PER_DESIGN:
+            raise ValueError("realization_index must be within 0 through 4")
+        expected_realization_id = f"R{realization_index:02d}"
+        expected_run_id = (
+            record["design_index"] * REALIZATIONS_PER_DESIGN + realization_index
+        )
+        expected_run_key = f"{record['design_id']}-{record['realization_id']}"
+        if record["realization_id"] != expected_realization_id:
+            raise ValueError("Realization ID differs from its zero-based index")
+        if record["run_id"] != expected_run_id:
+            raise ValueError("Run ID differs from the authoritative mapping")
+        if record["run_key"] != expected_run_key:
+            raise ValueError("Run key differs from the authoritative mapping")
+        if record["split_assignment"] not in {"train", "validation", "test"}:
+            raise ValueError("Run split assignment is invalid")
+        if record["contract_spec_hash"] != design["contract_spec_hash"]:
+            raise ValueError("Run references the wrong contract specification")
         for field in ("ground_selection_seed", "ground_selection_hash", "ground_design_hash"):
             if record[field] != design[field]:
                 raise ValueError(f"Run-level {field} differs from its design")
         if record["design_record_hash"] != design["design_record_hash"]:
             raise ValueError("Run references the wrong design-record hash")
-        if not 0 <= record["satellite_seed"] < 2**63 or not 0 <= record["ground_failure_seed"] < 2**63:
-            raise ValueError("Run seed is outside the production range")
+        expected_satellite_seed = derived_seed(
+            satellite_seed_payload(record["design_id"], record["realization_id"])
+        )
+        expected_ground_failure_seed = derived_seed(
+            ground_failure_seed_payload(record["design_id"], record["realization_id"])
+        )
+        if record["satellite_seed_purpose"] != "satellite_rollout_and_failure":
+            raise ValueError("Satellite seed purpose is invalid")
+        if record["ground_failure_seed_purpose"] != "ground_failure_realization":
+            raise ValueError("Ground-failure seed purpose is invalid")
+        if record["satellite_seed"] != expected_satellite_seed:
+            raise ValueError("Satellite seed differs from canonical derivation")
+        if record["ground_failure_seed"] != expected_ground_failure_seed:
+            raise ValueError("Ground-failure seed differs from canonical derivation")
+        if record["expected_satellite_config_hash"] != _satellite_config(
+            design, expected_satellite_seed
+        ).config_hash():
+            raise ValueError("Expected satellite configuration hash is invalid")
         if record["run_record_hash"] != _record_hash(
             record,
             domain=RUN_RECORD_IDENTITY_DOMAIN,
@@ -582,8 +680,12 @@ def validate_run_records(
             raise ValueError("Run-record hash mismatch")
     for design_id in design_by_id:
         group = [record for record in normalized if record["design_id"] == design_id]
-        if len(group) != 5 or len({record["ground_design_hash"] for record in group}) != 1:
-            raise ValueError("Every design must have five fixed-ground realizations")
+        if (
+            len(group) != REALIZATIONS_PER_DESIGN
+            or len({record["ground_design_hash"] for record in group}) != 1
+            or len({record["split_assignment"] for record in group}) != 1
+        ):
+            raise ValueError("Every design must have five colocated fixed-ground realizations")
 
 
 def run_manifest_hash(records: Iterable[dict[str, Any]]) -> str:
@@ -591,7 +693,7 @@ def run_manifest_hash(records: Iterable[dict[str, Any]]) -> str:
     return canonical_hash(
         {
             "identity_domain": RUN_MANIFEST_IDENTITY_DOMAIN,
-            "identity_version": MANIFEST_IDENTITY_VERSION,
+            "identity_version": RUN_MANIFEST_IDENTITY_VERSION,
             "runs": list(normalized),
         }
     )

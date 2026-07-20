@@ -12,9 +12,11 @@ from satnet.experiments.final_dataset.deterministic import (
 from satnet.ground.canonical import canonical_hash
 
 SPLIT_MANIFEST_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_split_manifest"
-SPLIT_MANIFEST_IDENTITY_VERSION = "1"
+SPLIT_MANIFEST_IDENTITY_VERSION = "2"
 SPLIT_NAMES = ("train", "validation", "test")
 SPLIT_SIZES = {"train": 70, "validation": 15, "test": 15}
+SPLIT_CANDIDATE_COUNT = 4096
+FROZEN_SPLIT_CANDIDATE_ID = 164
 MARGINAL_FIELDS = (
     "num_planes",
     "sats_per_plane",
@@ -149,6 +151,46 @@ def _fraction_object(value: Fraction) -> dict[str, int]:
     return {"numerator": value.numerator, "denominator": value.denominator}
 
 
+def select_frozen_split(
+    designs: Iterable[dict[str, Any]],
+) -> tuple[
+    tuple[Fraction, Fraction, Fraction],
+    dict[str, tuple[dict[str, Any], ...]],
+]:
+    normalized = tuple(designs)
+    if len(normalized) != 100:
+        raise ValueError("Grouped split requires exactly 100 designs")
+    valid_candidates: list[
+        tuple[
+            tuple[Fraction, Fraction, Fraction],
+            int,
+            dict[str, tuple[dict[str, Any], ...]],
+        ]
+    ] = []
+    for candidate_id in range(SPLIT_CANDIDATE_COUNT):
+        assignments = _candidate_assignments(normalized, candidate_id)
+        if _meets_hard_requirements(assignments):
+            valid_candidates.append((_score(normalized, assignments), candidate_id, assignments))
+    if not valid_candidates:
+        raise RuntimeError("No split candidate satisfies every hard requirement")
+    score, candidate_id, assignments = min(
+        valid_candidates, key=lambda item: (*item[0], item[1])
+    )
+    if candidate_id != FROZEN_SPLIT_CANDIDATE_ID:
+        raise RuntimeError("Deterministic split selection differs from frozen candidate 164")
+    return score, assignments
+
+
+def design_split_mapping(
+    assignments: dict[str, tuple[dict[str, Any], ...]],
+) -> dict[str, str]:
+    return {
+        record["design_id"]: split
+        for split in SPLIT_NAMES
+        for record in assignments[split]
+    }
+
+
 def build_split_manifest(
     *,
     designs: Iterable[dict[str, Any]],
@@ -158,24 +200,8 @@ def build_split_manifest(
 ) -> dict[str, Any]:
     normalized_designs = tuple(designs)
     normalized_runs = tuple(runs)
-    if len(normalized_designs) != 100:
-        raise ValueError("Grouped split requires exactly 100 designs")
-    valid_candidates: list[
-        tuple[
-            tuple[Fraction, Fraction, Fraction],
-            int,
-            dict[str, tuple[dict[str, Any], ...]],
-        ]
-    ] = []
-    for candidate_id in range(4096):
-        assignments = _candidate_assignments(normalized_designs, candidate_id)
-        if _meets_hard_requirements(assignments):
-            valid_candidates.append((_score(normalized_designs, assignments), candidate_id, assignments))
-    if not valid_candidates:
-        raise RuntimeError("No split candidate satisfies every hard requirement")
-    score, candidate_id, assignments = min(
-        valid_candidates, key=lambda item: (*item[0], item[1])
-    )
+    score, assignments = select_frozen_split(normalized_designs)
+    candidate_id = FROZEN_SPLIT_CANDIDATE_ID
     design_assignments = {
         split: sorted(record["design_id"] for record in assignments[split])
         for split in SPLIT_NAMES
@@ -185,6 +211,11 @@ def build_split_manifest(
         for split, design_ids in design_assignments.items()
         for design_id in design_ids
     }
+    if any(
+        record.get("split_assignment") != design_split[record["design_id"]]
+        for record in normalized_runs
+    ):
+        raise ValueError("Run split assignment differs from the frozen design split")
     run_assignments = {
         split: [
             record["run_id"]
@@ -199,7 +230,7 @@ def build_split_manifest(
         "contract_spec_hash": contract_spec_hash,
         "design_manifest_hash": design_manifest_hash,
         "strategy": "pre_outcome_grouped_marginal_balance",
-        "candidate_count": 4096,
+        "candidate_count": SPLIT_CANDIDATE_COUNT,
         "selected_candidate_id": candidate_id,
         "selected_candidate_score": {
             "maximum_normalized_deviation": _fraction_object(score[0]),
@@ -247,10 +278,23 @@ def validate_split_manifest(
         "test": 75,
     }:
         raise ValueError("Split run counts are invalid")
-    run_by_id = {record["run_id"]: record for record in runs}
+    normalized_runs = tuple(runs)
+    if any(type(record.get("run_id")) is not int for record in normalized_runs):
+        raise TypeError("Split run IDs must be exact integers")
+    if any(
+        type(run_id) is not int
+        for split in SPLIT_NAMES
+        for run_id in run_assignments[split]
+    ):
+        raise TypeError("Split assignments must contain exact integer run IDs")
+    run_by_id = {record["run_id"]: record for record in normalized_runs}
     all_run_ids = [run_id for split in SPLIT_NAMES for run_id in run_assignments[split]]
     if len(all_run_ids) != len(set(all_run_ids)) or set(all_run_ids) != set(run_by_id):
         raise ValueError("Split runs are not a disjoint complete partition")
     for split in SPLIT_NAMES:
-        if any(design_split[run_by_id[run_id]["design_id"]] != split for run_id in run_assignments[split]):
+        if any(
+            design_split[run_by_id[run_id]["design_id"]] != split
+            or run_by_id[run_id].get("split_assignment") != split
+            for run_id in run_assignments[split]
+        ):
             raise ValueError("A design realization crossed split boundaries")

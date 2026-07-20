@@ -53,7 +53,7 @@ from satnet.simulation.tier1_rollout import (
 
 CONTRACT_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_contract_specification"
 CONTRACT_IDENTITY_VERSION = "1"
-CONTRACT_VERSION = "1"
+CONTRACT_VERSION = "2"
 CONTRACT_MASTER_SEED = 20260719
 SPLIT_MASTER_SEED = 20260720
 SEED_MODULUS = 2**63
@@ -137,7 +137,38 @@ def build_contract_specification() -> dict[str, Any]:
             "realizations_per_design": 5,
             "run_count": 500,
             "design_ids": "D000_through_D099",
-            "realization_ids": "R01_through_R05",
+            "realization_ids": "R00_through_R04",
+        },
+        "run_identity": {
+            "schema_version": "2",
+            "authoritative_field": "run_id",
+            "run_id_value_type": "exact_integer_not_boolean",
+            "run_id_first": 0,
+            "run_id_last": 499,
+            "run_id_formula": "design_index * realizations_per_design + realization_index",
+            "run_key_value_type": "string",
+            "run_key_formula": "design_id + '-' + realization_id",
+            "design_index_first": 0,
+            "design_index_last": 99,
+            "realization_index_first": 0,
+            "realization_index_last": 4,
+            "run_index_present": False,
+            "authoritative_execution_join_field": "run_id",
+            "run_key_role": "human_readable_composite_identity",
+            "scientific_identity_fields": [
+                "contract_spec_hash",
+                "design_record_hash",
+                "run_id",
+                "run_key",
+                "design_id",
+                "realization_id",
+                "design_index",
+                "realization_index",
+                "satellite_seed",
+                "ground_failure_seed",
+                "ground_selection_seed",
+                "split_assignment",
+            ],
         },
         "doe": {
             "strata": [

@@ -122,10 +122,13 @@ def build_rf_schema() -> dict[str, Any]:
         ],
         "identity_provenance_not_predictors": [
             "run_id",
+            "run_key",
             "design_id",
             "design_index",
             "design_group_id",
             "realization_id",
+            "realization_index",
+            "split_assignment",
             "doe_stratum",
             "contract_spec_hash",
             "design_record_hash",
@@ -145,6 +148,7 @@ def build_rf_schema() -> dict[str, Any]:
             "threshold_outcomes",
             "target_fields",
             "generation_or_replay_status",
+            "split_assignments",
             "runtime_or_artifact_size",
         ],
         "redundancy_note": (

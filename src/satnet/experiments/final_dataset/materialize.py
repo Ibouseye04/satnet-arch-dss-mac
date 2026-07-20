@@ -34,6 +34,8 @@ from satnet.experiments.final_dataset.specification import (
 )
 from satnet.experiments.final_dataset.split import (
     build_split_manifest,
+    design_split_mapping,
+    select_frozen_split,
     validate_split_manifest,
 )
 from satnet.experiments.integrated_ground_manifest import read_pilot_design_manifest
@@ -133,13 +135,13 @@ def build_golden_vectors() -> dict[str, Any]:
             include_seed=True,
         ),
         _golden_vector(
-            "satellite_seed_D000_R01",
-            satellite_seed_payload("D000", "R01"),
+            "satellite_seed_D000_R00",
+            satellite_seed_payload("D000", "R00"),
             include_seed=True,
         ),
         _golden_vector(
-            "ground_failure_seed_D000_R01",
-            ground_failure_seed_payload("D000", "R01"),
+            "ground_failure_seed_D000_R00",
+            ground_failure_seed_payload("D000", "R00"),
             include_seed=True,
         ),
         _golden_vector(
@@ -274,7 +276,10 @@ def materialize_final_contract_manifests(
     )
     pilot_designs = read_pilot_design_manifest(pilot_design_manifest)
     validate_design_records(designs, pilot_designs=pilot_designs)
-    runs = build_run_records(designs)
+    _, frozen_assignments = select_frozen_split(designs)
+    runs = build_run_records(
+        designs, design_split=design_split_mapping(frozen_assignments)
+    )
     validate_run_records(runs, designs=designs)
     design_hash = design_manifest_hash(designs)
     run_hash = run_manifest_hash(runs)
