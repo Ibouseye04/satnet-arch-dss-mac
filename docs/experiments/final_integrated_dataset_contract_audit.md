@@ -1,12 +1,12 @@
-# Final Integrated Dataset Contract Audit
+# Corrected Final Integrated Dataset Contract Re-Audit Handoff
 
 ## Verdict
 
-**READY FOR EXTERNAL CONTRACT AUDIT**
+**READY FOR EXTERNAL CONTRACT RE-AUDIT**
 
-The contract-only implementation is complete at validated contract-tooling SHA `461d556f750491be1e521b81169b6a2462fd28a1`.
+The two binding defects reported against previous audit HEAD `e72e371f64faa3dcb7cd5ca0da98f95a9912f63d` are corrected. The validated corrected contract-tooling SHA is `75a50a057038b0a43c95f9c8a3dd5325b33ac4da`.
 
-This verdict authorizes external audit only. It does not authorize simulation generation, G1-to-G5 scientific changes, RF/TGNN implementation changes, model training, release tagging, or final dataset generation.
+This verdict authorizes external contract re-audit only. It does not authorize simulation generation, G1-to-G5 scientific changes, RF/TGNN implementation changes, model training, release tagging, or final dataset generation.
 
 ## Audited repository identities
 
@@ -19,7 +19,11 @@ This verdict authorizes external audit only. It does not authorize simulation ge
 | Deterministic DOE tooling | `ad80765b5f0dc52f322c427b449330234f22b8f8` |
 | Canonical manifests and split | `23c2ccff110f2fdad1debbb79a6dd88ae6680c52` |
 | Human-readable scientific contract | `6e4a94543a99105759932fd6824df78a0f19c5fe` |
-| Validated contract tooling and tests | `461d556f750491be1e521b81169b6a2462fd28a1` |
+| Original validated contract tooling and tests | `461d556f750491be1e521b81169b6a2462fd28a1` |
+| Previous independent-audit HEAD | `e72e371f64faa3dcb7cd5ca0da98f95a9912f63d` |
+| Numeric run-identity correction | `191e42c15ab6c86171a36c85897ff2c4dde2d330` |
+| Later-generation gate correction | `5aef8ce61f9f1a1f6ffb249711fe2eb5a7a659a4` |
+| Corrected validated tooling and tests | `75a50a057038b0a43c95f9c8a3dd5325b33ac4da` |
 
 The pilot SHA originally supplied in abbreviated form as `e447e5c095f57e70c5fc08f92ea5155bf9f24da3` was not a valid repository object. Preflight established and used the actual validated pilot report SHA `e4475f9bc22a83b30cdc6862d3337a1e2b6dbc3f`.
 
@@ -47,17 +51,21 @@ No G1, G2, G3, G4, G5, satellite rollout, model, or training artifacts were crea
 
 | Identity | Hash |
 |---|---|
-| Contract specification | `487b72217ef75e3edd5b460f0c8fa43e6c643f342f05b6c783a43ef9a125f286` |
-| Contract bundle | `930ff61414f9806464fad8e27de4eaf1523cebaeadde71df89a5e2ec409ffcd9` |
+| Previous contract specification | `487b72217ef75e3edd5b460f0c8fa43e6c643f342f05b6c783a43ef9a125f286` |
+| Corrected contract specification | `482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b` |
+| Previous contract bundle | `930ff61414f9806464fad8e27de4eaf1523cebaeadde71df89a5e2ec409ffcd9` |
+| Corrected contract bundle | `3250dcf66e859a7dba151c6564827fcb89ddbea17a5ab5d39540e3087dd2e2ba` |
 | Target schema | `9088948d6b03db59877a129179ac3091c3690aeab9d2849a921bfa90f05da528` |
-| RF export schema | `f60519fe5440645646697fa697207bed3411fece89720e0048663037ed54e9b4` |
+| Corrected RF export schema | `56ffd04aa7dc7b98e34ec63c6e0422d2eb772271e9710b981f986a323e7ea384` |
 | TGNN adapter schema | `bb1d5454904266b83a3c7457098df00d46733994e9f673e4a40b94f31c893cfa` |
 | Pilot semantic catalog | `810c64dfb030b042311c90f2f42f8dee866a48fc63a6a29e362ee328c52eaa6e` |
 | Pilot catalog file bytes | `e8855d4ded4c242f3e5b35b90610d5f9c4f218bdf717d2d08b2464cac39f1598` |
 | Pilot design manifest | `514795b9cc17deacd81ffb9308e0d944f8da64b80444047647e919b375ef27bf` |
-| Final design manifest | `9f7ded00d12c6dcff0155d8d145503582c3da0cddd534d41b775c43d4982654e` |
-| Final run manifest | `2a21031ef14a36462692731f839e46333fa3016a47e5c499ad07f170db216f51` |
-| Final split manifest | `3256e07451654cf68c2cf0654ac4c8cc38bec3230a7988f9899834150eed8969` |
+| Corrected final design manifest | `43ffe79701c7e624abc17c45f198397c20fae55ed243502953aa8c898462bcc8` |
+| Previous final run manifest | `2a21031ef14a36462692731f839e46333fa3016a47e5c499ad07f170db216f51` |
+| Corrected final run manifest | `2925c3c65cf7e2b6debcc42b6e6414186f3474eb88998486f7571af73dda2a36` |
+| Previous final split manifest | `3256e07451654cf68c2cf0654ac4c8cc38bec3230a7988f9899834150eed8969` |
+| Corrected final split manifest | `930454b2be6eb5033efebc7ab407c2400c66f0ca998e9283c36890b69ea2e08d` |
 
 The semantic catalog identity and raw file-byte identity are intentionally separate.
 
@@ -68,6 +76,11 @@ The semantic catalog identity and raw file-byte identity are intentionally separ
 | Unique designs | 100 |
 | Realizations per design | 5 |
 | Run records | 500 |
+| Unique exact-integer run IDs | 500; exact set 0 through 499 |
+| Unique run keys | 500; `D000-R00` through `D099-R04` mapping |
+| Unique design-realization pairs | 500 |
+| Numeric mapping | `run_id = design_index * 5 + realization_index` |
+| Obsolete `run_index` present | No |
 | Training designs/runs | 70 / 350 |
 | Validation designs/runs | 15 / 75 |
 | Test designs/runs | 15 / 75 |
@@ -97,7 +110,7 @@ The implementation locks:
 - Canonical UTF-8 sorted compact JSON and final newline persistence.
 - Strict canonical binary64 parsing, finite-value enforcement, and negative-zero rejection.
 
-Byte-for-byte rematerialization of all eleven contract artifacts passed in a temporary directory.
+All eleven contract artifacts were rematerialized independently into two separate temporary directories. The two outputs matched each other byte-for-byte and both matched the committed corrected artifacts byte-for-byte.
 
 ## DOE evidence
 
@@ -124,6 +137,12 @@ Each design materializes:
 - One ground-design hash.
 
 Every one of the five run records for a design references the same selection seed, selection hash, and ground-design hash. Each run has a distinct deterministic satellite seed and ground-failure seed. No run-level geography resampling exists.
+
+## Machine-bound later-generation gates
+
+The corrected contract specification separately binds `contract_phase_validation_gates` and `later_generation_acceptance_gates`. The latter requires exactly 500 manifest records, generation attempts, successful generations, replay attempts, and successful replays. It prohibits seed substitution, omission, silent removal, replacement runs, outcome-driven split reshuffling, and threshold tuning. A failed run retains its evidence and frozen identity and marks the dataset incomplete.
+
+The machine gates also require finite numeric targets, closed-unit-interval fractions, both primary-classification classes in each frozen split, nonzero population standard deviation and at least five unique exact finite values for the primary regression in each split, frozen candidate 164 assignments, five colocated realizations, complete satellite/G1-through-G5 artifacts, unique identities, exact G1-to-G5 replay, and empty protected-science diffs. No target values were inspected or calculated during correction.
 
 ## Target and leakage evidence
 
@@ -165,15 +184,17 @@ tests/experiments/test_final_dataset_*
 | Validation | Result |
 |---|---|
 | Pre-change complete baseline | 809 passed |
-| Focused final-contract suite | 24 passed |
-| Post-change complete suite | 833 passed |
-| Python compilation | Passed |
+| Original focused final-contract suite | 24 passed |
+| Corrected focused final-contract suite | 38 passed in 18.55s |
+| Original complete suite | 833 passed |
+| Corrected complete suite | 847 passed in 28.01s |
+| Python compilation | Eight changed Python modules passed no-write compilation |
 | `git diff --check` | Passed |
 | Protected pilot-to-tooling diff | Empty |
 | Protected science-base-to-pilot diff | Empty |
 | Ruff | Not executed; module not installed in the active Python environment |
 
-One pre-existing Windows timing test, `TestExperimentLogger.test_timer`, intermittently measured a requested 10 ms sleep as zero during two complete-suite attempts. The same isolated test passed, and the subsequent unmodified complete-suite run passed all 833 tests. No timer, utility, or protected implementation code was changed. This environmental timing flake is recorded for audit transparency and is not a contract-tooling failure.
+The corrected complete-suite run emitted `Windows fatal exception: code 0xc0000139` during execution. Pytest continued and exited successfully with all 847 tests passing. No related implementation or protected code was changed.
 
 ## Repository state warning
 
@@ -193,6 +214,8 @@ Production research catalog availability remains **NOT AVAILABLE**. Production r
 
 ## Stop condition confirmation
 
-The task stopped after contract artifacts, schemas, deterministic manifests, split assignments, documentation, tests, protected diffs, and audit reporting.
+The correction stopped after numeric run identity, run-key addition, machine-bound later-generation gates, dependent identity regeneration, tests, documentation, protected diffs, and this re-audit handoff.
 
-No simulations were executed. No final dataset run was generated. No release tag was created. No generation branch was started.
+No simulations were executed. No G1-to-G5 run artifact or target value was generated. No model was trained. No release tag was created. No generation branch was started. The tracked working tree was clean before the documentation-only handoff commit; only the three pre-existing untracked paths remained untouched.
+
+READY FOR EXTERNAL CONTRACT RE-AUDIT

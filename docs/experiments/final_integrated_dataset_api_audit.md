@@ -2,7 +2,7 @@
 
 ## Status
 
-Audited for the contract-only final integrated dataset phase on 2026-07-19.
+Audited for the contract-only final integrated dataset phase on 2026-07-19 and amended on 2026-07-20 to bind corrected numeric run identity semantics.
 
 The audited repository HEAD is `e4475f9bc22a83b30cdc6862d3337a1e2b6dbc3f`, the validated integrated-pilot report commit. The protected G1-to-G5 science base remains `62beda9df1576958d9e33d33d2d9eb5489e24b20`.
 
@@ -60,6 +60,12 @@ realization-level: ground_failure_realization
 ```
 
 No separate node-failure, edge-failure, orbit, visibility, G4, or G5 timestep seeds exist in production.
+
+## Production run identity
+
+The final run manifest uses exact integer `run_id` values 0 through 499 as the sole authoritative production execution, filename, replay, and dataset-join identity. Boolean values are rejected. With zero-based design and realization indices, `run_id = design_index * 5 + realization_index`.
+
+The human-readable `run_key` is `design_id + "-" + realization_id`, with realization labels `R00` through `R04`. Run records bind `run_id`, `run_key`, both indices, all approved seeds, and the frozen design-level split assignment. The obsolete `run_index` alias is absent and has no production role.
 
 ## Fixed satellite and temporal profile
 

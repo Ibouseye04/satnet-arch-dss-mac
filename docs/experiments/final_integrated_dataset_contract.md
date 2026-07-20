@@ -2,7 +2,7 @@
 
 ## Status
 
-Locked on 2026-07-19 for external contract audit. This document authorizes a later 500-run final integrated dataset generation phase only after external approval. It does not generate simulations and does not alter G1-to-G5 science or current RF/TGNN implementations.
+Corrected on 2026-07-20 after independent external audit identified two binding defects. This document authorizes a later 500-run final integrated dataset generation phase only after external approval. It does not generate simulations and does not alter G1-to-G5 science or current RF/TGNN implementations.
 
 ## Validated foundation
 
@@ -21,16 +21,16 @@ The machine-authoritative artifacts are under `artifacts/final_integrated_datase
 
 | Artifact identity | Hash |
 |---|---|
-| Contract specification | `487b72217ef75e3edd5b460f0c8fa43e6c643f342f05b6c783a43ef9a125f286` |
-| Contract bundle | `930ff61414f9806464fad8e27de4eaf1523cebaeadde71df89a5e2ec409ffcd9` |
+| Contract specification | `482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b` |
+| Contract bundle | `3250dcf66e859a7dba151c6564827fcb89ddbea17a5ab5d39540e3087dd2e2ba` |
 | Target schema | `9088948d6b03db59877a129179ac3091c3690aeab9d2849a921bfa90f05da528` |
-| Integrated RF export schema | `f60519fe5440645646697fa697207bed3411fece89720e0048663037ed54e9b4` |
+| Integrated RF export schema | `56ffd04aa7dc7b98e34ec63c6e0422d2eb772271e9710b981f986a323e7ea384` |
 | Integrated TGNN adapter schema | `bb1d5454904266b83a3c7457098df00d46733994e9f673e4a40b94f31c893cfa` |
-| Design manifest | `9f7ded00d12c6dcff0155d8d145503582c3da0cddd534d41b775c43d4982654e` |
-| Run manifest | `2a21031ef14a36462692731f839e46333fa3016a47e5c499ad07f170db216f51` |
-| Split manifest | `3256e07451654cf68c2cf0654ac4c8cc38bec3230a7988f9899834150eed8969` |
+| Design manifest | `43ffe79701c7e624abc17c45f198397c20fae55ed243502953aa8c898462bcc8` |
+| Run manifest | `2925c3c65cf7e2b6debcc42b6e6414186f3474eb88998486f7571af73dda2a36` |
+| Split manifest | `930454b2be6eb5033efebc7ab407c2400c66f0ca998e9283c36890b69ea2e08d` |
 
-The contract specification hash binds the scientific specification, seeds, DOE, production policy profile, schema hashes, split algorithm, and acceptance gates. Design records reference the specification hash. Run records reference the specification and design-record hashes. The split references the specification and design manifest. The bundle binds every resulting identity. Generated records never reference the bundle hash, so the graph is acyclic.
+The contract specification hash binds the scientific specification, numeric run-identity schema, seeds, DOE, production policy profile, schema hashes, split algorithm, contract-phase validation gates, and later-generation acceptance gates. Design records reference the specification hash. Run records reference the specification and design-record hashes and bind their frozen split assignment. The split references the specification and design manifest. The bundle binds every resulting identity. Generated records never reference the bundle hash, so the graph is acyclic.
 
 ## Scope
 
@@ -43,6 +43,16 @@ The contract contains exactly:
 ```
 
 The contract phase creates only specifications, deterministic manifests, split assignments, tests, and documentation. It does not create satellite rollout, G1, G2, G3, G4, or G5 run artifacts.
+
+## Authoritative run identity
+
+`run_id` is the sole authoritative production execution and join identity. It is an exact integer, Boolean values are invalid, and the frozen manifest contains every value from 0 through 499 exactly once. For zero-based `design_index` and `realization_index`:
+
+```text
+run_id = design_index * 5 + realization_index
+```
+
+`run_key` is the human-readable composite string `design_id + "-" + realization_id`. Realization labels and indices are `R00`/0 through `R04`/4. Therefore the boundary examples are `D000-R00`/0, `D000-R04`/4, `D001-R00`/5, and `D099-R04`/499. Each run record also binds `design_index`, `realization_index`, all approved seeds, and `split_assignment`. The obsolete `run_index` field is absent and has no identity, filename, replay, join, or acceptance-gate role.
 
 ## DOE strata
 
@@ -192,7 +202,7 @@ Examples:
 0.8 -> "0.80000000000000004"
 ```
 
-Design JSONL is ordered by design index. Run JSONL is ordered by run index. Canonical JSON uses sorted keys, compact separators, UTF-8, Unix newlines, and duplicate-key rejection.
+Design JSONL is ordered by design index. Run JSONL is ordered by authoritative integer `run_id`. Canonical JSON uses sorted keys, compact separators, UTF-8, Unix newlines, and duplicate-key rejection.
 
 ## Pre-outcome grouped split
 
@@ -202,25 +212,39 @@ The score balances marginally across planes, satellites per plane, DOE stratum, 
 
 Hard requirements ensure all plane categories, satellite-per-plane categories, and DOE strata occur in every split. The five anchors split 3/1/1 across train/validation/test. No target or outcome field participates. The assignment is frozen before simulation generation and cannot be silently reshuffled.
 
+## Contract-phase validation gates
+
+The machine `contract_phase_validation_gates` section applies only to contract materialization. It requires 100 designs, 500 run records, 70/15/15 design counts, colocated realizations, canonical numeric strings, outcome-free manifests, empty protected diffs, and passing focused and complete tests. It explicitly requires no simulation artifacts.
+
 ## Later generation acceptance gates
 
-External contract approval authorizes a separate generation branch. That phase must require:
+External contract approval may authorize a separate generation branch. The distinct machine `later_generation_acceptance_gates` section binds all of the following:
 
 ```text
-500 expected runs
-500 attempted runs
-500 successful generation runs
-500 exact authoritative G1-to-G5 replays
-no missing or duplicate identities
-no design-group split leakage
-all target values finite and in-domain
-both classes in every classification split
-primary regression unique-value count at least 20
-complete protected-science diff isolation
-focused and complete tests passing
+500 frozen run-manifest records
+500 generation attempts
+500 successful generations
+500 authoritative replay attempts
+500 successful authoritative replays
+no seed substitution
+no run omission, silent removal, or replacement run
+preserved failure evidence and unchanged frozen manifest after any failure
+dataset status incomplete after any generation or replay failure
+all numeric targets finite; NaN and both infinities rejected
+all fraction targets in the closed interval [0.0, 1.0]
+both Boolean classes for overall_threshold_breach_any in each split
+population standard deviation greater than zero for failure_adjusted_overall_service_fraction_mean in each split
+at least five unique exact finite binary64 primary-regression values in each split
+no outcome-driven split reshuffling or threshold tuning
+frozen split candidate 164 and frozen split assignments
+all five realizations colocated by design
+zero missing satellite-rollout or G1-through-G5 artifacts
+zero duplicate run IDs or design-realization pairs
+exact G1-to-G5 replay
+empty protected-science diff
 ```
 
-A failed run is not omitted, replaced, or assigned a new seed. A failed balance or variance gate does not trigger post-outcome reshuffling or threshold tuning.
+If any class or regression-spread gate fails, generation acceptance fails pending explicit contract-version review. Outcomes cannot trigger reshuffling, threshold changes, seed changes, replacement runs, or run removal. Retry is permitted only for the same authoritative `run_id` with its frozen seeds, while preserving prior failure evidence. No target value is inspected or calculated during this contract-only correction.
 
 ## Protected boundary
 
