@@ -13,6 +13,7 @@ from satnet.experiments.final_generation.constants import QUALIFICATION_RUN_IDS
 from satnet.experiments.final_generation.contract import ensure_mode_root, validate_frozen_contract
 from satnet.experiments.final_generation.io import atomic_write_json
 from satnet.experiments.final_generation.mapping import map_all_runs
+from satnet.ground.canonical import canonical_float_string
 
 
 def _mappings():
@@ -137,3 +138,60 @@ def test_production_acceptance_rejects_protected_diff(
             replay_root=tmp_path / "replay",
             protected_science_diff_empty=False,
         )
+
+
+def test_production_acceptance_passes_valid_record_derived_fixture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mappings = _mappings()
+    contract = validate_frozen_contract(compare_tag_blobs=False)
+    generation_ledger = {
+        "distinct_frozen_run_submission_count": 500,
+        "records": [{} for _ in mappings],
+        "successful_generation_count": 500,
+    }
+    replay_ledger = {
+        "records": [{} for _ in mappings],
+        "replay_submission_count": 500,
+        "successful_replay_count": 500,
+    }
+    targets = {}
+    for mapping in mappings:
+        value = canonical_float_string((mapping.run_id % 97) / 100.0)
+        targets[mapping.run_id] = {
+            "overall_threshold_breach_any": bool(mapping.run_id % 2),
+            "ground_threshold_breach_any": bool(mapping.run_id % 3),
+            "space_threshold_breach_any": bool(mapping.run_id % 5),
+            "failure_adjusted_overall_service_fraction_mean": value,
+            "failure_adjusted_overall_service_fraction_min": value,
+            "failure_adjusted_ground_service_fraction_min": value,
+            "space_gcc_fraction_original_min": value,
+            "ground_service_loss_due_to_failures_max": value,
+        }
+    monkeypatch.setattr(acceptance_module, "validate_frozen_contract", lambda **kwargs: contract)
+    monkeypatch.setattr(
+        acceptance_module,
+        "ensure_mode_root",
+        lambda root, mode, create: Path(root),
+    )
+    monkeypatch.setattr(
+        acceptance_module,
+        "read_canonical_json",
+        lambda path: generation_ledger if path.name == "generation_ledger.json" else replay_ledger,
+    )
+    monkeypatch.setattr(acceptance_module, "validate_catalog", lambda: object())
+    monkeypatch.setattr(
+        acceptance_module,
+        "validate_generation_evidence",
+        lambda **kwargs: (targets, {mapping.run_id: {} for mapping in mappings}),
+    )
+    monkeypatch.setattr(acceptance_module, "validate_replay_evidence", lambda **kwargs: {})
+    report = validate_production_acceptance(
+        mappings=mappings,
+        generation_root=tmp_path / "generation",
+        replay_root=tmp_path / "replay",
+        protected_science_diff_empty=True,
+    )
+    assert report["production_acceptance"] == "passed"
+    assert report["derived_generation_submission_count"] == 500
+    assert report["derived_replay_submission_count"] == 500

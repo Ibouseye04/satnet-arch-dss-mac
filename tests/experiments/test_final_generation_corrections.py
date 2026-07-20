@@ -465,6 +465,29 @@ def test_production_replay_uses_production_mode_pair(
     assert captured["output_mode"] == "production_replay"
 
 
+def test_validate_production_command_writes_atomic_operational_report(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    mapping = _mapping()
+    report_path = tmp_path / "reports" / "production_acceptance.json"
+    args = _production_namespace(acceptance_report=report_path)
+    monkeypatch.setattr(cli, "_load", lambda **kwargs: ({}, (mapping,)))
+    monkeypatch.setattr(cli, "protected_science_isolation_passes", lambda: True)
+    monkeypatch.setattr(
+        cli,
+        "validate_production_acceptance",
+        lambda **kwargs: {"production_acceptance": "passed", "validated_run_count": 500},
+    )
+    monkeypatch.setattr(cli, "_print", lambda value: None)
+    cli.command_validate_production(args)
+    from satnet.experiments.final_generation.io import read_canonical_json
+
+    assert read_canonical_json(report_path) == {
+        "production_acceptance": "passed",
+        "validated_run_count": 500,
+    }
+
+
 def test_completed_run_requires_authoritative_stage_validation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
