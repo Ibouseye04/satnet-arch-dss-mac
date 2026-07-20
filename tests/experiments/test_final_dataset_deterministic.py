@@ -54,14 +54,14 @@ def test_seed_and_digest_golden_vectors() -> None:
             9054823368371031027,
         ),
         (
-            satellite_seed_payload("D000", "R01"),
-            "24e1fe32a6364a745651c89a026fa59d2a531c60f29520df98b602a0fe20599e",
-            1780613593153165726,
+            satellite_seed_payload("D000", "R00"),
+            "a4a0ad1553309875b2e5fa5b64c7d67aaccdbc4ab3b6a136d5c09a149a7a6501",
+            6179108102034056449,
         ),
         (
-            ground_failure_seed_payload("D000", "R01"),
-            "e9398c741d333c08e4e3aa647088a32c5bd701c8fd26b6cf8f92cdccd3429e72",
-            1122185536770055794,
+            ground_failure_seed_payload("D000", "R00"),
+            "3491ab32f540baa102cc0a05e9ac9fca5db7923401123985793cfc7cafd0550c",
+            8736134989647729932,
         ),
     )
     for payload, digest, seed in cases:

@@ -52,7 +52,10 @@ def test_manifest_counts_ordering_and_hash_inventory(designs, runs) -> None:
     assert len(designs) == 100
     assert len(runs) == 500
     assert [record["design_id"] for record in designs] == [f"D{index:03d}" for index in range(100)]
-    assert [record["run_index"] for record in runs] == list(range(500))
+    assert [record["run_id"] for record in runs] == list(range(500))
+    assert all(type(record["run_id"]) is int for record in runs)
+    assert all("run_index" not in record for record in runs)
+    assert len({record["run_key"] for record in runs}) == 500
     inventory = read_json(OUTPUT / "manifest_inventory.json")
     assert inventory["catalog_hash"] == CATALOG_HASH
     assert inventory["design_manifest_hash"] == design_manifest_hash(designs)
@@ -242,19 +245,22 @@ def test_schemas_have_no_rf_outcome_leakage() -> None:
 
 
 def test_contract_rematerializes_byte_for_byte(tmp_path: Path) -> None:
-    output = tmp_path / "contract"
-    materialize_machine_specification(output)
-    materialize_final_contract_manifests(
-        output_root=output,
-        pilot_design_manifest=PILOT_DESIGNS,
-        catalog_path=PILOT_CATALOG,
-    )
-    assert validate_materialized_contract(output) == validate_materialized_contract(OUTPUT)
+    outputs = (tmp_path / "contract_a", tmp_path / "contract_b")
+    for output in outputs:
+        materialize_machine_specification(output)
+        materialize_final_contract_manifests(
+            output_root=output,
+            pilot_design_manifest=PILOT_DESIGNS,
+            catalog_path=PILOT_CATALOG,
+        )
+        assert validate_materialized_contract(output) == validate_materialized_contract(OUTPUT)
     expected_names = sorted(path.name for path in OUTPUT.iterdir() if path.is_file())
-    actual_names = sorted(path.name for path in output.iterdir() if path.is_file())
-    assert actual_names == expected_names
+    for output in outputs:
+        assert sorted(path.name for path in output.iterdir() if path.is_file()) == expected_names
     for name in expected_names:
-        assert (output / name).read_bytes() == (OUTPUT / name).read_bytes()
+        committed = (OUTPUT / name).read_bytes()
+        assert (outputs[0] / name).read_bytes() == (outputs[1] / name).read_bytes()
+        assert (outputs[0] / name).read_bytes() == committed
 
 
 def test_machine_specification_precedes_manifest_identity(designs) -> None:
