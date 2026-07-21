@@ -1,0 +1,6 @@
+check,collision_count,status,detail
+original_design_id_collision,0,passed,AUGV1-D000..D089 is disjoint from D000..D099
+original_integer_run_id_collision,0,passed,AUGV1-Dxxx-R00..R04 does not reuse frozen integer run IDs 0..499
+duplicate_new_scientific_parameter_vector,0,passed,Full comparable scientific signatures are unique
+duplicate_original_scientific_parameter_vector,0,passed,No proposed signature exactly duplicates an original design
+stage_a_namespace_defined,0,failed,No Stage A design/run namespace or exact Stage A table is defined; Stage B already occupies AUGV1-D000..D089

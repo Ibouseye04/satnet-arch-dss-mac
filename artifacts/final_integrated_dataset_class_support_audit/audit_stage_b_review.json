@@ -1,0 +1,24 @@
+{
+  "arithmetic": {
+    "design_count": 90,
+    "realizations_per_design": 5,
+    "region_total": 90,
+    "run_count": 450,
+    "split_design_counts": {
+      "test": 15,
+      "train": 60,
+      "validation": 15
+    }
+  },
+  "arithmetic_passed": true,
+  "cross_split_pairs_within_0_10": 0,
+  "exact_duplicate_new_count": 0,
+  "exact_duplicate_original_count": 0,
+  "freeze_readiness": "Stage B must remain NOT_FROZEN until Stage A development/validation findings are reviewed under a new proposal and independently audited.",
+  "minimum_new_new_cross_split_distance": 0.13460738729509497,
+  "minimum_new_original_cross_split_distance": 0.22042999245042424,
+  "proposal_status": "NOT_FROZEN",
+  "simulation_authorized": false,
+  "status": "proposal_only_not_freeze_ready",
+  "unique_design_count": 90
+}

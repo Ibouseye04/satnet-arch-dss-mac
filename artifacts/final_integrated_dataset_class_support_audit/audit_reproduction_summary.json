@@ -1,0 +1,541 @@
+{
+  "analysis_commit_audited": "340af3f22f2bc7facc4f0e749b10490f06e80cde",
+  "analysis_outputs": {
+    "analysis_inventory_sha256": "5ac295ba0e08797b63a2ce3f062a1995dc7aa850f11a2bf5d83a0580731afd85",
+    "canonical_external_only_outputs": [
+      "design_level_class_support.csv",
+      "run_level_class_support.csv",
+      "temporal_breach_summary.csv"
+    ],
+    "inventory_output_count": 24,
+    "line_ending_note": "Canonical external bytes are authoritative; tracked text files are semantically equal after checkout line-ending conversion.",
+    "tracked_checkout_inventory_sha256": "7463e59b05032a10d8de3e48a13081b1a108bf3637dc6849b502bb040e29784d",
+    "tracked_semantic_mismatch_count": 0,
+    "verification_status": "passed"
+  },
+  "boundary": {
+    "all_500_polarities_match": true,
+    "canonical_comparison": "binary64 service value >= binary64 0.80 is threshold-met; equality is non-breach",
+    "d000_margins": [
+      0.1499999999999999,
+      0.1499999999999999,
+      0.1499999999999999,
+      0.1499999999999999,
+      0.1499999999999999
+    ],
+    "d001_margins": [
+      0.0,
+      -0.050000000000000044,
+      0.0,
+      -0.10000000000000009,
+      -0.15000000000000002
+    ],
+    "design_means_below_negative_0_20_exclusive": 96,
+    "endpoint_treatment": {
+      "below_negative_0_20": "exclusive",
+      "symmetric_windows": "inclusive at both endpoints"
+    },
+    "exact_threshold_run_ids": [
+      5,
+      7
+    ],
+    "nearest_breach": {
+      "design_id": "D001",
+      "margin": -0.050000000000000044,
+      "run_id": 6
+    },
+    "runs_below_negative_0_20_exclusive": 480,
+    "status": "passed",
+    "symmetric_window_counts_inclusive": {
+      "0.010": 2,
+      "0.025": 2,
+      "0.050": 2,
+      "0.100": 3
+    },
+    "threshold": 0.8
+  },
+  "classification_gate_feasibility": {
+    "combined_candidate_scopes_feasible": true,
+    "operational_definitions_require_correction": {
+      "boundary_design": "Declare preassigned region membership versus observed inclusive margin window.",
+      "distinct_margin": "Declare canonical binary64 equality or a predeclared tolerance/quantization rule.",
+      "mixed_design_class_counting": "Declare whether one mixed design may support both design-level class minima."
+    },
+    "scope_ambiguity_requires_correction": true
+  },
+  "corpus": {
+    "all_realizations_colocated": true,
+    "classification_counts": {
+      "test": {
+        "false": 5,
+        "true": 70
+      },
+      "train": {
+        "false": 2,
+        "true": 348
+      },
+      "validation": {
+        "false": 0,
+        "true": 75
+      }
+    },
+    "design_count": 100,
+    "doe_stratum_design_counts": {
+      "global": 60,
+      "pilot_anchor": 5,
+      "transition": 35
+    },
+    "non_breach_design_ids": [
+      "D000",
+      "D001"
+    ],
+    "non_breach_run_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      7
+    ],
+    "realizations_per_design": 5,
+    "run_count": 500,
+    "run_ids_exact_0_through_499": true,
+    "split_design_counts": {
+      "test": 15,
+      "train": 70,
+      "validation": 15
+    },
+    "split_run_counts": {
+      "test": 75,
+      "train": 350,
+      "validation": 75
+    },
+    "transition_and_global_non_breach_count": 0,
+    "unique_design_realization_pair_count": 500,
+    "unique_run_key_count": 500,
+    "verification_status": "independently_reproduced",
+    "zero_of_five_non_breach_design_count": 98
+  },
+  "evidence": {
+    "archive_hash_record_read_only": true,
+    "archive_hash_record_verified": true,
+    "archive_read_only": true,
+    "combined": {
+      "byte_count": 1337549193,
+      "file_count": 9004,
+      "verified_sha256_count": 9004
+    },
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "freeze_metadata_all_read_only": true,
+    "freeze_metadata_file_count": 8,
+    "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+    "frozen_contract_tag": "final-integrated-dataset-contract-v1",
+    "generation": {
+      "all_files_read_only": true,
+      "byte_count": 1336139056,
+      "file_count": 8502,
+      "read_only_file_count": 8502,
+      "verified_sha256_count": 8502
+    },
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_clean": true,
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay": {
+      "all_files_read_only": true,
+      "byte_count": 1410137,
+      "file_count": 502,
+      "read_only_file_count": 502,
+      "verified_sha256_count": 502
+    },
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "verification_status": "passed"
+  },
+  "nearest_neighbors": {
+    "categorical_variables": [],
+    "cluster_conclusion": "No resilient local cluster is observed under this declared metric; this is descriptive and metric-dependent.",
+    "distance_metric": "Euclidean",
+    "failure_probabilities_included": true,
+    "features": [
+      "num_planes",
+      "sats_per_plane",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "total_ground_station_count",
+      "ground_station_failure_probability",
+      "civilian_fraction",
+      "government_fraction",
+      "military_fraction"
+    ],
+    "fixed_parameters_excluded": true,
+    "neighbors": {
+      "D000": [
+        {
+          "design_id": "D001",
+          "distance": 0.8294212447374086,
+          "mean_boundary_margin": -0.06000000000000003,
+          "non_breach_realization_count": 2,
+          "rank": 1
+        },
+        {
+          "design_id": "D008",
+          "distance": 0.9820724320046522,
+          "mean_boundary_margin": -0.37,
+          "non_breach_realization_count": 0,
+          "rank": 2
+        },
+        {
+          "design_id": "D022",
+          "distance": 0.9931202808869277,
+          "mean_boundary_margin": -0.33333333333333337,
+          "non_breach_realization_count": 0,
+          "rank": 3
+        },
+        {
+          "design_id": "D037",
+          "distance": 1.0373626521216046,
+          "mean_boundary_margin": -0.76,
+          "non_breach_realization_count": 0,
+          "rank": 4
+        },
+        {
+          "design_id": "D028",
+          "distance": 1.040256299135979,
+          "mean_boundary_margin": -0.8,
+          "non_breach_realization_count": 0,
+          "rank": 5
+        },
+        {
+          "design_id": "D005",
+          "distance": 1.041350258453519,
+          "mean_boundary_margin": -0.8,
+          "non_breach_realization_count": 0,
+          "rank": 6
+        },
+        {
+          "design_id": "D029",
+          "distance": 1.0473053729215622,
+          "mean_boundary_margin": -0.76,
+          "non_breach_realization_count": 0,
+          "rank": 7
+        },
+        {
+          "design_id": "D023",
+          "distance": 1.0563240073926226,
+          "mean_boundary_margin": -0.29000000000000004,
+          "non_breach_realization_count": 0,
+          "rank": 8
+        }
+      ],
+      "D001": [
+        {
+          "design_id": "D022",
+          "distance": 0.3932311802307627,
+          "mean_boundary_margin": -0.33333333333333337,
+          "non_breach_realization_count": 0,
+          "rank": 1
+        },
+        {
+          "design_id": "D028",
+          "distance": 0.39329477708806027,
+          "mean_boundary_margin": -0.8,
+          "non_breach_realization_count": 0,
+          "rank": 2
+        },
+        {
+          "design_id": "D005",
+          "distance": 0.47388323473160593,
+          "mean_boundary_margin": -0.8,
+          "non_breach_realization_count": 0,
+          "rank": 3
+        },
+        {
+          "design_id": "D037",
+          "distance": 0.5212410989902616,
+          "mean_boundary_margin": -0.76,
+          "non_breach_realization_count": 0,
+          "rank": 4
+        },
+        {
+          "design_id": "D008",
+          "distance": 0.5514719588394384,
+          "mean_boundary_margin": -0.37,
+          "non_breach_realization_count": 0,
+          "rank": 5
+        },
+        {
+          "design_id": "D029",
+          "distance": 0.5547833366834012,
+          "mean_boundary_margin": -0.76,
+          "non_breach_realization_count": 0,
+          "rank": 6
+        },
+        {
+          "design_id": "D038",
+          "distance": 0.561503117691465,
+          "mean_boundary_margin": -0.49333333333333346,
+          "non_breach_realization_count": 0,
+          "rank": 7
+        },
+        {
+          "design_id": "D023",
+          "distance": 0.5882747602344405,
+          "mean_boundary_margin": -0.29000000000000004,
+          "non_breach_realization_count": 0,
+          "rank": 8
+        }
+      ]
+    },
+    "normalization": "predeclared full DOE min-max ranges",
+    "status": "passed",
+    "tie_handling": "ascending design_index",
+    "zero_range_handling": "not applicable; all 11 declared ranges are nonzero"
+  },
+  "parameter_support": {
+    "correlations": {
+      "altitude_km": 0.6627247027078719,
+      "civilian_count": 0.05580466621673989,
+      "configured_satellite_count": 0.39215337541491824,
+      "government_count": 0.001070936010617174,
+      "ground_station_failure_probability": -0.11413901941271684,
+      "inclination_deg": 0.26015529260699544,
+      "military_count": 0.06076005115400889,
+      "num_planes": 0.07932601739862866,
+      "phasing_factor": null,
+      "satellite_edge_failure_probability": -0.034568856773217964,
+      "satellite_node_failure_probability": 0.04981710663125745,
+      "sats_per_plane": 0.5338963974657238,
+      "total_ground_station_count": 0.07334717237197595
+    },
+    "interpretation": "Observed support consists of seven realizations from only D000 and D001. Numeric intervals between their values are DOE-containing ranges, not independently supported resilient regions.",
+    "method": "run-level Spearman rank correlation using average ranks for ties and Pearson correlation of ranks",
+    "missing_value_handling": "fail closed; no missing values observed",
+    "non_breach_design_support": [
+      {
+        "altitude_km": 1200.0,
+        "configured_satellite_count": 48,
+        "design_id": "D000",
+        "ground_station_failure_probability": 0.0,
+        "inclination_deg": 98.0,
+        "non_breach_realization_count": 5,
+        "num_planes": 6,
+        "satellite_edge_failure_probability": 0.0,
+        "satellite_node_failure_probability": 0.0,
+        "sats_per_plane": 8
+      },
+      {
+        "altitude_km": 800.0,
+        "configured_satellite_count": 48,
+        "design_id": "D001",
+        "ground_station_failure_probability": 0.05,
+        "inclination_deg": 60.0,
+        "non_breach_realization_count": 2,
+        "num_planes": 6,
+        "satellite_edge_failure_probability": 0.05,
+        "satellite_node_failure_probability": 0.05,
+        "sats_per_plane": 8
+      }
+    ],
+    "non_breach_run_support": {
+      "altitude_km": [
+        800.0,
+        1200.0
+      ],
+      "configured_satellite_count": [
+        48.0
+      ],
+      "ground_station_failure_probability": [
+        0.0,
+        0.05
+      ],
+      "inclination_deg": [
+        60.0,
+        98.0
+      ],
+      "num_planes": [
+        6.0
+      ],
+      "satellite_edge_failure_probability": [
+        0.0,
+        0.05
+      ],
+      "satellite_node_failure_probability": [
+        0.0,
+        0.05
+      ],
+      "sats_per_plane": [
+        8.0
+      ]
+    },
+    "normalization": "none",
+    "run_count": 500,
+    "status": "passed"
+  },
+  "regression_only": {
+    "all_four_targets_have_nonzero_spread_in_every_split": true,
+    "assessment": "Supports review of a separately predeclared regression-only contract; does not approve regression use.",
+    "by_split": {
+      "test": {
+        "failure_adjusted_ground_service_fraction_min": {
+          "count": 75,
+          "mean": 0.18362962962962961,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.28686526760106373,
+          "unique_value_count": 14
+        },
+        "failure_adjusted_overall_service_fraction_mean": {
+          "count": 75,
+          "mean": 0.23218085618085618,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.3110362546438848,
+          "unique_value_count": 43
+        },
+        "failure_adjusted_overall_service_fraction_min": {
+          "count": 75,
+          "mean": 0.18362962962962961,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.28686526760106373,
+          "unique_value_count": 14
+        },
+        "space_gcc_fraction_original_min": {
+          "count": 75,
+          "mean": 0.3097433862433862,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.35639147380944797,
+          "unique_value_count": 26
+        }
+      },
+      "train": {
+        "failure_adjusted_ground_service_fraction_min": {
+          "count": 350,
+          "mean": 0.1561471655328798,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.20826556413227815,
+          "unique_value_count": 53
+        },
+        "failure_adjusted_overall_service_fraction_mean": {
+          "count": 350,
+          "mean": 0.2339977272727273,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.2484489820182131,
+          "unique_value_count": 237
+        },
+        "failure_adjusted_overall_service_fraction_min": {
+          "count": 350,
+          "mean": 0.15549863945578232,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.2080113437453658,
+          "unique_value_count": 54
+        },
+        "space_gcc_fraction_original_min": {
+          "count": 350,
+          "mean": 0.3318795351473923,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.3231745119440332,
+          "unique_value_count": 95
+        }
+      },
+      "validation": {
+        "failure_adjusted_ground_service_fraction_min": {
+          "count": 75,
+          "mean": 0.14093333333333333,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.21364813116574946,
+          "unique_value_count": 24
+        },
+        "failure_adjusted_overall_service_fraction_mean": {
+          "count": 75,
+          "mean": 0.1881074555074555,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.2447719355573115,
+          "unique_value_count": 51
+        },
+        "failure_adjusted_overall_service_fraction_min": {
+          "count": 75,
+          "mean": 0.13955555555555554,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.21316905325935495,
+          "unique_value_count": 24
+        },
+        "space_gcc_fraction_original_min": {
+          "count": 75,
+          "mean": 0.26351851851851854,
+          "nonzero_spread": true,
+          "population_standard_deviation": 0.2808518841973449,
+          "unique_value_count": 28
+        }
+      }
+    },
+    "primary_regression_target": "failure_adjusted_overall_service_fraction_mean",
+    "status": "passed"
+  },
+  "schema_identifier": "satnet.final_dataset_class_support_audit_reproduction.v1",
+  "temporal": {
+    "authoritative_source": "persisted generation run G5 ground_failure_service_steps.jsonl",
+    "breach_comparison": "failure_adjusted_overall_service_fraction < 0.80",
+    "d001": [
+      {
+        "breach_count": 0,
+        "breach_fraction": 0.0,
+        "first_breach_timestep": null,
+        "last_breach_timestep": null,
+        "longest_breach_streak": 0,
+        "minimum_service_timestep": 1,
+        "recovery_count": 0,
+        "run_id": 5
+      },
+      {
+        "breach_count": 2,
+        "breach_fraction": 0.18181818181818182,
+        "first_breach_timestep": 9,
+        "last_breach_timestep": 10,
+        "longest_breach_streak": 2,
+        "minimum_service_timestep": 9,
+        "recovery_count": 0,
+        "run_id": 6
+      },
+      {
+        "breach_count": 0,
+        "breach_fraction": 0.0,
+        "first_breach_timestep": null,
+        "last_breach_timestep": null,
+        "longest_breach_streak": 0,
+        "minimum_service_timestep": 4,
+        "recovery_count": 0,
+        "run_id": 7
+      },
+      {
+        "breach_count": 3,
+        "breach_fraction": 0.2727272727272727,
+        "first_breach_timestep": 4,
+        "last_breach_timestep": 10,
+        "longest_breach_streak": 2,
+        "minimum_service_timestep": 10,
+        "recovery_count": 1,
+        "run_id": 8
+      },
+      {
+        "breach_count": 8,
+        "breach_fraction": 0.7272727272727273,
+        "first_breach_timestep": 0,
+        "last_breach_timestep": 10,
+        "longest_breach_streak": 4,
+        "minimum_service_timestep": 9,
+        "recovery_count": 3,
+        "run_id": 9
+      }
+    ],
+    "mean_temporal_breach_fraction_by_stratum": {
+      "global": 0.9893939393939394,
+      "pilot_anchor": 0.6472727272727273,
+      "transition": 0.9677922077922079
+    },
+    "sampled_state_count_per_run": 11,
+    "status": "passed",
+    "temporal_ordering": "persisted order exactly timestep_index 0 through 10 with strictly increasing timestamps",
+    "total_sampled_state_count": 5500
+  }
+}

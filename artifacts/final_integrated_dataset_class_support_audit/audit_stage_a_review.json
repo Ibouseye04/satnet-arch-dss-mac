@@ -1,0 +1,40 @@
+{
+  "arithmetic": {
+    "design_count": 30,
+    "realizations_per_design": 5,
+    "region_split_total": 30,
+    "region_total": 30,
+    "run_count": 150,
+    "split_total": 30
+  },
+  "arithmetic_passed": true,
+  "binding_corrections": [
+    "Create an exact 30-design Stage A table with admissible ranges and preassigned development/validation/internal-holdout blocks.",
+    "Define disjoint Stage A design and run namespaces before any seed manifest is created.",
+    "Replace the collective-sign boundary criterion with design-level mixed-realization and near-boundary criteria.",
+    "Declare whether Stage A evidence will later join the final combined corpus or remain discovery-only.",
+    "Freeze domain-separated deterministic seed derivation and explicit new output roots in the future Stage A contract."
+  ],
+  "discovery_phase_assessment": "Scientifically appropriate as discovery only if outcomes inform Stage B solely through a new contract.",
+  "exact_stage_a_design_table_present": false,
+  "existing_discovery_criteria_assessment": "Operational completion and core support are useful, but 'four boundary designs collectively sample both signs' does not require any design to exhibit mixed realizations and does not localize a usable transition.",
+  "holdout_policy": "Stage A train/development and validation may inform Stage B; the five-design internal holdout remains sealed until the predeclared final acceptance point.",
+  "partition_tradeoff": "A five-design internal holdout provides an outcome-independent check but lowers development coverage. It must not influence Stage B and must not be called a final evaluation set before a final combined-corpus contract declares its role.",
+  "proposed_stop_go_criteria": {
+    "boundary_mixing": "Among development plus validation, at least three distinct boundary designs are individually mixed, each producing at least one breach and one non-breach realization.",
+    "control_consistency": "At least four of the five development-plus-validation global controls remain 0/5 non-breach; otherwise investigate population shift before Stage B design.",
+    "core_reproduction": "Among development plus validation, at least two distinct resilient-core designs each produce at least three of five non-breach realizations.",
+    "go": "All operational, core, boundary, transition, independent-support, and control criteria pass using only development plus validation.",
+    "independent_class_support": "Development plus validation contain at least four non-breach-supporting designs and at least four breach-supporting designs; mixed designs may support both counts but must be reported explicitly.",
+    "operational": "Exactly 30 unique designs and 150 fixed-identity runs generate and replay with no substitutions, retries under new identities, or evidence mutations.",
+    "realization_stability": "Report each design's 0..5 non-breach count and margin spread; no pooled run count may substitute for distinct-design support.",
+    "revise": "Core support exists but boundary localization or control consistency fails; create a new Stage B proposal and contract without consulting the sealed holdout.",
+    "stop": "Core reproduction or independent class support fails; do not freeze Stage B.",
+    "transition_localization": "At least four distinct boundary designs have at least one run within inclusive ±0.10 margin, with both margin signs represented across at least two distinct designs per sign."
+  },
+  "selected_partition_approach": "B. Discovery plus internal holdout",
+  "stage_a_namespace_present": false,
+  "stage_a_output_roots_present": false,
+  "stage_a_seed_manifest_present": false,
+  "status": "not_freeze_ready"
+}

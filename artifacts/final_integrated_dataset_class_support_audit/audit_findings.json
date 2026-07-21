@@ -1,0 +1,70 @@
+{
+  "binding": [
+    {
+      "finding": "The proposal defines only 30-design regional/split arithmetic. It provides no exact Stage A design table, admissible Stage A parameter bounds, frozen identity manifest, or output-root manifest, so it cannot become a frozen contract as written.",
+      "id": "B-001",
+      "required_correction": "Create and independently audit an exact 30-design discovery table and manifests before freeze.",
+      "title": "Stage A scientific design contract is incomplete"
+    },
+    {
+      "finding": "Stage B already occupies AUGV1-D000 through AUGV1-D089, while Stage A has no separate design or run namespace. Current artifacts do not collide because Stage A IDs do not exist, but freezing Stage A without a disjoint namespace would create material collision risk.",
+      "id": "B-002",
+      "required_correction": "Declare stable Stage A design/run IDs disjoint from D000-D099, integer runs 0-499, and AUGV1-D000-D089.",
+      "title": "Stage A identity namespace is undefined"
+    },
+    {
+      "finding": "The gates say fixed-original-plus-augmentation, but the proposal does not state whether Stage A becomes part of the final corpus alongside Stage B or remains discovery-only. Both mathematically feasible totals are different.",
+      "id": "B-003",
+      "required_correction": "Declare one final membership and split-appending rule before gate freeze.",
+      "title": "Final combined-corpus membership is ambiguous"
+    },
+    {
+      "finding": "The existing criterion that four boundary designs collectively sample both signs can pass with no individually mixed design and does not establish a usable realization-sensitive transition region.",
+      "id": "B-004",
+      "required_correction": "Predeclare distinct-design mixed-realization and near-boundary stop/go criteria.",
+      "title": "Stage A boundary discovery criterion is not design-level"
+    },
+    {
+      "finding": "The proposal does not define whether a boundary design means a preassigned DOE region or an observed margin condition, how distinct binary64 margins are compared, or whether a mixed design may satisfy both breach-design and non-breach-design minima.",
+      "id": "B-005",
+      "required_correction": "Define every acceptance-gate counting rule and numeric equality rule in the future contract and its executable validator.",
+      "title": "Final classification gate definitions are incomplete"
+    }
+  ],
+  "final_verdict": "NOT APPROVED FOR STAGE A CONTRACT FREEZE",
+  "nonbinding": [
+    {
+      "finding": "The sealed five-design Stage A test is scientifically acceptable under Approach B, but should be called an internal holdout until a final combined-corpus contract defines its evaluation role.",
+      "id": "N-001",
+      "title": "Stage A internal holdout terminology"
+    },
+    {
+      "finding": "Phrases such as 'well inside the observed resilient region' should be narrowed to an observed anchor or candidate region because D000 is the only consistently non-breach design.",
+      "id": "N-002",
+      "title": "Single-design regional wording"
+    },
+    {
+      "finding": "The 0.10 normalized radius passes the current Stage B table, but its scientific sensitivity should be reviewed before freeze because the conclusion is metric- and radius-dependent.",
+      "id": "N-003",
+      "title": "Near-neighbor radius sensitivity"
+    }
+  ],
+  "observations": [
+    {
+      "finding": "All binding corpus, class, boundary, temporal, parameter, nearest-neighbor, and regression findings independently reproduced.",
+      "id": "O-001",
+      "title": "Scientific reproduction passed"
+    },
+    {
+      "finding": "Every proposed final gate is physically feasible under both original-plus-Stage-B and original-plus-Stage-A-plus-Stage-B totals. The gates are not applicable to Stage A discovery alone.",
+      "id": "O-002",
+      "title": "Proposed final gates are arithmetically feasible"
+    },
+    {
+      "finding": "The external inventory and all 24 bound outputs verify. Three large tables are external-only; tracked summaries are semantically equal despite Windows line-ending conversion.",
+      "id": "O-003",
+      "title": "Canonical analysis outputs are external"
+    }
+  ],
+  "schema_identifier": "satnet.final_dataset_class_support_audit_findings.v1"
+}

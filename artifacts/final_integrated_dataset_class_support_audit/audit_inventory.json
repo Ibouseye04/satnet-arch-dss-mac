@@ -1,0 +1,52 @@
+{
+  "analysis_commit_audited": "340af3f22f2bc7facc4f0e749b10490f06e80cde",
+  "outputs": [
+    {
+      "byte_length": 4313,
+      "relative_path": "audit_findings.json",
+      "sha256": "cbd30b85786d1147cddb54b869f0f9e314586f1988002b7ed73eeb128345bebe"
+    },
+    {
+      "byte_length": 17315,
+      "relative_path": "audit_reproduction_summary.json",
+      "sha256": "3f612f9984c68506e33583ffc0db7ccd991b61717f912c05483829c88626980b"
+    },
+    {
+      "byte_length": 58044,
+      "relative_path": "audit_boundary_reproduction.csv",
+      "sha256": "cd1ec8f75160504db53e4b6b91999b65d7d15006461a261ea74844890ad72d12"
+    },
+    {
+      "byte_length": 536,
+      "relative_path": "audit_non_breach_reproduction.csv",
+      "sha256": "26ccc004d3d27d1e9a66bcb473ef55ac37021d9154a83be77d1d614f8d737fef"
+    },
+    {
+      "byte_length": 3697,
+      "relative_path": "audit_stage_a_review.json",
+      "sha256": "badd161b8a729fef55a524080107f3a069b7d1ad975d1c91c41d1e91ff4b9b72"
+    },
+    {
+      "byte_length": 803,
+      "relative_path": "audit_stage_b_review.json",
+      "sha256": "c561c244642930dab03e9bcd50ceb2b6af248d90d275b263b2e1e2f553d0b77b"
+    },
+    {
+      "byte_length": 11407,
+      "relative_path": "audit_gate_feasibility.csv",
+      "sha256": "cc883a05761747b1a16c9622ebd967ce1b5274b0ccccc8687471410ddb5f89c6"
+    },
+    {
+      "byte_length": 587,
+      "relative_path": "audit_identity_collision_report.csv",
+      "sha256": "6fd577591d5cfccc09a5c33bb0f9d2a00336242bf62f1fd435018a97dbfade0e"
+    },
+    {
+      "byte_length": 17030,
+      "relative_path": "audit_near_neighbor_leakage.csv",
+      "sha256": "a148b0e5af969e116b27a2007af455a65440e130cca1eb014e2ca134e618812d"
+    }
+  ],
+  "schema_identifier": "satnet.final_dataset_class_support_audit_inventory.v1",
+  "self_exclusion": "audit_inventory.json is excluded to avoid a self-referential hash cycle."
+}
