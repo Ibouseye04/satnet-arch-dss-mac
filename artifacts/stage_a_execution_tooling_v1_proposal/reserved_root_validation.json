@@ -1,0 +1,13 @@
+{
+  "all_absent": true,
+  "checked_roots": {
+    "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+    "evidence_freeze": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze",
+    "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+    "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+  },
+  "creation_authorized": false,
+  "result": "PASSED",
+  "schema_identifier": "satnet.stage_a.execution_tooling_reserved_root_validation.v1",
+  "status": "TOOLING_PROPOSAL"
+}

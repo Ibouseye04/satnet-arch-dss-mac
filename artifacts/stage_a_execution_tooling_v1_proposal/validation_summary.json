@@ -1,0 +1,39 @@
+{
+  "compilation": {
+    "python_file_count": 217,
+    "result": "PASSED"
+  },
+  "complete_suite": {
+    "duration_seconds": "70.06",
+    "passed": 1138,
+    "result": "PASSED"
+  },
+  "execution_authorized": false,
+  "focused_execution_tooling": {
+    "passed": 31,
+    "result": "PASSED"
+  },
+  "focused_stage_a_and_audit": {
+    "passed": 225,
+    "result": "PASSED"
+  },
+  "frozen_evidence": {
+    "byte_count": 1337549193,
+    "file_count": 9004,
+    "verified_sha256_count": 9004,
+    "result": "PASSED"
+  },
+  "logger_tests": {
+    "passed": 7,
+    "result": "PASSED"
+  },
+  "schema_identifier": "satnet.stage_a.execution_tooling_validation_summary.v1",
+  "simulation_authorized": false,
+  "status": "TOOLING_PROPOSAL",
+  "timer_independent_rerun": {
+    "passed": 1,
+    "result": "PASSED"
+  },
+  "tooling_inventory_sha256": "8d08eb964d3460a8a75673cb7f764532836103dbd37ce52f2c8eb439e6a86721",
+  "whitespace": "PASSED"
+}

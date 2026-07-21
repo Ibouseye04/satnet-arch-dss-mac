@@ -1,0 +1,150 @@
+{
+  "artifact_count_excluding_inventory": 28,
+  "artifacts": [
+    {
+      "byte_length": 482,
+      "relative_path": ".gitattributes",
+      "sha256": "833a4e2bffce3300821001fc2792bf463e8dac1ad067a6bc35430c15fe2c89a7"
+    },
+    {
+      "byte_length": 1070,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_acceptance_report_schema.json",
+      "sha256": "76bd71212be3a24acb04a02a0a7d2ab0ffb8db6864e9b8c38e87fb79f89edab7"
+    },
+    {
+      "byte_length": 2185,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_authorization_schema.json",
+      "sha256": "b1dab98bbab3edff6e3a5a300c1a44397066362017751dd6e70dd61b8bcdab41"
+    },
+    {
+      "byte_length": 1066,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_ledger_schema.json",
+      "sha256": "d51e2620d02a5e1f2c27c2eb359bea6ea9793543d6998bc74cbbe59eb8a98e1d"
+    },
+    {
+      "byte_length": 1371,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_plan_schema.json",
+      "sha256": "f2395e3486f25bf47acfce3edd65f646ad1423fd9fd393b0cf16e6d2c013e615"
+    },
+    {
+      "byte_length": 1936,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_tooling_specification.json",
+      "sha256": "157e5ec3e623c4adbf85bdd8f3d13f52f3cca02ff8c0f03de6fefd285a754485"
+    },
+    {
+      "byte_length": 741,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_replay_ledger_schema.json",
+      "sha256": "2bffb3339235277ef0d60d4d4fa4640bea776a8ef5256c134e4f5af9fa2f71f4"
+    },
+    {
+      "byte_length": 834,
+      "relative_path": "src/satnet/experiments/stage_a_execution/__init__.py",
+      "sha256": "3c16350310ff552896a1d146c2727c5962010417d24b7ef2aac51b01fb4bb60f"
+    },
+    {
+      "byte_length": 48,
+      "relative_path": "src/satnet/experiments/stage_a_execution/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
+    },
+    {
+      "byte_length": 3974,
+      "relative_path": "src/satnet/experiments/stage_a_execution/acceptance.py",
+      "sha256": "cbdb89804e5a3c7b9f5df18edbdb50df7ce55fd973ba8384529c6445b5bffea7"
+    },
+    {
+      "byte_length": 5388,
+      "relative_path": "src/satnet/experiments/stage_a_execution/authorization.py",
+      "sha256": "06ee7663b5e71fef417f0053a61a059bf9fa5c795121758b48eb27b278601bb4"
+    },
+    {
+      "byte_length": 9290,
+      "relative_path": "src/satnet/experiments/stage_a_execution/cli.py",
+      "sha256": "1637d3c2b0e146be48e49d5449247ac2c862262dbaa04ab8306b98a74785f3bd"
+    },
+    {
+      "byte_length": 2577,
+      "relative_path": "src/satnet/experiments/stage_a_execution/common.py",
+      "sha256": "3ffb40772415735a5169d7aee5d909119df9bc52014e462d0f5f0943e4c104c1"
+    },
+    {
+      "byte_length": 6892,
+      "relative_path": "src/satnet/experiments/stage_a_execution/contract.py",
+      "sha256": "00c776b72cbabc00570ac740d023cfadb374e4ba09a13ca3d5de66013a203428"
+    },
+    {
+      "byte_length": 11435,
+      "relative_path": "src/satnet/experiments/stage_a_execution/generate.py",
+      "sha256": "fc520017aecccd465f418c8d1bdb52ddf8578ed438b7754a61c31273230300cd"
+    },
+    {
+      "byte_length": 1296,
+      "relative_path": "src/satnet/experiments/stage_a_execution/integrity.py",
+      "sha256": "dc96a35b7f6af0ef5702b6699203f3712279e4d20db06f5ac4074032ba9b23f8"
+    },
+    {
+      "byte_length": 6200,
+      "relative_path": "src/satnet/experiments/stage_a_execution/ledger.py",
+      "sha256": "29c2cf4250b7c165fccb341a72a17e0b48fccb56ae126780b316e97545a57fc7"
+    },
+    {
+      "byte_length": 4016,
+      "relative_path": "src/satnet/experiments/stage_a_execution/paths.py",
+      "sha256": "12b9083a04adb2a8d6223938058ffea8f43db38ae6c2a1de320f18db401af7a2"
+    },
+    {
+      "byte_length": 4222,
+      "relative_path": "src/satnet/experiments/stage_a_execution/plan.py",
+      "sha256": "fa49673a263a8b2d9739fb093abb8cd2e85c7fc32dbf586ea5c3b6db68634ab8"
+    },
+    {
+      "byte_length": 3523,
+      "relative_path": "src/satnet/experiments/stage_a_execution/preflight.py",
+      "sha256": "9fdec8ee49a510dbe7be555af7b61a8f2eb7ba99454e1794f1da5b7c3d1c691e"
+    },
+    {
+      "byte_length": 3960,
+      "relative_path": "src/satnet/experiments/stage_a_execution/replay.py",
+      "sha256": "46be90a7bf3ec8516000dd4cead707b9159a076cff1ebde5f8c0bc39673560f4"
+    },
+    {
+      "byte_length": 2231,
+      "relative_path": "src/satnet/experiments/stage_a_execution/resume.py",
+      "sha256": "00779162c3b91fb6049e3230a761f85f15ba0988e869d0deac1ac544718af4ed"
+    },
+    {
+      "byte_length": 0,
+      "relative_path": "tests/experiments/stage_a_execution/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "byte_length": 4659,
+      "relative_path": "tests/experiments/stage_a_execution/conftest.py",
+      "sha256": "fc166f493adac54d7da658b50d102fafab0190fe6e56b581fca7d71c6c1daa7f"
+    },
+    {
+      "byte_length": 8926,
+      "relative_path": "tests/experiments/stage_a_execution/test_contract_plan_authorization.py",
+      "sha256": "f125cd2cc57ac1cb11e8a9007d425af8a51165e70d31ae2089a39a868194db5d"
+    },
+    {
+      "byte_length": 6793,
+      "relative_path": "tests/experiments/stage_a_execution/test_execution_replay_acceptance.py",
+      "sha256": "a3a8efc4471ce0987f738088df0b9dad45fe6adbb81bf08c37bd3e79860d9743"
+    },
+    {
+      "byte_length": 8469,
+      "relative_path": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py",
+      "sha256": "a740c5b672e79fb78aa9c228bd6502bde7923095c763f8003180db9544bb5be1"
+    },
+    {
+      "byte_length": 4742,
+      "relative_path": "tests/experiments/test_final_dataset_isolation.py",
+      "sha256": "17842254e927433c4d244db25256f4e653850adb57554076998e6a4c11e6e9d7"
+    }
+  ],
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.execution_tooling_inventory.v1",
+  "self_reference_policy": "This inventory excludes its own bytes.",
+  "status": "TOOLING_PROPOSAL"
+}

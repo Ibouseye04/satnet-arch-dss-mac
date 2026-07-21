@@ -1,0 +1,21 @@
+{
+  "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "design_count": 20,
+  "execution_authorized": false,
+  "first_run_identity": "SA-D000-R00",
+  "last_run_identity": "SA-D027-R04",
+  "ordered_global_run_ids_sha256": "94a3fa9098c01b348ced330b0d12f69fcf3d36003d47aa19294fe4637a27c732",
+  "partition": "development",
+  "plan_hash": "a0af1d56fb32cb62b7b7331b6124ee85749ab6c2e1801ee76cbeccbdc65dc2bd",
+  "production_root_created": false,
+  "run_count": 100,
+  "schema_identifier": "satnet.stage_a.development_plan_preview.v1",
+  "sealed_holdout": {
+    "design_count": 5,
+    "identities": "REDACTED",
+    "run_count": 25
+  },
+  "simulation_authorized": false,
+  "tooling_implementation_commit": "76bdaa06cbd083fb5de0ecf92cb60626387e3a6e",
+  "tooling_inventory_sha256": "8d08eb964d3460a8a75673cb7f764532836103dbd37ce52f2c8eb439e6a86721"
+}
