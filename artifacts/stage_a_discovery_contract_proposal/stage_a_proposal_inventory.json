@@ -6,14 +6,14 @@
       "record_count": null,
       "relative_path": "stage_a_contract_proposal.json",
       "schema_identifier": "satnet.stage_a_discovery_contract_proposal.v1",
-      "sha256": "43acd648f28ee3ebb6e8cf937dad2779c9c426980985b2c06cd1ee3c5611e4f4"
+      "sha256": "35637c41199f8d7d824d18484cf00496c6d97aa71129b3a4d263bd155b5de0e3"
     },
     {
-      "byte_length": 25399,
+      "byte_length": 25398,
       "record_count": 30,
       "relative_path": "stage_a_design_manifest.csv",
       "schema_identifier": "satnet.stage_a.design_manifest.v1",
-      "sha256": "3c30c8b04be879b6c4585d9dcfefd8f28145f5a579a54e9213ee12fa34772ee4"
+      "sha256": "073e48dbfb8fb6309bbbb9305fcbf4d0769a5ad85db9f1f3e04320f2dc413d75"
     },
     {
       "byte_length": 10820,
@@ -23,11 +23,11 @@
       "sha256": "d86a30c71e52c65bd8ce290fd702539d21a71bcdf2c64f85d28c86bc898e41f1"
     },
     {
-      "byte_length": 14683,
+      "byte_length": 27778,
       "record_count": null,
       "relative_path": "stage_a_near_neighbor_policy.json",
       "schema_identifier": "satnet.stage_a.near_neighbor_policy.v1",
-      "sha256": "692b9014a6d1ba7c1097cfa780a37fc6ba16f63f300defa1998f9c71d05a52b0"
+      "sha256": "b5ebbd7ce681ed0fd57ab037bf2249b23c801787c7294691225d7e9919fdbc8f"
     },
     {
       "byte_length": 951,
@@ -55,7 +55,7 @@
       "record_count": 150,
       "relative_path": "stage_a_run_manifest.csv",
       "schema_identifier": "satnet.stage_a.run_manifest.v1",
-      "sha256": "37c09e2c78e2259196266018f2dcd8cdb139e72aac73d63ae74d2bf3c70c2aec"
+      "sha256": "f71556529f47ef642d8fe56d041312320cba22dcaed9575812d9693511b0b79a"
     },
     {
       "byte_length": 26529,

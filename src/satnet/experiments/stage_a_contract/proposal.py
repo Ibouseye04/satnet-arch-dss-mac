@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from copy import deepcopy
 import csv
 from decimal import Decimal
 import io
@@ -43,6 +44,7 @@ from satnet.experiments.stage_a_contract.semantics import (
     SEED_POLICY_VERSION,
     SERVICE_THRESHOLD,
     SIMULATION_AUTHORIZED,
+    canonical_float,
     canonical_json_bytes,
     canonical_margin,
     canonical_payload_hash,
@@ -52,6 +54,23 @@ from satnet.experiments.stage_a_contract.semantics import (
     observed_boundary_design,
     paths_overlap,
     sha256_bytes,
+)
+
+NEAR_NEIGHBOR_THRESHOLD = 0.10
+APPROVED_EXCEPTION_STATUS = "APPROVED_PRE_FREEZE_SCIENTIFIC_EXCEPTION"
+SA_D020_PRIOR_GROUND_FAILURE_PROBABILITY = 0.075
+SA_D020_CORRECTED_GROUND_FAILURE_PROBABILITY = 0.100
+SA_D020_CANDIDATE_REVIEW = (
+    ("ground_station_failure_probability", 0.100, "Selected: minimal ground-failure stress-axis correction with a non-fragile separation margin."),
+    ("ground_station_failure_probability", 0.095, "Smaller perturbation, but the development separation margin is comparatively fragile."),
+    ("ground_station_failure_probability", 0.105, "Preserves the stress axis with greater separation but moves farther from the proposed validation point."),
+    ("satellite_edge_failure_probability", 0.085, "Preserves geometry and station composition but changes the space-failure stress axis."),
+    ("inclination_deg", 64, "Preserves failure assumptions but changes orbital geometry."),
+    ("altitude_km", 650, "Preserves failure assumptions but shifts the orbital shell toward the lower boundary range."),
+    ("ground_station_failure_probability", 0.110, "Preserves the stress axis but perturbs the proposed point more than the selected correction."),
+    ("inclination_deg", 65, "Provides separation through a larger orbital-geometry change."),
+    ("satellite_node_failure_probability", 0.035, "Provides separation by reducing the satellite node-failure stress assumption."),
+    ("satellite_edge_failure_probability", 0.090, "Provides greater separation through a larger space-edge-failure change."),
 )
 
 ARTIFACT_SCHEMAS = {
@@ -373,34 +392,170 @@ def _nearest(source: Mapping[str, Any], candidates: Iterable[Mapping[str, Any]])
     return {"source_design_id": source["design_id"], "neighbor_design_id": candidate["design_id"], "neighbor_partition": candidate.get("partition", candidate.get("split_assignment")), "normalized_distance": distance}
 
 
+def _minimum_pair(first: Sequence[Mapping[str, Any]], second: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    distance, first_row, second_row = min(
+        (normalized_distance(left, right), left, right)
+        for left in first
+        for right in second
+    )
+    return {
+        "first_design_id": first_row["design_id"],
+        "first_partition": first_row.get("partition", first_row.get("split_assignment")),
+        "second_design_id": second_row["design_id"],
+        "second_partition": second_row.get("partition", second_row.get("split_assignment")),
+        "normalized_distance": distance,
+    }
+
+
+def _exception_key(row: Mapping[str, Any]) -> frozenset[str]:
+    return frozenset((str(row.get("first_design_id")), str(row.get("second_design_id"))))
+
+
+def validate_near_neighbor_separation(
+    designs: Sequence[Mapping[str, Any]],
+    exceptions: Sequence[Mapping[str, Any]] = (),
+) -> None:
+    cross = [
+        (first, second, normalized_distance(first, second))
+        for index, first in enumerate(designs)
+        for second in designs[index + 1 :]
+        if first["partition"] != second["partition"]
+    ]
+    close_pairs = [pair for pair in cross if pair[2] < NEAR_NEIGHBOR_THRESHOLD]
+    if any("sealed_holdout" in {first["partition"], second["partition"]} for first, second, _ in close_pairs):
+        raise ValueError("Stage A sealed holdout has a cross-partition neighbor below normalized distance 0.10")
+    by_key = {_exception_key(row): row for row in exceptions}
+    if len(by_key) != len(exceptions):
+        raise ValueError("Stage A near-neighbor exceptions must identify unique design pairs")
+    required_keys = {frozenset((str(first["design_id"]), str(second["design_id"]))) for first, second, _ in close_pairs}
+    if set(by_key) != required_keys:
+        raise ValueError("Stage A cross-partition distance below 0.10 requires an exact explicit exception record")
+    for first, second, distance in close_pairs:
+        exception = by_key[frozenset((str(first["design_id"]), str(second["design_id"])))]
+        if exception.get("review_status") != APPROVED_EXCEPTION_STATUS:
+            raise ValueError("Stage A near-neighbor exception lacks approved pre-freeze status")
+        if not str(exception.get("scientific_justification", "")).strip():
+            raise ValueError("Stage A near-neighbor exception lacks scientific justification")
+        if not str(exception.get("approval_reference", "")).strip():
+            raise ValueError("Stage A near-neighbor exception lacks an approval reference")
+        if abs(float(exception.get("normalized_distance", -1.0)) - distance) > 1e-15:
+            raise ValueError("Stage A near-neighbor exception distance differs from the exact design distance")
+
+
+def _candidate_review(
+    designs: Sequence[Mapping[str, Any]],
+    original: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    corrected = next(row for row in designs if row["design_id"] == "SA-D020")
+    prior = deepcopy(corrected)
+    prior["ground_station_failure_probability"] = canonical_float(SA_D020_PRIOR_GROUND_FAILURE_PROBABILITY)
+    stage_signatures = {scientific_signature(row) for row in designs if row["design_id"] != "SA-D020"}
+    original_signatures = {scientific_signature(row) for row in original}
+    groups = {
+        partition: [row for row in designs if row["partition"] == partition and row["design_id"] != "SA-D020"]
+        for partition in ("development", "validation", "sealed_holdout")
+    }
+    rows = []
+    for rank, (field, value, rationale) in enumerate(SA_D020_CANDIDATE_REVIEW, start=1):
+        candidate = deepcopy(prior)
+        candidate[field] = canonical_float(float(value))
+        region_rules = REGION_BOUNDS[str(candidate["region"])]
+        region_passes = all(
+            float(candidate[name]) in rule["allowed_values"]
+            if "allowed_values" in rule
+            else float(rule["minimum"]) <= float(candidate[name]) <= float(rule["maximum"])
+            for name, rule in region_rules.items()
+        )
+        duplicate_passes = scientific_signature(candidate) not in stage_signatures | original_signatures
+        minimums = {partition: _minimum_pair([candidate], group) for partition, group in groups.items()}
+        if not region_passes or not duplicate_passes:
+            raise ValueError("Stage A candidate review contains an inadmissible or duplicate design")
+        if minimums["development"]["normalized_distance"] < 0.11:
+            raise ValueError("Stage A candidate review lacks the required development safety margin")
+        if minimums["sealed_holdout"]["normalized_distance"] < NEAR_NEIGHBOR_THRESHOLD:
+            raise ValueError("Stage A candidate review weakens sealed-holdout separation")
+        nearest_original = _nearest(candidate, original)
+        rows.append(
+            {
+                "candidate_rank": rank,
+                "selected": rank == 1,
+                "changed_parameters": [field],
+                "original_values": {field: prior[field]},
+                "candidate_values": {field: candidate[field]},
+                "normalized_distance_from_original_sa_d020": normalized_distance(prior, candidate),
+                "minimum_development_distance": minimums["development"]["normalized_distance"],
+                "nearest_development_design_id": minimums["development"]["second_design_id"],
+                "minimum_validation_distance": minimums["validation"]["normalized_distance"],
+                "nearest_validation_design_id": minimums["validation"]["second_design_id"],
+                "minimum_sealed_holdout_distance": minimums["sealed_holdout"]["normalized_distance"],
+                "nearest_sealed_holdout_design_id": minimums["sealed_holdout"]["second_design_id"],
+                "nearest_original_design_id": nearest_original["neighbor_design_id"],
+                "nearest_original_distance": nearest_original["normalized_distance"],
+                "region_bound_result": "PASS",
+                "duplicate_result": "PASS",
+                "scientific_rationale": rationale,
+            }
+        )
+    return rows
+
+
 def build_near_neighbor_policy(designs: Sequence[Mapping[str, Any]], original: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    justified_exceptions: list[dict[str, Any]] = []
+    validate_near_neighbor_separation(designs, justified_exceptions)
     stage_pairs = [(first, second, normalized_distance(first, second)) for index, first in enumerate(designs) for second in designs[index + 1 :]]
     cross = [(first, second, distance) for first, second, distance in stage_pairs if first["partition"] != second["partition"]]
-    sealed = [(first, second, distance) for first, second, distance in cross if "sealed_holdout" in {first["partition"], second["partition"]}]
-    threshold = 0.10
-    cross_review = [{"first_design_id": first["design_id"], "first_partition": first["partition"], "second_design_id": second["design_id"], "second_partition": second["partition"], "normalized_distance": distance, "review_status": "REQUIRES_EXPLICIT_PRE_FREEZE_REVIEW"} for first, second, distance in cross if distance <= threshold]
-    sealed_review = [row for row in cross_review if "sealed_holdout" in {row["first_partition"], row["second_partition"]}]
-    if sealed_review:
-        raise ValueError("Sealed holdout has an unapproved neighbor within normalized distance 0.10")
+    groups = {partition: [row for row in designs if row["partition"] == partition] for partition in ("development", "validation", "sealed_holdout")}
+    close_pairs = [{"first_design_id": first["design_id"], "first_partition": first["partition"], "second_design_id": second["design_id"], "second_partition": second["partition"], "normalized_distance": distance, "review_status": "REQUIRES_EXPLICIT_PRE_FREEZE_REVIEW"} for first, second, distance in cross if distance < NEAR_NEIGHBOR_THRESHOLD]
     within_reports = {}
-    for partition in ("development", "validation", "sealed_holdout"):
-        group = [row for row in designs if row["partition"] == partition]
+    for partition, group in groups.items():
         within_reports[partition] = [_nearest(row, [candidate for candidate in group if candidate["design_id"] != row["design_id"]]) for row in group]
+    corrected = next(row for row in designs if row["design_id"] == "SA-D020")
+    prior = deepcopy(corrected)
+    prior["ground_station_failure_probability"] = canonical_float(SA_D020_PRIOR_GROUND_FAILURE_PROBABILITY)
+    development_validation = _minimum_pair(groups["development"], groups["validation"])
+    development_holdout = _minimum_pair(groups["development"], groups["sealed_holdout"])
+    validation_holdout = _minimum_pair(groups["validation"], groups["sealed_holdout"])
+    new_original = min(
+        (_minimum_pair([row], original) for row in designs),
+        key=lambda row: row["normalized_distance"],
+    )
     return {
         "schema_identifier": ARTIFACT_SCHEMAS["stage_a_near_neighbor_policy.json"],
         "proposal_status": PROPOSAL_STATUS,
         "simulation_authorized": SIMULATION_AUTHORIZED,
-        "distance_method": {"metric": "Euclidean", "features": list(NEIGHBOR_FEATURES), "normalization": "Frozen full-DOE min-max ranges", "near_neighbor_radius_inclusive": threshold},
+        "distance_method": {"metric": "Euclidean", "features": list(NEIGHBOR_FEATURES), "normalization": "Frozen full-DOE min-max ranges", "near_neighbor_threshold": NEAR_NEIGHBOR_THRESHOLD, "acceptance_rule": "Every unexplained cross-partition distance must be greater than or equal to 0.10."},
         "duplicate_policy": {"identity_duplicates": "PROHIBITED", "parameter_vector_duplicates": "PROHIBITED", "exact_original_duplicates": "PROHIBITED"},
-        "cross_partition_policy": "Pairs at distance <= 0.10 require explicit pre-freeze review; scientifically important boundary probes are not removed automatically.",
-        "sealed_holdout_policy": "No development or validation neighbor at distance <= 0.10 without scientific justification and explicit approval before freeze.",
+        "cross_partition_policy": "A pair below normalized distance 0.10 fails proposal validation unless an exact approved pre-freeze scientific exception is recorded; sealed-holdout pairs below 0.10 always fail.",
+        "sealed_holdout_policy": "Every development-to-holdout and validation-to-holdout distance must be greater than or equal to 0.10.",
+        "resolved_scientific_reviews": [
+            {
+                "review_id": "SA-NN-001",
+                "first_design_id": "SA-D013",
+                "first_partition": "development",
+                "second_design_id": "SA-D020",
+                "second_partition": "validation",
+                "prior_normalized_distance": normalized_distance(next(row for row in designs if row["design_id"] == "SA-D013"), prior),
+                "corrected_normalized_distance": normalized_distance(next(row for row in designs if row["design_id"] == "SA-D013"), corrected),
+                "resolution": "MODIFY_SA-D020_PRE_SIMULATION_PROPOSAL_VECTOR",
+                "parameters_changed": [{"field": "ground_station_failure_probability", "prior_value": canonical_float(SA_D020_PRIOR_GROUND_FAILURE_PROBABILITY), "corrected_value": canonical_float(SA_D020_CORRECTED_GROUND_FAILURE_PROBABILITY)}],
+                "scientific_justification": "Move the validation boundary probe along the ground-failure stress axis while preserving architecture, orbit, space-failure assumptions, ground-station composition, region, partition, identity, and deterministic seeds; the corrected pair has a non-fragile margin above 0.10.",
+                "review_status": "RESOLVED_BY_PRE_SIMULATION_PROPOSAL_CORRECTION",
+            }
+        ],
+        "pending_scientific_reviews": close_pairs,
+        "candidate_review": {
+            "search_method": "Deterministic one-parameter local search over admissible boundary-region values with fixed simulation profile, identity, partition, region, architecture, and positive ground-station class counts.",
+            "ranking_factors": ["scientific role preservation", "cross-partition separation with non-fragile margin", "distance from original proposal", "regional coverage", "D000/D001/D022 transition coverage", "sampling-gap avoidance"],
+            "ranked_admissible_alternatives": _candidate_review(designs, original),
+        },
         "reports": {
             "stage_a_to_original_nearest": [_nearest(row, original) for row in designs],
             "stage_a_within_partition_nearest": within_reports,
-            "stage_a_cross_partition": {"minimum_distance": min(distance for _, _, distance in cross), "pairs_within_0_10": cross_review},
-            "stage_a_sealed_holdout": {"minimum_distance_to_unsealed": min(distance for _, _, distance in sealed), "pairs_within_0_10": sealed_review, "nearest_by_design": [_nearest(row, [candidate for candidate in designs if candidate["partition"] != "sealed_holdout"]) for row in designs if row["partition"] == "sealed_holdout"]},
+            "stage_a_cross_partition": {"minimum_distance": min(distance for _, _, distance in cross), "pairs_below_0_10": close_pairs, "minimum_development_validation": development_validation, "minimum_development_sealed_holdout": development_holdout, "minimum_validation_sealed_holdout": validation_holdout},
+            "stage_a_sealed_holdout": {"minimum_distance_to_unsealed": min(development_holdout["normalized_distance"], validation_holdout["normalized_distance"]), "pairs_below_0_10": [], "nearest_by_design": [_nearest(row, [candidate for candidate in designs if candidate["partition"] != "sealed_holdout"]) for row in groups["sealed_holdout"]]},
+            "stage_a_to_original_global_minimum": new_original,
         },
-        "justified_exceptions": [],
+        "justified_exceptions": justified_exceptions,
         "pre_freeze_requirement": "Repeat exact duplicate and distance audit, including radius sensitivity, on frozen candidate bytes.",
     }
 
@@ -489,8 +644,9 @@ def build_artifact_payloads(repo_root: Path) -> dict[str, bytes]:
     designs = build_design_rows()
     validate_design_rows(designs, original)
     distances = minimum_distances(designs)
-    if distances["minimum_sealed_to_unsealed_distance"] <= 0.10:
+    if distances["minimum_sealed_to_unsealed_distance"] < NEAR_NEIGHBOR_THRESHOLD:
         raise ValueError("Stage A sealed holdout violates near-neighbor isolation")
+    validate_near_neighbor_separation(designs)
     runs = build_run_rows(designs)
     seeds = build_seed_rows(runs)
     partition = build_partition_manifest(designs, runs)

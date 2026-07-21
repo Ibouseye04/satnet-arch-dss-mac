@@ -1,6 +1,270 @@
 {
-  "cross_partition_policy": "Pairs at distance <= 0.10 require explicit pre-freeze review; scientifically important boundary probes are not removed automatically.",
+  "candidate_review": {
+    "ranked_admissible_alternatives": [
+      {
+        "candidate_rank": 1,
+        "candidate_values": {
+          "ground_station_failure_probability": "0.10000000000000001"
+        },
+        "changed_parameters": [
+          "ground_station_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.12039492645571381,
+        "minimum_sealed_holdout_distance": 0.1500946005884104,
+        "minimum_validation_distance": 0.31272960980120906,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D022",
+        "nearest_original_distance": 0.24538558318207365,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.06250000000000003,
+        "original_values": {
+          "ground_station_failure_probability": "0.074999999999999997"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Selected: minimal ground-failure stress-axis correction with a non-fragile separation margin.",
+        "selected": true
+      },
+      {
+        "candidate_rank": 2,
+        "candidate_values": {
+          "ground_station_failure_probability": "0.095000000000000001"
+        },
+        "changed_parameters": [
+          "ground_station_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.11023242860554572,
+        "minimum_sealed_holdout_distance": 0.14852487712768675,
+        "minimum_validation_distance": 0.30845349543556233,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.2429855086630126,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.05000000000000002,
+        "original_values": {
+          "ground_station_failure_probability": "0.074999999999999997"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Smaller perturbation, but the development separation margin is comparatively fragile.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 3,
+        "candidate_values": {
+          "ground_station_failure_probability": "0.105"
+        },
+        "changed_parameters": [
+          "ground_station_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.13096254547112593,
+        "minimum_sealed_holdout_distance": 0.15267494596624046,
+        "minimum_validation_distance": 0.31744063830331565,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D022",
+        "nearest_original_distance": 0.2433288497970454,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.07499999999999998,
+        "original_values": {
+          "ground_station_failure_probability": "0.074999999999999997"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Preserves the stress axis with greater separation but moves farther from the proposed validation point.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 4,
+        "candidate_values": {
+          "satellite_edge_failure_probability": "0.085000000000000006"
+        },
+        "changed_parameters": [
+          "satellite_edge_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.1245037682814329,
+        "minimum_sealed_holdout_distance": 0.14180845928855743,
+        "minimum_validation_distance": 0.31692831815162315,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.25747224592220225,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.08000000000000002,
+        "original_values": {
+          "satellite_edge_failure_probability": "0.065000000000000002"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Preserves geometry and station composition but changes the space-failure stress axis.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 5,
+        "candidate_values": {
+          "inclination_deg": "64"
+        },
+        "changed_parameters": [
+          "inclination_deg"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.11606201992265114,
+        "minimum_sealed_holdout_distance": 0.13552483505048024,
+        "minimum_validation_distance": 0.2548253252517674,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.23137826617230317,
+        "nearest_sealed_holdout_design_id": "SA-D011",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.0735294117647059,
+        "original_values": {
+          "inclination_deg": "59"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Preserves failure assumptions but changes orbital geometry.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 6,
+        "candidate_values": {
+          "altitude_km": "650"
+        },
+        "changed_parameters": [
+          "altitude_km"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.13219403311175132,
+        "minimum_sealed_holdout_distance": 0.1987796338398332,
+        "minimum_validation_distance": 0.3498082061196373,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D022",
+        "nearest_original_distance": 0.238129699044864,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.08333333333333331,
+        "original_values": {
+          "altitude_km": "725"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Preserves failure assumptions but shifts the orbital shell toward the lower boundary range.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 7,
+        "candidate_values": {
+          "ground_station_failure_probability": "0.11"
+        },
+        "changed_parameters": [
+          "ground_station_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.14184476837824062,
+        "minimum_sealed_holdout_distance": 0.15621584146876538,
+        "minimum_validation_distance": 0.3225675260258175,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D022",
+        "nearest_original_distance": 0.24190137216125862,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.0875,
+        "original_values": {
+          "ground_station_failure_probability": "0.074999999999999997"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Preserves the stress axis but perturbs the proposed point more than the selected correction.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 8,
+        "candidate_values": {
+          "inclination_deg": "65"
+        },
+        "changed_parameters": [
+          "inclination_deg"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.12760020044516768,
+        "minimum_sealed_holdout_distance": 0.13945714680270999,
+        "minimum_validation_distance": 0.24837874658068243,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.23554674448802745,
+        "nearest_sealed_holdout_design_id": "SA-D011",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.08823529411764702,
+        "original_values": {
+          "inclination_deg": "59"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Provides separation through a larger orbital-geometry change.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 9,
+        "candidate_values": {
+          "satellite_node_failure_probability": "0.035000000000000003"
+        },
+        "changed_parameters": [
+          "satellite_node_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.1260999140216865,
+        "minimum_sealed_holdout_distance": 0.17160505760132072,
+        "minimum_validation_distance": 0.29604654844536943,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.2351424194402681,
+        "nearest_sealed_holdout_design_id": "SA-D011",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.09999999999999995,
+        "original_values": {
+          "satellite_node_failure_probability": "0.055"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Provides separation by reducing the satellite node-failure stress assumption.",
+        "selected": false
+      },
+      {
+        "candidate_rank": 10,
+        "candidate_values": {
+          "satellite_edge_failure_probability": "0.089999999999999997"
+        },
+        "changed_parameters": [
+          "satellite_edge_failure_probability"
+        ],
+        "duplicate_result": "PASS",
+        "minimum_development_distance": 0.14107157160915423,
+        "minimum_sealed_holdout_distance": 0.14597821455886642,
+        "minimum_validation_distance": 0.3250285508173343,
+        "nearest_development_design_id": "SA-D013",
+        "nearest_original_design_id": "D001",
+        "nearest_original_distance": 0.26887163744103426,
+        "nearest_sealed_holdout_design_id": "SA-D022",
+        "nearest_validation_design_id": "SA-D009",
+        "normalized_distance_from_original_sa_d020": 0.09999999999999998,
+        "original_values": {
+          "satellite_edge_failure_probability": "0.065000000000000002"
+        },
+        "region_bound_result": "PASS",
+        "scientific_rationale": "Provides greater separation through a larger space-edge-failure change.",
+        "selected": false
+      }
+    ],
+    "ranking_factors": [
+      "scientific role preservation",
+      "cross-partition separation with non-fragile margin",
+      "distance from original proposal",
+      "regional coverage",
+      "D000/D001/D022 transition coverage",
+      "sampling-gap avoidance"
+    ],
+    "search_method": "Deterministic one-parameter local search over admissible boundary-region values with fixed simulation profile, identity, partition, region, architecture, and positive ground-station class counts."
+  },
+  "cross_partition_policy": "A pair below normalized distance 0.10 fails proposal validation unless an exact approved pre-freeze scientific exception is recorded; sealed-holdout pairs below 0.10 always fail.",
   "distance_method": {
+    "acceptance_rule": "Every unexplained cross-partition distance must be greater than or equal to 0.10.",
     "features": [
       "num_planes",
       "sats_per_plane",
@@ -15,7 +279,7 @@
       "military_fraction"
     ],
     "metric": "Euclidean",
-    "near_neighbor_radius_inclusive": 0.1,
+    "near_neighbor_threshold": 0.1,
     "normalization": "Frozen full-DOE min-max ranges"
   },
   "duplicate_policy": {
@@ -24,21 +288,34 @@
     "parameter_vector_duplicates": "PROHIBITED"
   },
   "justified_exceptions": [],
+  "pending_scientific_reviews": [],
   "pre_freeze_requirement": "Repeat exact duplicate and distance audit, including radius sensitivity, on frozen candidate bytes.",
   "proposal_status": "NOT_FROZEN",
   "reports": {
     "stage_a_cross_partition": {
-      "minimum_distance": 0.07681919236933395,
-      "pairs_within_0_10": [
-        {
-          "first_design_id": "SA-D013",
-          "first_partition": "development",
-          "normalized_distance": 0.07681919236933395,
-          "review_status": "REQUIRES_EXPLICIT_PRE_FREEZE_REVIEW",
-          "second_design_id": "SA-D020",
-          "second_partition": "validation"
-        }
-      ]
+      "minimum_development_sealed_holdout": {
+        "first_design_id": "SA-D013",
+        "first_partition": "development",
+        "normalized_distance": 0.1205683310788027,
+        "second_design_id": "SA-D011",
+        "second_partition": "sealed_holdout"
+      },
+      "minimum_development_validation": {
+        "first_design_id": "SA-D013",
+        "first_partition": "development",
+        "normalized_distance": 0.12039492645571381,
+        "second_design_id": "SA-D020",
+        "second_partition": "validation"
+      },
+      "minimum_distance": 0.12039492645571381,
+      "minimum_validation_sealed_holdout": {
+        "first_design_id": "SA-D020",
+        "first_partition": "validation",
+        "normalized_distance": 0.1500946005884104,
+        "second_design_id": "SA-D022",
+        "second_partition": "sealed_holdout"
+      },
+      "pairs_below_0_10": []
     },
     "stage_a_sealed_holdout": {
       "minimum_distance_to_unsealed": 0.1205683310788027,
@@ -58,7 +335,7 @@
         {
           "neighbor_design_id": "SA-D020",
           "neighbor_partition": "validation",
-          "normalized_distance": 0.15267494596624046,
+          "normalized_distance": 0.1500946005884104,
           "source_design_id": "SA-D022"
         },
         {
@@ -74,7 +351,14 @@
           "source_design_id": "SA-D029"
         }
       ],
-      "pairs_within_0_10": []
+      "pairs_below_0_10": []
+    },
+    "stage_a_to_original_global_minimum": {
+      "first_design_id": "SA-D024",
+      "first_partition": "development",
+      "normalized_distance": 0.06382978723404255,
+      "second_design_id": "D004",
+      "second_partition": null
     },
     "stage_a_to_original_nearest": [
       {
@@ -198,9 +482,9 @@
         "source_design_id": "SA-D019"
       },
       {
-        "neighbor_design_id": "D001",
+        "neighbor_design_id": "D022",
         "neighbor_partition": null,
-        "normalized_distance": 0.22425868415787822,
+        "normalized_distance": 0.24538558318207365,
         "source_design_id": "SA-D020"
       },
       {
@@ -423,19 +707,19 @@
         {
           "neighbor_design_id": "SA-D020",
           "neighbor_partition": "validation",
-          "normalized_distance": 0.29604654844536943,
+          "normalized_distance": 0.31272960980120906,
           "source_design_id": "SA-D009"
         },
         {
           "neighbor_design_id": "SA-D009",
           "neighbor_partition": "validation",
-          "normalized_distance": 0.29604654844536943,
+          "normalized_distance": 0.31272960980120906,
           "source_design_id": "SA-D020"
         },
         {
           "neighbor_design_id": "SA-D020",
           "neighbor_partition": "validation",
-          "normalized_distance": 0.5509385165118528,
+          "normalized_distance": 0.5445199711454862,
           "source_design_id": "SA-D021"
         },
         {
@@ -447,7 +731,28 @@
       ]
     }
   },
+  "resolved_scientific_reviews": [
+    {
+      "corrected_normalized_distance": 0.12039492645571381,
+      "first_design_id": "SA-D013",
+      "first_partition": "development",
+      "parameters_changed": [
+        {
+          "corrected_value": "0.10000000000000001",
+          "field": "ground_station_failure_probability",
+          "prior_value": "0.074999999999999997"
+        }
+      ],
+      "prior_normalized_distance": 0.07681919236933395,
+      "resolution": "MODIFY_SA-D020_PRE_SIMULATION_PROPOSAL_VECTOR",
+      "review_id": "SA-NN-001",
+      "review_status": "RESOLVED_BY_PRE_SIMULATION_PROPOSAL_CORRECTION",
+      "scientific_justification": "Move the validation boundary probe along the ground-failure stress axis while preserving architecture, orbit, space-failure assumptions, ground-station composition, region, partition, identity, and deterministic seeds; the corrected pair has a non-fragile margin above 0.10.",
+      "second_design_id": "SA-D020",
+      "second_partition": "validation"
+    }
+  ],
   "schema_identifier": "satnet.stage_a.near_neighbor_policy.v1",
-  "sealed_holdout_policy": "No development or validation neighbor at distance <= 0.10 without scientific justification and explicit approval before freeze.",
+  "sealed_holdout_policy": "Every development-to-holdout and validation-to-holdout distance must be greater than or equal to 0.10.",
   "simulation_authorized": false
 }

@@ -37,7 +37,7 @@ DESIGN_VALUES = (
     ("boundary", "development", 5, 8, 775, 60, 0.050, 0.070, 6, 6, 6, 0.070),
     ("boundary", "development", 6, 7, 825, 62, 0.045, 0.055, 10, 5, 5, 0.060),
     ("boundary", "development", 6, 7, 700, 57, 0.065, 0.090, 5, 6, 4, 0.120),
-    ("boundary", "validation", 6, 8, 725, 59, 0.055, 0.065, 9, 6, 5, 0.075),
+    ("boundary", "validation", 6, 8, 725, 59, 0.055, 0.065, 9, 6, 5, 0.100),
     ("boundary", "validation", 5, 8, 675, 54, 0.075, 0.095, 7, 4, 4, 0.110),
     ("boundary", "sealed_holdout", 6, 8, 775, 63, 0.060, 0.080, 9, 4, 5, 0.090),
     ("boundary", "sealed_holdout", 5, 7, 625, 52, 0.085, 0.110, 4, 4, 4, 0.140),
@@ -193,6 +193,32 @@ def validate_design_rows(rows: Sequence[Mapping[str, Any]], original_rows: Itera
 
 
 def minimum_distances(rows: Sequence[Mapping[str, Any]]) -> dict[str, float]:
-    cross = [normalized_distance(first, second) for index, first in enumerate(rows) for second in rows[index + 1 :] if first["partition"] != second["partition"]]
-    sealed = [normalized_distance(first, second) for first in rows if first["partition"] == "sealed_holdout" for second in rows if second["partition"] != "sealed_holdout"]
-    return {"minimum_cross_partition_distance": min(cross), "minimum_sealed_to_unsealed_distance": min(sealed)}
+    by_partition = {
+        partition: [row for row in rows if row["partition"] == partition]
+        for partition in ("development", "validation", "sealed_holdout")
+    }
+
+    def between(first_partition: str, second_partition: str) -> float:
+        return min(
+            normalized_distance(first, second)
+            for first in by_partition[first_partition]
+            for second in by_partition[second_partition]
+        )
+
+    development_validation = between("development", "validation")
+    development_holdout = between("development", "sealed_holdout")
+    validation_holdout = between("validation", "sealed_holdout")
+    return {
+        "minimum_cross_partition_distance": min(
+            development_validation,
+            development_holdout,
+            validation_holdout,
+        ),
+        "minimum_sealed_to_unsealed_distance": min(
+            development_holdout,
+            validation_holdout,
+        ),
+        "minimum_development_validation_distance": development_validation,
+        "minimum_development_holdout_distance": development_holdout,
+        "minimum_validation_holdout_distance": validation_holdout,
+    }

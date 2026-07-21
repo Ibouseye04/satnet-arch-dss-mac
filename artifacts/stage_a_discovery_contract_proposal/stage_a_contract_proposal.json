@@ -158,9 +158,9 @@
   },
   "artifact_references": {
     "stage_a_design_manifest": {
-      "byte_length": 25399,
+      "byte_length": 25398,
       "relative_path": "stage_a_design_manifest.csv",
-      "sha256": "3c30c8b04be879b6c4585d9dcfefd8f28145f5a579a54e9213ee12fa34772ee4"
+      "sha256": "073e48dbfb8fb6309bbbb9305fcbf4d0769a5ad85db9f1f3e04320f2dc413d75"
     },
     "stage_a_discovery_criteria": {
       "byte_length": 10820,
@@ -168,9 +168,9 @@
       "sha256": "d86a30c71e52c65bd8ce290fd702539d21a71bcdf2c64f85d28c86bc898e41f1"
     },
     "stage_a_near_neighbor_policy": {
-      "byte_length": 14683,
+      "byte_length": 27778,
       "relative_path": "stage_a_near_neighbor_policy.json",
-      "sha256": "692b9014a6d1ba7c1097cfa780a37fc6ba16f63f300defa1998f9c71d05a52b0"
+      "sha256": "b5ebbd7ce681ed0fd57ab037bf2249b23c801787c7294691225d7e9919fdbc8f"
     },
     "stage_a_output_root_manifest": {
       "byte_length": 951,
@@ -190,7 +190,7 @@
     "stage_a_run_manifest": {
       "byte_length": 34907,
       "relative_path": "stage_a_run_manifest.csv",
-      "sha256": "37c09e2c78e2259196266018f2dcd8cdb139e72aac73d63ae74d2bf3c70c2aec"
+      "sha256": "f71556529f47ef642d8fe56d041312320cba22dcaed9575812d9693511b0b79a"
     },
     "stage_a_seed_manifest": {
       "byte_length": 26529,
