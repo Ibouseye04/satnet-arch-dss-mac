@@ -12,7 +12,7 @@ from satnet.experiments.stage_a_execution.contract import load_frozen_contract
 from satnet.experiments.stage_a_execution.ledger import build_ledger, write_ledger
 from satnet.experiments.stage_a_execution.paths import validate_output_roots, validate_relative_artifact_path
 from satnet.experiments.stage_a_execution.plan import build_plan
-from satnet.experiments.stage_a_execution.preflight import run_preflight
+from satnet.experiments.stage_a_execution.preflight import run_preflight, tooling_identity
 
 from .conftest import TOOLING_COMMIT, TOOLING_INVENTORY, make_authorization
 
@@ -92,6 +92,13 @@ def test_cli_status_never_lists_holdout_identities(synthetic_contract, tmp_path:
     result = json.loads(capsys.readouterr().out)
     assert result["sealed_holdout_identities"] == "REDACTED"
     assert "SYN-D002" not in json.dumps(result)
+
+
+def test_tooling_identity_uses_last_executable_change() -> None:
+    commit, inventory_hash = tooling_identity(ROOT, PROPOSAL / "stage_a_execution_tooling_inventory.json")
+    assert len(commit) == 40
+    assert inventory_hash == sha256_file(PROPOSAL / "stage_a_execution_tooling_inventory.json")
+    assert commit != "82c7787"
 
 
 def test_tooling_proposal_has_no_authorization_and_false_flags() -> None:

@@ -14,9 +14,23 @@ from .plan import validate_plan
 MINIMUM_FREE_BYTES = 1_000_000_000
 
 
+TOOLING_IDENTITY_PATHS = (
+    ".gitattributes",
+    "src/satnet/experiments/stage_a_execution",
+    "tests/experiments/stage_a_execution",
+    "tests/experiments/test_final_dataset_isolation.py",
+)
+
+
 def tooling_identity(repo_root: Path, inventory_path: Path) -> tuple[str, str]:
-    result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo_root, capture_output=True, text=True, check=True)
-    return result.stdout.strip(), sha256_file(inventory_path)
+    result = subprocess.run(
+        ["git", "rev-list", "-n", "1", "HEAD", "--", *TOOLING_IDENTITY_PATHS],
+        cwd=repo_root, capture_output=True, text=True, check=True,
+    )
+    commit = result.stdout.strip()
+    if len(commit) != 40:
+        raise ValueError("Execution-tooling implementation commit is unavailable")
+    return commit, sha256_file(inventory_path)
 
 
 def run_preflight(
