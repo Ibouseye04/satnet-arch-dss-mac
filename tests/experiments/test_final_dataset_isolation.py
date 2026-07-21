@@ -28,6 +28,7 @@ ALLOWED_PREFIXES = (
     "docs/stage_a_near_neighbor_resolution_v1.md",
     "docs/validation/final_integrated_dataset_class_support_audit.md",
     "docs/validation/stage_a_discovery_contract_freeze_readiness_audit.md",
+    "docs/validation/stage_a_discovery_contract_freeze_v1.md",
     "scripts/analysis/final_integrated_dataset_class_support.py",
     "scripts/validation/audit_final_dataset_class_support.py",
     "scripts/validation/audit_stage_a_discovery_contract.py",
