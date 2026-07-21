@@ -1,0 +1,398 @@
+{
+  "approved_proposal": {
+    "branch": "correction/stage-a-near-neighbor-resolution-v1",
+    "commit": "509f2449dbbaf4c1f5153ecfa4bc1652f24f75da",
+    "proposal_inventory_sha256": "69fd2a9fbcc1b461ae4230a282cfcaaadc26ba7b65563bc90a81e86e1ca98127",
+    "seed_manifest_sha256": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace"
+  },
+  "base_production_provenance": {
+    "contract_specification_sha256": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "evidence_freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+    "frozen_contract_tag": "final-integrated-dataset-contract-v1",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd"
+  },
+  "boundary_definitions": {
+    "endpoint_behavior": "absolute margin exactly 0.05 qualifies",
+    "observed_boundary_design": {
+      "combination": "condition_a OR condition_b",
+      "condition_a": "minimum realization margin < 0 and maximum realization margin >= 0",
+      "condition_b": "at least two of five realizations have absolute margin <= 0.05"
+    },
+    "preassigned_boundary_region": "DOE designation only; not automatically an observed boundary result"
+  },
+  "byte_preservation_policy": {
+    "approved_proposal_bundle_attribute": "text unset",
+    "audit_bundle_attribute": "text unset",
+    "commit": "9c55e5999f308a84b857fdf6828cf48a9ca5b360",
+    "frozen_contract_bundle_attribute": "text unset"
+  },
+  "canonical_margin": {
+    "distinct_margin_count": "number of unique quantized margins",
+    "quantization_increment": "0.000001",
+    "rounding": "ROUND_HALF_EVEN"
+  },
+  "cardinality": {
+    "design_count": 30,
+    "realizations_per_design": 5,
+    "run_count": 150,
+    "seed_record_count": 150
+  },
+  "contract_frozen": true,
+  "contract_name": "SATNET Stage A Discovery Contract",
+  "contract_version": "1",
+  "corpus_namespace": "stage_a_discovery_v1",
+  "design_level_class_rules": {
+    "breach_majority": "at least 3 of 5 realizations are breach",
+    "counting_rule": "Each design counts toward exactly one majority-class minimum; mixed designs are assigned by majority class, are not double-counted, and may separately count as observed boundary designs.",
+    "mixed_design": "at least one breach and at least one non-breach realization",
+    "non_breach_majority": "at least 3 of 5 realizations are non-breach"
+  },
+  "execution_authorized": false,
+  "final_corpus_membership": {
+    "expected_if_stage_b_remains_90_designs": {
+      "designs": 190,
+      "runs": 950
+    },
+    "future_training_inclusion": "Requires a separately proposed and audited corpus contract",
+    "primary_final_classification_corpus": [
+      "original frozen 500-run corpus",
+      "future frozen Stage B corpus"
+    ],
+    "stage_a_development": "EXCLUDED",
+    "stage_a_sealed_holdout": "EXCLUDED",
+    "stage_a_validation": "EXCLUDED"
+  },
+  "freeze_date": "2026-07-21",
+  "freeze_readiness_audit": {
+    "binding_findings": [],
+    "branch": "audit/stage-a-contract-freeze-readiness-v1",
+    "commit": "a1514a654fe76518db16001b98e899f773eb9d1e",
+    "implementation_commit": "27b889b83e26158778f4031df9084c3c5d825d5f",
+    "inventory_sha256": "16ce1a1b138567a144cbf9b1d715c74b30f05e1d8262841d9580240080339d10",
+    "nonbinding_findings": [],
+    "report_commit": "a1514a654fe76518db16001b98e899f773eb9d1e",
+    "required_corrections": [],
+    "verdict": "APPROVED FOR STAGE A CONTRACT FREEZE"
+  },
+  "freeze_status": "FROZEN_PENDING_INDEPENDENT_AUDIT",
+  "future_output_roots": {
+    "creation_authorized": false,
+    "must_be_mutually_non_overlapping": true,
+    "must_be_outside_frozen_evidence": true,
+    "must_be_outside_git_worktrees": true,
+    "paths": {
+      "evidence_freeze": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze",
+      "production_acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+      "production_generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+      "production_replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    },
+    "required_state_at_freeze": "ABSENT"
+  },
+  "future_requirements": {
+    "independent_frozen_contract_audit_required": true,
+    "required_next_step": "Independent audit of the frozen SATNET Stage A Discovery Contract v1",
+    "separate_execution_tooling_task_required": true,
+    "separate_production_authorization_required": true
+  },
+  "git_provenance": {
+    "annotated_tag": "stage-a-discovery-contract-v1",
+    "byte_policy_correction_commit": "9c55e5999f308a84b857fdf6828cf48a9ca5b360",
+    "freeze_base_audit_commit": "a1514a654fe76518db16001b98e899f773eb9d1e",
+    "freeze_branch": "freeze/stage-a-discovery-contract-v1-restart"
+  },
+  "identity_namespace": {
+    "collision_policy": {
+      "duplicate_design_id": "PROHIBITED",
+      "duplicate_design_realization_pair": "PROHIBITED",
+      "duplicate_run_id": "PROHIBITED",
+      "duplicate_run_key": "PROHIBITED",
+      "original_identity_collision": "PROHIBITED",
+      "stage_a_identity_collision": "PROHIBITED"
+    },
+    "design_ids": "SA-D000 through SA-D029",
+    "design_indexes": "0 through 29",
+    "global_run_id_formula": "500 + stage_a_design_index * 5 + realization_index",
+    "global_run_ids": "500 through 649",
+    "realization_ids": "R00 through R04",
+    "realization_indexes": "0 through 4",
+    "run_keys": "SA-D000-R00 through SA-D029-R04"
+  },
+  "near_neighbor_policy": {
+    "changed_design": "SA-D020",
+    "changed_parameter": "ground_station_failure_probability",
+    "corrected_sa_d013_sa_d020_distance": 0.12039492645571381,
+    "corrected_value": "0.100",
+    "cross_partition_policy": "A pair below normalized distance 0.10 fails proposal validation unless an exact approved pre-freeze scientific exception is recorded; sealed-holdout pairs below 0.10 always fail.",
+    "duplicate_policy": {
+      "exact_original_duplicates": "PROHIBITED",
+      "identity_duplicates": "PROHIBITED",
+      "parameter_vector_duplicates": "PROHIBITED"
+    },
+    "minimum_development_holdout": 0.1205683310788027,
+    "minimum_development_validation": 0.12039492645571381,
+    "minimum_stage_a_to_original": {
+      "distance": 0.06382978723404255,
+      "original_design_id": "D004",
+      "stage_a_design_id": "SA-D024"
+    },
+    "minimum_validation_holdout": 0.1500946005884104,
+    "original_sa_d013_sa_d020_distance": 0.07681919236933395,
+    "original_value": "0.075",
+    "pending_scientific_reviews": [],
+    "remaining_exceptions": [],
+    "sealed_holdout_policy": "Every development-to-holdout and validation-to-holdout distance must be greater than or equal to 0.10."
+  },
+  "partition_allocation": {
+    "development": {
+      "design_count": 20,
+      "run_count": 100
+    },
+    "sealed_holdout": {
+      "design_count": 5,
+      "run_count": 25
+    },
+    "validation": {
+      "design_count": 5,
+      "run_count": 25
+    }
+  },
+  "production_authorized": false,
+  "protected_science_boundary": {
+    "frozen_production_evidence_changes_authorized": false,
+    "proposal_source_changes_authorized": false,
+    "protected_paths": [
+      "src/satnet/ground",
+      "src/satnet/network",
+      "src/satnet/simulation/tier1_rollout.py",
+      "src/satnet/models/gnn_dataset.py",
+      "src/satnet/models/gnn_model.py",
+      "src/satnet/models/risk_model.py",
+      "src/satnet/utils/graph_cache.py",
+      "artifacts/final_integrated_dataset_contract",
+      "src/satnet/experiments/final_dataset",
+      "src/satnet/experiments/final_generation"
+    ],
+    "scientific_content_changes_authorized": false
+  },
+  "region_allocation": {
+    "boundary": 12,
+    "global_control": 6,
+    "resilient_core": 12
+  },
+  "region_by_partition_allocation": {
+    "boundary": {
+      "development": 8,
+      "sealed_holdout": 2,
+      "validation": 2
+    },
+    "global_control": {
+      "development": 4,
+      "sealed_holdout": 1,
+      "validation": 1
+    },
+    "resilient_core": {
+      "development": 8,
+      "sealed_holdout": 2,
+      "validation": 2
+    }
+  },
+  "schema_identifier": "satnet.stage_a.frozen_contract_specification.v1",
+  "sealed_holdout_policy": {
+    "change_rule": "If holdout results require design changes, reject Stage B v1 and create, freeze, and audit Stage B v2.",
+    "may_alter_frozen_stage_b_contract": false,
+    "may_confirm_or_reject_only": true,
+    "partition": {
+      "design_count": 5,
+      "design_ids": [
+        "SA-D010",
+        "SA-D011",
+        "SA-D022",
+        "SA-D023",
+        "SA-D029"
+      ],
+      "global_run_ids": [
+        550,
+        551,
+        552,
+        553,
+        554,
+        555,
+        556,
+        557,
+        558,
+        559,
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616,
+        617,
+        618,
+        619,
+        645,
+        646,
+        647,
+        648,
+        649
+      ],
+      "permitted_uses": [
+        "After lawful unsealing, decide whether an already-frozen and independently audited Stage B contract is executed"
+      ],
+      "prohibited_uses": [
+        "Select Stage B parameter bounds",
+        "Select Stage B regions",
+        "Select Stage B design density",
+        "Select Stage B sample size",
+        "Select Stage B split allocation",
+        "Select Stage B seeds",
+        "Select Stage B acceptance gates",
+        "Modify a frozen Stage B contract"
+      ],
+      "region_counts": {
+        "boundary": 2,
+        "global_control": 1,
+        "resilient_core": 2
+      },
+      "run_count": 25,
+      "sealed": true
+    },
+    "unsealing_conditions": [
+      "Stage B contract completely specified",
+      "Stage B design manifest generated",
+      "Stage B run and seed manifests generated",
+      "Stage B split frozen",
+      "Stage B contract passed independent audit",
+      "Stage B contract hash recorded"
+    ]
+  },
+  "simulation_authorized": false,
+  "source_bundle": {
+    "artifact_count": 11,
+    "artifacts": [
+      {
+        "byte_length": 13072,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_contract_proposal.json",
+        "schema_identifier": "satnet.stage_a_discovery_contract_proposal.v1",
+        "sha256": "35637c41199f8d7d824d18484cf00496c6d97aa71129b3a4d263bd155b5de0e3",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 25398,
+        "record_count": 30,
+        "relative_path": "source_bundle/stage_a_design_manifest.csv",
+        "schema_identifier": "satnet.stage_a.design_manifest.v1",
+        "sha256": "073e48dbfb8fb6309bbbb9305fcbf4d0769a5ad85db9f1f3e04320f2dc413d75",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 10820,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_discovery_criteria.json",
+        "schema_identifier": "satnet.stage_a.discovery_criteria.v1",
+        "sha256": "d86a30c71e52c65bd8ce290fd702539d21a71bcdf2c64f85d28c86bc898e41f1",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 27778,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_near_neighbor_policy.json",
+        "schema_identifier": "satnet.stage_a.near_neighbor_policy.v1",
+        "sha256": "b5ebbd7ce681ed0fd57ab037bf2249b23c801787c7294691225d7e9919fdbc8f",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 951,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_output_root_manifest.json",
+        "schema_identifier": "satnet.stage_a.output_roots.v1",
+        "sha256": "0fe861498c173aaaafff78772eac03b3f9722a82efe80d3a292cfc43ffba15c8",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 4879,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_partition_manifest.json",
+        "schema_identifier": "satnet.stage_a.partition_manifest.v1",
+        "sha256": "0694a4a64c885245ff2ee2ab127499b6ad6f2766a2fb6c8e8ebad799944f4b1d",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 3100,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_proposal_inventory.json",
+        "schema_identifier": "satnet.stage_a.proposal_inventory.v1",
+        "sha256": "69fd2a9fbcc1b461ae4230a282cfcaaadc26ba7b65563bc90a81e86e1ca98127",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 7716,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_region_bounds.json",
+        "schema_identifier": "satnet.stage_a.region_bounds.v1",
+        "sha256": "4c0cb0cbd9b4968bd98ac6c40424f78a85858258dcb5353d0ced63635bb04fc8",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 34907,
+        "record_count": 150,
+        "relative_path": "source_bundle/stage_a_run_manifest.csv",
+        "schema_identifier": "satnet.stage_a.run_manifest.v1",
+        "sha256": "f71556529f47ef642d8fe56d041312320cba22dcaed9575812d9693511b0b79a",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 26529,
+        "record_count": 150,
+        "relative_path": "source_bundle/stage_a_seed_manifest.csv",
+        "schema_identifier": "satnet.stage_a.seed_manifest.v1",
+        "sha256": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace",
+        "source_classification": "approved_proposal_source_copy"
+      },
+      {
+        "byte_length": 1366,
+        "record_count": null,
+        "relative_path": "source_bundle/stage_a_seed_policy.json",
+        "schema_identifier": "satnet.stage_a.seed_policy.v1",
+        "sha256": "dac611d8b90e036e3ce5fb552aa5a8eec713036cda1cc136b7115c582fc379cd",
+        "source_classification": "approved_proposal_source_copy"
+      }
+    ],
+    "historical_status_explanation": "The source bundle preserves the exact audited proposal bytes. Its internal NOT_FROZEN fields represent the source proposal's historical state. The frozen contract envelope binds that exact source bundle as Stage A Discovery Contract v1. Simulation authorization remains false.",
+    "preservation": "Byte-exact copies of the independently audited proposal artifacts."
+  },
+  "stage_b_adaptation_boundary": {
+    "adaptation_sources": [
+      "Stage A development",
+      "Stage A validation"
+    ],
+    "planning_baseline": {
+      "boundary": 36,
+      "designs": 90,
+      "global_control": 18,
+      "resilient_core": 36,
+      "runs": 450
+    },
+    "prohibited_source": "Stage A sealed holdout",
+    "proposal_status": "NOT_FROZEN",
+    "required_process": [
+      "new Stage B proposal",
+      "new design/run/seed manifests",
+      "frozen split",
+      "independent audit",
+      "recorded contract hash"
+    ],
+    "simulation_authorized": false
+  },
+  "threshold_definition": {
+    "breach": "margin < 0",
+    "margin": "failure_adjusted_overall_service_fraction_min - 0.80",
+    "non_breach": "margin >= 0",
+    "value": "0.80"
+  }
+}

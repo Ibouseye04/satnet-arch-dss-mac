@@ -1,0 +1,22 @@
+{
+  "all_external_to_git_worktrees": true,
+  "all_outside_frozen_evidence": true,
+  "creation_authorized": false,
+  "current_existence": {
+    "evidence_freeze": false,
+    "production_acceptance": false,
+    "production_generation": false,
+    "production_replay": false
+  },
+  "isolation_policy": "Future roots may be created only after contract freeze, independent audit, and explicit execution authorization.",
+  "mutually_non_overlapping": true,
+  "proposal_status": "NOT_FROZEN",
+  "proposed_resolved_paths": {
+    "evidence_freeze": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze",
+    "production_acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+    "production_generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+    "production_replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+  },
+  "schema_identifier": "satnet.stage_a.output_roots.v1",
+  "simulation_authorized": false
+}

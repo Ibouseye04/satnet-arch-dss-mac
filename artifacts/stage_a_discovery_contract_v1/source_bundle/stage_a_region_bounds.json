@@ -1,0 +1,276 @@
+{
+  "base_admissible_bounds": {
+    "altitude_km": [
+      300.0,
+      1200.0
+    ],
+    "civilian_fraction": [
+      0.0,
+      1.0
+    ],
+    "government_fraction": [
+      0.0,
+      1.0
+    ],
+    "ground_station_failure_probability": [
+      0.0,
+      0.4
+    ],
+    "inclination_deg": [
+      30.0,
+      98.0
+    ],
+    "military_fraction": [
+      0.0,
+      1.0
+    ],
+    "num_planes": [
+      4.0,
+      6.0
+    ],
+    "satellite_edge_failure_probability": [
+      0.0,
+      0.25
+    ],
+    "satellite_node_failure_probability": [
+      0.0,
+      0.2
+    ],
+    "sats_per_plane": [
+      5.0,
+      8.0
+    ],
+    "total_ground_station_count": [
+      3.0,
+      50.0
+    ]
+  },
+  "excluded_values": {
+    "all_regions": [
+      "non-finite numeric values",
+      "negative class counts",
+      "zero total ground-station count",
+      "parameters outside frozen base DOE"
+    ]
+  },
+  "fixed_values": {
+    "adjacent_search_k": 1,
+    "duration_minutes": 10,
+    "epoch_iso": "2000-01-01T12:00:00+00:00",
+    "ground_service_policy_hash": "e314b9d4123ef84832965b1baadd04a118805f8cab368bd548a3f8f65ae02950",
+    "ground_service_threshold": 0.8,
+    "isl_policy": "grid_fixed",
+    "max_inter_plane_links_per_sat": 1,
+    "max_isl_distance_km": 10000.0,
+    "minimum_elevation_deg": 10.0,
+    "orbital_engine": "sgp4",
+    "satellite_failure_model": "persistent_temporal_union_edges_v1",
+    "space_gcc_threshold": 0.8,
+    "step_seconds": 60,
+    "visibility_policy_hash": "5dda243a39d13746d4e9d16922318df1774c4cf29a95fbc70677b618a41c45b1"
+  },
+  "proposal_status": "NOT_FROZEN",
+  "regions": {
+    "boundary": {
+      "allowed_parameter_bounds": {
+        "altitude_km": {
+          "maximum": 900.0,
+          "minimum": 600.0
+        },
+        "ground_station_failure_probability": {
+          "maximum": 0.15,
+          "minimum": 0.03
+        },
+        "inclination_deg": {
+          "maximum": 75.0,
+          "minimum": 50.0
+        },
+        "num_planes": {
+          "allowed_values": [
+            5,
+            6
+          ]
+        },
+        "satellite_edge_failure_probability": {
+          "maximum": 0.12,
+          "minimum": 0.03
+        },
+        "satellite_node_failure_probability": {
+          "maximum": 0.1,
+          "minimum": 0.03
+        },
+        "sats_per_plane": {
+          "allowed_values": [
+            7,
+            8
+          ]
+        },
+        "total_ground_station_count": {
+          "maximum": 30,
+          "minimum": 10
+        }
+      },
+      "construction_rationale": "Controlled transition probes spanning D001 toward D022 and nearby breached evidence; assignment does not imply an observed boundary outcome.",
+      "excluded_values": [],
+      "fixed_values": {
+        "adjacent_search_k": 1,
+        "duration_minutes": 10,
+        "epoch_iso": "2000-01-01T12:00:00+00:00",
+        "ground_service_policy_hash": "e314b9d4123ef84832965b1baadd04a118805f8cab368bd548a3f8f65ae02950",
+        "ground_service_threshold": 0.8,
+        "isl_policy": "grid_fixed",
+        "max_inter_plane_links_per_sat": 1,
+        "max_isl_distance_km": 10000.0,
+        "minimum_elevation_deg": 10.0,
+        "orbital_engine": "sgp4",
+        "satellite_failure_model": "persistent_temporal_union_edges_v1",
+        "space_gcc_threshold": 0.8,
+        "step_seconds": 60,
+        "visibility_policy_hash": "5dda243a39d13746d4e9d16922318df1774c4cf29a95fbc70677b618a41c45b1"
+      },
+      "source_evidence": [
+        "D001",
+        "D022",
+        "D001-to-D022 normalized distance 0.3932311802307627",
+        "audit boundary findings"
+      ]
+    },
+    "global_control": {
+      "allowed_parameter_bounds": {
+        "altitude_km": {
+          "maximum": 1200.0,
+          "minimum": 300.0
+        },
+        "ground_station_failure_probability": {
+          "maximum": 0.4,
+          "minimum": 0.0
+        },
+        "inclination_deg": {
+          "maximum": 98.0,
+          "minimum": 30.0
+        },
+        "num_planes": {
+          "allowed_values": [
+            4,
+            5,
+            6
+          ]
+        },
+        "satellite_edge_failure_probability": {
+          "maximum": 0.25,
+          "minimum": 0.0
+        },
+        "satellite_node_failure_probability": {
+          "maximum": 0.2,
+          "minimum": 0.0
+        },
+        "sats_per_plane": {
+          "allowed_values": [
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        "total_ground_station_count": {
+          "allowed_values": [
+            6,
+            10,
+            15,
+            20,
+            25,
+            30,
+            35,
+            40,
+            45,
+            50
+          ]
+        }
+      },
+      "construction_rationale": "Broad comparison coverage across the original admissible DOE rather than concentration near D000 or D001.",
+      "excluded_values": [],
+      "fixed_values": {
+        "adjacent_search_k": 1,
+        "duration_minutes": 10,
+        "epoch_iso": "2000-01-01T12:00:00+00:00",
+        "ground_service_policy_hash": "e314b9d4123ef84832965b1baadd04a118805f8cab368bd548a3f8f65ae02950",
+        "ground_service_threshold": 0.8,
+        "isl_policy": "grid_fixed",
+        "max_inter_plane_links_per_sat": 1,
+        "max_isl_distance_km": 10000.0,
+        "minimum_elevation_deg": 10.0,
+        "orbital_engine": "sgp4",
+        "satellite_failure_model": "persistent_temporal_union_edges_v1",
+        "space_gcc_threshold": 0.8,
+        "step_seconds": 60,
+        "visibility_policy_hash": "5dda243a39d13746d4e9d16922318df1774c4cf29a95fbc70677b618a41c45b1"
+      },
+      "source_evidence": [
+        "frozen original global DOE ranges"
+      ]
+    },
+    "resilient_core": {
+      "allowed_parameter_bounds": {
+        "altitude_km": {
+          "maximum": 1200.0,
+          "minimum": 800.0
+        },
+        "ground_station_failure_probability": {
+          "maximum": 0.08,
+          "minimum": 0.0
+        },
+        "inclination_deg": {
+          "maximum": 98.0,
+          "minimum": 60.0
+        },
+        "num_planes": {
+          "allowed_values": [
+            6
+          ]
+        },
+        "satellite_edge_failure_probability": {
+          "maximum": 0.07,
+          "minimum": 0.0
+        },
+        "satellite_node_failure_probability": {
+          "maximum": 0.06,
+          "minimum": 0.0
+        },
+        "sats_per_plane": {
+          "allowed_values": [
+            8
+          ]
+        },
+        "total_ground_station_count": {
+          "maximum": 35,
+          "minimum": 18
+        }
+      },
+      "construction_rationale": "Controlled variation around independently observed resilient anchors D000 and D001; assignment is a sampling hypothesis, not validated regional resilience.",
+      "excluded_values": [],
+      "fixed_values": {
+        "adjacent_search_k": 1,
+        "duration_minutes": 10,
+        "epoch_iso": "2000-01-01T12:00:00+00:00",
+        "ground_service_policy_hash": "e314b9d4123ef84832965b1baadd04a118805f8cab368bd548a3f8f65ae02950",
+        "ground_service_threshold": 0.8,
+        "isl_policy": "grid_fixed",
+        "max_inter_plane_links_per_sat": 1,
+        "max_isl_distance_km": 10000.0,
+        "minimum_elevation_deg": 10.0,
+        "orbital_engine": "sgp4",
+        "satellite_failure_model": "persistent_temporal_union_edges_v1",
+        "space_gcc_threshold": 0.8,
+        "step_seconds": 60,
+        "visibility_policy_hash": "5dda243a39d13746d4e9d16922318df1774c4cf29a95fbc70677b618a41c45b1"
+      },
+      "source_evidence": [
+        "D000",
+        "D001",
+        "audit parameter-support findings"
+      ]
+    }
+  },
+  "schema_identifier": "satnet.stage_a.region_bounds.v1",
+  "simulation_authorized": false
+}

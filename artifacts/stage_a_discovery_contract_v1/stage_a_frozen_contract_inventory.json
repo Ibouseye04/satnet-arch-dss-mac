@@ -1,0 +1,111 @@
+{
+  "artifacts": [
+    {
+      "byte_length": 13072,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_contract_proposal.json",
+      "schema_identifier": "satnet.stage_a_discovery_contract_proposal.v1",
+      "sha256": "35637c41199f8d7d824d18484cf00496c6d97aa71129b3a4d263bd155b5de0e3",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 25398,
+      "record_count": 30,
+      "relative_path": "source_bundle/stage_a_design_manifest.csv",
+      "schema_identifier": "satnet.stage_a.design_manifest.v1",
+      "sha256": "073e48dbfb8fb6309bbbb9305fcbf4d0769a5ad85db9f1f3e04320f2dc413d75",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 10820,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_discovery_criteria.json",
+      "schema_identifier": "satnet.stage_a.discovery_criteria.v1",
+      "sha256": "d86a30c71e52c65bd8ce290fd702539d21a71bcdf2c64f85d28c86bc898e41f1",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 27778,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_near_neighbor_policy.json",
+      "schema_identifier": "satnet.stage_a.near_neighbor_policy.v1",
+      "sha256": "b5ebbd7ce681ed0fd57ab037bf2249b23c801787c7294691225d7e9919fdbc8f",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 951,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_output_root_manifest.json",
+      "schema_identifier": "satnet.stage_a.output_roots.v1",
+      "sha256": "0fe861498c173aaaafff78772eac03b3f9722a82efe80d3a292cfc43ffba15c8",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 4879,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_partition_manifest.json",
+      "schema_identifier": "satnet.stage_a.partition_manifest.v1",
+      "sha256": "0694a4a64c885245ff2ee2ab127499b6ad6f2766a2fb6c8e8ebad799944f4b1d",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 3100,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_proposal_inventory.json",
+      "schema_identifier": "satnet.stage_a.proposal_inventory.v1",
+      "sha256": "69fd2a9fbcc1b461ae4230a282cfcaaadc26ba7b65563bc90a81e86e1ca98127",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 7716,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_region_bounds.json",
+      "schema_identifier": "satnet.stage_a.region_bounds.v1",
+      "sha256": "4c0cb0cbd9b4968bd98ac6c40424f78a85858258dcb5353d0ced63635bb04fc8",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 34907,
+      "record_count": 150,
+      "relative_path": "source_bundle/stage_a_run_manifest.csv",
+      "schema_identifier": "satnet.stage_a.run_manifest.v1",
+      "sha256": "f71556529f47ef642d8fe56d041312320cba22dcaed9575812d9693511b0b79a",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 26529,
+      "record_count": 150,
+      "relative_path": "source_bundle/stage_a_seed_manifest.csv",
+      "schema_identifier": "satnet.stage_a.seed_manifest.v1",
+      "sha256": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 1366,
+      "record_count": null,
+      "relative_path": "source_bundle/stage_a_seed_policy.json",
+      "schema_identifier": "satnet.stage_a.seed_policy.v1",
+      "sha256": "dac611d8b90e036e3ce5fb552aa5a8eec713036cda1cc136b7115c582fc379cd",
+      "source_classification": "approved_proposal_source_copy"
+    },
+    {
+      "byte_length": 15431,
+      "record_count": null,
+      "relative_path": "stage_a_frozen_contract_specification.json",
+      "schema_identifier": "satnet.stage_a.frozen_contract_specification.v1",
+      "sha256": "c1822db61182e6ff6436c767ac39a35065ff84741119bd7306b261dc2a1f7373",
+      "source_classification": "frozen_contract_specification"
+    }
+  ],
+  "contract_bound_artifact_count": 12,
+  "contract_name": "SATNET Stage A Discovery Contract",
+  "contract_version": "1",
+  "encoding": "UTF-8 without BOM",
+  "hash_algorithm": "SHA-256",
+  "hash_encoding": "lowercase hexadecimal",
+  "newline": "LF with one terminal newline",
+  "ordering": "relative_path ordinal lexical ascending",
+  "path_format": "relative POSIX forward-slash paths",
+  "schema_identifier": "satnet.stage_a.frozen_contract_inventory.v1",
+  "self_reference_policy": "This inventory excludes its own bytes."
+}

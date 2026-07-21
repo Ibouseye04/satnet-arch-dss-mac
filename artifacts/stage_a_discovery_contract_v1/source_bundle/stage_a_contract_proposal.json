@@ -1,0 +1,373 @@
+{
+  "acceptance_definitions": {
+    "final_classification": {
+      "by_split": {
+        "test": {
+          "all_gates_mathematically_feasible": true,
+          "combined_capacity": {
+            "designs": 30,
+            "runs": 150
+          },
+          "exact_feasible_stage_b_non_breach_majority_design_interval": {
+            "maximum": 15,
+            "minimum": 3
+          },
+          "exact_feasible_stage_b_non_breach_run_interval": {
+            "maximum": 75,
+            "minimum": 9
+          },
+          "maximum_new_distinct_canonical_margins_available": 75,
+          "maximum_new_observed_boundary_designs_available": 15,
+          "minimum_new_distinct_canonical_margins_required": 0,
+          "minimum_new_observed_boundary_designs_required": 3,
+          "original": {
+            "breach_majority_designs": 14,
+            "breach_runs": 70,
+            "designs": 15,
+            "distinct_canonical_margins": 14,
+            "non_breach_majority_designs": 1,
+            "non_breach_runs": 5,
+            "observed_boundary_designs": 0,
+            "runs": 75
+          },
+          "stage_b_capacity": {
+            "designs": 15,
+            "runs": 75
+          }
+        },
+        "train": {
+          "all_gates_mathematically_feasible": true,
+          "combined_capacity": {
+            "designs": 130,
+            "runs": 650
+          },
+          "exact_feasible_stage_b_non_breach_majority_design_interval": {
+            "maximum": 60,
+            "minimum": 12
+          },
+          "exact_feasible_stage_b_non_breach_run_interval": {
+            "maximum": 300,
+            "minimum": 48
+          },
+          "maximum_new_distinct_canonical_margins_available": 300,
+          "maximum_new_observed_boundary_designs_available": 60,
+          "minimum_new_distinct_canonical_margins_required": 0,
+          "minimum_new_observed_boundary_designs_required": 9,
+          "original": {
+            "breach_majority_designs": 70,
+            "breach_runs": 348,
+            "designs": 70,
+            "distinct_canonical_margins": 54,
+            "non_breach_majority_designs": 0,
+            "non_breach_runs": 2,
+            "observed_boundary_designs": 1,
+            "runs": 350
+          },
+          "stage_b_capacity": {
+            "designs": 60,
+            "runs": 300
+          }
+        },
+        "validation": {
+          "all_gates_mathematically_feasible": true,
+          "combined_capacity": {
+            "designs": 30,
+            "runs": 150
+          },
+          "exact_feasible_stage_b_non_breach_majority_design_interval": {
+            "maximum": 15,
+            "minimum": 4
+          },
+          "exact_feasible_stage_b_non_breach_run_interval": {
+            "maximum": 75,
+            "minimum": 14
+          },
+          "maximum_new_distinct_canonical_margins_available": 75,
+          "maximum_new_observed_boundary_designs_available": 15,
+          "minimum_new_distinct_canonical_margins_required": 0,
+          "minimum_new_observed_boundary_designs_required": 3,
+          "original": {
+            "breach_majority_designs": 15,
+            "breach_runs": 75,
+            "designs": 15,
+            "distinct_canonical_margins": 24,
+            "non_breach_majority_designs": 0,
+            "non_breach_runs": 0,
+            "observed_boundary_designs": 0,
+            "runs": 75
+          },
+          "stage_b_capacity": {
+            "designs": 15,
+            "runs": 75
+          }
+        }
+      },
+      "expected_size_if_stage_b_remains_90_designs": {
+        "designs": 190,
+        "runs": 950
+      },
+      "gate_definitions": {
+        "design_class": "Five-realization majority; a mixed design counts once according to majority and never toward both class minima.",
+        "distinct_margin": "Margin quantized to 0.000001 with round-half-even; count unique canonical values.",
+        "observed_boundary_design": "minimum margin < 0 and maximum margin >= 0, or at least two absolute margins <= 0.05",
+        "run_ratio": "max(breach runs, non-breach runs) / min(breach runs, non-breach runs)",
+        "threshold": "margin = failure_adjusted_overall_service_fraction_min - 0.80; zero is non-breach"
+      },
+      "gates": {
+        "maximum_majority_to_minority_run_ratio": {
+          "test": 10.0,
+          "train": 12.0,
+          "validation": 10.0
+        },
+        "minimum_breach_majority_designs": {
+          "test": 10,
+          "train": 40,
+          "validation": 10
+        },
+        "minimum_breach_runs": {
+          "test": 60,
+          "train": 200,
+          "validation": 60
+        },
+        "minimum_distinct_canonical_margins": {
+          "test": 12,
+          "train": 30,
+          "validation": 12
+        },
+        "minimum_non_breach_majority_designs": {
+          "test": 4,
+          "train": 12,
+          "validation": 4
+        },
+        "minimum_non_breach_runs": {
+          "test": 14,
+          "train": 50,
+          "validation": 14
+        },
+        "minimum_observed_boundary_designs": {
+          "test": 3,
+          "train": 10,
+          "validation": 3
+        }
+      },
+      "overall_feasible": true,
+      "scope": "primary combined classification corpus: original frozen corpus + future frozen Stage B corpus",
+      "stage_a_excluded": true
+    },
+    "stage_a": "Discovery criteria only; final classification gates do not apply"
+  },
+  "artifact_references": {
+    "stage_a_design_manifest": {
+      "byte_length": 25398,
+      "relative_path": "stage_a_design_manifest.csv",
+      "sha256": "073e48dbfb8fb6309bbbb9305fcbf4d0769a5ad85db9f1f3e04320f2dc413d75"
+    },
+    "stage_a_discovery_criteria": {
+      "byte_length": 10820,
+      "relative_path": "stage_a_discovery_criteria.json",
+      "sha256": "d86a30c71e52c65bd8ce290fd702539d21a71bcdf2c64f85d28c86bc898e41f1"
+    },
+    "stage_a_near_neighbor_policy": {
+      "byte_length": 27778,
+      "relative_path": "stage_a_near_neighbor_policy.json",
+      "sha256": "b5ebbd7ce681ed0fd57ab037bf2249b23c801787c7294691225d7e9919fdbc8f"
+    },
+    "stage_a_output_root_manifest": {
+      "byte_length": 951,
+      "relative_path": "stage_a_output_root_manifest.json",
+      "sha256": "0fe861498c173aaaafff78772eac03b3f9722a82efe80d3a292cfc43ffba15c8"
+    },
+    "stage_a_partition_manifest": {
+      "byte_length": 4879,
+      "relative_path": "stage_a_partition_manifest.json",
+      "sha256": "0694a4a64c885245ff2ee2ab127499b6ad6f2766a2fb6c8e8ebad799944f4b1d"
+    },
+    "stage_a_region_bounds": {
+      "byte_length": 7716,
+      "relative_path": "stage_a_region_bounds.json",
+      "sha256": "4c0cb0cbd9b4968bd98ac6c40424f78a85858258dcb5353d0ced63635bb04fc8"
+    },
+    "stage_a_run_manifest": {
+      "byte_length": 34907,
+      "relative_path": "stage_a_run_manifest.csv",
+      "sha256": "f71556529f47ef642d8fe56d041312320cba22dcaed9575812d9693511b0b79a"
+    },
+    "stage_a_seed_manifest": {
+      "byte_length": 26529,
+      "relative_path": "stage_a_seed_manifest.csv",
+      "sha256": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace"
+    },
+    "stage_a_seed_policy": {
+      "byte_length": 1366,
+      "relative_path": "stage_a_seed_policy.json",
+      "sha256": "dac611d8b90e036e3ce5fb552aa5a8eec713036cda1cc136b7115c582fc379cd"
+    }
+  },
+  "audit_identities": {
+    "analysis_commit_audited": "340af3f22f2bc7facc4f0e749b10490f06e80cde",
+    "analysis_inventory_sha256": "5ac295ba0e08797b63a2ce3f062a1995dc7aa850f11a2bf5d83a0580731afd85",
+    "audit_commit_corrected": "5add33fcd8205f59e8694b104c9b34f82bd66cd1",
+    "audit_implementation_commit": "47d0fa6d428bdbf8796e0d9db2eb5f3767b7dd94",
+    "audit_inventory_sha256": "20d2e7037940d708e133936d3907ad822caac3b46cd73c84329f3efd16c4037a"
+  },
+  "base_corpus_identities": {
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd"
+  },
+  "boundary_definitions": {
+    "endpoint_behavior": "Absolute margin 0.05 qualifies; margin 0 is non-breach",
+    "observed_boundary_design": "Five margins straddle zero or at least two have absolute margin <= 0.05",
+    "preassigned_boundary_region": "Pre-simulation DOE assignment only"
+  },
+  "class_support_definitions": {
+    "breach_majority": "at least 3 of 5 breach",
+    "mixed_design": "at least one of each class; counts once by majority and may separately count as observed boundary",
+    "non_breach_majority": "at least 3 of 5 non-breach"
+  },
+  "corpus_namespace": "stage_a_discovery_v1",
+  "distinct_margin_definition": {
+    "canonical_margin": "signed boundary margin quantized to six decimal places",
+    "quantization_increment": "0.000001",
+    "rounding_mode": "ROUND_HALF_EVEN"
+  },
+  "final_corpus_membership": {
+    "expected_if_stage_b_remains_90_designs": {
+      "designs": 190,
+      "runs": 950
+    },
+    "future_training_inclusion": "Requires a separately proposed and audited corpus contract",
+    "primary_final_classification_corpus": [
+      "original frozen 500-run corpus",
+      "future frozen Stage B corpus"
+    ],
+    "stage_a_development": "EXCLUDED",
+    "stage_a_sealed_holdout": "EXCLUDED",
+    "stage_a_validation": "EXCLUDED"
+  },
+  "holdout_policy": {
+    "design_count": 5,
+    "design_ids": [
+      "SA-D010",
+      "SA-D011",
+      "SA-D022",
+      "SA-D023",
+      "SA-D029"
+    ],
+    "global_run_ids": [
+      550,
+      551,
+      552,
+      553,
+      554,
+      555,
+      556,
+      557,
+      558,
+      559,
+      610,
+      611,
+      612,
+      613,
+      614,
+      615,
+      616,
+      617,
+      618,
+      619,
+      645,
+      646,
+      647,
+      648,
+      649
+    ],
+    "not_final_model_test_set": true,
+    "permitted_uses": [
+      "After lawful unsealing, decide whether an already-frozen and independently audited Stage B contract is executed"
+    ],
+    "prohibited_uses": [
+      "Select Stage B parameter bounds",
+      "Select Stage B regions",
+      "Select Stage B design density",
+      "Select Stage B sample size",
+      "Select Stage B split allocation",
+      "Select Stage B seeds",
+      "Select Stage B acceptance gates",
+      "Modify a frozen Stage B contract"
+    ],
+    "region_counts": {
+      "boundary": 2,
+      "global_control": 1,
+      "resilient_core": 2
+    },
+    "run_count": 25,
+    "sealed": true,
+    "unsealing_conditions": [
+      "Stage B contract completely specified",
+      "Stage B design manifest generated",
+      "Stage B run and seed manifests generated",
+      "Stage B split frozen",
+      "Stage B contract passed independent audit",
+      "Stage B contract hash recorded"
+    ]
+  },
+  "original_split_preservation": {
+    "rule": "Future Stage B appends designs; every original design remains in its frozen split",
+    "test_designs": 15,
+    "train_designs": 70,
+    "validation_designs": 15
+  },
+  "proposal_schema": "satnet.stage_a_discovery_contract_proposal.v1",
+  "proposal_status": "NOT_FROZEN",
+  "proposal_version": "1",
+  "required_future_freeze_steps": [
+    "Independent freeze-readiness audit",
+    "Resolve any reviewed near-neighbor exception",
+    "Freeze exact artifact bytes and hashes",
+    "Record frozen contract hash",
+    "Explicitly authorize simulation in a later task"
+  ],
+  "required_independent_audit_steps": [
+    "Verify every proposal artifact and inventory hash",
+    "Recompute exact duplicates and distance reports",
+    "Recompute seeds and record hashes",
+    "Verify holdout and final-corpus semantics",
+    "Verify final-gate feasibility",
+    "Verify output roots remain absent and isolated"
+  ],
+  "scientific_objective": "Outcome-independent Stage A discovery of reproducible resilient-core support and design-level threshold transitions without altering frozen science.",
+  "simulation_authorized": false,
+  "stage_b_adaptation_boundary": {
+    "adaptation_sources": [
+      "Stage A development",
+      "Stage A validation"
+    ],
+    "planning_baseline": {
+      "boundary": 36,
+      "designs": 90,
+      "global_control": 18,
+      "resilient_core": 36,
+      "runs": 450
+    },
+    "prohibited_source": "Stage A sealed holdout",
+    "proposal_status": "NOT_FROZEN",
+    "required_process": [
+      "new Stage B proposal",
+      "new design/run/seed manifests",
+      "frozen split",
+      "independent audit",
+      "recorded contract hash"
+    ],
+    "simulation_authorized": false
+  },
+  "target_schema_reference": "Frozen final integrated eight-target schema; no target or threshold change",
+  "threshold_definition": {
+    "breach": "margin < 0",
+    "margin": "failure_adjusted_overall_service_fraction_min - 0.80",
+    "non_breach": "margin >= 0",
+    "value": "0.80"
+  }
+}
