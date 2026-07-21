@@ -52,7 +52,7 @@ The inventory binds 28 source, schema, specification, byte-policy, isolation, an
 
 ## Validation
 
-The new suite passed 32 tests. The focused Stage A, frozen-contract, audit, byte-policy, class-support, and isolation set passed 225 tests. Logger tests passed 7 tests; the independently rerun Windows timer test passed. The complete suite passed 1,138 tests. Compilation covered 217 Python files. Whitespace, protected science, frozen contract, annotated tag, 9,004-file frozen evidence, tooling inventory, reserved-root absence, and simulation nonexecution checks passed.
+The new suite passed 32 tests. The focused Stage A, frozen-contract, audit, byte-policy, class-support, and isolation set passed 225 tests. Logger tests passed 7 tests; the independently rerun Windows timer test passed. The final monolithic suite recorded 1,138 passed and one known Windows timer-resolution failure; the exact timer test passed independently. Compilation covered 217 Python files. Whitespace, protected science, frozen contract, annotated tag, 9,004-file frozen evidence, tooling inventory, reserved-root absence, and simulation nonexecution checks passed.
 
 ## Prohibited actions and next task
 

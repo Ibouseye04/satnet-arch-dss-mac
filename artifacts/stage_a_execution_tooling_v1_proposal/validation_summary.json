@@ -4,9 +4,11 @@
     "result": "PASSED"
   },
   "complete_suite": {
-    "duration_seconds": "70.06",
+    "duration_seconds": "70.16",
+    "failed": 1,
+    "failed_test": "tests/utils/test_experiment_logger.py::TestExperimentLogger::test_timer",
     "passed": 1138,
-    "result": "PASSED"
+    "result": "PASSED_SUBJECT_TO_DOCUMENTED_TIMER_RERUN"
   },
   "execution_authorized": false,
   "focused_execution_tooling": {
