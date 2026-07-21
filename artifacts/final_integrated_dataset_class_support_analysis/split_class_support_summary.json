@@ -1,0 +1,55 @@
+{
+  "outcome_driven_reshuffling_prohibited": true,
+  "overall": {
+    "design_count": 100,
+    "non_breach_design_count": 2,
+    "non_breach_run_count": 7,
+    "run_count": 500
+  },
+  "production_verdict": "PRODUCTION DATASET NOT ACCEPTED",
+  "schema_identifier": "satnet.class_support.split_summary.v1",
+  "splits": {
+    "test": {
+      "breach_run_count": 70,
+      "design_count": 15,
+      "non_breach_design_count": 1,
+      "non_breach_design_ids": [
+        "D000"
+      ],
+      "non_breach_run_count": 5,
+      "non_breach_run_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "run_count": 75
+    },
+    "train": {
+      "breach_run_count": 348,
+      "design_count": 70,
+      "non_breach_design_count": 1,
+      "non_breach_design_ids": [
+        "D001"
+      ],
+      "non_breach_run_count": 2,
+      "non_breach_run_ids": [
+        5,
+        7
+      ],
+      "run_count": 350
+    },
+    "validation": {
+      "breach_run_count": 75,
+      "design_count": 15,
+      "non_breach_design_count": 0,
+      "non_breach_design_ids": [],
+      "non_breach_run_count": 0,
+      "non_breach_run_ids": [],
+      "run_count": 75
+    }
+  },
+  "technical_split_failure": "Validation contains zero non-breach runs.",
+  "underlying_scientific_support_failure": "Only seven of 500 runs and two of 100 designs have any non-breach support."
+}

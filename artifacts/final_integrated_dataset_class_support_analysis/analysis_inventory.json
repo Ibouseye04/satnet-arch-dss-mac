@@ -1,0 +1,182 @@
+{
+  "analysis_schema_version": "satnet.final_integrated_dataset_class_support_analysis.v1",
+  "input_identities": {
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab"
+  },
+  "outputs": [
+    {
+      "byte_length": 6927,
+      "record_count": null,
+      "relative_path": "augmentation_contract_proposal.json",
+      "schema_identifier": "satnet.class_support.augmentation_contract_proposal.v1",
+      "sha256": "669a7149240c9446ae47c44d137d53d1c7c22fda6c0697e3e6ec470d9178b43e"
+    },
+    {
+      "byte_length": 3013,
+      "record_count": null,
+      "relative_path": "augmentation_size_options.json",
+      "schema_identifier": "satnet.class_support.augmentation_options.v1",
+      "sha256": "4ff5462ed11e8246fc2d4dbcde026748878658be48c898979ca02c0cbf7a837b"
+    },
+    {
+      "byte_length": 6788,
+      "record_count": 50,
+      "relative_path": "boundary_design_ranking.csv",
+      "schema_identifier": "satnet.class_support.boundary_design_ranking.v1",
+      "sha256": "71c904b19ca6037737e0c5576a4c7ba06bac044db0000f1b05e5925c43848303"
+    },
+    {
+      "byte_length": 2383,
+      "record_count": null,
+      "relative_path": "boundary_region_summary.json",
+      "schema_identifier": "satnet.class_support.boundary_summary.v1",
+      "sha256": "1ec73016bff222c120bffc25d41252f6296c77bb9e7194b75dfc33c51d9953e3"
+    },
+    {
+      "byte_length": 6894,
+      "record_count": 57,
+      "relative_path": "boundary_run_ranking.csv",
+      "schema_identifier": "satnet.class_support.boundary_run_ranking.v1",
+      "sha256": "ac8de8e19074d307a0ac20b2307b5c93167cb63c3b07ace2db119670876fbcef"
+    },
+    {
+      "byte_length": 186040,
+      "record_count": 100,
+      "relative_path": "design_level_class_support.csv",
+      "schema_identifier": "satnet.class_support.design.v1",
+      "sha256": "c02e9e0c4a9a67c572907f323a8e4c10e09fad14f0739ac0d4bc3a2ea62ecb2d"
+    },
+    {
+      "byte_length": 5542,
+      "record_count": 16,
+      "relative_path": "nearest_neighbor_summary.csv",
+      "schema_identifier": "satnet.class_support.nearest_neighbor.v1",
+      "sha256": "09fd867ea021fdf91e19143fe0e686950c8be2b081ec66dfb7f15d14e14271b5"
+    },
+    {
+      "byte_length": 5061,
+      "record_count": 2,
+      "relative_path": "non_breach_designs.csv",
+      "schema_identifier": "satnet.class_support.non_breach_designs.v1",
+      "sha256": "aa7bc4006dc940988e9727f6cae283a26d048d0b219bba58e59b6504ad2e0c36"
+    },
+    {
+      "byte_length": 2549,
+      "record_count": 7,
+      "relative_path": "non_breach_runs.csv",
+      "schema_identifier": "satnet.class_support.non_breach_runs.v1",
+      "sha256": "c1a6551de9a1c1b692cf97f44b19c488b4efc80a92ad79e5e9c9ea097659fd85"
+    },
+    {
+      "byte_length": 12461,
+      "record_count": 22,
+      "relative_path": "parameter_support_summary.csv",
+      "schema_identifier": "satnet.class_support.parameter_support.v1",
+      "sha256": "ef82ed7447b1f02c4ecb63359949661224f591c65d5f8897cb2b0173281ed0d6"
+    },
+    {
+      "byte_length": 7914,
+      "record_count": null,
+      "relative_path": "plots/boundary_margin_empirical_distribution.svg",
+      "schema_identifier": "satnet.class_support.plot.margin_ecdf.v1",
+      "sha256": "b3026ece8879041872ceb42493aae2f63486b2474019256e20b1fbf539398df6"
+    },
+    {
+      "byte_length": 2250,
+      "record_count": null,
+      "relative_path": "plots/boundary_margin_histogram_by_split.svg",
+      "schema_identifier": "satnet.class_support.plot.margin_histogram.v1",
+      "sha256": "34fdfdf5325b177e5f597d1bd328f7029ea6346a04aae71eb123a69008924ca0"
+    },
+    {
+      "byte_length": 2839,
+      "record_count": null,
+      "relative_path": "plots/classification_counts_by_split.svg",
+      "schema_identifier": "satnet.class_support.plot.class_counts.v1",
+      "sha256": "0082051ed6f4a821918cef717cd55f6e2b3f342abcd1def8da3f93d4ae0c746f"
+    },
+    {
+      "byte_length": 2462,
+      "record_count": null,
+      "relative_path": "plots/design_non_breach_realization_counts.svg",
+      "schema_identifier": "satnet.class_support.plot.design_counts.v1",
+      "sha256": "1ae553291d2b9d84574288cbd1d2fa9deb2c0f417c4e3aa8e2e05de33866cee6"
+    },
+    {
+      "byte_length": 2134,
+      "record_count": null,
+      "relative_path": "plots/nearest_neighbor_outcome_comparison.svg",
+      "schema_identifier": "satnet.class_support.plot.neighbors.v1",
+      "sha256": "88f431cd661da35d218fe74353df620e8f237f06c2492ffffbbadc25cc42d223"
+    },
+    {
+      "byte_length": 2469,
+      "record_count": null,
+      "relative_path": "plots/non_breach_near_boundary_profiles.svg",
+      "schema_identifier": "satnet.class_support.plot.parameter_profiles.v1",
+      "sha256": "1fa6816db2adc3ae83be2422fa4e8f70faada3baa02b9fd3424849ae14a5cb83"
+    },
+    {
+      "byte_length": 8353,
+      "record_count": null,
+      "relative_path": "plots/parameter_vs_boundary_margin.svg",
+      "schema_identifier": "satnet.class_support.plot.parameter_margin.v1",
+      "sha256": "4e343bc837372b9c325a3de2ef06c7d8d0ebe1637279bd81be815d08cdc942ee"
+    },
+    {
+      "byte_length": 3432,
+      "record_count": null,
+      "relative_path": "plots/proposed_augmentation_allocation.svg",
+      "schema_identifier": "satnet.class_support.plot.augmentation_allocation.v1",
+      "sha256": "0e6a9ead7b0a67bfd48bf60b392d9a732258f1461951c915c2b01166059de890"
+    },
+    {
+      "byte_length": 3224,
+      "record_count": null,
+      "relative_path": "plots/regression_target_distributions_by_split.svg",
+      "schema_identifier": "satnet.class_support.plot.regression.v1",
+      "sha256": "a2f6655cc9322914d5745bce3db019120b7382e600ac79767cbd11672653efad"
+    },
+    {
+      "byte_length": 38643,
+      "record_count": 90,
+      "relative_path": "recommended_augmentation_design.csv",
+      "schema_identifier": "satnet.class_support.augmentation_design_proposal.v1",
+      "sha256": "43c8ebf9e60f5255d10a002d466da48dab211ec038ded5f59af2ea921763814a"
+    },
+    {
+      "byte_length": 6613,
+      "record_count": null,
+      "relative_path": "regression_only_summary.json",
+      "schema_identifier": "satnet.class_support.regression_summary.v1",
+      "sha256": "12f21e64fe271b9540c25bb373a1d215c424f08db8a28a0a74c5e44d576437ec"
+    },
+    {
+      "byte_length": 1205063,
+      "record_count": 500,
+      "relative_path": "run_level_class_support.csv",
+      "schema_identifier": "satnet.class_support.run.v1",
+      "sha256": "8b59cf6179c4b9441333af4d576518cda32edb05650f536eda9cb6527c84613a"
+    },
+    {
+      "byte_length": 1366,
+      "record_count": null,
+      "relative_path": "split_class_support_summary.json",
+      "schema_identifier": "satnet.class_support.split_summary.v1",
+      "sha256": "df6a7fbf01366e0f5c365d62a876a0e010d5c60f866f87f563f7ea01ca945800"
+    },
+    {
+      "byte_length": 216521,
+      "record_count": 500,
+      "relative_path": "temporal_breach_summary.csv",
+      "schema_identifier": "satnet.class_support.temporal.v1",
+      "sha256": "47730548dfe833f1513c782c244152fc9672d4ed5d62216d84c8ed267d5a9d6f"
+    }
+  ],
+  "schema_identifier": "satnet.class_support.analysis_inventory.v1",
+  "self_exclusion": "analysis_inventory.json is excluded to avoid a self-referential hash cycle."
+}

@@ -1,0 +1,167 @@
+{
+  "acceptance_gates": [
+    "All generation and replay identities and inventories match.",
+    "All class-support gates pass in each combined fixed-original-plus-augmentation split.",
+    "All target/boundary and temporal-summary consistency checks pass.",
+    "Targeted-region and global-control results are reported separately to expose population shift."
+  ],
+  "augmentation_purpose": "Add independent non-breach and threshold-transition design support without changing any original run, design, target, or split.",
+  "base_corpus_identity": {
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "name": "SATNET Final Integrated Production Corpus v1",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "verdict": "PRODUCTION DATASET NOT ACCEPTED"
+  },
+  "class_support_gates": {
+    "maximum_majority_to_minority_run_ratio": {
+      "test": 10.0,
+      "train": 12.0,
+      "validation": 10.0
+    },
+    "minimum_boundary_region_designs": {
+      "test": 3,
+      "train": 10,
+      "validation": 3
+    },
+    "minimum_breach_designs": {
+      "test": 10,
+      "train": 40,
+      "validation": 10
+    },
+    "minimum_breach_runs": {
+      "test": 60,
+      "train": 200,
+      "validation": 60
+    },
+    "minimum_distinct_run_margin_values": {
+      "test": 12,
+      "train": 30,
+      "validation": 12
+    },
+    "minimum_non_breach_designs": {
+      "test": 4,
+      "train": 12,
+      "validation": 4
+    },
+    "minimum_non_breach_runs": {
+      "test": 14,
+      "train": 50,
+      "validation": 14
+    },
+    "priority": "Independent design support is binding; repeated realizations from one design cannot satisfy design-level gates."
+  },
+  "contract_version": "satnet.final_integrated_dataset_augmentation_proposal.v1",
+  "leakage_controls": [
+    "Group all five realizations by design.",
+    "No original or augmentation design overlap across splits.",
+    "No outcome-driven reshuffling, seed substitution, replacement run, or movement of original designs.",
+    "Deduplicate exact scientific parameter vectors before freezing.",
+    "Build a normalized DOE-distance graph at a predeclared 0.10 radius; assign each connected component wholly to one split or document a stricter justified radius before freeze.",
+    "Do not tune against either Stage A or Stage B final test split."
+  ],
+  "new_design_identity_namespace": "AUGV1-D000 through AUGV1-D089",
+  "new_run_identity_namespace": "AUGV1-Dxxx-R00 through R04; separate from frozen integer run IDs 0 through 499",
+  "output_root_policy": "Use new immutable Stage A and Stage B generation/replay roots outside all production and freeze roots.",
+  "proposal_label": "PROPOSAL ONLY — NOT FROZEN — DO NOT SIMULATE",
+  "proposal_status": "NOT_FROZEN",
+  "recommended_strategy": "STAGED",
+  "regression_gates": {
+    "principle": "Preserve finite [0,1] targets, nonzero split spread, and minimum unique-value support at least as strong as the frozen base contract.",
+    "status": "REQUIRES_SEPARATE_PREDECLARATION"
+  },
+  "required_future_audit_steps": [
+    "Review Stage A proposal and freeze a separate discovery contract.",
+    "Execute Stage A only after independent preflight approval.",
+    "Analyze Stage A train/validation while keeping its test partition sealed.",
+    "Create, review, and freeze a distinct Stage B contract and seed/run manifests.",
+    "Perform clean generation, authoritative replay, protected-science audit, and fail-closed acceptance."
+  ],
+  "seed_policy": {
+    "requirement": "Derive and freeze new domain-separated design, satellite, ground-selection, and ground-failure seeds before simulation; no seed substitution.",
+    "status": "NOT_ISSUED"
+  },
+  "simulation_authorized": false,
+  "stage_a": {
+    "acceptance_criteria": [
+      "All 150 runs generate and replay exactly with no substitutions or mutations.",
+      "At least two resilient-core designs produce at least three of five non-breach realizations.",
+      "At least four boundary designs collectively sample both margin signs; otherwise revise the boundary model under a new proposal.",
+      "The discovery test partition remains sealed and cannot influence Stage B DOE selection."
+    ],
+    "design_count": 30,
+    "permitted_influence_on_stage_b": [
+      "Stage A train and validation direct boundary-margin and neighborhood evidence.",
+      "Observed storage and runtime for planning."
+    ],
+    "prohibited_adaptation": "No silent design, seed, split, gate, or target change within Stage A. Stage B requires a separately reviewed and frozen contract.",
+    "realization_count_per_design": 5,
+    "region_allocation": {
+      "boundary": 12,
+      "global_control": 6,
+      "resilient_core": 12
+    },
+    "region_split_allocation": {
+      "boundary": {
+        "test": 2,
+        "train": 8,
+        "validation": 2
+      },
+      "global_control": {
+        "test": 1,
+        "train": 4,
+        "validation": 1
+      },
+      "resilient_core": {
+        "test": 2,
+        "train": 8,
+        "validation": 2
+      }
+    },
+    "run_count": 150,
+    "split_allocation": {
+      "test": 5,
+      "train": 20,
+      "validation": 5
+    },
+    "status": "FUTURE_SEPARATE_DISCOVERY_CONTRACT_REQUIRED"
+  },
+  "stage_b": {
+    "design_count": 90,
+    "doe_regions": {
+      "boundary": "Transition region around D001 and nearest breached designs, spanning architecture and failure gradients.",
+      "global_control": "Broad deterministic coverage of the original admissible DOE range.",
+      "resilient_core": "Low-failure, high-capacity region anchored by D000 and bounded toward D001."
+    },
+    "preliminary_near_neighbor_assessment": {
+      "cross_split_pairs_within_radius": 0,
+      "distance_metric": "Euclidean distance over 11 DOE-range-normalized architecture, failure, station-total, and composition-fraction variables.",
+      "minimum_cross_split_distance": 0.13460738729509497,
+      "predeclared_candidate_radius": 0.1,
+      "status": "PRELIMINARY_PASS_REQUIRES_PRE_FREEZE_REAUDIT"
+    },
+    "realizations_per_design": 5,
+    "region_split_allocation": {
+      "boundary": {
+        "test": 6,
+        "train": 24,
+        "validation": 6
+      },
+      "global_control": {
+        "test": 3,
+        "train": 12,
+        "validation": 3
+      },
+      "resilient_core": {
+        "test": 6,
+        "train": 24,
+        "validation": 6
+      }
+    },
+    "run_count": 450,
+    "status": "PROPOSAL_ONLY"
+  },
+  "target_schema_reference": "Frozen eight-target schema and unchanged 0.80 thresholds; any change requires a new reviewed scientific contract."
+}

@@ -1,0 +1,83 @@
+{
+  "options": [
+    {
+      "estimated_generation_bytes": 801683434,
+      "estimated_generation_seconds": 863.1101680799999,
+      "estimated_replay_bytes": 846082,
+      "estimated_replay_seconds": 525.4883247,
+      "new_design_count": 60,
+      "new_run_count": 300,
+      "region_design_allocation": {
+        "boundary": 24,
+        "global_control": 12,
+        "resilient_core": 24
+      },
+      "scenario_non_breach_run_range": [
+        30,
+        135
+      ],
+      "scenario_range_status": "Exploratory scenario, not a probability interval or guarantee.",
+      "scientific_advantages": "Lowest cost; useful as a discovery-scale augmentation but weak independent split support.",
+      "scientific_risks": "May still miss stable non-breach support in validation or test.",
+      "split_design_allocation": {
+        "test": 10,
+        "train": 40,
+        "validation": 10
+      }
+    },
+    {
+      "estimated_generation_bytes": 1202525150,
+      "estimated_generation_seconds": 1294.6652521199999,
+      "estimated_replay_bytes": 1269123,
+      "estimated_replay_seconds": 788.23248705,
+      "new_design_count": 90,
+      "new_run_count": 450,
+      "region_design_allocation": {
+        "boundary": 36,
+        "global_control": 18,
+        "resilient_core": 36
+      },
+      "scenario_non_breach_run_range": [
+        45,
+        202
+      ],
+      "scenario_range_status": "Exploratory scenario, not a probability interval or guarantee.",
+      "scientific_advantages": "Balanced region/split allocation with materially stronger independent validation and test design support.",
+      "scientific_risks": "Targeted regions may remain realization-sensitive; requires control-region comparison.",
+      "split_design_allocation": {
+        "test": 15,
+        "train": 60,
+        "validation": 15
+      }
+    },
+    {
+      "estimated_generation_bytes": 1603366867,
+      "estimated_generation_seconds": 1726.2203361599998,
+      "estimated_replay_bytes": 1692164,
+      "estimated_replay_seconds": 1050.9766494,
+      "new_design_count": 120,
+      "new_run_count": 600,
+      "region_design_allocation": {
+        "boundary": 48,
+        "global_control": 24,
+        "resilient_core": 48
+      },
+      "scenario_non_breach_run_range": [
+        60,
+        270
+      ],
+      "scenario_range_status": "Exploratory scenario, not a probability interval or guarantee.",
+      "scientific_advantages": "Strongest coverage and class-support opportunity; highest cost and greatest targeted-population shift.",
+      "scientific_risks": "May overinvest before the resilient region is scientifically localized.",
+      "split_design_allocation": {
+        "test": 20,
+        "train": 80,
+        "validation": 20
+      }
+    }
+  ],
+  "realizations_per_design": 5,
+  "recommendation": "Use 90 designs as the separately frozen Stage B target only after a 30-design discovery Stage A.",
+  "recommended_new_design_count": 90,
+  "schema_identifier": "satnet.class_support.augmentation_options.v1"
+}
