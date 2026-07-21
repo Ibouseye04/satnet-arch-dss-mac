@@ -18,11 +18,20 @@ ALLOWED_EXACT_PATHS = frozenset({".gitattributes"})
 ALLOWED_PREFIXES = (
     "artifacts/final_integrated_dataset_contract/",
     "artifacts/final_integrated_dataset_generation_qualification/",
+    "artifacts/final_integrated_dataset_class_support_analysis/",
+    "artifacts/final_integrated_dataset_class_support_audit/",
     "docs/experiments/final_integrated_dataset_",
+    "docs/validation/final_integrated_dataset_class_support_audit.md",
+    "scripts/analysis/final_integrated_dataset_class_support.py",
+    "scripts/validation/audit_final_dataset_class_support.py",
+    "src/satnet/experiments/final_class_support/",
+    "src/satnet/experiments/final_class_support_audit/",
     "src/satnet/experiments/final_dataset/",
     "src/satnet/experiments/final_generation/",
+    "tests/experiments/test_final_class_support_analysis.py",
     "tests/experiments/test_final_dataset_",
     "tests/experiments/test_final_generation_",
+    "tests/validation/test_final_dataset_class_support_audit.py",
 )
 
 
