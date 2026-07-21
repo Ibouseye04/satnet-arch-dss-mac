@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "satnet.stage_a.acceptance_report.v1",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_report_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "acceptance_state": {"const": "PASSED"},
+    "accepted_run_count": {"type": "integer"},
+    "authorization_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "comparisons": {"items": {"type": "object"}, "type": "array"},
+    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "expected_run_count": {"type": "integer"},
+    "partition": {"enum": ["development", "validation"]},
+    "plan_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "schema_identifier": {"const": "satnet.stage_a.acceptance_report.v1"}
+  },
+  "required": ["schema_identifier", "contract_hash", "plan_hash", "authorization_hash", "partition", "expected_run_count", "accepted_run_count", "comparisons", "acceptance_state", "acceptance_report_hash"],
+  "title": "SATNET Stage A Acceptance Report",
+  "type": "object"
+}

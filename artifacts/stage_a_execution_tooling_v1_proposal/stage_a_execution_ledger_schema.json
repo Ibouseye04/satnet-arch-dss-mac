@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "satnet.stage_a.execution_ledger.v1",
+  "properties": {
+    "authorization_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "expected_run_count": {"type": "integer"},
+    "ledger_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "operation": {"enum": ["GENERATE", "REPLAY"]},
+    "partition": {"enum": ["development", "validation"]},
+    "plan_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "records": {"items": {"properties": {"state": {"enum": ["PLANNED", "STARTING", "RUNNING", "SUCCEEDED", "FAILED", "INTERRUPTED"]}}, "required": ["state"], "type": "object"}, "type": "array"},
+    "schema_identifier": {"const": "satnet.stage_a.execution_ledger.v1"}
+  },
+  "required": ["schema_identifier", "contract_hash", "plan_hash", "authorization_hash", "operation", "partition", "expected_run_count", "records", "ledger_hash"],
+  "title": "SATNET Stage A Execution Ledger",
+  "type": "object"
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "satnet.stage_a.replay_ledger.v1",
+  "properties": {
+    "authorization_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "expected_run_count": {"type": "integer"},
+    "ledger_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "operation": {"const": "REPLAY"},
+    "partition": {"enum": ["development", "validation"]},
+    "records": {"items": {"type": "object"}, "type": "array"}
+  },
+  "required": ["contract_hash", "authorization_hash", "operation", "partition", "expected_run_count", "records", "ledger_hash"],
+  "title": "SATNET Stage A Replay Ledger",
+  "type": "object"
+}

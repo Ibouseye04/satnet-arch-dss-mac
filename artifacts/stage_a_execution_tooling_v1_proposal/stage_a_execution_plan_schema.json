@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "satnet.stage_a.execution_plan.v1",
+  "additionalProperties": false,
+  "properties": {
+    "authorization_hash": {"type": ["string", "null"]},
+    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "design_count": {"type": "integer"},
+    "operation": {"enum": ["PLAN", "GENERATE", "REPLAY", "ACCEPT"]},
+    "output_roots": {"additionalProperties": false, "properties": {"acceptance": {"type": "string"}, "generation": {"type": "string"}, "replay": {"type": "string"}}, "required": ["generation", "replay", "acceptance"], "type": "object"},
+    "partition": {"enum": ["development", "validation"]},
+    "plan_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "run_count": {"type": "integer"},
+    "runs": {"items": {"type": "object"}, "type": "array"},
+    "schema_identifier": {"const": "satnet.stage_a.execution_plan.v1"},
+    "tooling_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "tooling_inventory_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+  },
+  "required": ["schema_identifier", "contract_hash", "tooling_commit", "tooling_inventory_hash", "partition", "operation", "output_roots", "authorization_hash", "run_count", "design_count", "runs", "plan_hash"],
+  "title": "SATNET Stage A Deterministic Execution Plan",
+  "type": "object"
+}
