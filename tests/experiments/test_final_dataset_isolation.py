@@ -14,7 +14,7 @@ PROTECTED_PATHS = (
     "src/satnet/models/risk_model.py",
     "src/satnet/utils/graph_cache.py",
 )
-ALLOWED_EXACT_PATHS = frozenset({".gitattributes"})
+ALLOWED_EXACT_PATHS = frozenset({".gitattributes", "tests/test_stage_a_byte_preservation_policy.py"})
 ALLOWED_PREFIXES = (
     "artifacts/final_integrated_dataset_contract/",
     "artifacts/final_integrated_dataset_generation_qualification/",
@@ -22,6 +22,7 @@ ALLOWED_PREFIXES = (
     "artifacts/final_integrated_dataset_class_support_audit/",
     "artifacts/stage_a_discovery_contract_proposal/",
     "artifacts/stage_a_discovery_contract_freeze_audit/",
+    "artifacts/stage_a_discovery_contract_v1/",
     "docs/experiments/final_integrated_dataset_",
     "docs/stage_a_discovery_contract_correction_v1.md",
     "docs/stage_a_near_neighbor_resolution_v1.md",
