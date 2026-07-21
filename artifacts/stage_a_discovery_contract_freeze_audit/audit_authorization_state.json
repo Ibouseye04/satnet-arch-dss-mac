@@ -1,0 +1,25 @@
+{
+  "checked_stage_a_paths": 19,
+  "contract_frozen_equivalent": false,
+  "contradiction_count": 0,
+  "equivalence_basis": "NOT_FROZEN status, false simulation authorization, future freeze listed as required, and no frozen contract hash",
+  "explicit_contract_frozen_field_present": false,
+  "pass": true,
+  "proposal_status": "NOT_FROZEN",
+  "protected_science": {
+    "pass": true,
+    "production_contract_and_logic_diff_from_proposal_commit": [],
+    "protected_science_diff_from_production_tooling": [],
+    "protected_science_diff_from_proposal_commit": []
+  },
+  "simulation_authorized": false,
+  "simulation_nonexecution": {
+    "pass": true,
+    "proposed_production_roots_absent": true,
+    "stage_a_acceptance_report_count": 0,
+    "stage_a_generation_ledger_count": 0,
+    "stage_a_replay_ledger_count": 0,
+    "tracked_stage_a_scientific_output_count": 0,
+    "tracked_stage_a_scientific_outputs": []
+  }
+}

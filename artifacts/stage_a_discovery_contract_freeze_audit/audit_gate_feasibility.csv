@@ -1,0 +1,4 @@
+split,original_designs,stage_b_designs,combined_designs,combined_runs,minimum_stage_b_non_breach_majority_designs,maximum_stage_b_non_breach_majority_designs,minimum_stage_b_non_breach_runs,maximum_stage_b_non_breach_runs,minimum_new_observed_boundary_designs,minimum_new_distinct_canonical_margins,simultaneously_feasible,stage_a_applicable
+train,70,60,130,650,12,60,48,300,9,0,True,False
+validation,15,15,30,150,4,15,14,75,3,0,True,False
+test,15,15,30,150,3,15,9,75,3,0,True,False

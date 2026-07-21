@@ -1,0 +1,46 @@
+{
+  "all_absent_and_isolated": true,
+  "creation_authorized": false,
+  "records": [
+    {
+      "exists": false,
+      "overlaps_audit_root": false,
+      "overlaps_frozen_evidence": false,
+      "overlaps_git_worktree": false,
+      "overlaps_other_stage_a_root": false,
+      "pass": true,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze",
+      "role": "evidence_freeze"
+    },
+    {
+      "exists": false,
+      "overlaps_audit_root": false,
+      "overlaps_frozen_evidence": false,
+      "overlaps_git_worktree": false,
+      "overlaps_other_stage_a_root": false,
+      "pass": true,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+      "role": "production_acceptance"
+    },
+    {
+      "exists": false,
+      "overlaps_audit_root": false,
+      "overlaps_frozen_evidence": false,
+      "overlaps_git_worktree": false,
+      "overlaps_other_stage_a_root": false,
+      "pass": true,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+      "role": "production_generation"
+    },
+    {
+      "exists": false,
+      "overlaps_audit_root": false,
+      "overlaps_frozen_evidence": false,
+      "overlaps_git_worktree": false,
+      "overlaps_other_stage_a_root": false,
+      "pass": true,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay",
+      "role": "production_replay"
+    }
+  ]
+}

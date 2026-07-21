@@ -1,0 +1,64 @@
+{
+  "absolute_0_05_qualifies": true,
+  "all_non_breach_counts": {
+    "0": {
+      "breach_realization_count": 5,
+      "majority_class": "breach_majority",
+      "mixed_design": false,
+      "non_breach_realization_count": 0,
+      "observed_boundary_design": false
+    },
+    "1": {
+      "breach_realization_count": 4,
+      "majority_class": "breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 1,
+      "observed_boundary_design": true
+    },
+    "2": {
+      "breach_realization_count": 3,
+      "majority_class": "breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 2,
+      "observed_boundary_design": true
+    },
+    "3": {
+      "breach_realization_count": 2,
+      "majority_class": "non_breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 3,
+      "observed_boundary_design": true
+    },
+    "4": {
+      "breach_realization_count": 1,
+      "majority_class": "non_breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 4,
+      "observed_boundary_design": true
+    },
+    "5": {
+      "breach_realization_count": 0,
+      "majority_class": "non_breach_majority",
+      "mixed_design": false,
+      "non_breach_realization_count": 5,
+      "observed_boundary_design": true
+    }
+  },
+  "margin_definition": "failure_adjusted_overall_service_fraction_min - 0.80",
+  "mixed_counts_once_by_majority": true,
+  "preassigned_and_observed_separated": true,
+  "quantization_increment": "0.000001",
+  "quantization_vectors": {
+    "-0.000000499999": "-0.000000",
+    "-0.0000005": "-0.000000",
+    "-0.000000500001": "-0.000001",
+    "-0.0000015": "-0.000002",
+    "0.000000499999": "0.000000",
+    "0.0000005": "0.000000",
+    "0.000000500001": "0.000001",
+    "0.0000015": "0.000002"
+  },
+  "rounding_mode": "ROUND_HALF_EVEN",
+  "threshold": "0.80",
+  "zero_is_non_breach": true
+}

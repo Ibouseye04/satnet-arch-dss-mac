@@ -1,0 +1,110 @@
+{
+  "corrected_sa_d013_sa_d020_distance": 0.12039492645571381,
+  "cross_partition_pairs_below_0_10": 0,
+  "distance_method": {
+    "features": [
+      "num_planes",
+      "sats_per_plane",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "total_ground_station_count",
+      "ground_station_failure_probability",
+      "civilian_fraction",
+      "government_fraction",
+      "military_fraction"
+    ],
+    "metric": "Euclidean",
+    "normalization": "frozen full-DOE min-max ranges"
+  },
+  "holdout_pairs_below_0_10": 0,
+  "minimum_development_holdout": {
+    "distance": 0.1205683310788027,
+    "first_design_id": "SA-D011",
+    "first_partition": "sealed_holdout",
+    "second_design_id": "SA-D013",
+    "second_partition": "development"
+  },
+  "minimum_development_validation": {
+    "distance": 0.12039492645571381,
+    "first_design_id": "SA-D013",
+    "first_partition": "development",
+    "second_design_id": "SA-D020",
+    "second_partition": "validation"
+  },
+  "minimum_stage_a_to_original": {
+    "distance": 0.06382978723404255,
+    "original_design_id": "D004",
+    "stage_a_design_id": "SA-D024"
+  },
+  "minimum_validation_holdout": {
+    "distance": 0.1500946005884104,
+    "first_design_id": "SA-D020",
+    "first_partition": "validation",
+    "second_design_id": "SA-D022",
+    "second_partition": "sealed_holdout"
+  },
+  "minimum_within_partition": {
+    "distance": 0.1249155271916213,
+    "first_design_id": "SA-D011",
+    "partition": "sealed_holdout",
+    "second_design_id": "SA-D022"
+  },
+  "near_neighbor_policy": {
+    "all_candidates_admissible": true,
+    "candidate_count": 10,
+    "candidate_search_outcome_independent": true,
+    "changed_parameter": [
+      {
+        "corrected_value": "0.10000000000000001",
+        "field": "ground_station_failure_probability",
+        "prior_value": "0.074999999999999997"
+      }
+    ],
+    "justified_exceptions": [],
+    "pending_scientific_reviews": [],
+    "resolved_review_count": 1,
+    "selected_candidate_preserves_boundary_region": true
+  },
+  "original_sa_d013_sa_d020_distance": 0.07681919236933395,
+  "sa_d020_correction": {
+    "corrected_ground_station_failure_probability": "0.10000000000000001",
+    "design_id": "SA-D020",
+    "identity_region_partition_profile_unchanged": true,
+    "only_scientific_parameter_changed": true,
+    "prior_ground_station_failure_probability": "0.074999999999999997",
+    "seed_manifest_byte_identical_to_starting_commit": true,
+    "unchanged_scientific_fields": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "phasing_factor",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "duration_minutes",
+      "step_seconds",
+      "epoch_iso",
+      "orbital_engine",
+      "max_isl_distance_km",
+      "isl_policy",
+      "adjacent_search_k",
+      "max_inter_plane_links_per_sat",
+      "satellite_failure_model",
+      "minimum_elevation_deg",
+      "space_gcc_threshold",
+      "ground_service_threshold",
+      "ground_service_policy_hash",
+      "visibility_policy_hash"
+    ]
+  },
+  "stage_a_exact_distance_zero_pairs": 0,
+  "stage_a_to_original_exact_distance_zero_pairs": 0,
+  "stage_a_to_original_redundancy_conclusion": "Scientifically acceptable control proximity: distinct discovery purpose and namespace, no exact parameter duplicate, and no final-corpus inclusion."
+}

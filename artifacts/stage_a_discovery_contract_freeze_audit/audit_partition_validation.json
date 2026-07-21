@@ -1,0 +1,62 @@
+{
+  "all_realizations_colocated": true,
+  "assignment_timing": "Pre-simulation and immutable with respect to outcomes",
+  "design_counts": {
+    "development": 20,
+    "sealed_holdout": 5,
+    "validation": 5
+  },
+  "original_split_preservation": {
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "design_ids_exact": true,
+    "pass": true,
+    "run_ids_exact": true,
+    "seed_records_preserved_in_immutable_run_manifest": true,
+    "split_assignments_match_all_500_runs": true,
+    "split_design_counts": {
+      "test": 15,
+      "train": 70,
+      "validation": 15
+    },
+    "split_run_counts": {
+      "test": 75,
+      "train": 350,
+      "validation": 75
+    },
+    "stage_a_partitions_not_mapped_to_final_splits": true,
+    "target_schema_hash": "9088948d6b03db59877a129179ac3091c3690aeab9d2849a921bfa90f05da528"
+  },
+  "partition_counts": {
+    "development": 20,
+    "sealed_holdout": 5,
+    "validation": 5
+  },
+  "partition_names": [
+    "development",
+    "sealed_holdout",
+    "validation"
+  ],
+  "pass": true,
+  "region_counts": {
+    "boundary": 12,
+    "global_control": 6,
+    "resilient_core": 12
+  },
+  "region_partition_counts": {
+    "boundary/development": 8,
+    "boundary/sealed_holdout": 2,
+    "boundary/validation": 2,
+    "global_control/development": 4,
+    "global_control/sealed_holdout": 1,
+    "global_control/validation": 1,
+    "resilient_core/development": 8,
+    "resilient_core/sealed_holdout": 2,
+    "resilient_core/validation": 2
+  },
+  "run_counts": {
+    "development": 100,
+    "sealed_holdout": 25,
+    "validation": 25
+  },
+  "stage_a_partitions_not_final_splits": true
+}

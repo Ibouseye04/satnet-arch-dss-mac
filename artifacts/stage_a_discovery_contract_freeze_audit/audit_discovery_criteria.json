@@ -1,0 +1,14 @@
+{
+  "all_fields_complete": true,
+  "criterion_count": 22,
+  "final_classification_gates_apply": false,
+  "groups_present": [
+    "development_criteria",
+    "validation_criteria",
+    "pre_holdout_stage_b_proposal_criteria",
+    "sealed_holdout_confirmation_criteria"
+  ],
+  "holdout_cannot_influence_stage_b": true,
+  "identifiers_unique": true,
+  "thresholds_mathematically_feasible": true
+}

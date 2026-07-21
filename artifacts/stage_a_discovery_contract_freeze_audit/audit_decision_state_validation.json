@@ -1,0 +1,29 @@
+{
+  "artifact_compact_workflow": [
+    "Run development",
+    "Evaluate development criteria",
+    "Expose and evaluate validation",
+    "Draft Stage B",
+    "Freeze and independently audit Stage B",
+    "Record Stage B contract hash",
+    "Unseal Stage A holdout",
+    "Evaluate holdout confirmation",
+    "Execute unchanged frozen Stage B or reject it"
+  ],
+  "decision_states_exact": true,
+  "required_workflow_actions": [
+    "Execute development",
+    "Evaluate development criteria",
+    "Execute or expose validation according to the frozen workflow",
+    "Evaluate validation criteria",
+    "Draft Stage B",
+    "Freeze Stage B",
+    "Independently audit Stage B",
+    "Record Stage B contract hash",
+    "Unseal Stage A holdout",
+    "Evaluate holdout confirmation",
+    "Execute or reject the already-frozen Stage B contract"
+  ],
+  "semantic_order_complete": true,
+  "silent_post_holdout_modification_permitted": false
+}

@@ -21,12 +21,15 @@ ALLOWED_PREFIXES = (
     "artifacts/final_integrated_dataset_class_support_analysis/",
     "artifacts/final_integrated_dataset_class_support_audit/",
     "artifacts/stage_a_discovery_contract_proposal/",
+    "artifacts/stage_a_discovery_contract_freeze_audit/",
     "docs/experiments/final_integrated_dataset_",
     "docs/stage_a_discovery_contract_correction_v1.md",
     "docs/stage_a_near_neighbor_resolution_v1.md",
     "docs/validation/final_integrated_dataset_class_support_audit.md",
+    "docs/validation/stage_a_discovery_contract_freeze_readiness_audit.md",
     "scripts/analysis/final_integrated_dataset_class_support.py",
     "scripts/validation/audit_final_dataset_class_support.py",
+    "scripts/validation/audit_stage_a_discovery_contract.py",
     "scripts/experiments/build_stage_a_contract_proposal.py",
     "src/satnet/experiments/final_class_support/",
     "src/satnet/experiments/final_class_support_audit/",
@@ -38,6 +41,7 @@ ALLOWED_PREFIXES = (
     "tests/experiments/test_final_generation_",
     "tests/experiments/test_stage_a_contract_",
     "tests/validation/test_final_dataset_class_support_audit.py",
+    "tests/validation/test_stage_a_discovery_contract_freeze_audit.py",
 )
 
 

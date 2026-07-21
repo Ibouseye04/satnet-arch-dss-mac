@@ -1,0 +1,28 @@
+{
+  "approval_scope": "Ready for a separate contract-freeze task only; the contract remains NOT_FROZEN and simulation remains unauthorized.",
+  "binding_findings": [],
+  "final_verdict": "APPROVED FOR STAGE A CONTRACT FREEZE",
+  "nonbinding_findings": [],
+  "observations": [
+    {
+      "detail": "SA-D024 is 0.06382978723404255 from D004, but the records have distinct purposes and namespaces and are not exact scientific duplicates; Stage A is excluded from the primary final corpus.",
+      "id": "OBS-001",
+      "severity": "OBSERVATION",
+      "title": "Stage A-to-original control proximity"
+    },
+    {
+      "detail": "Inclusive timestep count, physics model, link budget, and G1-G5 version identities are inherited through the exact immutable base-contract reference and specification hash rather than duplicated into every Stage A design row.",
+      "id": "OBS-002",
+      "severity": "OBSERVATION",
+      "title": "Inherited fixed-profile fields"
+    },
+    {
+      "detail": "Seed derivation intentionally binds identity and purpose, not design parameters; the SA-D020 scientific correction therefore preserves all 150 seed records byte-for-byte.",
+      "id": "OBS-003",
+      "severity": "OBSERVATION",
+      "title": "Identity-only Stage A seed derivation"
+    }
+  ],
+  "proposal_commit_audited": "509f2449dbbaf4c1f5153ecfa4bc1652f24f75da",
+  "required_corrections": []
+}

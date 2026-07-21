@@ -1,0 +1,103 @@
+{
+  "analysis_inventory_sha256": "5ac295ba0e08797b63a2ce3f062a1995dc7aa850f11a2bf5d83a0580731afd85",
+  "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+  "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+  "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+  "frozen_contract_tag": "final-integrated-dataset-contract-v1",
+  "frozen_evidence_after": {
+    "archive_hash_record_read_only": true,
+    "archive_hash_record_verified": true,
+    "archive_read_only": true,
+    "combined": {
+      "byte_count": 1337549193,
+      "file_count": 9004,
+      "verified_sha256_count": 9004
+    },
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "freeze_metadata_all_read_only": true,
+    "freeze_metadata_file_count": 8,
+    "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+    "frozen_contract_tag": "final-integrated-dataset-contract-v1",
+    "generation": {
+      "all_files_read_only": true,
+      "byte_count": 1336139056,
+      "file_count": 8502,
+      "read_only_file_count": 8502,
+      "verified_sha256_count": 8502
+    },
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_clean": true,
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay": {
+      "all_files_read_only": true,
+      "byte_count": 1410137,
+      "file_count": 502,
+      "read_only_file_count": 502,
+      "verified_sha256_count": 502
+    },
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "verification_status": "passed"
+  },
+  "frozen_evidence_before": {
+    "archive_hash_record_read_only": true,
+    "archive_hash_record_verified": true,
+    "archive_read_only": true,
+    "combined": {
+      "byte_count": 1337549193,
+      "file_count": 9004,
+      "verified_sha256_count": 9004
+    },
+    "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "freeze_metadata_all_read_only": true,
+    "freeze_metadata_file_count": 8,
+    "frozen_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+    "frozen_contract_tag": "final-integrated-dataset-contract-v1",
+    "generation": {
+      "all_files_read_only": true,
+      "byte_count": 1336139056,
+      "file_count": 8502,
+      "read_only_file_count": 8502,
+      "verified_sha256_count": 8502
+    },
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_clean": true,
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay": {
+      "all_files_read_only": true,
+      "byte_count": 1410137,
+      "file_count": 502,
+      "read_only_file_count": 502,
+      "verified_sha256_count": 502
+    },
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "verification_status": "passed"
+  },
+  "frozen_evidence_unchanged": true,
+  "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+  "prior_audit_inventory_sha256": "20d2e7037940d708e133936d3907ad822caac3b46cd73c84329f3efd16c4037a",
+  "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+  "production_tooling_status": "",
+  "proposal_branch_base_is_ancestor": true,
+  "proposal_commit": "509f2449dbbaf4c1f5153ecfa4bc1652f24f75da",
+  "proposal_commit_type": "commit",
+  "proposal_inventory_sha256": "69fd2a9fbcc1b461ae4230a282cfcaaadc26ba7b65563bc90a81e86e1ca98127",
+  "protected_science": {
+    "pass": true,
+    "production_contract_and_logic_diff_from_proposal_commit": [],
+    "protected_science_diff_from_production_tooling": [],
+    "protected_science_diff_from_proposal_commit": []
+  },
+  "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+  "seed_manifest_sha256": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace",
+  "simulation_nonexecution": {
+    "pass": true,
+    "proposed_production_roots_absent": true,
+    "stage_a_acceptance_report_count": 0,
+    "stage_a_generation_ledger_count": 0,
+    "stage_a_replay_ledger_count": 0,
+    "tracked_stage_a_scientific_output_count": 0,
+    "tracked_stage_a_scientific_outputs": []
+  }
+}

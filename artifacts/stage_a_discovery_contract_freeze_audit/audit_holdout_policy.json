@@ -1,0 +1,21 @@
+{
+  "exact_cardinality": true,
+  "final_corpus": {
+    "development_excluded": true,
+    "holdout_excluded": true,
+    "primary_membership_exact": true,
+    "stage_a_is_discovery_only": true,
+    "validation_excluded": true
+  },
+  "prohibited_uses_complete": true,
+  "sealed": true,
+  "stage_b_adaptation_boundary": {
+    "development_and_validation_only": true,
+    "holdout_prohibited": true,
+    "separate_proposal_and_audit_required": true,
+    "simulation_authorized": false
+  },
+  "unchanged_contract_only_after_unseal": true,
+  "unsealing_conditions_cover_all_required_actions": true,
+  "versioned_rejection_rule_present": true
+}
