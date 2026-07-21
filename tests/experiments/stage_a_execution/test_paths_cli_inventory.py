@@ -46,6 +46,15 @@ def test_preflight_checks_authorization_roots_dependencies_and_lock(tmp_path: Pa
     roots[0].with_name(roots[0].name + ".lock").write_text("locked", encoding="utf-8")
     with pytest.raises(RuntimeError, match="lock"):
         run_preflight(repo_root=ROOT, contract=contract, plan=plan, authorization=authorization, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], minimum_free_bytes=0)
+    roots[0].with_name(roots[0].name + ".lock").unlink()
+    roots[0].mkdir()
+    replay_plan = build_plan(contract, partition="development", operation="REPLAY", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    replay_authorization = make_authorization(contract, operation="REPLAY", partition="development", run_ids=list(contract.partitions["development"]["global_run_ids"]), generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    assert run_preflight(repo_root=ROOT, contract=contract, plan=replay_plan, authorization=replay_authorization, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], minimum_free_bytes=0)["preflight"] == "PASSED"
+    roots[1].mkdir()
+    acceptance_plan = build_plan(contract, partition="development", operation="ACCEPT", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    acceptance_authorization = make_authorization(contract, operation="ACCEPT", partition="development", run_ids=list(contract.partitions["development"]["global_run_ids"]), generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    assert run_preflight(repo_root=ROOT, contract=contract, plan=acceptance_plan, authorization=acceptance_authorization, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], minimum_free_bytes=0)["preflight"] == "PASSED"
 
 
 def test_atomic_write_failure_preserves_existing_target(tmp_path: Path, monkeypatch) -> None:

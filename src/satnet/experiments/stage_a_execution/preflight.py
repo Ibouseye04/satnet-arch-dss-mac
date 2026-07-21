@@ -35,8 +35,17 @@ def run_preflight(
     )
     roots = validate_output_roots(
         repo_root=repo_root, generation_root=generation_root, replay_root=replay_root,
-        acceptance_root=acceptance_root, require_absent=plan["operation"] in {"GENERATE", "REPLAY", "ACCEPT"},
+        acceptance_root=acceptance_root, require_absent=False,
     )
+    states = {name: Path(path).exists() for name, path in roots.items()}
+    required_states = {
+        "GENERATE": {"generation": False, "replay": False, "acceptance": False},
+        "REPLAY": {"generation": True, "replay": False, "acceptance": False},
+        "ACCEPT": {"generation": True, "replay": True, "acceptance": False},
+        "PLAN": states,
+    }[plan["operation"]]
+    if states != required_states:
+        raise FileExistsError(f"Output-root state mismatch for {plan['operation']}: {states}")
     if check_write_probe:
         for root in (generation_root, replay_root, acceptance_root):
             probe_parent(root)
