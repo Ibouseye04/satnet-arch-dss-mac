@@ -23,6 +23,7 @@ ALLOWED_PREFIXES = (
     "artifacts/stage_a_discovery_contract_proposal/",
     "docs/experiments/final_integrated_dataset_",
     "docs/stage_a_discovery_contract_correction_v1.md",
+    "docs/stage_a_near_neighbor_resolution_v1.md",
     "docs/validation/final_integrated_dataset_class_support_audit.md",
     "scripts/analysis/final_integrated_dataset_class_support.py",
     "scripts/validation/audit_final_dataset_class_support.py",
