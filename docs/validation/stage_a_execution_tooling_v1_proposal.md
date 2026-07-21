@@ -24,7 +24,7 @@ Ordinary tooling supports only `development` and `validation`; there is no seale
 
 ## Run planning
 
-Plans sort by global run ID and bind the frozen contract, tooling identity, partition, operation, ordered records, relative output paths, all output roots, and optional authorization identity. Timestamps are excluded. The development preview contains 100 runs, 20 designs, deterministic ordering, no authorization, and plan hash `a0af1d56fb32cb62b7b7331b6124ee85749ab6c2e1801ee76cbeccbdc65dc2bd`.
+Plans sort by global run ID and bind the frozen contract, tooling identity, partition, operation, ordered records, relative output paths, all output roots, and optional authorization identity. Timestamps are excluded. The development preview contains 100 runs, 20 designs, deterministic ordering, no authorization, and plan hash `b666d8c7700a10418de85180624617fae744cb80a64b675ca95d1c89c1fc61c3`.
 
 ## Output-root controls and preflight
 
@@ -48,11 +48,11 @@ The implementation rejects traversal, absolute relative-artifact paths, symlink/
 
 ## Tooling proposal identity
 
-The inventory binds 28 source, schema, specification, byte-policy, isolation, and test files. Its SHA-256 and authoritative tooling proposal hash are both `8d08eb964d3460a8a75673cb7f764532836103dbd37ce52f2c8eb439e6a86721`.
+The inventory binds 28 source, schema, specification, byte-policy, isolation, and test files. Its SHA-256 and authoritative tooling proposal hash are both `75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17`.
 
 ## Validation
 
-The new suite passed 31 tests. The focused Stage A, frozen-contract, audit, byte-policy, class-support, and isolation set passed 225 tests. Logger tests passed 7 tests; the independently rerun Windows timer test passed. The complete suite passed 1,138 tests. Compilation covered 217 Python files. Whitespace, protected science, frozen contract, annotated tag, 9,004-file frozen evidence, tooling inventory, reserved-root absence, and simulation nonexecution checks passed.
+The new suite passed 32 tests. The focused Stage A, frozen-contract, audit, byte-policy, class-support, and isolation set passed 225 tests. Logger tests passed 7 tests; the independently rerun Windows timer test passed. The complete suite passed 1,138 tests. Compilation covered 217 Python files. Whitespace, protected science, frozen contract, annotated tag, 9,004-file frozen evidence, tooling inventory, reserved-root absence, and simulation nonexecution checks passed.
 
 ## Prohibited actions and next task
 

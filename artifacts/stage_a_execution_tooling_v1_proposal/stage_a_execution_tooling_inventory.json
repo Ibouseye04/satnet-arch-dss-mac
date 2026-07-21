@@ -97,9 +97,9 @@
       "sha256": "fa49673a263a8b2d9739fb093abb8cd2e85c7fc32dbf586ea5c3b6db68634ab8"
     },
     {
-      "byte_length": 3523,
+      "byte_length": 3917,
       "relative_path": "src/satnet/experiments/stage_a_execution/preflight.py",
-      "sha256": "9fdec8ee49a510dbe7be555af7b61a8f2eb7ba99454e1794f1da5b7c3d1c691e"
+      "sha256": "ad8d1497e594a9cc8f5e7361f3103190222f11627637534526b90cbcce2ee728"
     },
     {
       "byte_length": 3960,
@@ -132,9 +132,9 @@
       "sha256": "a3a8efc4471ce0987f738088df0b9dad45fe6adbb81bf08c37bd3e79860d9743"
     },
     {
-      "byte_length": 8469,
+      "byte_length": 8817,
       "relative_path": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py",
-      "sha256": "a740c5b672e79fb78aa9c228bd6502bde7923095c763f8003180db9544bb5be1"
+      "sha256": "b223e2073f37cb834bc898bff3942e6f665e4c549a3a1cf3d077855070fbb72c"
     },
     {
       "byte_length": 4742,
