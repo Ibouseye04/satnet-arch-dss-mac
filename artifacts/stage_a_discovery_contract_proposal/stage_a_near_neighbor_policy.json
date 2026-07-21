@@ -1,0 +1,453 @@
+{
+  "cross_partition_policy": "Pairs at distance <= 0.10 require explicit pre-freeze review; scientifically important boundary probes are not removed automatically.",
+  "distance_method": {
+    "features": [
+      "num_planes",
+      "sats_per_plane",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "total_ground_station_count",
+      "ground_station_failure_probability",
+      "civilian_fraction",
+      "government_fraction",
+      "military_fraction"
+    ],
+    "metric": "Euclidean",
+    "near_neighbor_radius_inclusive": 0.1,
+    "normalization": "Frozen full-DOE min-max ranges"
+  },
+  "duplicate_policy": {
+    "exact_original_duplicates": "PROHIBITED",
+    "identity_duplicates": "PROHIBITED",
+    "parameter_vector_duplicates": "PROHIBITED"
+  },
+  "justified_exceptions": [],
+  "pre_freeze_requirement": "Repeat exact duplicate and distance audit, including radius sensitivity, on frozen candidate bytes.",
+  "proposal_status": "NOT_FROZEN",
+  "reports": {
+    "stage_a_cross_partition": {
+      "minimum_distance": 0.07681919236933395,
+      "pairs_within_0_10": [
+        {
+          "first_design_id": "SA-D013",
+          "first_partition": "development",
+          "normalized_distance": 0.07681919236933395,
+          "review_status": "REQUIRES_EXPLICIT_PRE_FREEZE_REVIEW",
+          "second_design_id": "SA-D020",
+          "second_partition": "validation"
+        }
+      ]
+    },
+    "stage_a_sealed_holdout": {
+      "minimum_distance_to_unsealed": 0.1205683310788027,
+      "nearest_by_design": [
+        {
+          "neighbor_design_id": "SA-D008",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.2066735723976519,
+          "source_design_id": "SA-D010"
+        },
+        {
+          "neighbor_design_id": "SA-D013",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.1205683310788027,
+          "source_design_id": "SA-D011"
+        },
+        {
+          "neighbor_design_id": "SA-D020",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.15267494596624046,
+          "source_design_id": "SA-D022"
+        },
+        {
+          "neighbor_design_id": "SA-D021",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.39689859053960064,
+          "source_design_id": "SA-D023"
+        },
+        {
+          "neighbor_design_id": "SA-D025",
+          "neighbor_partition": "development",
+          "normalized_distance": 1.1280922358256182,
+          "source_design_id": "SA-D029"
+        }
+      ],
+      "pairs_within_0_10": []
+    },
+    "stage_a_to_original_nearest": [
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.07071067811865474,
+        "source_design_id": "SA-D000"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.20743395966966682,
+        "source_design_id": "SA-D001"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.43269073580317036,
+        "source_design_id": "SA-D002"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.4586242288781579,
+        "source_design_id": "SA-D003"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.4054497921320686,
+        "source_design_id": "SA-D004"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.35038048279241946,
+        "source_design_id": "SA-D005"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.5608950787642837,
+        "source_design_id": "SA-D006"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.32514303644327075,
+        "source_design_id": "SA-D007"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.2591263990375943,
+        "source_design_id": "SA-D008"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.27015717854356464,
+        "source_design_id": "SA-D009"
+      },
+      {
+        "neighbor_design_id": "D000",
+        "neighbor_partition": null,
+        "normalized_distance": 0.33690579428191686,
+        "source_design_id": "SA-D010"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.2082346196994769,
+        "source_design_id": "SA-D011"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.07092858519335385,
+        "source_design_id": "SA-D012"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.21191635627866762,
+        "source_design_id": "SA-D013"
+      },
+      {
+        "neighbor_design_id": "D022",
+        "neighbor_partition": null,
+        "normalized_distance": 0.20784383295302342,
+        "source_design_id": "SA-D014"
+      },
+      {
+        "neighbor_design_id": "D022",
+        "neighbor_partition": null,
+        "normalized_distance": 0.17155742340949842,
+        "source_design_id": "SA-D015"
+      },
+      {
+        "neighbor_design_id": "D014",
+        "neighbor_partition": null,
+        "normalized_distance": 0.30672218140118274,
+        "source_design_id": "SA-D016"
+      },
+      {
+        "neighbor_design_id": "D014",
+        "neighbor_partition": null,
+        "normalized_distance": 0.19965887526413548,
+        "source_design_id": "SA-D017"
+      },
+      {
+        "neighbor_design_id": "D028",
+        "neighbor_partition": null,
+        "normalized_distance": 0.2360130867737239,
+        "source_design_id": "SA-D018"
+      },
+      {
+        "neighbor_design_id": "D029",
+        "neighbor_partition": null,
+        "normalized_distance": 0.1056675467764584,
+        "source_design_id": "SA-D019"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.22425868415787822,
+        "source_design_id": "SA-D020"
+      },
+      {
+        "neighbor_design_id": "D021",
+        "neighbor_partition": null,
+        "normalized_distance": 0.21766760105205377,
+        "source_design_id": "SA-D021"
+      },
+      {
+        "neighbor_design_id": "D001",
+        "neighbor_partition": null,
+        "normalized_distance": 0.21902501159171756,
+        "source_design_id": "SA-D022"
+      },
+      {
+        "neighbor_design_id": "D013",
+        "neighbor_partition": null,
+        "normalized_distance": 0.27514312786222805,
+        "source_design_id": "SA-D023"
+      },
+      {
+        "neighbor_design_id": "D004",
+        "neighbor_partition": null,
+        "normalized_distance": 0.06382978723404255,
+        "source_design_id": "SA-D024"
+      },
+      {
+        "neighbor_design_id": "D002",
+        "neighbor_partition": null,
+        "normalized_distance": 0.5804790964530345,
+        "source_design_id": "SA-D025"
+      },
+      {
+        "neighbor_design_id": "D061",
+        "neighbor_partition": null,
+        "normalized_distance": 1.1448209093790405,
+        "source_design_id": "SA-D026"
+      },
+      {
+        "neighbor_design_id": "D076",
+        "neighbor_partition": null,
+        "normalized_distance": 0.5100191315692889,
+        "source_design_id": "SA-D027"
+      },
+      {
+        "neighbor_design_id": "D053",
+        "neighbor_partition": null,
+        "normalized_distance": 0.8658486060032837,
+        "source_design_id": "SA-D028"
+      },
+      {
+        "neighbor_design_id": "D074",
+        "neighbor_partition": null,
+        "normalized_distance": 0.7921981036134647,
+        "source_design_id": "SA-D029"
+      }
+    ],
+    "stage_a_within_partition_nearest": {
+      "development": [
+        {
+          "neighbor_design_id": "SA-D001",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.21454334672563719,
+          "source_design_id": "SA-D000"
+        },
+        {
+          "neighbor_design_id": "SA-D000",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.21454334672563719,
+          "source_design_id": "SA-D001"
+        },
+        {
+          "neighbor_design_id": "SA-D003",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.22895955541879173,
+          "source_design_id": "SA-D002"
+        },
+        {
+          "neighbor_design_id": "SA-D002",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.22895955541879173,
+          "source_design_id": "SA-D003"
+        },
+        {
+          "neighbor_design_id": "SA-D001",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.2964589810839329,
+          "source_design_id": "SA-D004"
+        },
+        {
+          "neighbor_design_id": "SA-D001",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.27557756466655636,
+          "source_design_id": "SA-D005"
+        },
+        {
+          "neighbor_design_id": "SA-D002",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.3067865612238419,
+          "source_design_id": "SA-D006"
+        },
+        {
+          "neighbor_design_id": "SA-D013",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.20001992041057906,
+          "source_design_id": "SA-D007"
+        },
+        {
+          "neighbor_design_id": "SA-D013",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.16499502075287611,
+          "source_design_id": "SA-D012"
+        },
+        {
+          "neighbor_design_id": "SA-D014",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.1339249736969507,
+          "source_design_id": "SA-D013"
+        },
+        {
+          "neighbor_design_id": "SA-D013",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.1339249736969507,
+          "source_design_id": "SA-D014"
+        },
+        {
+          "neighbor_design_id": "SA-D014",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.1601361643535737,
+          "source_design_id": "SA-D015"
+        },
+        {
+          "neighbor_design_id": "SA-D017",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.18802515685807866,
+          "source_design_id": "SA-D016"
+        },
+        {
+          "neighbor_design_id": "SA-D016",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.18802515685807866,
+          "source_design_id": "SA-D017"
+        },
+        {
+          "neighbor_design_id": "SA-D012",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.34513763946390885,
+          "source_design_id": "SA-D018"
+        },
+        {
+          "neighbor_design_id": "SA-D014",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.37046087914350495,
+          "source_design_id": "SA-D019"
+        },
+        {
+          "neighbor_design_id": "SA-D025",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.8596197835995605,
+          "source_design_id": "SA-D024"
+        },
+        {
+          "neighbor_design_id": "SA-D024",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.8596197835995605,
+          "source_design_id": "SA-D025"
+        },
+        {
+          "neighbor_design_id": "SA-D016",
+          "neighbor_partition": "development",
+          "normalized_distance": 1.0649737660423313,
+          "source_design_id": "SA-D026"
+        },
+        {
+          "neighbor_design_id": "SA-D018",
+          "neighbor_partition": "development",
+          "normalized_distance": 0.9081473913653666,
+          "source_design_id": "SA-D027"
+        }
+      ],
+      "sealed_holdout": [
+        {
+          "neighbor_design_id": "SA-D011",
+          "neighbor_partition": "sealed_holdout",
+          "normalized_distance": 0.6735713710959369,
+          "source_design_id": "SA-D010"
+        },
+        {
+          "neighbor_design_id": "SA-D022",
+          "neighbor_partition": "sealed_holdout",
+          "normalized_distance": 0.1249155271916213,
+          "source_design_id": "SA-D011"
+        },
+        {
+          "neighbor_design_id": "SA-D011",
+          "neighbor_partition": "sealed_holdout",
+          "normalized_distance": 0.1249155271916213,
+          "source_design_id": "SA-D022"
+        },
+        {
+          "neighbor_design_id": "SA-D022",
+          "neighbor_partition": "sealed_holdout",
+          "normalized_distance": 0.7212583118790906,
+          "source_design_id": "SA-D023"
+        },
+        {
+          "neighbor_design_id": "SA-D023",
+          "neighbor_partition": "sealed_holdout",
+          "normalized_distance": 1.0021513753142295,
+          "source_design_id": "SA-D029"
+        }
+      ],
+      "validation": [
+        {
+          "neighbor_design_id": "SA-D009",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.5069264571024272,
+          "source_design_id": "SA-D008"
+        },
+        {
+          "neighbor_design_id": "SA-D020",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.29604654844536943,
+          "source_design_id": "SA-D009"
+        },
+        {
+          "neighbor_design_id": "SA-D009",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.29604654844536943,
+          "source_design_id": "SA-D020"
+        },
+        {
+          "neighbor_design_id": "SA-D020",
+          "neighbor_partition": "validation",
+          "normalized_distance": 0.5509385165118528,
+          "source_design_id": "SA-D021"
+        },
+        {
+          "neighbor_design_id": "SA-D021",
+          "neighbor_partition": "validation",
+          "normalized_distance": 1.296582911336273,
+          "source_design_id": "SA-D028"
+        }
+      ]
+    }
+  },
+  "schema_identifier": "satnet.stage_a.near_neighbor_policy.v1",
+  "sealed_holdout_policy": "No development or validation neighbor at distance <= 0.10 without scientific justification and explicit approval before freeze.",
+  "simulation_authorized": false
+}

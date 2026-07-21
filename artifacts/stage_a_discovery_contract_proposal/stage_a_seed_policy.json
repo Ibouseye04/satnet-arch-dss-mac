@@ -1,0 +1,39 @@
+{
+  "authority": "Proposed only; seeds become authoritative only after future freeze and independent audit.",
+  "bound_identity_fields": [
+    "corpus_namespace",
+    "proposal_version",
+    "design_id",
+    "realization_id when applicable",
+    "seed_purpose"
+  ],
+  "byte_extraction": "all 32 SHA-256 digest bytes",
+  "domain_separation_string": "satnet_stage_a_discovery_v1_seed",
+  "hash_algorithm": "SHA-256",
+  "input_encoding": "UTF-8 canonical JSON with lexicographically sorted object keys and compact separators",
+  "integer_conversion": "unsigned big-endian",
+  "proposal_status": "NOT_FROZEN",
+  "purposes": {
+    "design_construction": {
+      "realization_bound": false
+    },
+    "ground_failure_realization": {
+      "realization_bound": true
+    },
+    "ground_station_selection": {
+      "realization_bound": false
+    },
+    "satellite_rollout_and_failure": {
+      "realization_bound": true
+    }
+  },
+  "range_reduction": "modulo 9223372036854775808",
+  "retry_policy": "Same-run retry retains identical identity and seeds; substitution and outcome-driven seed changes are prohibited.",
+  "schema_identifier": "satnet.stage_a.seed_policy.v1",
+  "seed_policy_version": "satnet.stage_a_seed_policy.v1",
+  "simulation_authorized": false,
+  "supported_integer_range": {
+    "maximum_inclusive": 9223372036854775807,
+    "minimum_inclusive": 0
+  }
+}

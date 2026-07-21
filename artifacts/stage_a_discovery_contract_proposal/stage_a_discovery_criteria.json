@@ -1,0 +1,293 @@
+{
+  "decision_states": [
+    "STAGE_A_DISCOVERY_INSUFFICIENT",
+    "STAGE_A_READY_FOR_STAGE_B_PROPOSAL",
+    "STAGE_A_VALIDATION_FAILED",
+    "STAGE_A_STAGE_B_CONTRACT_FROZEN",
+    "STAGE_A_HOLDOUT_CONFIRMED",
+    "STAGE_A_HOLDOUT_NOT_CONFIRMED"
+  ],
+  "development_criteria": [
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "DEV-001",
+      "description": "Complete fixed development block",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development",
+      "metric": "successful fixed-identity designs/runs",
+      "operator": "equals",
+      "scientific_rationale": "Operational completeness",
+      "threshold": {
+        "designs": 20,
+        "runs": 100
+      }
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "DEV-002",
+      "description": "Reproduce resilient-core support",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development",
+      "metric": "resilient-core non-breach-majority designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Independent design support cannot be replaced by pooled runs",
+      "threshold": 2
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "DEV-003",
+      "description": "Locate realization-sensitive boundary probes",
+      "failure_consequence": "Continue only to predeclared validation; no Stage B freeze",
+      "input_partition": "development",
+      "metric": "individually mixed preassigned-boundary designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Requires within-design class variation",
+      "threshold": 2
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "DEV-004",
+      "description": "Retain broad-control consistency",
+      "failure_consequence": "Investigate before Stage B proposal",
+      "input_partition": "development",
+      "metric": "global controls with zero of five non-breach",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Detect targeted-region population shift",
+      "threshold": 3
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "DEV-005",
+      "description": "Report realization stability",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development",
+      "metric": "designs with reported non-breach count and margin spread",
+      "operator": "equals",
+      "scientific_rationale": "Pooled run counts cannot replace design support",
+      "threshold": 20
+    }
+  ],
+  "final_classification_gates_apply": false,
+  "pre_holdout_stage_b_proposal_criteria": [
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-001",
+      "description": "Core reproduction",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development+validation",
+      "metric": "distinct resilient-core non-breach-majority designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Audit minimum",
+      "threshold": 2
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-002",
+      "description": "Boundary mixing",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development+validation",
+      "metric": "distinct individually mixed preassigned-boundary designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Audit minimum and design-level correction",
+      "threshold": 3
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-003",
+      "description": "Near-boundary localization",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development+validation",
+      "metric": "distinct preassigned-boundary designs with at least one absolute margin <= 0.10",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Audit minimum",
+      "threshold": 4
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-004",
+      "description": "Both transition signs across independent designs",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development+validation",
+      "metric": "distinct near-boundary designs by sign",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Audit minimum; zero is non-breach",
+      "threshold": {
+        "negative": 2,
+        "nonnegative": 2
+      }
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-005",
+      "description": "Independent majority-class support",
+      "failure_consequence": "STAGE_A_DISCOVERY_INSUFFICIENT",
+      "input_partition": "development+validation",
+      "metric": "majority-class design counts",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Mixed designs count once by majority class",
+      "threshold": {
+        "breach_majority": 4,
+        "non_breach_majority": 4
+      }
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "PRE-006",
+      "description": "Global-control consistency",
+      "failure_consequence": "Investigate population shift before Stage B proposal",
+      "input_partition": "development+validation",
+      "metric": "global controls with zero of five non-breach",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Audit minimum",
+      "threshold": 4
+    },
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "PRE-007",
+      "description": "No holdout consultation",
+      "failure_consequence": "Reject Stage B proposal process and create a new holdout",
+      "input_partition": "sealed_holdout",
+      "metric": "holdout outcomes accessed",
+      "operator": "equals",
+      "scientific_rationale": "Protect outcome-independent confirmation",
+      "threshold": 0
+    }
+  ],
+  "proposal_status": "NOT_FROZEN",
+  "schema_identifier": "satnet.stage_a.discovery_criteria.v1",
+  "sealed_holdout_confirmation_criteria": [
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "HOLD-001",
+      "description": "Lawful unsealing prerequisites",
+      "failure_consequence": "STAGE_A_HOLDOUT_NOT_CONFIRMED",
+      "input_partition": "sealed_holdout",
+      "metric": "completed unsealing conditions",
+      "operator": "equals",
+      "scientific_rationale": "Holdout cannot shape Stage B",
+      "threshold": 6
+    },
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "HOLD-002",
+      "description": "Complete fixed holdout block",
+      "failure_consequence": "STAGE_A_HOLDOUT_NOT_CONFIRMED",
+      "input_partition": "sealed_holdout",
+      "metric": "successful fixed-identity designs/runs",
+      "operator": "equals",
+      "scientific_rationale": "Operational confirmation",
+      "threshold": {
+        "designs": 5,
+        "runs": 25
+      }
+    },
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "HOLD-003",
+      "description": "Confirm core support",
+      "failure_consequence": "STAGE_A_HOLDOUT_NOT_CONFIRMED",
+      "input_partition": "sealed_holdout",
+      "metric": "resilient-core non-breach-majority designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Independent confirmation",
+      "threshold": 1
+    },
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "HOLD-004",
+      "description": "Confirm boundary localization",
+      "failure_consequence": "STAGE_A_HOLDOUT_NOT_CONFIRMED",
+      "input_partition": "sealed_holdout",
+      "metric": "observed boundary designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Uses outcome-defined boundary rule",
+      "threshold": 1
+    },
+    {
+      "can_influence_stage_b": false,
+      "criterion_id": "HOLD-005",
+      "description": "Confirm global control",
+      "failure_consequence": "STAGE_A_HOLDOUT_NOT_CONFIRMED",
+      "input_partition": "sealed_holdout",
+      "metric": "global controls with zero of five non-breach",
+      "operator": "equals",
+      "scientific_rationale": "Population-shift check",
+      "threshold": 1
+    }
+  ],
+  "simulation_authorized": false,
+  "validation_criteria": [
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "VAL-001",
+      "description": "Complete fixed validation block",
+      "failure_consequence": "STAGE_A_VALIDATION_FAILED",
+      "input_partition": "validation",
+      "metric": "successful fixed-identity designs/runs",
+      "operator": "equals",
+      "scientific_rationale": "Outcome-independent reproduction",
+      "threshold": {
+        "designs": 5,
+        "runs": 25
+      }
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "VAL-002",
+      "description": "Reproduce core support independently",
+      "failure_consequence": "STAGE_A_VALIDATION_FAILED",
+      "input_partition": "validation",
+      "metric": "resilient-core non-breach-majority designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Development support must reproduce",
+      "threshold": 1
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "VAL-003",
+      "description": "Reproduce boundary mixing independently",
+      "failure_consequence": "STAGE_A_VALIDATION_FAILED",
+      "input_partition": "validation",
+      "metric": "individually mixed preassigned-boundary designs",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Boundary localization must not be development-only",
+      "threshold": 1
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "VAL-004",
+      "description": "Retain validation control consistency",
+      "failure_consequence": "STAGE_A_VALIDATION_FAILED",
+      "input_partition": "validation",
+      "metric": "global controls with zero of five non-breach",
+      "operator": "equals",
+      "scientific_rationale": "Detect population shift",
+      "threshold": 1
+    },
+    {
+      "can_influence_stage_b": true,
+      "criterion_id": "VAL-005",
+      "description": "Contain both majority classes",
+      "failure_consequence": "STAGE_A_VALIDATION_FAILED",
+      "input_partition": "validation",
+      "metric": "majority-class design counts",
+      "operator": "greater_than_or_equal",
+      "scientific_rationale": "Independent class support",
+      "threshold": {
+        "breach_majority": 1,
+        "non_breach_majority": 1
+      }
+    }
+  ],
+  "workflow": [
+    "Run development",
+    "Evaluate development criteria",
+    "Expose and evaluate validation",
+    "Draft Stage B",
+    "Freeze and independently audit Stage B",
+    "Record Stage B contract hash",
+    "Unseal Stage A holdout",
+    "Evaluate holdout confirmation",
+    "Execute unchanged frozen Stage B or reject it"
+  ]
+}

@@ -4,3 +4,4 @@
 
 artifacts/final_integrated_dataset_contract/** -text
 artifacts/integrated_ground_pilot_25/inputs/pilot_catalog.csv -text
+artifacts/stage_a_discovery_contract_proposal/** -text
