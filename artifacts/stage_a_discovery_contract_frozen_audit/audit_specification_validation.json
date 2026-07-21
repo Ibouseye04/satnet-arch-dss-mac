@@ -1,0 +1,13 @@
+{
+  "canonical_utf8_lf": true,
+  "pass": true,
+  "provenance_bound": true,
+  "sha256": "c1822db61182e6ff6436c767ac39a35065ff84741119bd7306b261dc2a1f7373",
+  "state": {
+    "contract_frozen": true,
+    "execution_authorized": false,
+    "freeze_status": "FROZEN_PENDING_INDEPENDENT_AUDIT",
+    "production_authorized": false,
+    "simulation_authorized": false
+  }
+}

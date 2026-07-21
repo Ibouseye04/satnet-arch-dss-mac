@@ -1,0 +1,130 @@
+{
+  "boundary_definition": "PASS",
+  "class_rules": {
+    "0": {
+      "breach_realization_count": 5,
+      "majority_class": "breach_majority",
+      "mixed_design": false,
+      "non_breach_realization_count": 0,
+      "observed_boundary_design": false
+    },
+    "1": {
+      "breach_realization_count": 4,
+      "majority_class": "breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 1,
+      "observed_boundary_design": true
+    },
+    "2": {
+      "breach_realization_count": 3,
+      "majority_class": "breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 2,
+      "observed_boundary_design": true
+    },
+    "3": {
+      "breach_realization_count": 2,
+      "majority_class": "non_breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 3,
+      "observed_boundary_design": true
+    },
+    "4": {
+      "breach_realization_count": 1,
+      "majority_class": "non_breach_majority",
+      "mixed_design": true,
+      "non_breach_realization_count": 4,
+      "observed_boundary_design": true
+    },
+    "5": {
+      "breach_realization_count": 0,
+      "majority_class": "non_breach_majority",
+      "mixed_design": false,
+      "non_breach_realization_count": 5,
+      "observed_boundary_design": true
+    }
+  },
+  "criteria_mathematically_feasible": true,
+  "criterion_count": 22,
+  "criterion_ids_unique": true,
+  "decision_states": [
+    "STAGE_A_DISCOVERY_INSUFFICIENT",
+    "STAGE_A_READY_FOR_STAGE_B_PROPOSAL",
+    "STAGE_A_VALIDATION_FAILED",
+    "STAGE_A_STAGE_B_CONTRACT_FROZEN",
+    "STAGE_A_HOLDOUT_CONFIRMED",
+    "STAGE_A_HOLDOUT_NOT_CONFIRMED"
+  ],
+  "final_corpus_membership": "PASS",
+  "holdout_policy": "PASS",
+  "manifest_summary": {
+    "base_bound_violations": 0,
+    "design_count": 30,
+    "design_hash_mismatches": 0,
+    "design_ids": "SA-D000-SA-D029",
+    "duplicate_count": 0,
+    "global_run_ids": "500-649",
+    "original_collision_count": 0,
+    "partition_allocation": {
+      "development": 20,
+      "sealed_holdout": 5,
+      "validation": 5
+    },
+    "pass": true,
+    "region_allocation": {
+      "boundary": 12,
+      "global_control": 6,
+      "resilient_core": 12
+    },
+    "region_bound_violations": 0,
+    "region_partition_allocation": {
+      "boundary/development": 8,
+      "boundary/sealed_holdout": 2,
+      "boundary/validation": 2,
+      "global_control/development": 4,
+      "global_control/sealed_holdout": 1,
+      "global_control/validation": 1,
+      "resilient_core/development": 8,
+      "resilient_core/sealed_holdout": 2,
+      "resilient_core/validation": 2
+    },
+    "run_count": 150,
+    "run_hash_mismatches": 0,
+    "run_keys": "SA-D000-R00-SA-D029-R04",
+    "seed_count": 150,
+    "seed_mismatches": 0
+  },
+  "margin_quantization": {
+    "increment": "0.000001",
+    "negative_zero_normalized": true,
+    "rounding": "ROUND_HALF_EVEN",
+    "vectors": {
+      "-0": "0.000000",
+      "-0.000000499999": "0.000000",
+      "-0.0000005": "0.000000",
+      "-0.000000500001": "-0.000001",
+      "-0.0000015": "-0.000002",
+      "0": "0.000000",
+      "0.000000499999": "0.000000",
+      "0.0000005": "0.000000",
+      "0.000000500001": "0.000001",
+      "0.0000015": "0.000002"
+    }
+  },
+  "pass": true,
+  "readme": {
+    "byte_length": 1695,
+    "machine_readable_contract_consistent": true,
+    "pass": true,
+    "required_statements_present": true,
+    "sha256": "d4d9d8b796b194ef6bebe7ad1a4520cc38cee4f3fb40889fc922cf3705928b0c"
+  },
+  "silent_holdout_modification_permitted": false,
+  "stage_b_adaptation_boundary": "PASS",
+  "threshold": {
+    "breach": "margin < 0",
+    "margin": "failure_adjusted_overall_service_fraction_min - 0.80",
+    "non_breach": "margin >= 0",
+    "value": "0.80"
+  }
+}

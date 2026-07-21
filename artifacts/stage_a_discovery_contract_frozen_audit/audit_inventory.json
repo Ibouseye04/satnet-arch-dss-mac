@@ -1,0 +1,138 @@
+{
+  "artifact_count_excluding_inventory": 21,
+  "artifacts": [
+    {
+      "byte_length": 3524,
+      "record_count": null,
+      "relative_path": "audit_audit_bundle_validation.json",
+      "sha256": "58b27d03d42f32f66723c7367ebced3fe62f3bd98985eee26464f09b00d639c4"
+    },
+    {
+      "byte_length": 250,
+      "record_count": null,
+      "relative_path": "audit_authorization_validation.json",
+      "sha256": "3c95cd8c192a15539892bdc9f820f566eb5d6e8db0a9e73c48582a8740036650"
+    },
+    {
+      "byte_length": 426,
+      "record_count": null,
+      "relative_path": "audit_byte_policy_validation.json",
+      "sha256": "66812548b2d8ce0b63c7e751c72327afd3fe51846e7cd0a88997961cc11ed423"
+    },
+    {
+      "byte_length": 433,
+      "record_count": null,
+      "relative_path": "audit_contract_hash_validation.json",
+      "sha256": "262e216178ff7d3707e69c018ff93289376ad22b1fc990e0c44798c045850bfc"
+    },
+    {
+      "byte_length": 452,
+      "record_count": null,
+      "relative_path": "audit_declaration_validation.json",
+      "sha256": "1e0f9701711913175a45f9017ae43b203e99324304e6a010e4f0430df80f0514"
+    },
+    {
+      "byte_length": 2489,
+      "record_count": 30,
+      "relative_path": "audit_design_manifest_validation.csv",
+      "sha256": "b390e692a4b70708e2ec7fcdd1fecb0985ede18a0dad09205b54478954965ca6"
+    },
+    {
+      "byte_length": 666,
+      "record_count": null,
+      "relative_path": "audit_findings.json",
+      "sha256": "12f9b67c69736de8915bec22383f3ec417673bbe4dca4a7ba2d58fbafed09748"
+    },
+    {
+      "byte_length": 1312,
+      "record_count": null,
+      "relative_path": "audit_frozen_evidence.json",
+      "sha256": "031c6ad0d436cd105576f9c8c59ad73f3ff694c8f93cf72a5278060ff270e97d"
+    },
+    {
+      "byte_length": 3217,
+      "record_count": 12,
+      "relative_path": "audit_frozen_inventory_validation.csv",
+      "sha256": "0dd0e7f6bfc2704bb5096392fdad0d88a438a94be60ad873216e7fccd9ae1aa6"
+    },
+    {
+      "byte_length": 3763,
+      "record_count": null,
+      "relative_path": "audit_governance_validation.json",
+      "sha256": "412c21fcaf338854a5c59cb7ba0000375b9d2d4058cb7135bafe72fcfbd97002"
+    },
+    {
+      "byte_length": 1148,
+      "record_count": null,
+      "relative_path": "audit_input_identity.json",
+      "sha256": "ec8b992729dc2dc60490b2a3fa793a5646897700525a1d1553e10cbaf3bb4d26"
+    },
+    {
+      "byte_length": 770,
+      "record_count": null,
+      "relative_path": "audit_neighbor_validation.json",
+      "sha256": "9135bbbd88f2a46ac3de3aa34aebb39fd54e73e850271565d0368b329dbd2fc9"
+    },
+    {
+      "byte_length": 1459,
+      "record_count": null,
+      "relative_path": "audit_output_root_validation.json",
+      "sha256": "59e7f09606ced15b64c6656fc17e45c3c90a67ed6313a3cca0e8de587a60c086"
+    },
+    {
+      "byte_length": 2293,
+      "record_count": null,
+      "relative_path": "audit_protected_science.json",
+      "sha256": "e7437a2361d24e7cb9e3c03c36119ee950e4613f48d8806afc52e33a73df2fd3"
+    },
+    {
+      "byte_length": 11958,
+      "record_count": 150,
+      "relative_path": "audit_run_manifest_validation.csv",
+      "sha256": "f4f671c4791b81b43d8655e2ba4deda143b5d9160bf7bae756a9df1a9cfa8962"
+    },
+    {
+      "byte_length": 8885,
+      "record_count": 150,
+      "relative_path": "audit_seed_manifest_validation.csv",
+      "sha256": "43bed71898f26e254d42f1ff16fd5bbd3b68374d0f066f15513867296646719d"
+    },
+    {
+      "byte_length": 231,
+      "record_count": null,
+      "relative_path": "audit_simulation_nonexecution.json",
+      "sha256": "699ef6188623065321e2c3b728b536143aa5c8821f59177fab5b4813183a23f7"
+    },
+    {
+      "byte_length": 2112,
+      "record_count": 11,
+      "relative_path": "audit_source_bundle_validation.csv",
+      "sha256": "b5935ee57ebed343380cef4e30242b414c7c6d0fd734d0ae84e44c3ea3ff4029"
+    },
+    {
+      "byte_length": 366,
+      "record_count": null,
+      "relative_path": "audit_specification_validation.json",
+      "sha256": "a979574e3f843f3562b4f93337b0195a1734f5ae4bf0250ce313820f701fac65"
+    },
+    {
+      "byte_length": 344,
+      "record_count": null,
+      "relative_path": "audit_tag_validation.json",
+      "sha256": "5cbb0eb845cfba414a4541d831a4cc84ca89a0dec04713e732220fa756dfb0a2"
+    },
+    {
+      "byte_length": 2800,
+      "record_count": null,
+      "relative_path": "audit_windows_checkout_validation.json",
+      "sha256": "a2a3763f1eab900795f75f7a052ff89a91318d47a4726f3da72b7df8c9158c33"
+    }
+  ],
+  "contract_hash_audited": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "encoding": "UTF-8 without BOM",
+  "freeze_commit_audited": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "newline": "LF with one terminal newline",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.frozen_contract_independent_audit_inventory.v1",
+  "self_reference_policy": "audit_inventory.json excludes its own bytes"
+}

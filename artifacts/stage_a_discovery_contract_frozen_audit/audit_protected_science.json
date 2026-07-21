@@ -1,0 +1,44 @@
+{
+  "approved_proposal_diff": [],
+  "freeze_changed_paths": [
+    "artifacts/stage_a_discovery_contract_v1/STAGE_A_CONTRACT_FREEZE_README.txt",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_contract_proposal.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_design_manifest.csv",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_discovery_criteria.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_near_neighbor_policy.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_output_root_manifest.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_partition_manifest.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_proposal_inventory.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_region_bounds.json",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_run_manifest.csv",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_seed_manifest.csv",
+    "artifacts/stage_a_discovery_contract_v1/source_bundle/stage_a_seed_policy.json",
+    "artifacts/stage_a_discovery_contract_v1/stage_a_contract_freeze_declaration.json",
+    "artifacts/stage_a_discovery_contract_v1/stage_a_frozen_contract.sha256",
+    "artifacts/stage_a_discovery_contract_v1/stage_a_frozen_contract_inventory.json",
+    "artifacts/stage_a_discovery_contract_v1/stage_a_frozen_contract_specification.json",
+    "docs/validation/stage_a_discovery_contract_freeze_v1.md",
+    "src/satnet/experiments/stage_a_contract/freeze.py",
+    "tests/experiments/test_final_dataset_isolation.py",
+    "tests/experiments/test_stage_a_contract_freeze.py"
+  ],
+  "freeze_tooling": {
+    "can_execute_simulations": false,
+    "pass": true,
+    "path": "src/satnet/experiments/stage_a_contract/freeze.py",
+    "permitted_surface_present": [
+      "create_frozen_contract",
+      "reproduce_approved_proposal",
+      "validate_frozen_contract",
+      "verify_frozen_production_evidence",
+      "verify_output_roots",
+      "verify_repository_identity"
+    ],
+    "prohibited_calls": [],
+    "simulation_imports": []
+  },
+  "pass": true,
+  "production_logic_diff": [],
+  "protected_science_diff": [],
+  "unauthorized_freeze_paths": []
+}

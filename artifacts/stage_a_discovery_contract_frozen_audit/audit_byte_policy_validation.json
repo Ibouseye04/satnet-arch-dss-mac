@@ -1,0 +1,16 @@
+{
+  "attributes": {
+    "audit_bundle": "unset",
+    "frozen_contract_bundle": "unset",
+    "proposal_bundle": "unset",
+    "readme": "unspecified"
+  },
+  "broad_type_rule": false,
+  "global_negative_text_rule": false,
+  "narrow_rules": [
+    "artifacts/stage_a_discovery_contract_freeze_audit/**",
+    "artifacts/stage_a_discovery_contract_proposal/**",
+    "artifacts/stage_a_discovery_contract_v1/**"
+  ],
+  "pass": true
+}

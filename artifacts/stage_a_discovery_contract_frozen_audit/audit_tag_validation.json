@@ -1,0 +1,10 @@
+{
+  "annotation_result": "PASS",
+  "annotation_sha256": "25f48163bd6a5fc66aac7d230a31da6c30a3922e424218cbbfc1403aceebe895",
+  "conflicting_tags": [],
+  "push_status": "not_pushed",
+  "tag_modified_by_audit": false,
+  "tag_name": "stage-a-discovery-contract-v1",
+  "tag_target": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "tag_type": "tag"
+}

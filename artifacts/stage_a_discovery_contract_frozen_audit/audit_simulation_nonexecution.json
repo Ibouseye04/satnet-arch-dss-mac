@@ -1,0 +1,9 @@
+{
+  "acceptance_report_count": 0,
+  "generation_ledger_count": 0,
+  "pass": true,
+  "replay_ledger_count": 0,
+  "reserved_execution_root_count": 0,
+  "scientific_output_tree_count": 0,
+  "tracked_stage_a_simulation_evidence": []
+}

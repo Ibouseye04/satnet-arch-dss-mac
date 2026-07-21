@@ -1,0 +1,9 @@
+{
+  "authoritative_contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "hash_record": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a  stage_a_frozen_contract_inventory.json",
+  "inventory_byte_length": 4763,
+  "inventory_ordering": "PASS",
+  "inventory_sha256": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "pass": true,
+  "self_reference_absent": true
+}

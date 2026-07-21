@@ -1,0 +1,14 @@
+{
+  "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "inventory_byte_length": 4763,
+  "pass": true,
+  "sha256": "e0987858e1eca4d04e7008a468de232ef26eaa867f9d2a750c83fc8c89717bd4",
+  "state": {
+    "contract_frozen": true,
+    "execution_authorized": false,
+    "freeze_status": "FROZEN_PENDING_INDEPENDENT_AUDIT",
+    "production_authorized": false,
+    "simulation_authorized": false
+  },
+  "tag_pushed": false
+}

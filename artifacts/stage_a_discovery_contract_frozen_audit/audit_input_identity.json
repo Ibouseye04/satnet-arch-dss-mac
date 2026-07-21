@@ -1,0 +1,18 @@
+{
+  "approved_audit_commit": "a1514a654fe76518db16001b98e899f773eb9d1e",
+  "approved_proposal_commit": "509f2449dbbaf4c1f5153ecfa4bc1652f24f75da",
+  "audit_branch": "audit/stage-a-frozen-contract-v1",
+  "audit_tooling_head": "50e0789903f24c9bf0e644787d18b63380cc84a9",
+  "base_contract_commit": "a1967185e80327e4b00c1831828dc975ab6819fc",
+  "base_contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+  "byte_policy_commit": "9c55e5999f308a84b857fdf6828cf48a9ca5b360",
+  "freeze_commit": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "freeze_feature_commit": "93019b2cc34fe7659d10e9e42b3cab9ae28ec2de",
+  "freeze_is_ancestor_of_audit_head": true,
+  "freeze_test_commit": "df81c1b38ac73e65b1d2dfdb3ec6a7dd6e517f39",
+  "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+  "pass": true,
+  "production_evidence_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+  "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+  "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd"
+}

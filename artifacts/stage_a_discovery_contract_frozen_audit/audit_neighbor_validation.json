@@ -1,0 +1,22 @@
+{
+  "changed_design": "SA-D020",
+  "changed_field": "ground_station_failure_probability",
+  "corrected_sa_d013_sa_d020_distance": 0.12039492645571381,
+  "corrected_value": 0.1,
+  "cross_partition_pairs_below_0_10": 0,
+  "holdout_pairs_below_0_10": 0,
+  "minimum_development_holdout": 0.1205683310788027,
+  "minimum_development_validation": 0.12039492645571381,
+  "minimum_stage_a_to_original": 0.06382978723404255,
+  "minimum_stage_a_to_original_pair": [
+    "SA-D024",
+    "D004"
+  ],
+  "minimum_validation_holdout": 0.1500946005884104,
+  "original_sa_d013_sa_d020_distance": 0.07681919236933395,
+  "original_value": 0.075,
+  "pass": true,
+  "pending_scientific_reviews": [],
+  "remaining_exceptions": [],
+  "stage_a_to_original_proximity_disclosed_nonbinding": true
+}

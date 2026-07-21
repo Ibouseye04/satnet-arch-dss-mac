@@ -1,0 +1,10 @@
+{
+  "checked_fields": 29,
+  "contract_frozen": true,
+  "contradictions": [],
+  "execution_authorized": false,
+  "freeze_status": "FROZEN_PENDING_INDEPENDENT_AUDIT",
+  "pass": true,
+  "production_authorized": false,
+  "simulation_authorized": false
+}
