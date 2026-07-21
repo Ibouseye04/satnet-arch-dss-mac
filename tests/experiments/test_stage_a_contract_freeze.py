@@ -490,6 +490,8 @@ def test_rejects_existing_contract_root_and_conflicting_tag(
     def qualified_branch(repo_root: Path, *args: str, check: bool = True) -> str:
         if args == ("branch", "--show-current"):
             return freeze.FREEZE_BRANCH
+        if args == ("tag", "--list", freeze.TAG_NAME):
+            return ""
         return original_git(repo_root, *args, check=check)
 
     monkeypatch.setattr(freeze, "git", qualified_branch)
