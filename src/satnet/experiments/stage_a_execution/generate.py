@@ -8,6 +8,7 @@ from typing import Any, Callable, Mapping
 from satnet.experiments.final_generation.constants import CONTRACT_SPEC_HASH as BASE_CONTRACT_SPEC_HASH
 from satnet.experiments.final_generation.mapping import FinalRunMapping
 from satnet.experiments.final_generation.orchestrator import generate_run
+from satnet.experiments.final_generation.run_validation import validate_run_authoritatively
 from satnet.ground.catalog import GroundStationCatalog
 from satnet.ground.failure_policy import GroundFailurePolicy
 from satnet.ground.persistence import make_enabled_ground_design_record
@@ -16,14 +17,28 @@ from satnet.ground.service_policy import GroundServicePolicy
 from satnet.ground.visibility import GroundVisibilityPolicy
 from satnet.simulation.tier1_rollout import Tier1RolloutConfig
 
+from .artifact_contract import (
+    PRODUCTION_ARTIFACT_CONTRACT,
+    SimulationAdapterResult,
+    bind_plan_run,
+    make_adapter_result,
+    validate_run_output,
+)
 from .common import atomic_write_json
 from .contract import FrozenStageAContract
-from .integrity import artifact_inventory, inventory_hash
-from .ledger import ExclusiveLock, build_ledger, read_ledger, transition, write_ledger
-from .paths import validate_relative_artifact_path
+from .integrity import inventory_hash
+from .ledger import build_ledger, read_ledger, transition, write_ledger
+from .locking import campaign_lock, per_run_lock
+from .paths import validate_output_roots, validate_relative_artifact_path
+from .preflight import PreflightCertificate, require_preflight
 from .resume import resumable_run_ids, validate_resume_identity
 
-SimulationAdapter = Callable[[Mapping[str, Any], Path], None]
+SimulationAdapter = Callable[[Mapping[str, Any], Path], SimulationAdapterResult]
+
+
+def _failure_diagnostic(error: BaseException) -> str:
+    message = " ".join(str(error).split())[:1000]
+    return f"{type(error).__name__}: {message or type(error).__name__}"
 
 
 def build_scientific_arguments(contract: FrozenStageAContract, global_run_id: int) -> dict[str, Any]:
@@ -64,7 +79,7 @@ def _float(value: object) -> float:
 
 
 def make_validated_production_adapter(contract: FrozenStageAContract, catalog: GroundStationCatalog) -> SimulationAdapter:
-    def adapter(plan_run: Mapping[str, Any], output_root: Path) -> None:
+    def adapter(plan_run: Mapping[str, Any], output_root: Path) -> SimulationAdapterResult:
         arguments = build_scientific_arguments(contract, int(plan_run["global_run_id"]))
         if arguments["run_record_hash"] != plan_run["run_record_hash"]:
             raise ValueError("Adapter run-record hash mismatch")
@@ -122,16 +137,35 @@ def make_validated_production_adapter(contract: FrozenStageAContract, catalog: G
         mapping = FinalRunMapping(design, run, satellite, ground, visibility, service, failure)
         pipeline_root = output_root / "validated_pipeline"
         result = generate_run(mapping=mapping, catalog=catalog, output_root=pipeline_root, mode="production")
+        authoritative = validate_run_authoritatively(
+            mapping=mapping, catalog=catalog, run_root=pipeline_root / f"run_{local_id:03d}",
+        )
+        if authoritative["result"] != result:
+            raise ValueError("Authoritative production adapter validation result mismatch")
         atomic_write_json(output_root / "stage_a_binding.json", {
+            "schema_identifier": "satnet.stage_a.run_binding.v2",
             "base_production_contract_specification_hash": BASE_CONTRACT_SPEC_HASH,
             "contract_hash": contract.contract_hash,
+            "plan_hash": plan_run["plan_hash"],
+            "stable_executable_commit": plan_run["stable_executable_commit"],
+            "executable_inventory_hash": plan_run["executable_inventory_hash"],
+            "tooling_proposal_hash": plan_run["tooling_proposal_hash"],
+            "artifact_contract_hash": plan_run["artifact_contract_hash"],
+            "partition": plan_run["partition"],
+            "design_id": plan_run["design_id"],
             "design_record_hash": arguments["design_record_hash"],
             "global_run_id": arguments["global_run_id"],
             "pipeline_local_run_id": local_id,
+            "realization_id": plan_run["realization_id"],
+            "realization_index": plan_run["realization_index"],
             "run_key": arguments["run_key"],
             "run_record_hash": arguments["run_record_hash"],
+            "ground_selection_seed": arguments["ground_selection_seed"],
+            "satellite_failure_seed": arguments["satellite_failure_seed"],
+            "ground_failure_seed": arguments["ground_failure_seed"],
             "validated_pipeline_result_hash": result["run_result_hash"],
         })
+        return make_adapter_result(plan_run, output_root, PRODUCTION_ARTIFACT_CONTRACT)
     return adapter
 
 
@@ -143,19 +177,30 @@ def initialize_campaign(root: Path, plan: dict[str, Any], authorization_hash: st
         "authorization_hash": authorization_hash,
         "contract_hash": plan["contract_hash"],
         "plan_hash": plan["plan_hash"],
-        "tooling_commit": plan["tooling_commit"],
-        "tooling_inventory_hash": plan["tooling_inventory_hash"],
+        "stable_executable_commit": plan["stable_executable_commit"],
+        "executable_inventory_hash": plan["executable_inventory_hash"],
+        "tooling_proposal_hash": plan["tooling_proposal_hash"],
+        "artifact_contract_hash": plan["artifact_contract_hash"],
     })
     return ledger_path
 
 
 def execute_generation(
-    *, contract: FrozenStageAContract, plan: dict[str, Any], authorization_hash: str,
-    campaign_root: Path, adapter: SimulationAdapter, resume: bool = False,
-    retry_failed: bool = False,
+    *, repo_root: Path, contract: FrozenStageAContract, plan: dict[str, Any], authorization_hash: str,
+    preflight: PreflightCertificate, campaign_root: Path, adapter: SimulationAdapter,
+    resume: bool = False, retry_failed: bool = False,
 ) -> dict[str, Any]:
-    lock_path = campaign_root.with_name(campaign_root.name + ".lock")
-    with ExclusiveLock(lock_path, plan["plan_hash"]):
+    require_preflight(preflight, plan=plan, authorization_hash=authorization_hash)
+    roots = validate_output_roots(
+        repo_root=repo_root,
+        generation_root=Path(plan["output_roots"]["generation"]),
+        replay_root=Path(plan["output_roots"]["replay"]),
+        acceptance_root=Path(plan["output_roots"]["acceptance"]),
+        require_absent=False,
+    )
+    if roots != plan["output_roots"] or str(campaign_root.resolve(strict=False)) != roots["generation"]:
+        raise PermissionError("Generation root differs from preflight-bound plan")
+    with campaign_lock(campaign_root, plan["plan_hash"]):
         ledger_path = campaign_root / "execution_ledger.json"
         if resume:
             ledger = read_ledger(ledger_path)
@@ -172,32 +217,33 @@ def execute_generation(
             final_root = campaign_root / relative
             if final_root.exists():
                 raise FileExistsError("Changed or partial run artifact cannot be replaced")
-            transition(ledger_path, global_run_id=run_id, new_state="STARTING")
-            temporary = Path(tempfile.mkdtemp(dir=campaign_root, prefix=f".{plan_run['run_key']}.in_progress."))
-            try:
-                transition(ledger_path, global_run_id=run_id, new_state="RUNNING")
-                adapter(plan_run, temporary)
-                records = artifact_inventory(temporary)
-                if not records:
-                    raise ValueError("Simulation adapter produced no artifacts")
-                final_root.parent.mkdir(parents=True, exist_ok=True)
-                temporary.replace(final_root)
-                transition(
-                    ledger_path, global_run_id=run_id, new_state="SUCCEEDED",
-                    artifacts=records, artifact_inventory_hash=inventory_hash(records),
-                )
-            except KeyboardInterrupt:
-                transition(ledger_path, global_run_id=run_id, new_state="INTERRUPTED", failure="KeyboardInterrupt")
-                shutil.rmtree(temporary, ignore_errors=True)
-                raise
-            except Exception as error:
-                transition(ledger_path, global_run_id=run_id, new_state="FAILED", failure=type(error).__name__)
-                failed_record = next(
-                    record for record in read_ledger(ledger_path)["records"]
-                    if record["global_run_id"] == run_id
-                )
-                failed = campaign_root / "failed_attempts" / f"{plan_run['run_key']}-{failed_record['attempt_count']:03d}"
-                failed.parent.mkdir(parents=True, exist_ok=True)
-                temporary.replace(failed)
-                raise
+            with per_run_lock(campaign_root, plan_run["run_key"], plan_run["run_record_hash"]):
+                transition(ledger_path, global_run_id=run_id, new_state="STARTING")
+                temporary = Path(tempfile.mkdtemp(dir=campaign_root, prefix=f".{plan_run['run_key']}.in_progress."))
+                try:
+                    transition(ledger_path, global_run_id=run_id, new_state="RUNNING")
+                    bound_run = bind_plan_run(plan, plan_run)
+                    adapter_result = adapter(bound_run, temporary)
+                    records = validate_run_output(bound_run, temporary, adapter_result)
+                    final_root.parent.mkdir(parents=True, exist_ok=True)
+                    temporary.replace(final_root)
+                    transition(
+                        ledger_path, global_run_id=run_id, new_state="SUCCEEDED",
+                        artifacts=records, artifact_inventory_hash=inventory_hash(records),
+                        adapter_result=adapter_result.as_dict(),
+                    )
+                except KeyboardInterrupt:
+                    transition(ledger_path, global_run_id=run_id, new_state="INTERRUPTED", failure="KeyboardInterrupt")
+                    shutil.rmtree(temporary, ignore_errors=True)
+                    raise
+                except Exception as error:
+                    transition(ledger_path, global_run_id=run_id, new_state="FAILED", failure=_failure_diagnostic(error))
+                    failed_record = next(
+                        record for record in read_ledger(ledger_path)["records"]
+                        if record["global_run_id"] == run_id
+                    )
+                    failed = campaign_root / "failed_attempts" / f"{plan_run['run_key']}-{failed_record['attempt_count']:03d}"
+                    failed.parent.mkdir(parents=True, exist_ok=True)
+                    temporary.replace(failed)
+                    raise
         return read_ledger(ledger_path)

@@ -7,8 +7,8 @@ from .authorization import Authorization
 from .common import payload_hash
 from .contract import FrozenStageAContract
 
-PLAN_SCHEMA = "satnet.stage_a.execution_plan.v1"
-PLAN_HASH_DOMAIN = "satnet_stage_a_execution_plan_v1"
+PLAN_SCHEMA = "satnet.stage_a.execution_plan.v2"
+PLAN_HASH_DOMAIN = "satnet_stage_a_execution_plan_v2"
 
 
 def build_plan(
@@ -16,8 +16,10 @@ def build_plan(
     *,
     partition: str,
     operation: str,
-    tooling_commit: str,
-    tooling_inventory_hash: str,
+    stable_executable_commit: str,
+    executable_inventory_hash: str,
+    tooling_proposal_hash: str,
+    artifact_contract_hash: str,
     generation_root: Path,
     replay_root: Path,
     acceptance_root: Path,
@@ -61,8 +63,10 @@ def build_plan(
     plan = {
         "schema_identifier": PLAN_SCHEMA,
         "contract_hash": contract.contract_hash,
-        "tooling_commit": tooling_commit,
-        "tooling_inventory_hash": tooling_inventory_hash,
+        "stable_executable_commit": stable_executable_commit,
+        "executable_inventory_hash": executable_inventory_hash,
+        "tooling_proposal_hash": tooling_proposal_hash,
+        "artifact_contract_hash": artifact_contract_hash,
         "partition": partition,
         "operation": operation,
         "output_roots": {
@@ -75,6 +79,14 @@ def build_plan(
         "design_count": len({row["design_id"] for row in records}),
         "runs": records,
     }
+    campaign_manifest = {
+        key: value
+        for key, value in plan.items()
+        if key not in {"schema_identifier", "operation", "authorization_hash"}
+    }
+    plan["campaign_manifest_hash"] = payload_hash(
+        campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"
+    )
     plan["plan_hash"] = payload_hash(plan, domain=PLAN_HASH_DOMAIN)
     return plan
 
@@ -87,6 +99,13 @@ def validate_plan(plan: dict[str, Any]) -> None:
     runs = plan.get("runs")
     if not isinstance(runs, list) or len(runs) != plan.get("run_count"):
         raise ValueError("Plan run count mismatch")
+    campaign_manifest = {
+        key: value
+        for key, value in payload.items()
+        if key not in {"schema_identifier", "operation", "authorization_hash", "campaign_manifest_hash"}
+    }
+    if plan.get("campaign_manifest_hash") != payload_hash(campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"):
+        raise ValueError("Campaign manifest hash mismatch")
     ids = [row["global_run_id"] for row in runs]
     outputs = [row["expected_output_relative_path"] for row in runs]
     if ids != sorted(ids) or len(ids) != len(set(ids)) or len(outputs) != len(set(outputs)):

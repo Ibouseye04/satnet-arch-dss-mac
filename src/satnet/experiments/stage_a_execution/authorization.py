@@ -47,8 +47,10 @@ def validate_authorization(
     authorization: Authorization,
     *,
     contract: FrozenStageAContract,
-    tooling_commit: str,
-    tooling_inventory_hash: str,
+    stable_executable_commit: str,
+    executable_inventory_hash: str,
+    tooling_proposal_hash: str,
+    artifact_contract_hash: str,
     operation: str,
     partition: str,
     run_ids: Iterable[int],
@@ -60,7 +62,8 @@ def validate_authorization(
     required = {
         "schema_identifier", "authorization_version", "authorization_id", "authorization_status",
         "authorized_contract_hash", "authorized_contract_tag", "authorized_frozen_commit",
-        "authorized_execution_tooling_commit", "authorized_execution_tooling_inventory_hash",
+        "authorized_stable_executable_commit", "authorized_executable_inventory_hash",
+        "authorized_tooling_proposal_hash", "authorized_artifact_contract_hash",
         "authorized_partition", "authorized_run_ids", "authorized_run_count", "authorized_operation",
         "authorized_generation_root", "authorized_replay_root", "authorized_acceptance_root",
         "authorization_date", "authorizing_decision_reference", "independently_approved",
@@ -93,8 +96,10 @@ def validate_authorization(
         "authorized_contract_hash": contract.contract_hash,
         "authorized_contract_tag": contract.frozen_tag,
         "authorized_frozen_commit": contract.frozen_commit,
-        "authorized_execution_tooling_commit": tooling_commit,
-        "authorized_execution_tooling_inventory_hash": tooling_inventory_hash,
+        "authorized_stable_executable_commit": stable_executable_commit,
+        "authorized_executable_inventory_hash": executable_inventory_hash,
+        "authorized_tooling_proposal_hash": tooling_proposal_hash,
+        "authorized_artifact_contract_hash": artifact_contract_hash,
         "authorized_generation_root": str(generation_root.resolve(strict=False)),
         "authorized_replay_root": str(replay_root.resolve(strict=False)),
         "authorized_acceptance_root": str(acceptance_root.resolve(strict=False)),
@@ -102,8 +107,10 @@ def validate_authorization(
     for field, expected in expected_identity.items():
         if value[field] != expected:
             raise PermissionError(f"Authorization identity mismatch: {field}")
-    ensure_hex(tooling_commit, length=40, field="tooling_commit")
-    ensure_hex(tooling_inventory_hash, length=64, field="tooling_inventory_hash")
+    ensure_hex(stable_executable_commit, length=40, field="stable_executable_commit")
+    ensure_hex(executable_inventory_hash, length=64, field="executable_inventory_hash")
+    ensure_hex(tooling_proposal_hash, length=64, field="tooling_proposal_hash")
+    ensure_hex(artifact_contract_hash, length=64, field="artifact_contract_hash")
     digest = authorization_digest(value)
     if value["authorization_sha256"] != digest or authorization.sha256 != digest:
         raise PermissionError("Authorization SHA-256 mismatch")

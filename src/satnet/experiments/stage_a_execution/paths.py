@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import shutil
 import subprocess
 import tempfile
@@ -93,8 +93,9 @@ def validate_relative_artifact_path(value: str) -> Path:
     if not isinstance(value, str) or not value or "\\" in value:
         raise ValueError("Artifact path must be nonempty relative POSIX")
     posix = PurePosixPath(value)
-    if posix.is_absolute() or value.startswith("/") or any(part in {"", ".", ".."} for part in posix.parts):
-        raise ValueError("Artifact path traversal or absolute path denied")
+    windows = PureWindowsPath(value)
+    if posix.is_absolute() or windows.drive or windows.root or value.startswith("/") or any(part in {"", ".", ".."} for part in posix.parts):
+        raise ValueError("Artifact path traversal, drive, or absolute path denied")
     return Path(*posix.parts)
 
 

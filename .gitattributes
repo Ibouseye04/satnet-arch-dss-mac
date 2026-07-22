@@ -9,3 +9,4 @@ artifacts/stage_a_discovery_contract_freeze_audit/** -text
 artifacts/stage_a_discovery_contract_frozen_audit/** -text
 artifacts/stage_a_discovery_contract_v1/** -text
 artifacts/stage_a_execution_tooling_v1_proposal/** -text
+*.py text eol=lf

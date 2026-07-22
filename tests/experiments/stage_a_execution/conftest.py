@@ -8,8 +8,12 @@ import pytest
 from satnet.experiments.stage_a_execution.authorization import Authorization, authorization_digest
 from satnet.experiments.stage_a_execution.contract import FrozenStageAContract
 
-TOOLING_COMMIT = "1" * 40
-TOOLING_INVENTORY = "2" * 64
+STABLE_EXECUTABLE_COMMIT = "1" * 40
+EXECUTABLE_INVENTORY = "2" * 64
+TOOLING_PROPOSAL = "3" * 64
+ARTIFACT_CONTRACT = "4" * 64
+TOOLING_COMMIT = STABLE_EXECUTABLE_COMMIT
+TOOLING_INVENTORY = EXECUTABLE_INVENTORY
 
 
 @pytest.fixture
@@ -58,8 +62,10 @@ def make_authorization(
         "authorized_contract_hash": contract.contract_hash,
         "authorized_contract_tag": contract.frozen_tag,
         "authorized_frozen_commit": contract.frozen_commit,
-        "authorized_execution_tooling_commit": TOOLING_COMMIT,
-        "authorized_execution_tooling_inventory_hash": TOOLING_INVENTORY,
+        "authorized_stable_executable_commit": STABLE_EXECUTABLE_COMMIT,
+        "authorized_executable_inventory_hash": EXECUTABLE_INVENTORY,
+        "authorized_tooling_proposal_hash": TOOLING_PROPOSAL,
+        "authorized_artifact_contract_hash": ARTIFACT_CONTRACT,
         "authorized_partition": partition,
         "authorized_run_ids": run_ids,
         "authorized_run_count": len(run_ids),

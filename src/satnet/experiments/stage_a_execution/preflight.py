@@ -1,89 +1,120 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import importlib.util
 from pathlib import Path
-import subprocess
 from typing import Any
 
 from .authorization import Authorization, validate_authorization
-from .common import sha256_file
 from .contract import FrozenStageAContract, load_frozen_contract
+from .evidence import DEFAULT_FROZEN_EVIDENCE_PATHS, FrozenEvidencePaths, verify_frozen_production_evidence
+from .identity import tooling_identity, verify_executable_identity
 from .paths import available_bytes, probe_parent, validate_output_roots
 from .plan import validate_plan
 
 MINIMUM_FREE_BYTES = 1_000_000_000
+_PREFLIGHT_SEAL = object()
 
 
-TOOLING_IDENTITY_PATHS = (
-    ".gitattributes",
-    "src/satnet/experiments/stage_a_execution",
-    "tests/experiments/stage_a_execution",
-    "tests/experiments/test_final_dataset_isolation.py",
-)
+@dataclass(frozen=True)
+class PreflightCertificate:
+    report: dict[str, Any]
+    plan_hash: str
+    authorization_hash: str
+    operation: str
+    roots: dict[str, str]
+    _seal: object
 
 
-def tooling_identity(repo_root: Path, inventory_path: Path) -> tuple[str, str]:
-    result = subprocess.run(
-        ["git", "rev-list", "-n", "1", "HEAD", "--", *TOOLING_IDENTITY_PATHS],
-        cwd=repo_root, capture_output=True, text=True, check=True,
-    )
-    commit = result.stdout.strip()
-    if len(commit) != 40:
-        raise ValueError("Execution-tooling implementation commit is unavailable")
-    return commit, sha256_file(inventory_path)
+def require_preflight(certificate: PreflightCertificate, *, plan: dict[str, Any], authorization_hash: str) -> None:
+    if not isinstance(certificate, PreflightCertificate) or certificate._seal is not _PREFLIGHT_SEAL:
+        raise PermissionError("A valid mandatory preflight certificate is required")
+    if certificate.report.get("preflight") != "PASSED":
+        raise PermissionError("Mandatory preflight did not pass")
+    if certificate.plan_hash != plan["plan_hash"] or certificate.authorization_hash != authorization_hash:
+        raise PermissionError("Mandatory preflight identity mismatch")
+    if certificate.operation != plan["operation"] or certificate.roots != plan["output_roots"]:
+        raise PermissionError("Mandatory preflight operation or roots mismatch")
 
 
 def run_preflight(
     *, repo_root: Path, contract: FrozenStageAContract, plan: dict[str, Any],
-    authorization: Authorization, tooling_commit: str, tooling_inventory_hash: str,
-    generation_root: Path, replay_root: Path, acceptance_root: Path,
-    check_write_probe: bool = True, minimum_free_bytes: int = MINIMUM_FREE_BYTES,
-) -> dict[str, Any]:
+    authorization: Authorization, generation_root: Path, replay_root: Path, acceptance_root: Path,
+    resume: bool = False, check_write_probe: bool = True,
+    minimum_free_bytes: int = MINIMUM_FREE_BYTES,
+    evidence_paths: FrozenEvidencePaths = DEFAULT_FROZEN_EVIDENCE_PATHS,
+) -> PreflightCertificate:
+    executable = verify_executable_identity(repo_root)
+    if executable["stable_executable_commit"] != plan["stable_executable_commit"]:
+        raise PermissionError("Plan stable executable identity mismatch")
+    if executable["executable_inventory_sha256"] != plan["executable_inventory_hash"]:
+        raise PermissionError("Plan executable inventory identity mismatch")
     reloaded = load_frozen_contract(repo_root, contract.contract_root)
+    if reloaded.contract_hash != contract.contract_hash:
+        raise ValueError("Frozen Stage A contract reload identity mismatch")
     validate_plan(plan)
     validate_authorization(
-        authorization, contract=reloaded, tooling_commit=tooling_commit,
-        tooling_inventory_hash=tooling_inventory_hash, operation=plan["operation"],
-        partition=plan["partition"], run_ids=[row["global_run_id"] for row in plan["runs"]],
+        authorization, contract=reloaded,
+        stable_executable_commit=plan["stable_executable_commit"],
+        executable_inventory_hash=plan["executable_inventory_hash"],
+        tooling_proposal_hash=plan["tooling_proposal_hash"],
+        artifact_contract_hash=plan["artifact_contract_hash"],
+        operation=plan["operation"], partition=plan["partition"],
+        run_ids=[row["global_run_id"] for row in plan["runs"]],
         generation_root=generation_root, replay_root=replay_root, acceptance_root=acceptance_root,
     )
     roots = validate_output_roots(
         repo_root=repo_root, generation_root=generation_root, replay_root=replay_root,
         acceptance_root=acceptance_root, require_absent=False,
     )
+    if roots != plan["output_roots"]:
+        raise PermissionError("Preflight roots differ from plan roots")
     states = {name: Path(path).exists() for name, path in roots.items()}
     required_states = {
-        "GENERATE": {"generation": False, "replay": False, "acceptance": False},
+        "GENERATE": {"generation": resume, "replay": False, "acceptance": False},
         "REPLAY": {"generation": True, "replay": False, "acceptance": False},
         "ACCEPT": {"generation": True, "replay": True, "acceptance": False},
         "PLAN": states,
     }[plan["operation"]]
     if states != required_states:
         raise FileExistsError(f"Output-root state mismatch for {plan['operation']}: {states}")
-    if check_write_probe:
-        for root in (generation_root, replay_root, acceptance_root):
-            probe_parent(root)
-    free = {name: available_bytes(Path(path)) for name, path in roots.items()}
-    if any(value < minimum_free_bytes for value in free.values()):
-        raise OSError("Insufficient disk space for authorized execution")
+    evidence = verify_frozen_production_evidence(evidence_paths)
     required_modules = (
         "satnet.experiments.final_generation.orchestrator",
+        "satnet.experiments.final_generation.run_validation",
         "satnet.simulation.tier1_rollout",
         "satnet.ground.failure_service_persistence",
     )
     missing = [name for name in required_modules if importlib.util.find_spec(name) is None]
     if missing:
         raise RuntimeError(f"Required runtime modules unavailable: {missing}")
-    lock_path = Path(roots[{"GENERATE": "generation", "REPLAY": "replay", "ACCEPT": "acceptance", "PLAN": "generation"}[plan["operation"]]])
-    if lock_path.with_name(lock_path.name + ".lock").exists():
-        raise RuntimeError("Conflicting execution lock exists")
-    return {
+    free = {name: available_bytes(Path(path)) for name, path in roots.items()}
+    if any(value < minimum_free_bytes for value in free.values()):
+        raise OSError("Insufficient disk space for authorized execution")
+    lock_root = Path(roots[{"GENERATE": "generation", "REPLAY": "replay", "ACCEPT": "acceptance", "PLAN": "generation"}[plan["operation"]]])
+    if lock_root.with_name(lock_root.name + ".lock").exists():
+        raise RuntimeError("Conflicting execution lock exists; explicit stale-lock recovery is required")
+    if check_write_probe:
+        for root in (generation_root, replay_root, acceptance_root):
+            probe_parent(root)
+    report = {
         "authorization": "VALID",
         "contract_hash": contract.contract_hash,
+        "stable_executable_commit": executable["stable_executable_commit"],
+        "executable_inventory_hash": executable["executable_inventory_sha256"],
+        "tooling_proposal_hash": plan["tooling_proposal_hash"],
+        "artifact_contract_hash": plan["artifact_contract_hash"],
         "dependencies": "AVAILABLE",
         "disk_free_bytes": free,
+        "frozen_evidence_file_count": evidence["combined"]["file_count"],
+        "frozen_evidence_byte_count": evidence["combined"]["byte_count"],
+        "frozen_evidence_verified_sha256_count": evidence["combined"]["verified_sha256_count"],
         "output_roots": roots,
         "plan_hash": plan["plan_hash"],
         "preflight": "PASSED",
         "simulation_executed": False,
     }
+    return PreflightCertificate(
+        report=report, plan_hash=plan["plan_hash"], authorization_hash=authorization.sha256,
+        operation=plan["operation"], roots=roots, _seal=_PREFLIGHT_SEAL,
+    )

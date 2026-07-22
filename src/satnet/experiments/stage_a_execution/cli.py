@@ -9,16 +9,17 @@ from typing import Any, Sequence
 from satnet.experiments.final_generation.contract import validate_catalog
 
 from .acceptance import evaluate_acceptance
+from .artifact_contract import artifact_contract_hash
 from .authorization import Authorization, load_authorization, validate_authorization
 from .common import canonical_json_bytes
 from .contract import CONTRACT_RELATIVE_ROOT, FrozenStageAContract, load_frozen_contract
 from .generate import execute_generation, make_validated_production_adapter
+from .identity import tooling_identity
 from .ledger import read_ledger
+from .locking import recover_stale_lock
 from .plan import build_plan
-from .preflight import run_preflight, tooling_identity
+from .preflight import run_preflight
 from .replay import execute_replay
-
-PROPOSAL_INVENTORY_RELATIVE = Path("artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_tooling_inventory.json")
 
 
 def _repo_root() -> Path:
@@ -29,26 +30,29 @@ def _print(value: dict[str, Any]) -> None:
     sys.stdout.buffer.write(canonical_json_bytes(value))
 
 
-def _context(args: argparse.Namespace, operation: str) -> tuple[FrozenStageAContract, str, str, Authorization | None, dict[str, Any]]:
+def _context(args: argparse.Namespace, operation: str) -> tuple[FrozenStageAContract, Authorization | None, dict[str, Any]]:
     repo = _repo_root()
     contract = load_frozen_contract(repo, repo / CONTRACT_RELATIVE_ROOT)
-    tooling_commit, tooling_hash = tooling_identity(repo, repo / PROPOSAL_INVENTORY_RELATIVE)
+    stable_commit, executable_hash, proposal_hash = tooling_identity(repo)
+    science_contract_hash = artifact_contract_hash()
     authorization = None if args.authorization is None else load_authorization(args.authorization)
     provisional = build_plan(
         contract, partition=args.partition, operation=operation,
-        tooling_commit=tooling_commit, tooling_inventory_hash=tooling_hash,
+        stable_executable_commit=stable_commit, executable_inventory_hash=executable_hash,
+        tooling_proposal_hash=proposal_hash, artifact_contract_hash=science_contract_hash,
         generation_root=args.generation_root, replay_root=args.replay_root,
         acceptance_root=args.acceptance_root, authorization=authorization,
     )
     if authorization is not None:
         validate_authorization(
-            authorization, contract=contract, tooling_commit=tooling_commit,
-            tooling_inventory_hash=tooling_hash, operation=operation,
+            authorization, contract=contract, stable_executable_commit=stable_commit,
+            executable_inventory_hash=executable_hash, tooling_proposal_hash=proposal_hash,
+            artifact_contract_hash=science_contract_hash, operation=operation,
             partition=args.partition, run_ids=[row["global_run_id"] for row in provisional["runs"]],
             generation_root=args.generation_root, replay_root=args.replay_root,
             acceptance_root=args.acceptance_root,
         )
-    return contract, tooling_commit, tooling_hash, authorization, provisional
+    return contract, authorization, provisional
 
 
 def command_verify_contract(args: argparse.Namespace) -> None:
@@ -64,14 +68,14 @@ def command_verify_contract(args: argparse.Namespace) -> None:
 
 
 def command_validate_authorization(args: argparse.Namespace) -> None:
-    _, _, _, authorization, plan = _context(args, args.operation)
+    _, authorization, plan = _context(args, args.operation)
     if authorization is None:
         raise PermissionError("EXECUTION NOT AUTHORIZED")
     _print({"authorization_hash": authorization.sha256, "operation": args.operation, "partition": args.partition, "run_count": plan["run_count"], "validation": "PASSED"})
 
 
 def command_plan(args: argparse.Namespace) -> None:
-    _, _, _, authorization, plan = _context(args, "PLAN")
+    _, authorization, plan = _context(args, "PLAN")
     runs = plan["runs"]
     _print({
         "authorization_status": "AUTHORIZED" if authorization is not None else "EXECUTION NOT AUTHORIZED",
@@ -89,24 +93,30 @@ def command_plan(args: argparse.Namespace) -> None:
 
 
 def command_preflight(args: argparse.Namespace) -> None:
-    contract, tooling_commit, tooling_hash, authorization, plan = _context(args, args.operation)
+    contract, authorization, plan = _context(args, args.operation)
     if authorization is None:
         raise PermissionError("EXECUTION NOT AUTHORIZED")
-    _print(run_preflight(
+    certificate = run_preflight(
         repo_root=_repo_root(), contract=contract, plan=plan, authorization=authorization,
-        tooling_commit=tooling_commit, tooling_inventory_hash=tooling_hash,
         generation_root=args.generation_root, replay_root=args.replay_root,
         acceptance_root=args.acceptance_root,
-    ))
+    )
+    _print(certificate.report)
 
 
 def command_generate(args: argparse.Namespace) -> None:
-    contract, _, _, authorization, plan = _context(args, "GENERATE")
+    contract, authorization, plan = _context(args, "GENERATE")
     if authorization is None:
         raise PermissionError("EXECUTION NOT AUTHORIZED")
+    certificate = run_preflight(
+        repo_root=_repo_root(), contract=contract, plan=plan, authorization=authorization,
+        generation_root=args.generation_root, replay_root=args.replay_root,
+        acceptance_root=args.acceptance_root, resume=args.resume,
+    )
     adapter = make_validated_production_adapter(contract, validate_catalog())
     ledger = execute_generation(
-        contract=contract, plan=plan, authorization_hash=authorization.sha256,
+        repo_root=_repo_root(), contract=contract, plan=plan,
+        authorization_hash=authorization.sha256, preflight=certificate,
         campaign_root=args.generation_root, adapter=adapter,
         resume=args.resume, retry_failed=args.retry_failed,
     )
@@ -114,24 +124,41 @@ def command_generate(args: argparse.Namespace) -> None:
 
 
 def command_replay(args: argparse.Namespace) -> None:
-    contract, _, _, authorization, plan = _context(args, "REPLAY")
+    contract, authorization, plan = _context(args, "REPLAY")
     if authorization is None:
         raise PermissionError("EXECUTION NOT AUTHORIZED")
+    certificate = run_preflight(
+        repo_root=_repo_root(), contract=contract, plan=plan, authorization=authorization,
+        generation_root=args.generation_root, replay_root=args.replay_root,
+        acceptance_root=args.acceptance_root,
+    )
     adapter = make_validated_production_adapter(contract, validate_catalog())
     _print(execute_replay(
-        plan=plan, authorization_hash=authorization.sha256,
-        generation_root=args.generation_root, replay_root=args.replay_root, adapter=adapter,
+        repo_root=_repo_root(), plan=plan, authorization_hash=authorization.sha256,
+        preflight=certificate, generation_root=args.generation_root,
+        replay_root=args.replay_root, adapter=adapter,
     ))
 
 
 def command_accept(args: argparse.Namespace) -> None:
-    _, _, _, authorization, plan = _context(args, "ACCEPT")
+    contract, authorization, plan = _context(args, "ACCEPT")
     if authorization is None:
         raise PermissionError("EXECUTION NOT AUTHORIZED")
-    _print(evaluate_acceptance(
-        plan=plan, authorization_hash=authorization.sha256,
+    certificate = run_preflight(
+        repo_root=_repo_root(), contract=contract, plan=plan, authorization=authorization,
         generation_root=args.generation_root, replay_root=args.replay_root,
         acceptance_root=args.acceptance_root,
+    )
+    _print(evaluate_acceptance(
+        repo_root=_repo_root(), plan=plan, authorization_hash=authorization.sha256,
+        preflight=certificate, generation_root=args.generation_root,
+        replay_root=args.replay_root, acceptance_root=args.acceptance_root,
+    ))
+
+
+def command_recover_lock(args: argparse.Namespace) -> None:
+    _print(recover_stale_lock(
+        args.lock, expected_identity=args.expected_identity, recovery_log=args.recovery_log,
     ))
 
 
@@ -170,22 +197,27 @@ def build_parser() -> argparse.ArgumentParser:
     _add_execution_arguments(plan)
     plan.set_defaults(handler=command_plan)
     preflight = subparsers.add_parser("preflight")
-    _add_execution_arguments(preflight)
+    _add_execution_arguments(preflight, authorization_required=True)
     preflight.add_argument("--operation", choices=("GENERATE", "REPLAY", "ACCEPT"), required=True)
     preflight.set_defaults(handler=command_preflight)
     generate = subparsers.add_parser("generate")
-    _add_execution_arguments(generate)
+    _add_execution_arguments(generate, authorization_required=True)
     generate.set_defaults(handler=command_generate, resume=False, retry_failed=False)
     resume = subparsers.add_parser("resume")
-    _add_execution_arguments(resume)
+    _add_execution_arguments(resume, authorization_required=True)
     resume.add_argument("--retry-failed", action="store_true")
     resume.set_defaults(handler=command_generate, resume=True)
     replay = subparsers.add_parser("replay")
-    _add_execution_arguments(replay)
+    _add_execution_arguments(replay, authorization_required=True)
     replay.set_defaults(handler=command_replay)
     accept = subparsers.add_parser("accept")
-    _add_execution_arguments(accept)
+    _add_execution_arguments(accept, authorization_required=True)
     accept.set_defaults(handler=command_accept)
+    recovery = subparsers.add_parser("recover-lock")
+    recovery.add_argument("--lock", type=Path, required=True)
+    recovery.add_argument("--expected-identity", required=True)
+    recovery.add_argument("--recovery-log", type=Path, required=True)
+    recovery.set_defaults(handler=command_recover_lock)
     status = subparsers.add_parser("status")
     status.add_argument("--ledger", type=Path, required=True)
     status.set_defaults(handler=command_status)

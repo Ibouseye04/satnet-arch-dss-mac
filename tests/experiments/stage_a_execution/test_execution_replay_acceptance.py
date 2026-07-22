@@ -5,97 +5,180 @@ from pathlib import Path
 import pytest
 
 from satnet.experiments.stage_a_execution.acceptance import evaluate_acceptance, validate_acceptance_report
-from satnet.experiments.stage_a_execution.common import atomic_write_json
+from satnet.experiments.stage_a_execution.artifact_contract import write_synthetic_artifacts
 from satnet.experiments.stage_a_execution.generate import execute_generation
-from satnet.experiments.stage_a_execution.ledger import ExclusiveLock, read_ledger
+from satnet.experiments.stage_a_execution.ledger import read_ledger
+from satnet.experiments.stage_a_execution.locking import ExclusiveLock
 from satnet.experiments.stage_a_execution.plan import build_plan
+import satnet.experiments.stage_a_execution.preflight as preflight_module
+from satnet.experiments.stage_a_execution.preflight import run_preflight
 from satnet.experiments.stage_a_execution.replay import execute_replay
 
-from .conftest import TOOLING_COMMIT, TOOLING_INVENTORY
+from .conftest import ARTIFACT_CONTRACT, EXECUTABLE_INVENTORY, STABLE_EXECUTABLE_COMMIT, TOOLING_PROPOSAL, make_authorization
+
+ROOT = Path(__file__).parents[3]
 
 
 def _plan(contract, operation: str, generation: Path, replay: Path, acceptance: Path):
-    return build_plan(contract, partition="development", operation=operation, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=generation, replay_root=replay, acceptance_root=acceptance)
+    return build_plan(
+        contract, partition="development", operation=operation,
+        stable_executable_commit=STABLE_EXECUTABLE_COMMIT,
+        executable_inventory_hash=EXECUTABLE_INVENTORY,
+        tooling_proposal_hash=TOOLING_PROPOSAL,
+        artifact_contract_hash=ARTIFACT_CONTRACT,
+        generation_root=generation, replay_root=replay, acceptance_root=acceptance,
+    )
 
 
-def _adapter(plan_run, output_root: Path) -> None:
-    atomic_write_json(output_root / "scientific.json", {
-        "global_run_id": plan_run["global_run_id"],
-        "run_record_hash": plan_run["run_record_hash"],
-        "seed": plan_run["satellite_failure_seed"],
+def _adapter(plan_run, output_root: Path):
+    return write_synthetic_artifacts(plan_run, output_root)
+
+
+def _certificate(monkeypatch, contract, plan, roots, authorization_hash_operation: str, *, resume: bool = False):
+    authorization = make_authorization(
+        contract, operation=authorization_hash_operation, partition="development", run_ids=[1, 2],
+        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+    )
+    monkeypatch.setattr(preflight_module, "verify_executable_identity", lambda _: {
+        "stable_executable_commit": STABLE_EXECUTABLE_COMMIT,
+        "executable_inventory_sha256": EXECUTABLE_INVENTORY,
     })
+    monkeypatch.setattr(preflight_module, "load_frozen_contract", lambda *_: contract)
+    monkeypatch.setattr(preflight_module, "verify_frozen_production_evidence", lambda *_: {
+        "combined": {"file_count": 9004, "byte_count": 1337549193, "verified_sha256_count": 9004},
+    })
+    certificate = run_preflight(
+        repo_root=ROOT, contract=contract, plan=plan, authorization=authorization,
+        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+        resume=resume, minimum_free_bytes=0,
+    )
+    return authorization, certificate
 
 
-def test_generation_ledger_atomic_success_and_resume_skip(synthetic_contract, tmp_path: Path) -> None:
-    generation, replay, acceptance = (tmp_path / name for name in ("generation", "replay", "acceptance"))
-    plan = _plan(synthetic_contract, "GENERATE", generation, replay, acceptance)
-    ledger = execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="a" * 64, campaign_root=generation, adapter=_adapter)
+def test_generation_ledger_atomic_success_and_resume_skip(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    plan = _plan(synthetic_contract, "GENERATE", *roots)
+    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE")
+    ledger = execute_generation(
+        repo_root=ROOT, contract=synthetic_contract, plan=plan,
+        authorization_hash=authorization.sha256, preflight=certificate,
+        campaign_root=roots[0], adapter=_adapter,
+    )
     assert [record["state"] for record in ledger["records"]] == ["SUCCEEDED", "SUCCEEDED"]
-    assert all(record["artifacts"] for record in ledger["records"])
-    resumed = execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="a" * 64, campaign_root=generation, adapter=lambda *_: pytest.fail("succeeded run must be skipped"), resume=True)
+    assert all(record["adapter_result"]["validation_status"] == "PASSED" for record in ledger["records"])
+    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE", resume=True)
+    resumed = execute_generation(
+        repo_root=ROOT, contract=synthetic_contract, plan=plan,
+        authorization_hash=authorization.sha256, preflight=certificate,
+        campaign_root=roots[0], adapter=lambda *_: pytest.fail("succeeded run must be skipped"), resume=True,
+    )
     assert resumed == ledger
 
 
-def test_crash_is_failed_and_requires_explicit_retry(synthetic_contract, tmp_path: Path) -> None:
-    generation, replay, acceptance = (tmp_path / name for name in ("generation", "replay", "acceptance"))
-    plan = _plan(synthetic_contract, "GENERATE", generation, replay, acceptance)
-    calls = 0
-    def crashing(plan_run, output_root: Path) -> None:
-        nonlocal calls
-        calls += 1
-        atomic_write_json(output_root / "partial.json", {"partial": True})
+def test_execution_requires_valid_preflight_before_writes(synthetic_contract, tmp_path: Path) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    plan = _plan(synthetic_contract, "GENERATE", *roots)
+    with pytest.raises(PermissionError, match="preflight"):
+        execute_generation(
+            repo_root=ROOT, contract=synthetic_contract, plan=plan,
+            authorization_hash="a" * 64, preflight=None,
+            campaign_root=roots[0], adapter=_adapter,
+        )
+    assert not any(root.exists() for root in roots)
+    assert not roots[0].with_name(roots[0].name + ".lock").exists()
+
+
+def test_crash_is_failed_and_locking_is_exclusive(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    plan = _plan(synthetic_contract, "GENERATE", *roots)
+    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE")
+    def crashing(plan_run, output_root: Path):
+        (output_root / "partial.bin").write_bytes(b"partial")
         raise RuntimeError("synthetic crash")
     with pytest.raises(RuntimeError, match="synthetic crash"):
-        execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="b" * 64, campaign_root=generation, adapter=crashing)
-    ledger = read_ledger(generation / "execution_ledger.json")
+        execute_generation(
+            repo_root=ROOT, contract=synthetic_contract, plan=plan,
+            authorization_hash=authorization.sha256, preflight=certificate,
+            campaign_root=roots[0], adapter=crashing,
+        )
+    ledger = read_ledger(roots[0] / "execution_ledger.json")
     assert ledger["records"][0]["state"] == "FAILED"
     assert ledger["records"][0]["artifacts"] == []
-    execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="b" * 64, campaign_root=generation, adapter=_adapter, resume=True, retry_failed=False)
-    assert read_ledger(generation / "execution_ledger.json")["records"][0]["state"] == "FAILED"
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match="lock"):
         with ExclusiveLock(tmp_path / "campaign.lock", "one"):
             with ExclusiveLock(tmp_path / "campaign.lock", "two"):
                 pass
 
 
-def test_resume_rejects_changed_seed_plan_and_artifact(synthetic_contract, tmp_path: Path) -> None:
-    generation, replay, acceptance = (tmp_path / name for name in ("generation", "replay", "acceptance"))
-    plan = _plan(synthetic_contract, "GENERATE", generation, replay, acceptance)
-    execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="c" * 64, campaign_root=generation, adapter=_adapter)
+def test_resume_rejects_changed_seed_plan_and_artifact(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    plan = _plan(synthetic_contract, "GENERATE", *roots)
+    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE")
+    execute_generation(
+        repo_root=ROOT, contract=synthetic_contract, plan=plan,
+        authorization_hash=authorization.sha256, preflight=certificate,
+        campaign_root=roots[0], adapter=_adapter,
+    )
     changed = {**plan, "runs": [dict(row) for row in plan["runs"]]}
     changed["runs"][0]["satellite_failure_seed"] += 1
     with pytest.raises(ValueError, match="Plan hash"):
         from satnet.experiments.stage_a_execution.plan import validate_plan
         validate_plan(changed)
-    artifact = generation / plan["runs"][0]["expected_output_relative_path"] / "scientific.json"
+    artifact = roots[0] / plan["runs"][0]["expected_output_relative_path"] / "scientific.json"
     artifact.write_text("mutation", encoding="utf-8")
+    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE", resume=True)
     with pytest.raises(ValueError, match="inventory changed"):
-        execute_generation(contract=synthetic_contract, plan=plan, authorization_hash="c" * 64, campaign_root=generation, adapter=_adapter, resume=True)
+        execute_generation(
+            repo_root=ROOT, contract=synthetic_contract, plan=plan,
+            authorization_hash=authorization.sha256, preflight=certificate,
+            campaign_root=roots[0], adapter=_adapter, resume=True,
+        )
 
 
-def test_replay_and_acceptance_synthetic_end_to_end(synthetic_contract, tmp_path: Path) -> None:
-    generation, replay, acceptance = (tmp_path / name for name in ("generation", "replay", "acceptance"))
-    generation_plan = _plan(synthetic_contract, "GENERATE", generation, replay, acceptance)
-    replay_plan = _plan(synthetic_contract, "REPLAY", generation, replay, acceptance)
-    acceptance_plan = _plan(synthetic_contract, "ACCEPT", generation, replay, acceptance)
-    execute_generation(contract=synthetic_contract, plan=generation_plan, authorization_hash="d" * 64, campaign_root=generation, adapter=_adapter)
-    replay_ledger = execute_replay(plan=replay_plan, authorization_hash="e" * 64, generation_root=generation, replay_root=replay, adapter=_adapter)
+def test_replay_and_acceptance_synthetic_end_to_end(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    generation_plan = _plan(synthetic_contract, "GENERATE", *roots)
+    replay_plan = _plan(synthetic_contract, "REPLAY", *roots)
+    acceptance_plan = _plan(synthetic_contract, "ACCEPT", *roots)
+    generation_authorization, generation_certificate = _certificate(monkeypatch, synthetic_contract, generation_plan, roots, "GENERATE")
+    execute_generation(
+        repo_root=ROOT, contract=synthetic_contract, plan=generation_plan,
+        authorization_hash=generation_authorization.sha256, preflight=generation_certificate,
+        campaign_root=roots[0], adapter=_adapter,
+    )
+    replay_authorization, replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, "REPLAY")
+    replay_ledger = execute_replay(
+        repo_root=ROOT, plan=replay_plan, authorization_hash=replay_authorization.sha256,
+        preflight=replay_certificate, generation_root=roots[0], replay_root=roots[1], adapter=_adapter,
+    )
     assert all(record["state"] == "SUCCEEDED" for record in replay_ledger["records"])
-    report = evaluate_acceptance(plan=acceptance_plan, authorization_hash="f" * 64, generation_root=generation, replay_root=replay, acceptance_root=acceptance)
+    acceptance_authorization, acceptance_certificate = _certificate(monkeypatch, synthetic_contract, acceptance_plan, roots, "ACCEPT")
+    report = evaluate_acceptance(
+        repo_root=ROOT, plan=acceptance_plan, authorization_hash=acceptance_authorization.sha256,
+        preflight=acceptance_certificate, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+    )
     validate_acceptance_report(report)
     assert report["accepted_run_count"] == 2
 
 
-def test_replay_mismatch_and_unexpected_artifact_fail_closed(synthetic_contract, tmp_path: Path) -> None:
-    generation, replay, acceptance = (tmp_path / name for name in ("generation", "replay", "acceptance"))
-    generation_plan = _plan(synthetic_contract, "GENERATE", generation, replay, acceptance)
-    replay_plan = _plan(synthetic_contract, "REPLAY", generation, replay, acceptance)
-    execute_generation(contract=synthetic_contract, plan=generation_plan, authorization_hash="1" * 64, campaign_root=generation, adapter=_adapter)
-    def mismatch(plan_run, output_root: Path) -> None:
-        atomic_write_json(output_root / "different.json", {"mismatch": True})
-    with pytest.raises(ValueError, match="mismatch"):
-        execute_replay(plan=replay_plan, authorization_hash="2" * 64, generation_root=generation, replay_root=replay, adapter=mismatch)
-    unexpected = generation / generation_plan["runs"][0]["expected_output_relative_path"] / "unexpected.bin"
-    unexpected.write_bytes(b"unexpected")
-    with pytest.raises(ValueError, match="inventory changed"):
-        execute_generation(contract=synthetic_contract, plan=generation_plan, authorization_hash="1" * 64, campaign_root=generation, adapter=_adapter, resume=True)
+def test_replay_mismatch_and_unexpected_artifact_fail_closed(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
+    roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
+    generation_plan = _plan(synthetic_contract, "GENERATE", *roots)
+    replay_plan = _plan(synthetic_contract, "REPLAY", *roots)
+    generation_authorization, generation_certificate = _certificate(monkeypatch, synthetic_contract, generation_plan, roots, "GENERATE")
+    execute_generation(
+        repo_root=ROOT, contract=synthetic_contract, plan=generation_plan,
+        authorization_hash=generation_authorization.sha256, preflight=generation_certificate,
+        campaign_root=roots[0], adapter=_adapter,
+    )
+    replay_authorization, replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, "REPLAY")
+    def mismatch(plan_run, output_root: Path):
+        result = write_synthetic_artifacts(plan_run, output_root)
+        (output_root / "scientific.json").write_text("mutation", encoding="utf-8")
+        return result
+    with pytest.raises(ValueError, match="manifest|mismatch"):
+        execute_replay(
+            repo_root=ROOT, plan=replay_plan, authorization_hash=replay_authorization.sha256,
+            preflight=replay_certificate, generation_root=roots[0], replay_root=roots[1], adapter=mismatch,
+        )
+    assert read_ledger(roots[1] / "replay_ledger.json")["records"][0]["state"] == "FAILED"

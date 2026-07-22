@@ -6,26 +6,39 @@ from typing import Any
 from .common import atomic_write_json, payload_hash, read_json_object
 from .integrity import verify_artifact_inventory
 from .ledger import read_ledger
-from .paths import validate_relative_artifact_path
+from .locking import campaign_lock
+from .paths import validate_output_roots, validate_relative_artifact_path
+from .preflight import PreflightCertificate, require_preflight
+from .resume import validate_ledger_binding
 
 ACCEPTANCE_SCHEMA = "satnet.stage_a.acceptance_report.v1"
 ACCEPTANCE_DOMAIN = "satnet_stage_a_acceptance_report_v1"
 
 
 def evaluate_acceptance(
-    *, plan: dict[str, Any], authorization_hash: str, generation_root: Path,
+    *, repo_root: Path, plan: dict[str, Any], authorization_hash: str,
+    preflight: PreflightCertificate, generation_root: Path,
     replay_root: Path, acceptance_root: Path,
 ) -> dict[str, Any]:
+    require_preflight(preflight, plan=plan, authorization_hash=authorization_hash)
+    roots = validate_output_roots(
+        repo_root=repo_root,
+        generation_root=Path(plan["output_roots"]["generation"]),
+        replay_root=Path(plan["output_roots"]["replay"]),
+        acceptance_root=Path(plan["output_roots"]["acceptance"]),
+        require_absent=False,
+    )
+    supplied = {
+        "generation": str(generation_root.resolve(strict=False)),
+        "replay": str(replay_root.resolve(strict=False)),
+        "acceptance": str(acceptance_root.resolve(strict=False)),
+    }
+    if roots != plan["output_roots"] or supplied != roots:
+        raise PermissionError("Acceptance roots differ from preflight-bound plan")
     generation = read_ledger(generation_root / "execution_ledger.json")
     replay = read_ledger(replay_root / "replay_ledger.json")
-    for label, ledger, operation in (
-        ("generation", generation, "GENERATE"),
-        ("replay", replay, "REPLAY"),
-    ):
-        if ledger["contract_hash"] != plan["contract_hash"] or ledger["partition"] != plan["partition"]:
-            raise ValueError(f"{label.title()} partition or contract mismatch")
-        if ledger["operation"] != operation or ledger["tooling_commit"] != plan["tooling_commit"] or ledger["tooling_inventory_hash"] != plan["tooling_inventory_hash"]:
-            raise ValueError(f"{label.title()} tooling or operation identity mismatch")
+    validate_ledger_binding(generation, plan, operation="GENERATE")
+    validate_ledger_binding(replay, plan, operation="REPLAY")
     expected_ids = [row["global_run_id"] for row in plan["runs"]]
     if [row["global_run_id"] for row in generation["records"]] != expected_ids or [row["global_run_id"] for row in replay["records"]] != expected_ids:
         raise ValueError("Acceptance run-set mismatch")
@@ -39,8 +52,25 @@ def evaluate_acceptance(
         report = read_json_object(replay_root / relative / "replay_report.json")
         if report.get("generation_replay_equal") is not True or report.get("replay_state") != "SUCCEEDED":
             raise ValueError("Replay mismatch cannot be accepted")
-        if report.get("run_record_hash") != plan_run["run_record_hash"]:
-            raise ValueError("Replay run identity mismatch")
+        expected_report = {
+            "contract_hash": plan["contract_hash"],
+            "generation_authorization_hash": generation["authorization_hash"],
+            "generation_plan_hash": generation["plan_hash"],
+            "generation_campaign_manifest_hash": generation["campaign_manifest_hash"],
+            "stable_executable_commit": plan["stable_executable_commit"],
+            "executable_inventory_hash": plan["executable_inventory_hash"],
+            "tooling_proposal_hash": plan["tooling_proposal_hash"],
+            "artifact_contract_hash": plan["artifact_contract_hash"],
+            "global_run_id": plan_run["global_run_id"],
+            "run_key": plan_run["run_key"],
+            "run_record_hash": plan_run["run_record_hash"],
+            "ground_selection_seed": plan_run["ground_selection_seed"],
+            "satellite_failure_seed": plan_run["satellite_failure_seed"],
+            "ground_failure_seed": plan_run["ground_failure_seed"],
+        }
+        for field, value in expected_report.items():
+            if report.get(field) != value:
+                raise ValueError(f"Replay report identity or seed mismatch: {field}")
         comparisons.append({
             "global_run_id": plan_run["global_run_id"],
             "run_key": plan_run["run_key"],
@@ -52,6 +82,15 @@ def evaluate_acceptance(
         "contract_hash": plan["contract_hash"],
         "plan_hash": plan["plan_hash"],
         "authorization_hash": authorization_hash,
+        "stable_executable_commit": plan["stable_executable_commit"],
+        "executable_inventory_hash": plan["executable_inventory_hash"],
+        "tooling_proposal_hash": plan["tooling_proposal_hash"],
+        "artifact_contract_hash": plan["artifact_contract_hash"],
+        "generation_plan_hash": generation["plan_hash"],
+        "generation_authorization_hash": generation["authorization_hash"],
+        "replay_plan_hash": replay["plan_hash"],
+        "replay_authorization_hash": replay["authorization_hash"],
+        "output_roots": roots,
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
         "accepted_run_count": len(comparisons),
@@ -59,8 +98,9 @@ def evaluate_acceptance(
         "acceptance_state": "PASSED",
     }
     report["acceptance_report_hash"] = payload_hash(report, domain=ACCEPTANCE_DOMAIN)
-    acceptance_root.mkdir(parents=False, exist_ok=False)
-    atomic_write_json(acceptance_root / "acceptance_report.json", report)
+    with campaign_lock(acceptance_root, plan["plan_hash"]):
+        acceptance_root.mkdir(parents=False, exist_ok=False)
+        atomic_write_json(acceptance_root / "acceptance_report.json", report)
     return report
 
 

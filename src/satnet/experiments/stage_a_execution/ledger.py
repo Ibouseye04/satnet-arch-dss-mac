@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from contextlib import AbstractContextManager
-import json
-import os
 from pathlib import Path
 from typing import Any
 
 from .common import atomic_write_json, payload_hash, read_json_object
 
-LEDGER_SCHEMA = "satnet.stage_a.execution_ledger.v1"
-LEDGER_DOMAIN = "satnet_stage_a_execution_ledger_v1"
+LEDGER_SCHEMA = "satnet.stage_a.execution_ledger.v2"
+LEDGER_DOMAIN = "satnet_stage_a_execution_ledger_v2"
 STATES = frozenset({"PLANNED", "STARTING", "RUNNING", "SUCCEEDED", "FAILED", "INTERRUPTED"})
 TRANSITIONS = {
     "PLANNED": frozenset({"STARTING"}),
@@ -37,8 +34,11 @@ def validate_ledger(ledger: dict[str, Any]) -> None:
     for record in records:
         if record.get("state") not in STATES:
             raise ValueError("Unknown execution ledger state")
-        if record.get("state") == "SUCCEEDED" and not record.get("artifacts"):
-            raise ValueError("Successful run has no verified artifacts")
+        if record.get("state") == "SUCCEEDED":
+            if not record.get("artifacts") or not record.get("adapter_result"):
+                raise ValueError("Successful run has no verified artifacts or adapter result")
+            if record["adapter_result"].get("validation_status") != "PASSED":
+                raise ValueError("Successful run adapter result was not validated")
 
 
 def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any]:
@@ -46,9 +46,12 @@ def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any
         "schema_identifier": LEDGER_SCHEMA,
         "contract_hash": plan["contract_hash"],
         "plan_hash": plan["plan_hash"],
+        "campaign_manifest_hash": plan["campaign_manifest_hash"],
         "authorization_hash": authorization_hash,
-        "tooling_commit": plan["tooling_commit"],
-        "tooling_inventory_hash": plan["tooling_inventory_hash"],
+        "stable_executable_commit": plan["stable_executable_commit"],
+        "executable_inventory_hash": plan["executable_inventory_hash"],
+        "tooling_proposal_hash": plan["tooling_proposal_hash"],
+        "artifact_contract_hash": plan["artifact_contract_hash"],
         "operation": plan["operation"],
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
@@ -66,6 +69,7 @@ def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any
                 "attempt_count": 0,
                 "artifacts": [],
                 "artifact_inventory_hash": None,
+                "adapter_result": None,
                 "failure": None,
             }
             for row in plan["runs"]
@@ -90,7 +94,8 @@ def write_ledger(path: Path, ledger: dict[str, Any], *, overwrite: bool) -> None
 def transition(
     path: Path, *, global_run_id: int, new_state: str,
     artifacts: list[dict[str, Any]] | None = None,
-    artifact_inventory_hash: str | None = None, failure: str | None = None,
+    artifact_inventory_hash: str | None = None, adapter_result: dict[str, Any] | None = None,
+    failure: str | None = None,
 ) -> dict[str, Any]:
     ledger = read_ledger(path)
     record = next((item for item in ledger["records"] if item["global_run_id"] == global_run_id), None)
@@ -103,54 +108,14 @@ def transition(
         record["attempt_count"] += 1
         record["failure"] = None
     if new_state == "SUCCEEDED":
-        if not artifacts or not artifact_inventory_hash:
-            raise ValueError("Success requires verified artifact identities")
+        if not artifacts or not artifact_inventory_hash or not adapter_result:
+            raise ValueError("Success requires verified artifact identities and adapter result")
+        if adapter_result.get("validation_status") != "PASSED" or adapter_result.get("simulation_return_status") != "SUCCEEDED":
+            raise ValueError("Success requires a passed structured adapter result")
         record["artifacts"] = artifacts
         record["artifact_inventory_hash"] = artifact_inventory_hash
+        record["adapter_result"] = adapter_result
     if new_state in {"FAILED", "INTERRUPTED"}:
         record["failure"] = failure or new_state
     write_ledger(path, ledger, overwrite=True)
     return ledger
-
-
-class ExclusiveLock(AbstractContextManager["ExclusiveLock"]):
-    def __init__(self, path: Path, identity: str) -> None:
-        self.path = path
-        self.identity = identity
-        self.acquired = False
-
-    def acquire(self) -> "ExclusiveLock":
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        payload = json.dumps({"identity": self.identity, "pid": os.getpid()}, sort_keys=True).encode("utf-8")
-        try:
-            descriptor = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError as exc:
-            raise RuntimeError(f"Execution lock already exists: {self.path}") from exc
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(payload)
-            handle.flush()
-            os.fsync(handle.fileno())
-        self.acquired = True
-        return self
-
-    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
-        if self.acquired:
-            self.path.unlink(missing_ok=False)
-            self.acquired = False
-
-    def __enter__(self) -> "ExclusiveLock":
-        return self.acquire()
-
-
-def lock_is_stale(path: Path) -> bool:
-    if not path.exists():
-        return False
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        pid = payload["pid"]
-        if type(pid) is not int or pid <= 0:
-            return True
-        os.kill(pid, 0)
-    except (OSError, ValueError, KeyError, json.JSONDecodeError):
-        return True
-    return False

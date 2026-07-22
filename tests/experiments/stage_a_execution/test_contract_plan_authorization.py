@@ -15,7 +15,7 @@ from satnet.experiments.stage_a_execution.contract import (
 from satnet.experiments.stage_a_execution.generate import build_scientific_arguments
 from satnet.experiments.stage_a_execution.plan import build_plan, validate_plan
 
-from .conftest import TOOLING_COMMIT, TOOLING_INVENTORY, make_authorization
+from .conftest import ARTIFACT_CONTRACT, EXECUTABLE_INVENTORY, STABLE_EXECUTABLE_COMMIT, TOOLING_PROPOSAL, make_authorization
 
 ROOT = Path(__file__).parents[3]
 CONTRACT_ROOT = ROOT / "artifacts/stage_a_discovery_contract_v1"
@@ -72,8 +72,8 @@ def test_generation_adapter_arguments_are_exactly_frozen_and_do_not_execute() ->
 def test_development_plan_is_exact_ordered_and_deterministic() -> None:
     contract = load_frozen_contract(ROOT)
     roots = [Path("C:/synthetic/generation"), Path("C:/synthetic/replay"), Path("C:/synthetic/acceptance")]
-    first = build_plan(contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
-    second = build_plan(contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    first = build_plan(contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    second = build_plan(contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
     assert first == second
     validate_plan(first)
     assert first["run_count"] == 100
@@ -85,22 +85,22 @@ def test_development_plan_is_exact_ordered_and_deterministic() -> None:
 
 def test_plan_hash_binds_partition_roots_authorization_and_run_set(synthetic_contract, tmp_path: Path) -> None:
     roots = [tmp_path / name for name in ("generation", "replay", "acceptance")]
-    base = build_plan(synthetic_contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
-    validation = build_plan(synthetic_contract, partition="validation", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
-    changed_root = build_plan(synthetic_contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=tmp_path / "different", replay_root=roots[1], acceptance_root=roots[2])
+    base = build_plan(synthetic_contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    validation = build_plan(synthetic_contract, partition="validation", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    changed_root = build_plan(synthetic_contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=tmp_path / "different", replay_root=roots[1], acceptance_root=roots[2])
     authorization = make_authorization(synthetic_contract, operation="PLAN", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
-    authorized = build_plan(synthetic_contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], authorization=authorization)
+    authorized = build_plan(synthetic_contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], authorization=authorization)
     assert len({base["plan_hash"], validation["plan_hash"], changed_root["plan_hash"], authorized["plan_hash"]}) == 4
     with pytest.raises(PermissionError):
-        build_plan(synthetic_contract, partition="development", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], selected_run_ids=[1])
+        build_plan(synthetic_contract, partition="development", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], selected_run_ids=[1])
     with pytest.raises(PermissionError, match="sealed"):
-        build_plan(synthetic_contract, partition="sealed_holdout", operation="PLAN", tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+        build_plan(synthetic_contract, partition="sealed_holdout", operation="PLAN", stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
 
 
 @pytest.mark.parametrize(("override", "message"), [
     ({"authorization_status": "PENDING"}, "AUTHORIZED"),
     ({"authorized_contract_hash": "0" * 64}, "contract_hash"),
-    ({"authorized_execution_tooling_inventory_hash": "0" * 64}, "tooling_inventory"),
+    ({"authorized_executable_inventory_hash": "0" * 64}, "executable_inventory"),
     ({"authorized_operation": "REPLAY"}, "operation"),
     ({"authorized_partition": "validation"}, "partition"),
     ({"authorized_run_count": 1}, "count"),
@@ -112,12 +112,12 @@ def test_authorization_fail_closed(synthetic_contract, tmp_path: Path, override:
     roots = [tmp_path / name for name in ("generation", "replay", "acceptance")]
     authorization = make_authorization(synthetic_contract, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], overrides=override)
     with pytest.raises((PermissionError, ValueError), match=message):
-        validate_authorization(authorization, contract=synthetic_contract, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+        validate_authorization(authorization, contract=synthetic_contract, stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
 
 
 def test_authorization_operations_are_not_transitive(synthetic_contract, tmp_path: Path) -> None:
     roots = [tmp_path / name for name in ("generation", "replay", "acceptance")]
     authorization = make_authorization(synthetic_contract, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
-    validate_authorization(authorization, contract=synthetic_contract, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+    validate_authorization(authorization, contract=synthetic_contract, stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, operation="GENERATE", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
     with pytest.raises(PermissionError, match="operation"):
-        validate_authorization(authorization, contract=synthetic_contract, tooling_commit=TOOLING_COMMIT, tooling_inventory_hash=TOOLING_INVENTORY, operation="REPLAY", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
+        validate_authorization(authorization, contract=synthetic_contract, stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY, tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT, operation="REPLAY", partition="development", run_ids=[1, 2], generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2])
