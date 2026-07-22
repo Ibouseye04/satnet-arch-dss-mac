@@ -1,14 +1,12 @@
 {
-  "acceptance_reports_found": 0,
-  "active_authorization_artifacts_found": 0,
   "development_simulations_performed": 0,
-  "generation_ledgers_found": 0,
-  "replay_ledgers_found": 0,
-  "result": "PASSED",
-  "schema_identifier": "satnet.stage_a.execution_tooling_simulation_nonexecution_validation.v1",
+  "execution_authorized": false,
+  "production_authorized": false,
+  "schema_identifier": "satnet.stage_a.simulation_nonexecution_validation.v2",
+  "scientific_output_roots": [],
   "sealed_holdout_simulations_performed": 0,
   "simulation_authorized": false,
   "stage_a_simulations_performed": 0,
-  "status": "TOOLING_PROPOSAL",
+  "validation": "PASSED",
   "validation_simulations_performed": 0
 }

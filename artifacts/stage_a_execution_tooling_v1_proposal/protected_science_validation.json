@@ -1,6 +1,8 @@
 {
   "base_commit": "c350d693bf47d007a0cb2a8c3b5cfb2259d2da48",
-  "changed_protected_paths": [],
+  "execution_authorized": false,
+  "modification_authorized": false,
+  "production_authorized": false,
   "protected_paths": [
     "src/satnet/ground",
     "src/satnet/network",
@@ -8,14 +10,9 @@
     "src/satnet/models/gnn_dataset.py",
     "src/satnet/models/gnn_model.py",
     "src/satnet/models/risk_model.py",
-    "src/satnet/utils/graph_cache.py",
-    "src/satnet/experiments/final_generation",
-    "artifacts/stage_a_discovery_contract_v1",
-    "artifacts/stage_a_discovery_contract_proposal",
-    "artifacts/stage_a_discovery_contract_freeze_audit",
-    "artifacts/stage_a_discovery_contract_frozen_audit"
+    "src/satnet/utils/graph_cache.py"
   ],
-  "result": "PASSED",
-  "schema_identifier": "satnet.stage_a.execution_tooling_protected_science_validation.v1",
-  "status": "TOOLING_PROPOSAL"
+  "schema_identifier": "satnet.stage_a.protected_science_validation.v2",
+  "simulation_authorized": false,
+  "validation": "PRESERVATION_REQUIRED"
 }

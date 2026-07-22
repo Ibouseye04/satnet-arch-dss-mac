@@ -1,30 +1,128 @@
 {
+  "$id": "https://satnet.invalid/schema/stage_a_execution_authorization_v1.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "satnet.stage_a.execution_authorization.v1",
   "additionalProperties": false,
   "properties": {
-    "authorization_date": {"type": "string"},
-    "authorization_id": {"minLength": 1, "type": "string"},
-    "authorization_sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "authorization_status": {"const": "AUTHORIZED"},
-    "authorization_version": {"const": "1"},
-    "authorized_acceptance_root": {"type": "string"},
-    "authorized_contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "authorized_contract_tag": {"type": "string"},
-    "authorized_execution_tooling_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
-    "authorized_execution_tooling_inventory_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "authorized_frozen_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
-    "authorized_generation_root": {"type": "string"},
-    "authorized_operation": {"enum": ["PLAN", "GENERATE", "REPLAY", "ACCEPT"]},
-    "authorized_partition": {"enum": ["development", "validation"]},
-    "authorized_replay_root": {"type": "string"},
-    "authorized_run_count": {"minimum": 1, "type": "integer"},
-    "authorized_run_ids": {"items": {"type": "integer"}, "minItems": 1, "type": "array", "uniqueItems": true},
-    "authorizing_decision_reference": {"minLength": 1, "type": "string"},
-    "independently_approved": {"const": true},
-    "schema_identifier": {"const": "satnet.stage_a.execution_authorization.v1"}
+    "authorization_date": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorization_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorization_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorization_status": {
+      "const": "AUTHORIZED"
+    },
+    "authorization_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized_acceptance_root": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized_artifact_contract_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorized_contract_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorized_contract_tag": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized_executable_inventory_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorized_frozen_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "authorized_generation_root": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized_operation": {
+      "enum": [
+        "PLAN",
+        "GENERATE",
+        "REPLAY",
+        "ACCEPT"
+      ]
+    },
+    "authorized_partition": {
+      "enum": [
+        "development",
+        "validation"
+      ]
+    },
+    "authorized_replay_root": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "authorized_run_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "authorized_run_ids": {
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "authorized_stable_executable_commit": {
+      "pattern": "^[0-9a-f]{40}$",
+      "type": "string"
+    },
+    "authorized_tooling_proposal_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authorizing_decision_reference": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "independently_approved": {
+      "const": true
+    },
+    "schema_identifier": {
+      "const": "satnet.stage_a.execution_authorization.v1"
+    }
   },
-  "required": ["schema_identifier", "authorization_version", "authorization_id", "authorization_status", "authorized_contract_hash", "authorized_contract_tag", "authorized_frozen_commit", "authorized_execution_tooling_commit", "authorized_execution_tooling_inventory_hash", "authorized_partition", "authorized_run_ids", "authorized_run_count", "authorized_operation", "authorized_generation_root", "authorized_replay_root", "authorized_acceptance_root", "authorization_date", "authorizing_decision_reference", "independently_approved", "authorization_sha256"],
-  "title": "SATNET Stage A External Execution Authorization",
+  "required": [
+    "authorization_date",
+    "authorization_id",
+    "authorization_sha256",
+    "authorization_status",
+    "authorization_version",
+    "authorized_acceptance_root",
+    "authorized_artifact_contract_hash",
+    "authorized_contract_hash",
+    "authorized_contract_tag",
+    "authorized_executable_inventory_hash",
+    "authorized_frozen_commit",
+    "authorized_generation_root",
+    "authorized_operation",
+    "authorized_partition",
+    "authorized_replay_root",
+    "authorized_run_count",
+    "authorized_run_ids",
+    "authorized_stable_executable_commit",
+    "authorized_tooling_proposal_hash",
+    "authorizing_decision_reference",
+    "independently_approved",
+    "schema_identifier"
+  ],
+  "title": "stage_a_execution_authorization_v1",
   "type": "object"
 }

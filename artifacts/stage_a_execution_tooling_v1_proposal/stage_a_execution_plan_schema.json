@@ -1,22 +1,64 @@
 {
+  "$id": "https://satnet.invalid/schema/stage_a_execution_plan_v2.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "satnet.stage_a.execution_plan.v1",
   "additionalProperties": false,
   "properties": {
-    "authorization_hash": {"type": ["string", "null"]},
-    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "design_count": {"type": "integer"},
-    "operation": {"enum": ["PLAN", "GENERATE", "REPLAY", "ACCEPT"]},
-    "output_roots": {"additionalProperties": false, "properties": {"acceptance": {"type": "string"}, "generation": {"type": "string"}, "replay": {"type": "string"}}, "required": ["generation", "replay", "acceptance"], "type": "object"},
-    "partition": {"enum": ["development", "validation"]},
-    "plan_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "run_count": {"type": "integer"},
-    "runs": {"items": {"type": "object"}, "type": "array"},
-    "schema_identifier": {"const": "satnet.stage_a.execution_plan.v1"},
-    "tooling_commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
-    "tooling_inventory_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"}
+    "artifact_contract_hash": {},
+    "authorization_hash": {},
+    "campaign_manifest_hash": {},
+    "contract_hash": {},
+    "design_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "executable_inventory_hash": {},
+    "operation": {
+      "enum": [
+        "PLAN",
+        "GENERATE",
+        "REPLAY",
+        "ACCEPT"
+      ]
+    },
+    "output_roots": {},
+    "partition": {
+      "enum": [
+        "development",
+        "validation"
+      ]
+    },
+    "plan_hash": {},
+    "run_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "runs": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema_identifier": {
+      "const": "satnet.stage_a.execution_plan.v2"
+    },
+    "stable_executable_commit": {},
+    "tooling_proposal_hash": {}
   },
-  "required": ["schema_identifier", "contract_hash", "tooling_commit", "tooling_inventory_hash", "partition", "operation", "output_roots", "authorization_hash", "run_count", "design_count", "runs", "plan_hash"],
-  "title": "SATNET Stage A Deterministic Execution Plan",
+  "required": [
+    "artifact_contract_hash",
+    "authorization_hash",
+    "campaign_manifest_hash",
+    "contract_hash",
+    "design_count",
+    "executable_inventory_hash",
+    "operation",
+    "output_roots",
+    "partition",
+    "plan_hash",
+    "run_count",
+    "runs",
+    "schema_identifier",
+    "stable_executable_commit",
+    "tooling_proposal_hash"
+  ],
+  "title": "stage_a_execution_plan_v2",
   "type": "object"
 }

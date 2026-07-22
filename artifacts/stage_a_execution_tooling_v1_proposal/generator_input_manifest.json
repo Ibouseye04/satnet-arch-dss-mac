@@ -1,0 +1,9 @@
+{
+  "canonical_encoding": "UTF-8 JSON sorted keys indent 2 final LF",
+  "frozen_contract_commit": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "frozen_contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "frozen_contract_tag": "stage-a-discovery-contract-v1",
+  "generator_relative_path": "scripts/generate_stage_a_execution_tooling_v1_proposal.py",
+  "schema_identifier": "satnet.stage_a.proposal_generator_input_manifest.v2",
+  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73"
+}

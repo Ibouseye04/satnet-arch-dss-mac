@@ -1,20 +1,55 @@
 {
+  "$id": "https://satnet.invalid/schema/stage_a_acceptance_report_v1.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "satnet.stage_a.acceptance_report.v1",
   "additionalProperties": false,
   "properties": {
-    "acceptance_report_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "acceptance_state": {"const": "PASSED"},
-    "accepted_run_count": {"type": "integer"},
-    "authorization_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "comparisons": {"items": {"type": "object"}, "type": "array"},
-    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "expected_run_count": {"type": "integer"},
-    "partition": {"enum": ["development", "validation"]},
-    "plan_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "schema_identifier": {"const": "satnet.stage_a.acceptance_report.v1"}
+    "acceptance_report_hash": {},
+    "acceptance_state": {
+      "const": "PASSED"
+    },
+    "accepted_run_count": {},
+    "artifact_contract_hash": {},
+    "authorization_hash": {},
+    "comparisons": {
+      "type": "array"
+    },
+    "contract_hash": {},
+    "executable_inventory_hash": {},
+    "expected_run_count": {},
+    "generation_authorization_hash": {},
+    "generation_plan_hash": {},
+    "output_roots": {},
+    "partition": {},
+    "plan_hash": {},
+    "replay_authorization_hash": {},
+    "replay_plan_hash": {},
+    "schema_identifier": {
+      "const": "satnet.stage_a.acceptance_report.v1"
+    },
+    "stable_executable_commit": {},
+    "tooling_proposal_hash": {}
   },
-  "required": ["schema_identifier", "contract_hash", "plan_hash", "authorization_hash", "partition", "expected_run_count", "accepted_run_count", "comparisons", "acceptance_state", "acceptance_report_hash"],
-  "title": "SATNET Stage A Acceptance Report",
+  "required": [
+    "acceptance_report_hash",
+    "acceptance_state",
+    "accepted_run_count",
+    "artifact_contract_hash",
+    "authorization_hash",
+    "comparisons",
+    "contract_hash",
+    "executable_inventory_hash",
+    "expected_run_count",
+    "generation_authorization_hash",
+    "generation_plan_hash",
+    "output_roots",
+    "partition",
+    "plan_hash",
+    "replay_authorization_hash",
+    "replay_plan_hash",
+    "schema_identifier",
+    "stable_executable_commit",
+    "tooling_proposal_hash"
+  ],
+  "title": "stage_a_acceptance_report_v1",
   "type": "object"
 }

@@ -1,0 +1,45 @@
+{
+  "artifact_contract_hash": "bdda72a8e3d6cd11fb79a42c1384aae042e93ebb7c912bda2803e08061f3eda1",
+  "hash_algorithm": "SHA-256",
+  "manifest_ordering": "relative_path ordinal lexical ascending",
+  "production_contract_identifier": "canonical_tier1_integrated_run_v1",
+  "production_pipeline": "satnet.experiments.final_generation",
+  "production_required_run_files": [
+    "g1/ground_design.jsonl",
+    "g2/ground_visibility.jsonl",
+    "g3/integrated_graphs.jsonl",
+    "g4/ground_service_run.jsonl",
+    "g4/ground_service_steps.jsonl",
+    "g5/ground_failure_realization.jsonl",
+    "g5/ground_failure_service_run.jsonl",
+    "g5/ground_failure_service_steps.jsonl",
+    "scientific_inventory.json",
+    "result.json",
+    "satellite/satellite_rollout.json",
+    "targets/target.json"
+  ],
+  "production_required_wrapper_files": [
+    "stage_a_binding.json",
+    "validated_pipeline/execution_mode.json",
+    "validated_pipeline/operational/attempts/run_{pipeline_local_run_id:03d}/attempt_001.json",
+    "validated_pipeline/operational/current_state/run_{pipeline_local_run_id:03d}.json",
+    "validated_pipeline/run_{pipeline_local_run_id:03d}/input/design_record.json",
+    "validated_pipeline/run_{pipeline_local_run_id:03d}/input/run_record.json",
+    "validated_pipeline/run_{pipeline_local_run_id:03d}/operational/attempt.json"
+  ],
+  "schema_identifier": "satnet.stage_a.scientific_artifact_contract.v2",
+  "success_requirements": [
+    "exact_required_path_set",
+    "canonical_parsing",
+    "schema_validation",
+    "scientific_identity_match",
+    "seed_match",
+    "adapter_manifest_filesystem_match"
+  ],
+  "synthetic_contract_identifier": "synthetic_stage_a_test_run_v1",
+  "synthetic_required_files": [
+    "scientific.json",
+    "stage_a_binding.json"
+  ],
+  "unexpected_artifacts": "FORBIDDEN"
+}

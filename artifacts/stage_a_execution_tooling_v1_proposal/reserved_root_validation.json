@@ -1,13 +1,26 @@
 {
-  "all_absent": true,
-  "checked_roots": {
-    "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
-    "evidence_freeze": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze",
-    "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
-    "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+  "execution_authorized": false,
+  "production_authorized": false,
+  "reserved_root_count": 0,
+  "reserved_roots": {
+    "acceptance": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance"
+    },
+    "evidence_freeze": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze"
+    },
+    "generation": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production"
+    },
+    "replay": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    }
   },
-  "creation_authorized": false,
-  "result": "PASSED",
-  "schema_identifier": "satnet.stage_a.execution_tooling_reserved_root_validation.v1",
-  "status": "TOOLING_PROPOSAL"
+  "schema_identifier": "satnet.stage_a.reserved_root_validation.v2",
+  "simulation_authorized": false,
+  "validation": "PASSED"
 }

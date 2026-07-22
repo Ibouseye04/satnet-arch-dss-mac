@@ -1,16 +1,51 @@
 {
+  "$id": "https://satnet.invalid/schema/stage_a_replay_ledger_v2.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "satnet.stage_a.replay_ledger.v1",
+  "additionalProperties": false,
   "properties": {
-    "authorization_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "contract_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "expected_run_count": {"type": "integer"},
-    "ledger_hash": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
-    "operation": {"const": "REPLAY"},
-    "partition": {"enum": ["development", "validation"]},
-    "records": {"items": {"type": "object"}, "type": "array"}
+    "artifact_contract_hash": {},
+    "authorization_hash": {},
+    "campaign_manifest_hash": {},
+    "contract_hash": {},
+    "executable_inventory_hash": {},
+    "expected_run_count": {},
+    "ledger_hash": {},
+    "operation": {
+      "enum": [
+        "GENERATE",
+        "REPLAY"
+      ]
+    },
+    "output_root_identity": {},
+    "partition": {},
+    "plan_hash": {},
+    "records": {
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema_identifier": {
+      "const": "satnet.stage_a.execution_ledger.v2"
+    },
+    "stable_executable_commit": {},
+    "tooling_proposal_hash": {}
   },
-  "required": ["contract_hash", "authorization_hash", "operation", "partition", "expected_run_count", "records", "ledger_hash"],
-  "title": "SATNET Stage A Replay Ledger",
+  "required": [
+    "artifact_contract_hash",
+    "authorization_hash",
+    "campaign_manifest_hash",
+    "contract_hash",
+    "executable_inventory_hash",
+    "expected_run_count",
+    "ledger_hash",
+    "operation",
+    "output_root_identity",
+    "partition",
+    "plan_hash",
+    "records",
+    "schema_identifier",
+    "stable_executable_commit",
+    "tooling_proposal_hash"
+  ],
+  "title": "stage_a_replay_ledger_v2",
   "type": "object"
 }

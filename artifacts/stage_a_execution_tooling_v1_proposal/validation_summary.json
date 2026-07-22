@@ -1,41 +1,23 @@
 {
-  "compilation": {
-    "python_file_count": 217,
-    "result": "PASSED"
-  },
-  "complete_suite": {
-    "duration_seconds": "70.16",
-    "failed": 1,
-    "failed_test": "tests/utils/test_experiment_logger.py::TestExperimentLogger::test_timer",
-    "passed": 1138,
-    "result": "PASSED_SUBJECT_TO_DOCUMENTED_TIMER_RERUN"
-  },
+  "byte_for_byte_regeneration": "AVAILABLE",
+  "corrected_binding_findings": [
+    "BINDING-001",
+    "BINDING-002",
+    "BINDING-003",
+    "BINDING-004",
+    "BINDING-005",
+    "BINDING-006",
+    "BINDING-007",
+    "BINDING-008",
+    "BINDING-009"
+  ],
+  "development_design_count": 20,
+  "development_run_count": 100,
   "execution_authorized": false,
-  "focused_execution_tooling": {
-    "passed": 32,
-    "result": "PASSED"
-  },
-  "focused_stage_a_and_audit": {
-    "passed": 226,
-    "result": "PASSED"
-  },
-  "frozen_evidence": {
-    "byte_count": 1337549193,
-    "file_count": 9004,
-    "verified_sha256_count": 9004,
-    "result": "PASSED"
-  },
-  "logger_tests": {
-    "passed": 7,
-    "result": "PASSED"
-  },
-  "schema_identifier": "satnet.stage_a.execution_tooling_validation_summary.v1",
+  "production_authorized": false,
+  "reserved_roots_absent": true,
+  "schema_identifier": "satnet.stage_a.execution_tooling_validation_summary.v2",
+  "sealed_holdout_identities": "REDACTED",
   "simulation_authorized": false,
-  "status": "TOOLING_PROPOSAL",
-  "timer_independent_rerun": {
-    "passed": 1,
-    "result": "PASSED"
-  },
-  "tooling_inventory_sha256": "75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17",
-  "whitespace": "PASSED"
+  "status": "TOOLING_PROPOSAL"
 }
