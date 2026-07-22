@@ -45,15 +45,16 @@ def test_preflight_checks_authorization_roots_dependencies_and_lock(synthetic_co
     monkeypatch.setattr(preflight_module, "verify_frozen_production_evidence", lambda *_: {
         "combined": {"file_count": 9004, "byte_count": 1337549193, "verified_sha256_count": 9004},
     })
+    authorization = make_authorization(
+        synthetic_contract, operation="GENERATE", partition="development", run_ids=[1, 2],
+        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+    )
     plan = build_plan(
         synthetic_contract, partition="development", operation="GENERATE",
         stable_executable_commit=STABLE_EXECUTABLE_COMMIT, executable_inventory_hash=EXECUTABLE_INVENTORY,
         tooling_proposal_hash=TOOLING_PROPOSAL, artifact_contract_hash=ARTIFACT_CONTRACT,
         generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
-    )
-    authorization = make_authorization(
-        synthetic_contract, operation="GENERATE", partition="development", run_ids=[1, 2],
-        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+        authorization=authorization,
     )
     certificate = run_preflight(
         repo_root=ROOT, contract=synthetic_contract, plan=plan, authorization=authorization,

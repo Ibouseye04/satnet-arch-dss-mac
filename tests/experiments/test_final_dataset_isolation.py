@@ -27,6 +27,7 @@ ALLOWED_PREFIXES = (
     "artifacts/stage_a_execution_tooling_v1_proposal/",
     "artifacts/stage_a_execution_tooling_v1_audit/",
     "artifacts/stage_a_execution_tooling_v1_remediation/",
+    "artifacts/stage_a_execution_tooling_v1_reaudit/",
     "docs/experiments/final_integrated_dataset_",
     "docs/stage_a_discovery_contract_correction_v1.md",
     "docs/stage_a_near_neighbor_resolution_v1.md",
@@ -37,12 +38,15 @@ ALLOWED_PREFIXES = (
     "docs/validation/stage_a_execution_tooling_v1_proposal.md",
     "docs/validation/stage_a_execution_tooling_v1_audit.md",
     "docs/validation/stage_a_execution_tooling_v1_remediation.md",
+    "docs/validation/stage_a_execution_tooling_v1_reaudit.md",
+    "docs/validation/stage_a_execution_tooling_v1_final_controls.md",
     "scripts/generate_stage_a_execution_tooling_v1_proposal.py",
     "scripts/analysis/final_integrated_dataset_class_support.py",
     "scripts/validation/audit_final_dataset_class_support.py",
     "scripts/validation/audit_stage_a_discovery_contract.py",
     "scripts/validation/audit_stage_a_frozen_contract_v1.py",
     "scripts/validation/audit_stage_a_execution_tooling_v1.py",
+    "scripts/validation/reaudit_stage_a_execution_tooling_v1.py",
     "scripts/experiments/build_stage_a_contract_proposal.py",
     "src/satnet/experiments/final_class_support/",
     "src/satnet/experiments/final_class_support_audit/",
@@ -59,6 +63,7 @@ ALLOWED_PREFIXES = (
     "tests/validation/test_stage_a_discovery_contract_freeze_audit.py",
     "tests/validation/test_stage_a_frozen_contract_v1_audit.py",
     "tests/validation/test_stage_a_execution_tooling_v1_audit.py",
+    "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py",
 )
 
 

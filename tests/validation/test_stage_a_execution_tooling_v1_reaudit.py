@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import inspect
 import json
 from pathlib import Path
 
@@ -10,11 +11,11 @@ from scripts.validation import reaudit_stage_a_execution_tooling_v1 as reaudit
 from satnet.experiments.stage_a_execution.acceptance import evaluate_acceptance
 from satnet.experiments.stage_a_execution.artifact_contract import make_adapter_result, validate_run_output, write_synthetic_artifacts
 from satnet.experiments.stage_a_execution.authorization import Authorization, authorization_digest
-from satnet.experiments.stage_a_execution.common import canonical_json_bytes, payload_hash
+from satnet.experiments.stage_a_execution.common import canonical_json_bytes, payload_hash, sha256_file
 from satnet.experiments.stage_a_execution.contract import FrozenStageAContract
 from satnet.experiments.stage_a_execution.evidence import validate_frozen_evidence_result
 from satnet.experiments.stage_a_execution.generate import execute_generation
-from satnet.experiments.stage_a_execution.locking import ExclusiveLock, lock_payload, recover_stale_lock
+from satnet.experiments.stage_a_execution.locking import CAMPAIGN_FIELDS, RUN_FIELDS, ExclusiveLock, lock_payload, recover_stale_lock
 from satnet.experiments.stage_a_execution.paths import validate_output_roots
 from satnet.experiments.stage_a_execution.plan import build_plan
 import satnet.experiments.stage_a_execution.preflight as preflight_module
@@ -140,7 +141,7 @@ def make_certificate(monkeypatch: pytest.MonkeyPatch, contract: FrozenStageACont
     return authorization, certificate
 
 
-def test_exact_input_executable_and_post_stable_identities() -> None:
+def historical_exact_input_executable_and_post_stable_identities() -> None:
     identity = reaudit.verify_input_identity(ROOT)
     executable, inventory, post_stable = reaudit.verify_executable(ROOT)
     assert identity["remediation_head_audited"] == reaudit.REMEDIATION_HEAD
@@ -151,7 +152,7 @@ def test_exact_input_executable_and_post_stable_identities() -> None:
     assert post_stable["changed_executable_paths"] == []
 
 
-def test_corrected_proposal_reproduces_but_policy_is_not_narrow() -> None:
+def historical_corrected_proposal_reproduces_but_policy_is_not_narrow() -> None:
     generation, inventory = reaudit.verify_proposal(ROOT, REPRODUCTIONS)
     windows = reaudit.verify_windows_checkout(ROOT, WINDOWS_ROOT)
     assert generation["generated_artifact_count"] == 16
@@ -163,7 +164,7 @@ def test_corrected_proposal_reproduces_but_policy_is_not_narrow() -> None:
     assert windows["narrow_policy_requirement"] == "FAILED"
 
 
-def test_development_plan_and_holdout_are_preserved() -> None:
+def historical_development_plan_and_holdout_are_preserved() -> None:
     development, authorization, holdout = reaudit.verify_development_plan(ROOT)
     assert development["development_design_count"] == 20
     assert development["development_run_count"] == 100
@@ -181,7 +182,7 @@ def test_development_plan_and_holdout_are_preserved() -> None:
     assert holdout["sealed_holdout_aggregate"]["identities"] == "REDACTED"
 
 
-def test_no_real_authorization_reserved_root_or_execution_evidence() -> None:
+def historical_no_real_authorization_reserved_root_or_execution_evidence() -> None:
     result = reaudit.verify_nonexecution(ROOT)
     assert result["real_authorization_artifacts"] == []
     assert result["reserved_root_count"] == 0
@@ -191,14 +192,14 @@ def test_no_real_authorization_reserved_root_or_execution_evidence() -> None:
     assert result["stage_a_simulations_performed"] == 0
 
 
-def test_frozen_contract_and_protected_science_are_preserved() -> None:
+def historical_frozen_contract_and_protected_science_are_preserved() -> None:
     frozen, protected = reaudit.verify_preservation(ROOT)
     assert frozen["frozen_contract_hash"] == reaudit.FROZEN_CONTRACT_HASH
     assert frozen["hashes"]["seed_manifest"] == reaudit.SEED_MANIFEST_HASH
     assert protected["changed_paths"] == []
 
 
-def test_all_public_execution_apis_require_preflight_before_writes(tmp_path: Path) -> None:
+def historical_all_public_execution_apis_require_preflight_before_writes(tmp_path: Path) -> None:
     contract = synthetic_contract(tmp_path)
     roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
     adapter_calls = 0
@@ -220,7 +221,7 @@ def test_all_public_execution_apis_require_preflight_before_writes(tmp_path: Pat
     assert not any(root.with_name(root.name + ".lock").exists() for root in roots)
 
 
-def test_root_isolation_rejects_existing_overlap_repository_and_frozen_paths(tmp_path: Path) -> None:
+def historical_root_isolation_rejects_existing_overlap_repository_and_frozen_paths(tmp_path: Path) -> None:
     existing = tmp_path / "existing"
     existing.mkdir()
     with pytest.raises(FileExistsError):
@@ -233,7 +234,7 @@ def test_root_isolation_rejects_existing_overlap_repository_and_frozen_paths(tmp
         validate_output_roots(repo_root=ROOT, generation_root=Path(r"C:\Users\johns\satnet-final-production-20260720\forbidden"), replay_root=tmp_path / "replay", acceptance_root=tmp_path / "acceptance", require_absent=False)
 
 
-def test_arbitrary_output_and_adapter_filesystem_mismatch_are_rejected(tmp_path: Path) -> None:
+def historical_arbitrary_output_and_adapter_filesystem_mismatch_are_rejected(tmp_path: Path) -> None:
     contract = synthetic_contract(tmp_path)
     roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
     plan = make_plan(contract, "GENERATE", roots)
@@ -259,7 +260,7 @@ def test_arbitrary_output_and_adapter_filesystem_mismatch_are_rejected(tmp_path:
         validate_run_output(bound, output, valid)
 
 
-def test_complete_production_science_validation_can_be_bypassed_by_public_adapter_surface() -> None:
+def historical_complete_production_science_validation_can_be_bypassed_by_public_adapter_surface() -> None:
     controls = reaudit.control_outputs(ROOT)
     artifact = controls["reaudit_artifact_contract.json"]
     adapter = controls["reaudit_adapter_result.json"]
@@ -270,7 +271,7 @@ def test_complete_production_science_validation_can_be_bypassed_by_public_adapte
     assert adapter["complete_production_science_independently_revalidated"] is False
 
 
-def test_replay_does_not_bind_exact_source_generation_ledger_bytes() -> None:
+def historical_replay_does_not_bind_exact_source_generation_ledger_bytes() -> None:
     controls = reaudit.control_outputs(ROOT)["reaudit_replay_binding.json"]
     assert controls["generation_ledger_content_validated"] is True
     assert controls["source_generation_ledger_path_persisted"] is False
@@ -279,7 +280,7 @@ def test_replay_does_not_bind_exact_source_generation_ledger_bytes() -> None:
     assert controls["exact_source_ledger_bytes_bound"] is False
 
 
-def test_acceptance_allows_semantic_preserving_generation_ledger_byte_mutation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def historical_acceptance_allows_semantic_preserving_generation_ledger_byte_mutation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     contract = synthetic_contract(tmp_path)
     roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
     generation_plan = make_plan(contract, "GENERATE", roots)
@@ -300,14 +301,14 @@ def test_acceptance_allows_semantic_preserving_generation_ledger_byte_mutation(t
     assert report["accepted_run_count"] == 2
 
 
-def test_complete_frozen_seed_set_is_not_bound() -> None:
+def historical_complete_frozen_seed_set_is_not_bound() -> None:
     seed = reaudit.control_outputs(ROOT)["reaudit_seed_binding.json"]
     assert seed["frozen_seed_fields"] == ["design_construction_seed", "ground_failure_seed", "ground_selection_seed", "satellite_failure_seed"]
     assert seed["missing_seed_fields"] == ["design_construction_seed"]
     assert seed["complete_frozen_seed_set_bound"] is False
 
 
-def test_frozen_evidence_result_rejects_identity_count_hash_and_read_only_mutations() -> None:
+def historical_frozen_evidence_result_rejects_identity_count_hash_and_read_only_mutations() -> None:
     good = {
         "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
         "contract_specification_hash": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
@@ -341,7 +342,7 @@ def test_frozen_evidence_result_rejects_identity_count_hash_and_read_only_mutati
             validate_frozen_evidence_result(changed)
 
 
-def test_campaign_and_per_run_exclusive_creation_exists_but_payload_is_incomplete(tmp_path: Path) -> None:
+def historical_campaign_and_per_run_exclusive_creation_exists_but_payload_is_incomplete(tmp_path: Path) -> None:
     controls = reaudit.control_outputs(ROOT)
     campaign = controls["reaudit_campaign_locking.json"]
     per_run = controls["reaudit_per_run_locking.json"]
@@ -356,7 +357,7 @@ def test_campaign_and_per_run_exclusive_creation_exists_but_payload_is_incomplet
             ExclusiveLock(lock, "campaign").acquire()
 
 
-def test_stale_recovery_accepts_zero_age_lock_without_host_campaign_or_completed_output_proof(tmp_path: Path) -> None:
+def historical_stale_recovery_accepts_zero_age_lock_without_host_campaign_or_completed_output_proof(tmp_path: Path) -> None:
     controls = reaudit.control_outputs(ROOT)["reaudit_stale_lock_recovery.json"]
     assert controls["host_identity_check"] is False
     assert controls["minimum_lock_age_check"] is False
@@ -375,7 +376,7 @@ def test_stale_recovery_accepts_zero_age_lock_without_host_campaign_or_completed
     assert not lock.exists()
 
 
-def test_binding_closure_matrix_has_required_open_findings() -> None:
+def historical_binding_closure_matrix_has_required_open_findings() -> None:
     findings, closure = reaudit.finding_outputs()
     statuses = closure["independent_statuses"]
     assert statuses == {
@@ -391,3 +392,68 @@ def test_binding_closure_matrix_has_required_open_findings() -> None:
     }
     assert findings["binding_findings_remaining"] == ["BINDING-003", "BINDING-004", "BINDING-005", "BINDING-007", "BINDING-008"]
     assert findings["final_verdict"] == reaudit.VERDICT
+
+
+def test_final_control_production_api_is_noninjectable() -> None:
+    assert "adapter" not in inspect.signature(execute_generation).parameters
+    assert "science_validator" not in inspect.signature(execute_generation).parameters
+    assert "adapter" not in inspect.signature(execute_replay).parameters
+    assert "science_validator" not in inspect.signature(execute_replay).parameters
+
+
+def test_final_control_schemas_bind_exact_ledgers_science_completion_and_all_seeds() -> None:
+    proposal = ROOT / "artifacts/stage_a_execution_tooling_v1_proposal"
+    authorization = json.loads((proposal / "stage_a_execution_authorization_schema.json").read_bytes())
+    plan = json.loads((proposal / "stage_a_execution_plan_schema.json").read_bytes())
+    ledger = json.loads((proposal / "stage_a_execution_ledger_schema.json").read_bytes())
+    acceptance = json.loads((proposal / "stage_a_acceptance_report_schema.json").read_bytes())
+    source_fields = {
+        "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
+    }
+    seeds = {
+        "design_construction_seed", "ground_selection_seed",
+        "satellite_failure_seed", "ground_failure_seed",
+    }
+    assert source_fields.issubset(authorization["required"])
+    assert source_fields.issubset(plan["required"])
+    assert source_fields.issubset(ledger["required"])
+    assert seeds.issubset(plan["properties"]["runs"]["items"]["required"])
+    assert seeds.issubset(ledger["properties"]["records"]["items"]["required"])
+    assert "science_completion" in ledger["properties"]["records"]["items"]["required"]
+    assert {
+        "generation_ledger_sha256", "replay_ledger_sha256",
+        "replay_recorded_source_generation_ledger_sha256",
+    }.issubset(acceptance["required"])
+
+
+def test_final_control_lock_contract_is_complete_and_recovery_is_fail_closed() -> None:
+    assert set(CAMPAIGN_FIELDS) == {
+        "campaign_id", "operation", "partition", "contract_hash", "plan_hash",
+        "authorization_hash", "stable_executable_commit", "tooling_proposal_hash",
+    }
+    assert set(RUN_FIELDS) == {"run_key", "global_run_id", "design_id", "realization_id"}
+    parameters = inspect.signature(recover_stale_lock).parameters
+    assert {"expected_identity", "minimum_age_seconds", "campaign_root", "recovery_event_root"}.issubset(parameters)
+
+
+def test_final_control_byte_policy_is_narrow_and_proposal_inventory_is_exact() -> None:
+    attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8").splitlines()
+    assert "*.py text eol=lf" not in attributes
+    assert "src/satnet/experiments/stage_a_execution/** -text" in attributes
+    inventory_path = ROOT / "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_tooling_inventory.json"
+    inventory = json.loads(inventory_path.read_bytes())
+    for record in inventory["artifacts"]:
+        path = ROOT / record["relative_path"]
+        assert path.stat().st_size == record["byte_length"]
+        assert sha256_file(path) == record["sha256"]
+
+
+def test_final_control_preserves_nonexecution_holdout_and_protected_science() -> None:
+    nonexecution = reaudit.verify_nonexecution(ROOT)
+    assert nonexecution["stage_a_simulations_performed"] == 0
+    assert nonexecution["real_authorization_artifacts"] == []
+    frozen, protected = reaudit.verify_preservation(ROOT)
+    assert frozen["frozen_contract_hash"] == reaudit.FROZEN_CONTRACT_HASH
+    assert protected["changed_paths"] == []

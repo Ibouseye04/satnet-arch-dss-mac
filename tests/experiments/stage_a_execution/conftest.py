@@ -32,7 +32,8 @@ def synthetic_contract(tmp_path: Path) -> FrozenStageAContract:
     seeds = tuple(
         {
             "global_run_id": row["global_run_id"], "run_key": row["run_key"], "design_id": row["design_id"],
-            "realization_id": row["realization_id"], "ground_selection_seed": row["global_run_id"] * 10 + 1,
+            "realization_id": row["realization_id"], "design_construction_seed": 1_000 + row["design_index"],
+            "ground_selection_seed": row["global_run_id"] * 10 + 1,
             "satellite_failure_seed": row["global_run_id"] * 10 + 2, "ground_failure_seed": row["global_run_id"] * 10 + 3,
         }
         for row in runs
@@ -52,6 +53,8 @@ def synthetic_contract(tmp_path: Path) -> FrozenStageAContract:
 def make_authorization(
     contract: FrozenStageAContract, *, operation: str, partition: str, run_ids: list[int],
     generation_root: Path, replay_root: Path, acceptance_root: Path,
+    source_generation_ledger: tuple[str, int, str] | None = None,
+    source_replay_ledger: tuple[str, int, str] | None = None,
     overrides: dict[str, Any] | None = None,
 ) -> Authorization:
     document: dict[str, Any] = {
@@ -73,6 +76,12 @@ def make_authorization(
         "authorized_generation_root": str(generation_root.resolve()),
         "authorized_replay_root": str(replay_root.resolve()),
         "authorized_acceptance_root": str(acceptance_root.resolve()),
+        "source_generation_ledger_relative_path": None if source_generation_ledger is None else source_generation_ledger[0],
+        "source_generation_ledger_byte_length": None if source_generation_ledger is None else source_generation_ledger[1],
+        "source_generation_ledger_sha256": None if source_generation_ledger is None else source_generation_ledger[2],
+        "source_replay_ledger_relative_path": None if source_replay_ledger is None else source_replay_ledger[0],
+        "source_replay_ledger_byte_length": None if source_replay_ledger is None else source_replay_ledger[1],
+        "source_replay_ledger_sha256": None if source_replay_ledger is None else source_replay_ledger[2],
         "authorization_date": "2099-01-01",
         "authorizing_decision_reference": "SYNTHETIC-TEST-ONLY",
         "independently_approved": True,

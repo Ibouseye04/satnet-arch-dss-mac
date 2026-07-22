@@ -4,20 +4,20 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import time
 
 import pytest
 
+from satnet.experiments.stage_a_execution._synthetic_harness import execute_synthetic_generation, execute_synthetic_replay
 from satnet.experiments.stage_a_execution.artifact_contract import SimulationAdapterResult, make_adapter_result, write_synthetic_artifacts
-from satnet.experiments.stage_a_execution.common import atomic_write_json, canonical_json_bytes, sha256_file
-from satnet.experiments.stage_a_execution.generate import execute_generation
+from satnet.experiments.stage_a_execution.common import atomic_write_json, canonical_json_bytes, payload_hash, sha256_file
 import satnet.experiments.stage_a_execution.identity as identity_module
 from satnet.experiments.stage_a_execution.identity import STABLE_IDENTITY_SCHEMA, make_executable_inventory, verify_executable_identity
 from satnet.experiments.stage_a_execution.ledger import read_ledger, write_ledger
-from satnet.experiments.stage_a_execution.locking import ExclusiveLock, lock_is_stale, lock_payload, recover_stale_lock
+from satnet.experiments.stage_a_execution.locking import LOCK_DOMAIN, ExclusiveLock, _write_recovery_event, lock_is_stale, lock_payload, recover_stale_lock
 from satnet.experiments.stage_a_execution.plan import build_plan
 import satnet.experiments.stage_a_execution.preflight as preflight_module
 from satnet.experiments.stage_a_execution.preflight import run_preflight
-from satnet.experiments.stage_a_execution.replay import execute_replay
 from satnet.experiments.stage_a_execution.acceptance import evaluate_acceptance
 from scripts.generate_stage_a_execution_tooling_v1_proposal import generate
 
@@ -31,7 +31,19 @@ def _git(root: Path, *arguments: str) -> str:
     return result.stdout.strip()
 
 
-def _plan(contract, operation: str, roots: tuple[Path, Path, Path]) -> dict:
+def _ledger_identity(path: Path) -> tuple[str, int, str]:
+    return path.name, path.stat().st_size, sha256_file(path)
+
+
+def _authorization(contract, operation: str, roots, generation_identity=None, replay_identity=None):
+    return make_authorization(
+        contract, operation=operation, partition="development", run_ids=[1, 2],
+        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+        source_generation_ledger=generation_identity, source_replay_ledger=replay_identity,
+    )
+
+
+def _plan(contract, operation: str, roots: tuple[Path, Path, Path], authorization) -> dict:
     return build_plan(
         contract, partition="development", operation=operation,
         stable_executable_commit=STABLE_EXECUTABLE_COMMIT,
@@ -39,14 +51,19 @@ def _plan(contract, operation: str, roots: tuple[Path, Path, Path]) -> dict:
         tooling_proposal_hash=TOOLING_PROPOSAL,
         artifact_contract_hash=ARTIFACT_CONTRACT,
         generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
+        authorization=authorization,
     )
 
 
-def _certificate(monkeypatch, contract, plan: dict, roots: tuple[Path, Path, Path], operation: str):
-    authorization = make_authorization(
-        contract, operation=operation, partition="development", run_ids=[1, 2],
-        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
-    )
+def _lock_identity() -> dict[str, str]:
+    return {
+        "campaign_id": "1" * 64, "operation": "GENERATE", "partition": "development",
+        "contract_hash": "2" * 64, "plan_hash": "3" * 64, "authorization_hash": "4" * 64,
+        "stable_executable_commit": "5" * 40, "tooling_proposal_hash": "6" * 64,
+    }
+
+
+def _certificate(monkeypatch, contract, plan: dict, roots: tuple[Path, Path, Path], authorization):
     monkeypatch.setattr(preflight_module, "verify_executable_identity", lambda _: {
         "stable_executable_commit": STABLE_EXECUTABLE_COMMIT,
         "executable_inventory_sha256": EXECUTABLE_INVENTORY,
@@ -59,7 +76,7 @@ def _certificate(monkeypatch, contract, plan: dict, roots: tuple[Path, Path, Pat
         repo_root=ROOT, contract=contract, plan=plan, authorization=authorization,
         generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], minimum_free_bytes=0,
     )
-    return authorization, certificate
+    return certificate
 
 
 def test_executable_identity_rejects_dirty_missing_extra_and_changed_bytes(tmp_path: Path, monkeypatch) -> None:
@@ -105,11 +122,8 @@ def test_executable_identity_rejects_dirty_missing_extra_and_changed_bytes(tmp_p
 def test_preflight_root_rejection_precedes_evidence_and_writes(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
     repo = ROOT
     roots = (repo / ".synthetic-forbidden-generation", tmp_path / "replay", tmp_path / "acceptance")
-    plan = _plan(synthetic_contract, "GENERATE", roots)
-    authorization = make_authorization(
-        synthetic_contract, operation="GENERATE", partition="development", run_ids=[1, 2],
-        generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
-    )
+    authorization = _authorization(synthetic_contract, "GENERATE", roots)
+    plan = _plan(synthetic_contract, "GENERATE", roots, authorization)
     monkeypatch.setattr(preflight_module, "verify_executable_identity", lambda _: {
         "stable_executable_commit": STABLE_EXECUTABLE_COMMIT,
         "executable_inventory_sha256": EXECUTABLE_INVENTORY,
@@ -133,13 +147,14 @@ def test_preflight_root_rejection_precedes_evidence_and_writes(synthetic_contrac
 
 def test_malformed_nonempty_output_never_succeeds(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
     roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
-    plan = _plan(synthetic_contract, "GENERATE", roots)
-    authorization, certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, "GENERATE")
+    authorization = _authorization(synthetic_contract, "GENERATE", roots)
+    plan = _plan(synthetic_contract, "GENERATE", roots, authorization)
+    certificate = _certificate(monkeypatch, synthetic_contract, plan, roots, authorization)
     def malformed(plan_run, output_root: Path):
         (output_root / "junk.bin").write_bytes(b"junk")
         return make_adapter_result(plan_run, output_root, "synthetic_stage_a_test_run_v1")
     with pytest.raises(ValueError, match="path set|artifact"):
-        execute_generation(
+        execute_synthetic_generation(
             repo_root=ROOT, contract=synthetic_contract, plan=plan,
             authorization_hash=authorization.sha256, preflight=certificate,
             campaign_root=roots[0], adapter=malformed,
@@ -151,39 +166,46 @@ def test_malformed_nonempty_output_never_succeeds(synthetic_contract, tmp_path: 
 
 def test_replay_and_acceptance_reject_bound_identity_and_seed_mutations(synthetic_contract, tmp_path: Path, monkeypatch) -> None:
     roots = tuple(tmp_path / name for name in ("generation", "replay", "acceptance"))
-    generation_plan = _plan(synthetic_contract, "GENERATE", roots)
-    generation_authorization, generation_certificate = _certificate(monkeypatch, synthetic_contract, generation_plan, roots, "GENERATE")
-    execute_generation(
+    generation_authorization = _authorization(synthetic_contract, "GENERATE", roots)
+    generation_plan = _plan(synthetic_contract, "GENERATE", roots, generation_authorization)
+    generation_certificate = _certificate(monkeypatch, synthetic_contract, generation_plan, roots, generation_authorization)
+    execute_synthetic_generation(
         repo_root=ROOT, contract=synthetic_contract, plan=generation_plan,
         authorization_hash=generation_authorization.sha256, preflight=generation_certificate,
         campaign_root=roots[0], adapter=write_synthetic_artifacts,
     )
-    replay_plan = _plan(synthetic_contract, "REPLAY", roots)
-    replay_authorization, replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, "REPLAY")
     generation_ledger_path = roots[0] / "execution_ledger.json"
+    authorized_generation_bytes = generation_ledger_path.read_bytes()
+    generation_identity = _ledger_identity(generation_ledger_path)
+    replay_authorization = _authorization(synthetic_contract, "REPLAY", roots, generation_identity)
+    replay_plan = _plan(synthetic_contract, "REPLAY", roots, replay_authorization)
+    replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, replay_authorization)
     generation_ledger = read_ledger(generation_ledger_path)
     generation_ledger["stable_executable_commit"] = "f" * 40
     write_ledger(generation_ledger_path, generation_ledger, overwrite=True)
-    with pytest.raises(ValueError, match="identity"):
-        execute_replay(
-            repo_root=ROOT, plan=replay_plan, authorization_hash=replay_authorization.sha256,
-            preflight=replay_certificate, generation_root=roots[0], replay_root=roots[1],
-            adapter=write_synthetic_artifacts,
+    with pytest.raises(ValueError, match="SHA-256|byte length"):
+        execute_synthetic_replay(
+            repo_root=ROOT, contract=synthetic_contract, plan=replay_plan,
+            authorization_hash=replay_authorization.sha256, preflight=replay_certificate,
+            generation_root=roots[0], replay_root=roots[1], adapter=write_synthetic_artifacts,
         )
-    generation_ledger["stable_executable_commit"] = STABLE_EXECUTABLE_COMMIT
-    write_ledger(generation_ledger_path, generation_ledger, overwrite=True)
-    replay_authorization, replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, "REPLAY")
-    execute_replay(
-        repo_root=ROOT, plan=replay_plan, authorization_hash=replay_authorization.sha256,
-        preflight=replay_certificate, generation_root=roots[0], replay_root=roots[1],
-        adapter=write_synthetic_artifacts,
+    generation_ledger_path.write_bytes(authorized_generation_bytes)
+    replay_certificate = _certificate(monkeypatch, synthetic_contract, replay_plan, roots, replay_authorization)
+    execute_synthetic_replay(
+        repo_root=ROOT, contract=synthetic_contract, plan=replay_plan,
+        authorization_hash=replay_authorization.sha256, preflight=replay_certificate,
+        generation_root=roots[0], replay_root=roots[1], adapter=write_synthetic_artifacts,
     )
+    replay_identity = _ledger_identity(roots[1] / "replay_ledger.json")
+    acceptance_authorization = _authorization(
+        synthetic_contract, "ACCEPT", roots, generation_identity, replay_identity,
+    )
+    acceptance_plan = _plan(synthetic_contract, "ACCEPT", roots, acceptance_authorization)
+    acceptance_certificate = _certificate(monkeypatch, synthetic_contract, acceptance_plan, roots, acceptance_authorization)
     generation_ledger = read_ledger(generation_ledger_path)
     generation_ledger["records"][0]["satellite_failure_seed"] += 1
     write_ledger(generation_ledger_path, generation_ledger, overwrite=True)
-    acceptance_plan = _plan(synthetic_contract, "ACCEPT", roots)
-    acceptance_authorization, acceptance_certificate = _certificate(monkeypatch, synthetic_contract, acceptance_plan, roots, "ACCEPT")
-    with pytest.raises(ValueError, match="seed|identity"):
+    with pytest.raises(ValueError, match="SHA-256|byte length"):
         evaluate_acceptance(
             repo_root=ROOT, plan=acceptance_plan, authorization_hash=acceptance_authorization.sha256,
             preflight=acceptance_certificate, generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],
@@ -191,22 +213,35 @@ def test_replay_and_acceptance_reject_bound_identity_and_seed_mutations(syntheti
 
 
 def test_stale_lock_recovery_validates_identity_and_records_immutable_evidence(tmp_path: Path) -> None:
-    lock = tmp_path / "campaign.lock"
-    value = lock_payload("campaign-identity", "campaign")
-    value["pid"] = 2_147_483_647
-    value["process_start_identity"] = "unavailable"
+    campaign_root = tmp_path / "campaign"
+    lock = campaign_root.with_name(campaign_root.name + ".lock")
+    identity = _lock_identity()
+    value = lock_payload(identity, "campaign")
+    value["process_id"] = 2_147_483_647
+    value["process_start_identity"] = "inactive"
+    value["creation_unix_ns"] = time.time_ns() - 120_000_000_000
+    value["creation_time"] = "2000-01-01T00:00:00+00:00"
     payload = {field: item for field, item in value.items() if field != "lock_hash"}
-    from satnet.experiments.stage_a_execution.common import payload_hash
-    value["lock_hash"] = payload_hash(payload, domain="satnet_stage_a_execution_lock_v2")
+    value["lock_hash"] = payload_hash(payload, domain=LOCK_DOMAIN)
     lock.write_bytes(canonical_json_bytes(value))
     assert lock_is_stale(lock) is True
+    wrong = {**identity, "contract_hash": "f" * 64}
     with pytest.raises(PermissionError, match="identity"):
-        recover_stale_lock(lock, expected_identity="wrong", recovery_log=tmp_path / "recoveries.json")
-    record = recover_stale_lock(lock, expected_identity="campaign-identity", recovery_log=tmp_path / "recoveries.json")
+        recover_stale_lock(
+            lock, expected_identity=wrong, minimum_age_seconds=60,
+            campaign_root=campaign_root, recovery_event_root=tmp_path / "events",
+        )
+    record = recover_stale_lock(
+        lock, expected_identity=identity, minimum_age_seconds=60,
+        campaign_root=campaign_root, recovery_event_root=tmp_path / "events",
+    )
     assert record["recovered_lock"] == value
     assert not lock.exists()
-    recovery = json.loads((tmp_path / "recoveries.json").read_bytes())
-    assert recovery["records"] == [record]
+    event_path = Path(record["recovery_event_path"])
+    event = json.loads(event_path.read_bytes())
+    assert event == {field: item for field, item in record.items() if field != "recovery_event_path"}
+    with pytest.raises(FileExistsError):
+        _write_recovery_event(tmp_path / "events", event)
 
 
 def test_proposal_generator_reproduces_all_artifacts_byte_for_byte(tmp_path: Path) -> None:
@@ -228,8 +263,14 @@ def test_proposal_generator_reproduces_all_artifacts_byte_for_byte(tmp_path: Pat
 
 
 def test_live_lock_cannot_be_recovered(tmp_path: Path) -> None:
-    lock = tmp_path / "campaign.lock"
-    with ExclusiveLock(lock, "campaign-identity"):
+    campaign_root = tmp_path / "campaign"
+    lock = campaign_root.with_name(campaign_root.name + ".lock")
+    identity = _lock_identity()
+    with ExclusiveLock(lock, identity):
         assert lock_is_stale(lock) is False
-        with pytest.raises(RuntimeError, match="Live"):
-            recover_stale_lock(lock, expected_identity="campaign-identity", recovery_log=tmp_path / "recoveries.json")
+        time.sleep(0.01)
+        with pytest.raises(RuntimeError, match="Active"):
+            recover_stale_lock(
+                lock, expected_identity=identity, minimum_age_seconds=0.001,
+                campaign_root=campaign_root, recovery_event_root=tmp_path / "events",
+            )
