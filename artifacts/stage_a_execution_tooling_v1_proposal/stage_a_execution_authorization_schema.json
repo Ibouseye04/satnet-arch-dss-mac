@@ -97,6 +97,46 @@
     },
     "schema_identifier": {
       "const": "satnet.stage_a.execution_authorization.v1"
+    },
+    "source_generation_ledger_byte_length": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "source_generation_ledger_relative_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_generation_ledger_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_replay_ledger_byte_length": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "source_replay_ledger_relative_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_replay_ledger_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [
@@ -121,7 +161,13 @@
     "authorized_tooling_proposal_hash",
     "authorizing_decision_reference",
     "independently_approved",
-    "schema_identifier"
+    "schema_identifier",
+    "source_generation_ledger_byte_length",
+    "source_generation_ledger_relative_path",
+    "source_generation_ledger_sha256",
+    "source_replay_ledger_byte_length",
+    "source_replay_ledger_relative_path",
+    "source_replay_ledger_sha256"
   ],
   "title": "stage_a_execution_authorization_v1",
   "type": "object"

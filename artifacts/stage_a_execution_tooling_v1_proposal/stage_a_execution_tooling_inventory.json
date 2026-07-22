@@ -1,20 +1,20 @@
 {
-  "artifact_count_excluding_inventory": 44,
+  "artifact_count_excluding_inventory": 48,
   "artifacts": [
     {
-      "byte_length": 500,
+      "byte_length": 1320,
       "relative_path": ".gitattributes",
-      "sha256": "6577eaea1c2a32072c811479d006365f44d36037e828f1d65de3d63a726f4ed2"
+      "sha256": "799dcc9ba16a37dca25af7dea04705787348e2f919e03f7180cc8393bf251211"
     },
     {
       "byte_length": 722,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/development_plan_preview.json",
-      "sha256": "da08b99789f84cbcfd127857a4f0e52482a004472cc44c294cae6959652d5eff"
+      "sha256": "fe48c01f88831ed257e66dc8ca3324707c230ee4cb0e98c1498334096a7e8c4d"
     },
     {
       "byte_length": 537,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/generator_input_manifest.json",
-      "sha256": "3a0a1af69b1fe743f51cf755f93df259e149f057f0b29cc458f410f77752b5b4"
+      "sha256": "f7707cd126ea052b669b33e9087659e0a7e5883b63cfdb80c702902d736204f5"
     },
     {
       "byte_length": 595,
@@ -32,49 +32,49 @@
       "sha256": "3ff0a17e2afd700a3e4b68e1e9f7f125860a1670caa6e7b5d20bda4c755f7a6e"
     },
     {
-      "byte_length": 1462,
+      "byte_length": 2841,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_acceptance_report_schema.json",
-      "sha256": "d91ae5afcc9442ef8c8848e2669a4d852218ff98ea606b90605114dee88affe0"
+      "sha256": "da1f4fd8781ac9583fe9a5fad3eca4de1ae4203b213b84bb1a52032e69473066"
     },
     {
-      "byte_length": 17777,
+      "byte_length": 18040,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_executable_source_inventory.json",
-      "sha256": "8404e0cda2864a111598bd8b1209a341a1f1ecfc1c12f7c17c611c0156a2f94a"
+      "sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d"
     },
     {
-      "byte_length": 3088,
+      "byte_length": 4088,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_authorization_schema.json",
-      "sha256": "c3451ba984a8f17c2306c970d6ae17ed8202d4236813e360b0f94da07d1906a4"
+      "sha256": "dae6bf0371691af6934ab2c3a9c823995b7310b9efa0a354c0337161dfd163aa"
     },
     {
-      "byte_length": 1237,
+      "byte_length": 2494,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_ledger_schema.json",
-      "sha256": "3ee6766baef4457ce710b95e738e0e4ad85acac95415d4116d924b383d4c0e2e"
+      "sha256": "78d26f099d4c60ca2fff15d42a9009c7e239c3ddb221933fa155361dec542de9"
     },
     {
-      "byte_length": 1398,
+      "byte_length": 2495,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_plan_schema.json",
-      "sha256": "fcf62acaf1bcb332225327e608d7c2318d55ac79775f797c1c59c06d901a315b"
+      "sha256": "447143302d52d1a1be4a8428220aaaf884abd142e5f48e881d0ceea2a60e2206"
     },
     {
       "byte_length": 1636,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_execution_tooling_specification.json",
-      "sha256": "6a5acb5f0b4f04495274e04288098f643ba95f07ed701419b61669f1017a74cd"
+      "sha256": "ae7086978c5714e85aa900fbd10453d0fc1bfd2d3a9272eeefe54970fedc6a64"
     },
     {
-      "byte_length": 1231,
+      "byte_length": 2488,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_replay_ledger_schema.json",
-      "sha256": "63ffa7402ad7a14f68611d791d34b12a1507250595ce54c8df5dad73158e888e"
+      "sha256": "b3c621443fea256bcea4198e3ad9b095421fc4a8429bbde51554aa900ad42df6"
     },
     {
-      "byte_length": 1816,
+      "byte_length": 1929,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_scientific_artifact_contract.json",
-      "sha256": "ea03ce40d849815c6a5d4c0275e68e0fa1cba165a44e351e6a6e8e6db99e8fe3"
+      "sha256": "d06bca8ab3048f82d2f49ed3948de3c23680820c5f9e28861a3a38498817ca50"
     },
     {
       "byte_length": 442,
       "relative_path": "artifacts/stage_a_execution_tooling_v1_proposal/stage_a_stable_executable_identity.json",
-      "sha256": "79d3813f79e6e1a13fc5d4aaeb7336943837eabb6ef45efd0b2e791d9b69841b"
+      "sha256": "4adfd2caf85a7bf94b74491f02f3ff47b2b294f96b348b0f2e8d698ac815c1f4"
     },
     {
       "byte_length": 613,
@@ -82,14 +82,19 @@
       "sha256": "92d8ac63b28ead55e0298abfa8164e5339cfbe9f93c121edc3ce363bc8437e03"
     },
     {
-      "byte_length": 17520,
+      "byte_length": 21191,
       "relative_path": "scripts/generate_stage_a_execution_tooling_v1_proposal.py",
-      "sha256": "0112dcbd5cd1055cac184998a1042558ad0f68d51fd2f1315a27cf42c63160c7"
+      "sha256": "3870820c87ae7f7e96b429e58a1d1e15859e5b6a5600e4710b7f0241d0945bbf"
     },
     {
-      "byte_length": 834,
+      "byte_length": 43926,
+      "relative_path": "scripts/validation/reaudit_stage_a_execution_tooling_v1.py",
+      "sha256": "c5f856e24173c558cf29164b22202931fe83a43ad6766ae07ac6bd71d4600d76"
+    },
+    {
+      "byte_length": 758,
       "relative_path": "src/satnet/experiments/stage_a_execution/__init__.py",
-      "sha256": "3c16350310ff552896a1d146c2727c5962010417d24b7ef2aac51b01fb4bb60f"
+      "sha256": "2e2699680223bbd35197cb52e62d40601056a780c1e00d4285b81e80b8a25132"
     },
     {
       "byte_length": 48,
@@ -97,24 +102,29 @@
       "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d"
     },
     {
-      "byte_length": 6124,
+      "byte_length": 3673,
+      "relative_path": "src/satnet/experiments/stage_a_execution/_synthetic_harness.py",
+      "sha256": "09defdd8da77bd0eb45019d45c0154745012034b85222b0156817331a160f15c"
+    },
+    {
+      "byte_length": 8290,
       "relative_path": "src/satnet/experiments/stage_a_execution/acceptance.py",
-      "sha256": "4dabc04f11410d4a1b3de3fe9427ec6486df4354dfd340c468553be94ba590b3"
+      "sha256": "42dc98bbdfd1a2f6f61b189c332c4beee89a973ddec3845e63e861b75e22135f"
     },
     {
-      "byte_length": 14250,
+      "byte_length": 16161,
       "relative_path": "src/satnet/experiments/stage_a_execution/artifact_contract.py",
-      "sha256": "b922e1eb9eab43945e10f5252b4d5445655afa3b9b5bb5fe8ae0427a7938e84b"
+      "sha256": "ae753305225e389f24ee555eb07f0cf661945ca9a5b1f050f52e2c6e4bb3eb77"
     },
     {
-      "byte_length": 5870,
+      "byte_length": 7827,
       "relative_path": "src/satnet/experiments/stage_a_execution/authorization.py",
-      "sha256": "f1a36555f1b685507d533ceb9f6a45fde64fbc9ed0db4210099086bdaf42deb5"
+      "sha256": "9ddf5532ea1161eb911d2d9e7de3dab4443aaa965f0f01d821430a9181660303"
     },
     {
-      "byte_length": 10971,
+      "byte_length": 12042,
       "relative_path": "src/satnet/experiments/stage_a_execution/cli.py",
-      "sha256": "2e083d02e7320c5a04836ffc1ad671a4851ca72d60f8b60270166c64f64b2ee2"
+      "sha256": "79bacddf2d19027df22d440787863aaeeec5382c70dfbefc1a4d710c097a8a65"
     },
     {
       "byte_length": 2577,
@@ -132,9 +142,9 @@
       "sha256": "d79d6ac0524f28a34869b6a77ba1a95939135c995d57de91894239cb22416bb1"
     },
     {
-      "byte_length": 14214,
+      "byte_length": 17528,
       "relative_path": "src/satnet/experiments/stage_a_execution/generate.py",
-      "sha256": "5c08a9a5b80b09875086bf014fc1339b60aa1820f69ce02083965454ec9f73ba"
+      "sha256": "b481032fcf6279c44638c6e7ccd825dcc377db383cf1ea20101c36ec18390638"
     },
     {
       "byte_length": 9285,
@@ -147,14 +157,14 @@
       "sha256": "dc96a35b7f6af0ef5702b6699203f3712279e4d20db06f5ac4074032ba9b23f8"
     },
     {
-      "byte_length": 5485,
+      "byte_length": 7817,
       "relative_path": "src/satnet/experiments/stage_a_execution/ledger.py",
-      "sha256": "6acc8633bec5a96a99d0d0f9786e17ea63ca4b851a23b2d06ca96fd7a29bb130"
+      "sha256": "2f0e66f3170ae6b4687ffff41bc5245d7e73ea00225ca9756156fc884d2731a9"
     },
     {
-      "byte_length": 7914,
+      "byte_length": 15562,
       "relative_path": "src/satnet/experiments/stage_a_execution/locking.py",
-      "sha256": "062c67a5cb14c3ba7de1778f901a8a2be1c5500c2e9c4345bd9077ceef1f9d83"
+      "sha256": "104ca3054556ab59b0ef37b3863a9cedd89eea4b8d5c92a0e6f6ea9f8e59d6d9"
     },
     {
       "byte_length": 4111,
@@ -162,24 +172,24 @@
       "sha256": "5f5ca60f0226098881e6ec438851f1efdbbbb774a32d9454d35146edf46ab164"
     },
     {
-      "byte_length": 5120,
+      "byte_length": 8696,
       "relative_path": "src/satnet/experiments/stage_a_execution/plan.py",
-      "sha256": "42ee3a13e778b7818b54a6790c15e51d4ce900dbef2c748cc0d302f7533fdc4d"
+      "sha256": "4102a91e3cc1c8185b2ace152679c4ad48197441bb21c1f48a3af282330360b4"
     },
     {
-      "byte_length": 6181,
+      "byte_length": 7895,
       "relative_path": "src/satnet/experiments/stage_a_execution/preflight.py",
-      "sha256": "f34f6b247260aad819771a4f9288914e2f30cafd702153e924675f1a0809cfe7"
+      "sha256": "87656e4a89c5dc121abff635d18fde92d0b990d3db9d7f24d234dfead7a94b25"
     },
     {
-      "byte_length": 6430,
+      "byte_length": 8155,
       "relative_path": "src/satnet/experiments/stage_a_execution/replay.py",
-      "sha256": "46dd5323e8ba928ef93f3574d0f4d17319ad74998f4a8a9f4675889f0fdbe7b3"
+      "sha256": "8f64efc98b43473b5cac2af450d352ff6a168d7d1a30d5dd6e246139274a2e92"
     },
     {
-      "byte_length": 4352,
+      "byte_length": 5554,
       "relative_path": "src/satnet/experiments/stage_a_execution/resume.py",
-      "sha256": "47eda2a5bd9c886c68d960441421b81be5be249d257c2f156e423d13ab1ce7ae"
+      "sha256": "8416ee6b5cb13b13f1012f4602319d606daba9119a92acb46b0523cedd1ba8e7"
     },
     {
       "byte_length": 0,
@@ -187,9 +197,9 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "byte_length": 4944,
+      "byte_length": 5837,
       "relative_path": "tests/experiments/stage_a_execution/conftest.py",
-      "sha256": "f27e181e4c65b4d509575e6f591d8958379efc0536a647d886cbaef1a76482ca"
+      "sha256": "fc21be0a8d6e308c36d8269e8a7591aa67d8521bd9bb20a44dd05bce655d3f06"
     },
     {
       "byte_length": 10160,
@@ -197,29 +207,39 @@
       "sha256": "0bf3cd96f9fa2e89d83d6c445e2868f642eddd873d41fc8d6f6419d9f71a570e"
     },
     {
-      "byte_length": 10286,
+      "byte_length": 12256,
       "relative_path": "tests/experiments/stage_a_execution/test_execution_replay_acceptance.py",
-      "sha256": "78c832ab476f496ee8f70e1a75b19fd5d06f41cc0524f0c0fa887a309cdb7f65"
+      "sha256": "1e8c4947ee169f0fad05704064daafe6c9b8ceed3e0f6484319112db4e5817a3"
     },
     {
-      "byte_length": 8126,
+      "byte_length": 10075,
+      "relative_path": "tests/experiments/stage_a_execution/test_final_controls.py",
+      "sha256": "c2de6a0ac8134abeb9806df90104456c2e6be85f116cb9515d6d6ccfb851b570"
+    },
+    {
+      "byte_length": 8163,
       "relative_path": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py",
-      "sha256": "8a7a79300deef038aa39daa3f20cbbfde90aee811b41161378a12312a7f62097"
+      "sha256": "e96d59c9d7e030d79ad7810de39b19d7000f5d7b344ec81b5dfcbb3eef825655"
     },
     {
-      "byte_length": 13122,
+      "byte_length": 15073,
       "relative_path": "tests/experiments/stage_a_execution/test_remediation_controls.py",
-      "sha256": "98c5d527d3dabe2df80447d44dac99063a9f5a2ddc89b8c3f2b662f83e78ce6e"
+      "sha256": "8166a59b0840ee5b24e67f805e493301e1b983e8db7e5abfc789a2a384479d61"
     },
     {
-      "byte_length": 5060,
+      "byte_length": 5383,
       "relative_path": "tests/experiments/test_final_dataset_isolation.py",
-      "sha256": "844f5dc76a7eab39e696e8b18a76ef23af1a59b9697c5879fbe4b3dbfac7d163"
+      "sha256": "9b07782705ff47acf7cc3d3c6f77e0c94d2c4937725d269f7004b538f9f463d8"
     },
     {
       "byte_length": 19296,
       "relative_path": "tests/validation/test_stage_a_execution_tooling_v1_audit.py",
       "sha256": "255bd65822638b1c67b7e8e629a85603c3d477c67b80d84a23c7efbb2b02706d"
+    },
+    {
+      "byte_length": 25820,
+      "relative_path": "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py",
+      "sha256": "b7f598ed477e579ec9ac7c60e1834deb7d9b3982265b4a57359eaddd56b68ac5"
     }
   ],
   "execution_authorized": false,
@@ -229,6 +249,6 @@
   "schema_identifier": "satnet.stage_a.execution_tooling_inventory.v2",
   "self_reference_policy": "stage_a_execution_tooling_inventory.json excludes its own bytes",
   "simulation_authorized": false,
-  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
   "status": "TOOLING_PROPOSAL"
 }

@@ -20,12 +20,48 @@
     "partition": {},
     "plan_hash": {},
     "records": {
+      "items": {
+        "properties": {
+          "design_construction_seed": {
+            "type": "integer"
+          },
+          "ground_failure_seed": {
+            "type": "integer"
+          },
+          "ground_selection_seed": {
+            "type": "integer"
+          },
+          "satellite_failure_seed": {
+            "type": "integer"
+          },
+          "science_completion": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "design_construction_seed",
+          "ground_selection_seed",
+          "satellite_failure_seed",
+          "ground_failure_seed",
+          "science_completion"
+        ],
+        "type": "object"
+      },
       "minItems": 1,
       "type": "array"
     },
     "schema_identifier": {
       "const": "satnet.stage_a.execution_ledger.v2"
     },
+    "source_generation_ledger_byte_length": {},
+    "source_generation_ledger_relative_path": {},
+    "source_generation_ledger_sha256": {},
+    "source_replay_ledger_byte_length": {},
+    "source_replay_ledger_relative_path": {},
+    "source_replay_ledger_sha256": {},
     "stable_executable_commit": {},
     "tooling_proposal_hash": {}
   },
@@ -43,6 +79,12 @@
     "plan_hash",
     "records",
     "schema_identifier",
+    "source_generation_ledger_byte_length",
+    "source_generation_ledger_relative_path",
+    "source_generation_ledger_sha256",
+    "source_replay_ledger_byte_length",
+    "source_replay_ledger_relative_path",
+    "source_replay_ledger_sha256",
     "stable_executable_commit",
     "tooling_proposal_hash"
   ],

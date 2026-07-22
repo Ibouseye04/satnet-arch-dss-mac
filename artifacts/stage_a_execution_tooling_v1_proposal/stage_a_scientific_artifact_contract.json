@@ -1,5 +1,5 @@
 {
-  "artifact_contract_hash": "bdda72a8e3d6cd11fb79a42c1384aae042e93ebb7c912bda2803e08061f3eda1",
+  "artifact_contract_hash": "cc721fd88dedcb90c0aa789b7815c7f6e35132e3aeebf2794e3e1d63a424380d",
   "hash_algorithm": "SHA-256",
   "manifest_ordering": "relative_path ordinal lexical ascending",
   "production_contract_identifier": "canonical_tier1_integrated_run_v1",
@@ -33,8 +33,10 @@
     "canonical_parsing",
     "schema_validation",
     "scientific_identity_match",
-    "seed_match",
-    "adapter_manifest_filesystem_match"
+    "complete_seed_match",
+    "adapter_manifest_filesystem_match",
+    "authoritative_satellite_and_g1_g5_replay",
+    "artifact_and_science_validation_before_succeeded"
   ],
   "synthetic_contract_identifier": "synthetic_stage_a_test_run_v1",
   "synthetic_required_files": [

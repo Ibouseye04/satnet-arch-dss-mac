@@ -36,7 +36,7 @@
   "required_next_task": "Independent reaudit of corrected Stage A execution tooling before any execution authorization",
   "schema_identifier": "satnet.stage_a.execution_tooling_proposal.v2",
   "simulation_authorized": false,
-  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
   "status": "TOOLING_PROPOSAL",
   "version": "2"
 }

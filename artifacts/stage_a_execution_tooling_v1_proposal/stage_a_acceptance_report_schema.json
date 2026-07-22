@@ -11,18 +11,50 @@
     "artifact_contract_hash": {},
     "authorization_hash": {},
     "comparisons": {
+      "items": {
+        "properties": {
+          "design_construction_seed": {
+            "type": "integer"
+          },
+          "ground_failure_seed": {
+            "type": "integer"
+          },
+          "ground_selection_seed": {
+            "type": "integer"
+          },
+          "satellite_failure_seed": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "design_construction_seed",
+          "ground_selection_seed",
+          "satellite_failure_seed",
+          "ground_failure_seed"
+        ],
+        "type": "object"
+      },
       "type": "array"
     },
     "contract_hash": {},
     "executable_inventory_hash": {},
     "expected_run_count": {},
     "generation_authorization_hash": {},
+    "generation_ledger_byte_length": {},
+    "generation_ledger_relative_path": {},
+    "generation_ledger_sha256": {},
     "generation_plan_hash": {},
     "output_roots": {},
     "partition": {},
     "plan_hash": {},
     "replay_authorization_hash": {},
+    "replay_ledger_byte_length": {},
+    "replay_ledger_relative_path": {},
+    "replay_ledger_sha256": {},
     "replay_plan_hash": {},
+    "replay_recorded_source_generation_ledger_byte_length": {},
+    "replay_recorded_source_generation_ledger_relative_path": {},
+    "replay_recorded_source_generation_ledger_sha256": {},
     "schema_identifier": {
       "const": "satnet.stage_a.acceptance_report.v1"
     },
@@ -40,12 +72,21 @@
     "executable_inventory_hash",
     "expected_run_count",
     "generation_authorization_hash",
+    "generation_ledger_byte_length",
+    "generation_ledger_relative_path",
+    "generation_ledger_sha256",
     "generation_plan_hash",
     "output_roots",
     "partition",
     "plan_hash",
     "replay_authorization_hash",
+    "replay_ledger_byte_length",
+    "replay_ledger_relative_path",
+    "replay_ledger_sha256",
     "replay_plan_hash",
+    "replay_recorded_source_generation_ledger_byte_length",
+    "replay_recorded_source_generation_ledger_relative_path",
+    "replay_recorded_source_generation_ledger_sha256",
     "schema_identifier",
     "stable_executable_commit",
     "tooling_proposal_hash"

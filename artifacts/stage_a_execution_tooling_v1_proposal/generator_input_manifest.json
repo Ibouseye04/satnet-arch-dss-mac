@@ -5,5 +5,5 @@
   "frozen_contract_tag": "stage-a-discovery-contract-v1",
   "generator_relative_path": "scripts/generate_stage_a_execution_tooling_v1_proposal.py",
   "schema_identifier": "satnet.stage_a.proposal_generator_input_manifest.v2",
-  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73"
+  "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7"
 }
