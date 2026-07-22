@@ -1,0 +1,82 @@
+{
+  "binding_findings": [
+    {
+      "evidence": "Exact 70-file executable inventory, clean state, stable ancestry, bytes, imports, and empty post-stable diff independently reproduced.",
+      "finding_id": "BINDING-001",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Generate, resume, replay, and accept require a sealed preflight certificate before root, lock, ledger, write, or adapter activity.",
+      "finding_id": "BINDING-002",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Arbitrary output is rejected, but the public orchestration API accepts an injected production adapter and _validate_production does not invoke authoritative G1-G5 replay before SUCCEEDED.",
+      "finding_id": "BINDING-003",
+      "severity": "BINDING",
+      "status": "OPEN"
+    },
+    {
+      "evidence": "Replay validates semantic ledger content but does not bind or persist source generation-ledger path, byte length, or SHA-256; semantic-preserving byte mutation is accepted.",
+      "finding_id": "BINDING-004",
+      "severity": "BINDING",
+      "status": "OPEN"
+    },
+    {
+      "evidence": "Acceptance cannot cross-bind replay to exact source generation-ledger bytes and the plan/ledgers omit design_construction_seed from the complete frozen seed set.",
+      "finding_id": "BINDING-005",
+      "severity": "BINDING",
+      "status": "OPEN"
+    },
+    {
+      "evidence": "Mandatory preflight invokes full frozen production-evidence verification and validates identities, 9,004 hashes, counts, bytes, archive, and read-only state.",
+      "finding_id": "BINDING-006",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "evidence": "Exclusive campaign and per-run files exist, but lock payloads omit required explicit campaign/run/host identities and stale recovery lacks minimum age, foreign-host denial, active-owner checks, and completed-output validation.",
+      "finding_id": "BINDING-007",
+      "severity": "BINDING",
+      "status": "OPEN"
+    },
+    {
+      "evidence": "Fresh autocrlf=true bytes match, but .gitattributes uses the explicitly forbidden broad repository-wide '*.py text eol=lf' policy instead of narrow inventory-bound rules.",
+      "finding_id": "BINDING-008",
+      "severity": "BINDING",
+      "status": "OPEN"
+    },
+    {
+      "evidence": "The checked-in generator reproduced all 16 proposal artifacts twice with zero byte mismatches and the exact authoritative proposal inventory hash.",
+      "finding_id": "BINDING-009",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    }
+  ],
+  "binding_findings_remaining": [
+    "BINDING-003",
+    "BINDING-004",
+    "BINDING-005",
+    "BINDING-007",
+    "BINDING-008"
+  ],
+  "execution_authorized": false,
+  "final_verdict": "NOT APPROVED FOR STAGE A DEVELOPMENT EXECUTION-AUTHORIZATION PREPARATION",
+  "nonbinding_findings": [],
+  "observations": [
+    "The remediation report reassigns the original BINDING-006 through BINDING-009 topics instead of preserving the authoritative original finding mapping.",
+    "Fresh Windows checkout byte identity succeeds despite the noncompliant broad Python text rule."
+  ],
+  "production_authorized": false,
+  "required_corrections": [
+    "Make complete authoritative production-science validation non-bypassable in every public execution path before SUCCEEDED.",
+    "Bind replay and acceptance to exact source ledger paths, byte lengths, and SHA-256 identities.",
+    "Carry and compare design_construction_seed with every other frozen seed across plan, generation, replay, and acceptance.",
+    "Redesign lock payloads and stale recovery to include all campaign/run/host identities, minimum age, active-owner proof, completed-output validation, and immutable recovery evidence.",
+    "Replace the broad repository-wide Python line-ending rule with narrow inventory-bound coverage and regenerate stable/proposal identities."
+  ],
+  "schema_identifier": "satnet.stage_a.execution_tooling_reaudit_findings.v1",
+  "simulation_authorized": false
+}

@@ -1,0 +1,12 @@
+{
+  "campaign_root_overlap_rejected": true,
+  "case_normalization": "os.path.normcase",
+  "existing_root_rejected_by_operation_state": true,
+  "frozen_evidence_overlap_rejected": true,
+  "link_and_junction_escape_rejected": true,
+  "relative_traversal_rejected": true,
+  "repository_and_worktree_overlap_rejected": true,
+  "root_created_before_preflight": false,
+  "schema_identifier": "satnet.stage_a.reaudit_root_isolation.v1",
+  "verification": "PASSED"
+}

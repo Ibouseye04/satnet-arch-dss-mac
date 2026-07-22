@@ -1,0 +1,19 @@
+{
+  "active_campaign_owner_check": false,
+  "completed_output_validation": false,
+  "explicit_recovery_action": true,
+  "foreign_host_lock_denial": false,
+  "host_identity_check": false,
+  "matching_generic_identity": true,
+  "minimum_lock_age_check": false,
+  "process_start_identity_check": true,
+  "recovery_log_append_is_immutable": false,
+  "recovery_parameters": [
+    "expected_identity",
+    "path",
+    "recovery_log"
+  ],
+  "schema_identifier": "satnet.stage_a.reaudit_stale_lock_recovery.v1",
+  "verification": "FAILED",
+  "zero_age_inactive_lock_recoverable": true
+}

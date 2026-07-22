@@ -1,0 +1,19 @@
+{
+  "all_binding_findings_closed": false,
+  "closed_count": 4,
+  "independent_statuses": {
+    "BINDING-001": "CLOSED",
+    "BINDING-002": "CLOSED",
+    "BINDING-003": "OPEN",
+    "BINDING-004": "OPEN",
+    "BINDING-005": "OPEN",
+    "BINDING-006": "CLOSED",
+    "BINDING-007": "OPEN",
+    "BINDING-008": "OPEN",
+    "BINDING-009": "CLOSED"
+  },
+  "open_count": 5,
+  "remediation_claimed_status": "CLOSED",
+  "schema_identifier": "satnet.stage_a.execution_tooling_reaudit_binding_closure.v1",
+  "verification": "FAILED"
+}

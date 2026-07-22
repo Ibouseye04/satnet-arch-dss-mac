@@ -1,0 +1,33 @@
+{
+  "contract_design_count": 30,
+  "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "contract_run_count": 150,
+  "contract_seed_count": 150,
+  "development_design_count": 20,
+  "development_plan_hash": "e517526db56f8cbce170980a02fdc6991787f2fbb435e68def7747db48029b97",
+  "development_run_count": 100,
+  "first_development_run": "SA-D000-R00",
+  "last_development_run": "SA-D027-R04",
+  "ordered_run_id_sha256": "94a3fa9098c01b348ced330b0d12f69fcf3d36003d47aa19294fe4637a27c732",
+  "partitions": {
+    "development": {
+      "design_count": 20,
+      "run_count": 100,
+      "sealed": false
+    },
+    "sealed_holdout": {
+      "design_count": 5,
+      "run_count": 25,
+      "sealed": true
+    },
+    "validation": {
+      "design_count": 5,
+      "run_count": 25,
+      "sealed": false
+    }
+  },
+  "reserved_roots_created": false,
+  "schema_identifier": "satnet.stage_a.reaudit_development_plan.v1",
+  "scientific_run_set_preserved": true,
+  "verification": "PASSED"
+}

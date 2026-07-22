@@ -1,0 +1,32 @@
+{
+  "accept_requires_sealed_preflight": true,
+  "frozen_evidence_verification": true,
+  "generate_requires_sealed_preflight": true,
+  "preflight_before_root_lock_ledger_or_adapter": true,
+  "replay_requires_sealed_preflight": true,
+  "required_calls": [
+    "FileExistsError",
+    "OSError",
+    "Path",
+    "PermissionError",
+    "PreflightCertificate",
+    "RuntimeError",
+    "ValueError",
+    "any",
+    "available_bytes",
+    "exists",
+    "find_spec",
+    "items",
+    "load_frozen_contract",
+    "probe_parent",
+    "validate_authorization",
+    "validate_output_roots",
+    "validate_plan",
+    "values",
+    "verify_executable_identity",
+    "verify_frozen_production_evidence",
+    "with_name"
+  ],
+  "schema_identifier": "satnet.stage_a.reaudit_preflight.v1",
+  "verification": "PASSED"
+}

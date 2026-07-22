@@ -1,0 +1,7 @@
+{
+  "changed_executable_paths": [],
+  "from_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "schema_identifier": "satnet.stage_a.reaudit_post_stable_diff.v1",
+  "to_commit": "21eea8bc8d713b8799ff4e2fc3c0365139e61de3",
+  "verification": "PASSED"
+}

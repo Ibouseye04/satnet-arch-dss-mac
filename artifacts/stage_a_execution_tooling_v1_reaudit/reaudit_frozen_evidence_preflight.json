@@ -1,0 +1,8 @@
+{
+  "identity_count_byte_count_hash_and_read_only_validated": true,
+  "persistent_campaign_write_before_evidence_verification": false,
+  "preflight_invokes_complete_verifier": true,
+  "schema_identifier": "satnet.stage_a.reaudit_frozen_evidence_preflight.v1",
+  "synthetic_mutation_cases_fail_closed": true,
+  "verification": "PASSED"
+}

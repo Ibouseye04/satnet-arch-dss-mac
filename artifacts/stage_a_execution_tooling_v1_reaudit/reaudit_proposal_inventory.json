@@ -1,0 +1,30 @@
+{
+  "artifact_count_excluding_inventory": 44,
+  "artifact_hashes": {
+    "development_plan_preview.json": "da08b99789f84cbcfd127857a4f0e52482a004472cc44c294cae6959652d5eff",
+    "generator_input_manifest.json": "3a0a1af69b1fe743f51cf755f93df259e149f057f0b29cc458f410f77752b5b4",
+    "protected_science_validation.json": "6a9a95b4160ff554967ceb43fe5e8abf06e562f884be963a932e764d16cc92d2",
+    "reserved_root_validation.json": "d2bdf86c06491f68472af43058a636de2e9eb1c27bb15a0f8f754bbd789a84f5",
+    "simulation_nonexecution_validation.json": "3ff0a17e2afd700a3e4b68e1e9f7f125860a1670caa6e7b5d20bda4c755f7a6e",
+    "stage_a_acceptance_report_schema.json": "d91ae5afcc9442ef8c8848e2669a4d852218ff98ea606b90605114dee88affe0",
+    "stage_a_executable_source_inventory.json": "8404e0cda2864a111598bd8b1209a341a1f1ecfc1c12f7c17c611c0156a2f94a",
+    "stage_a_execution_authorization_schema.json": "c3451ba984a8f17c2306c970d6ae17ed8202d4236813e360b0f94da07d1906a4",
+    "stage_a_execution_ledger_schema.json": "3ee6766baef4457ce710b95e738e0e4ad85acac95415d4116d924b383d4c0e2e",
+    "stage_a_execution_plan_schema.json": "fcf62acaf1bcb332225327e608d7c2318d55ac79775f797c1c59c06d901a315b",
+    "stage_a_execution_tooling_inventory.json": "845f4c72548b584af371ae1d3b868b7805673e05832ff4dbfff09703a3b2a7f9",
+    "stage_a_execution_tooling_specification.json": "6a5acb5f0b4f04495274e04288098f643ba95f07ed701419b61669f1017a74cd",
+    "stage_a_replay_ledger_schema.json": "63ffa7402ad7a14f68611d791d34b12a1507250595ce54c8df5dad73158e888e",
+    "stage_a_scientific_artifact_contract.json": "ea03ce40d849815c6a5d4c0275e68e0fa1cba165a44e351e6a6e8e6db99e8fe3",
+    "stage_a_stable_executable_identity.json": "79d3813f79e6e1a13fc5d4aaeb7336943837eabb6ef45efd0b2e791d9b69841b",
+    "validation_summary.json": "92d8ac63b28ead55e0298abfa8164e5339cfbe9f93c121edc3ce363bc8437e03"
+  },
+  "authoritative_tooling_proposal_hash": "845f4c72548b584af371ae1d3b868b7805673e05832ff4dbfff09703a3b2a7f9",
+  "deterministic_lexical_ordering": true,
+  "duplicate_record_count": 0,
+  "inventory_sha256": "845f4c72548b584af371ae1d3b868b7805673e05832ff4dbfff09703a3b2a7f9",
+  "proposal_artifact_count": 16,
+  "record_mismatches": [],
+  "schema_identifier": "satnet.stage_a.reaudit_proposal_inventory.v1",
+  "self_reference_present": false,
+  "verification": "PASSED"
+}

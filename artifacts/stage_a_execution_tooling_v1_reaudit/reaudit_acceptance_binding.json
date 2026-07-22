@@ -1,0 +1,10 @@
+{
+  "complete_seed_set_cross_bound": false,
+  "evidence_repair_or_rewrite": false,
+  "exact_generation_ledger_bytes_cross_bound": false,
+  "exact_replay_ledger_bytes_cross_bound": false,
+  "generation_and_replay_ledgers_validated": true,
+  "replay_source_generation_ledger_hash_cross_bound": false,
+  "schema_identifier": "satnet.stage_a.reaudit_acceptance_binding.v1",
+  "verification": "FAILED"
+}

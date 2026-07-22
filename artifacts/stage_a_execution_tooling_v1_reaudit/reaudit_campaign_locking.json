@@ -1,0 +1,29 @@
+{
+  "exclusive_creation": true,
+  "lock_fields": [
+    "created_unix_ns",
+    "identity",
+    "lock_hash",
+    "lock_token",
+    "pid",
+    "process_start_identity",
+    "schema_identifier",
+    "scope"
+  ],
+  "required_explicit_fields": [
+    "campaign_id",
+    "operation",
+    "contract_hash",
+    "plan_hash",
+    "authorization_hash",
+    "stable_executable_commit",
+    "host_identity",
+    "process_identity",
+    "creation_time",
+    "nonce"
+  ],
+  "required_explicit_fields_complete": false,
+  "schema_identifier": "satnet.stage_a.reaudit_campaign_locking.v1",
+  "second_campaign_process_rejected": true,
+  "verification": "FAILED"
+}

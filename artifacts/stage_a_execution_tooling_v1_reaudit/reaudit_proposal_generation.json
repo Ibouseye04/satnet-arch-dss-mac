@@ -1,0 +1,30 @@
+{
+  "byte_mismatches": {},
+  "environment_dependent_binding_fields": [],
+  "execution_authorized": false,
+  "generated_artifact_count": 16,
+  "generated_artifact_names": [
+    "development_plan_preview.json",
+    "generator_input_manifest.json",
+    "protected_science_validation.json",
+    "reserved_root_validation.json",
+    "simulation_nonexecution_validation.json",
+    "stage_a_acceptance_report_schema.json",
+    "stage_a_executable_source_inventory.json",
+    "stage_a_execution_authorization_schema.json",
+    "stage_a_execution_ledger_schema.json",
+    "stage_a_execution_plan_schema.json",
+    "stage_a_execution_tooling_inventory.json",
+    "stage_a_execution_tooling_specification.json",
+    "stage_a_replay_ledger_schema.json",
+    "stage_a_scientific_artifact_contract.json",
+    "stage_a_stable_executable_identity.json",
+    "validation_summary.json"
+  ],
+  "generator": "scripts/generate_stage_a_execution_tooling_v1_proposal.py",
+  "independent_reproduction_count": 2,
+  "production_authorized": false,
+  "schema_identifier": "satnet.stage_a.reaudit_proposal_generation.v1",
+  "simulation_authorized": false,
+  "verification": "PASSED"
+}

@@ -1,0 +1,12 @@
+{
+  "artifact_manifest_and_hash_bound": true,
+  "complete_production_science_independently_revalidated": false,
+  "design_identity_bound": true,
+  "filesystem_claims_independently_compared": true,
+  "realization_identity_bound": true,
+  "return_and_validation_states_bound": true,
+  "run_identity_bound": true,
+  "schema_identifier": "satnet.stage_a.reaudit_adapter_result.v1",
+  "three_operational_seeds_bound": true,
+  "verification": "FAILED"
+}

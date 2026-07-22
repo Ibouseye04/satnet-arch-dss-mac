@@ -1,0 +1,34 @@
+{
+  "acceptance_reports": [],
+  "campaign_locks": [],
+  "development_runs_executed": 0,
+  "generation_ledgers": [],
+  "per_run_locks": [],
+  "real_authorization_artifacts": [],
+  "replay_ledgers": [],
+  "reserved_root_count": 0,
+  "reserved_roots": {
+    "acceptance": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance"
+    },
+    "evidence_freeze": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze"
+    },
+    "generation": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production"
+    },
+    "replay": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    }
+  },
+  "schema_identifier": "satnet.stage_a.reaudit_simulation_nonexecution.v1",
+  "sealed_holdout_runs_executed": 0,
+  "stage_a_scientific_outputs": [],
+  "stage_a_simulations_performed": 0,
+  "validation_runs_executed": 0,
+  "verification": "PASSED"
+}

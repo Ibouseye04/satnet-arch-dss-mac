@@ -1,0 +1,11 @@
+{
+  "exact_source_ledger_bytes_bound": false,
+  "generation_evidence_overwritten": false,
+  "generation_ledger_content_validated": true,
+  "schema_identifier": "satnet.stage_a.reaudit_replay_binding.v1",
+  "semantic_preserving_byte_mutation_rejected": false,
+  "source_generation_ledger_byte_length_persisted": false,
+  "source_generation_ledger_path_persisted": false,
+  "source_generation_ledger_sha256_persisted": false,
+  "verification": "FAILED"
+}

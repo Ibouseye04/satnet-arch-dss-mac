@@ -1,0 +1,10 @@
+{
+  "campaign_identity_explicit_field": false,
+  "exclusive_creation": true,
+  "global_run_id_explicit_field": false,
+  "per_run_lock_present": true,
+  "run_key_explicit_field": false,
+  "same_run_concurrency_rejected": true,
+  "schema_identifier": "satnet.stage_a.reaudit_per_run_locking.v1",
+  "verification": "FAILED"
+}

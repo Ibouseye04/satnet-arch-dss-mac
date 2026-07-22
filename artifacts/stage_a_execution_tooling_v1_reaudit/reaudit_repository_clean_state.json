@@ -1,0 +1,11 @@
+{
+  "clean_repository": true,
+  "dirty_documentation_only_rejected": true,
+  "dirty_executable_rejected": true,
+  "implemented_rule": "all tracked and untracked repository dirt is binding",
+  "schema_identifier": "satnet.stage_a.reaudit_repository_clean_state.v1",
+  "staged_executable_rejected": true,
+  "untracked_executable_rejected": true,
+  "untracked_unrelated_file_rejected": true,
+  "verification": "PASSED"
+}

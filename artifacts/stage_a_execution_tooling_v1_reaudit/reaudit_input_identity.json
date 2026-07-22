@@ -1,0 +1,16 @@
+{
+  "frozen_contract_commit": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "frozen_contract_tag": "stage-a-discovery-contract-v1",
+  "frozen_contract_tag_type": "tag",
+  "original_audit_head": "4d9ad633329bd3e0710ab566a1b25c7e01af889f",
+  "original_audit_inventory_sha256": "5c40277ffb85576eea9bf8c5f6772f99f0375a4828e4fcbba73a15c78a5368c8",
+  "original_stable_executable_commit": "c1605fbe62c57c1968856b592185e3f08bb9541d",
+  "original_tooling_head": "94e0a9b2ee2d5699eba172eef84cbb857f5bd4cf",
+  "original_tooling_proposal_hash": "75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17",
+  "reaudit_branch": "audit/stage-a-execution-tooling-v1-reaudit",
+  "reaudit_head": "46f83b7e53f14fe2e2ac74fc9a7feb82b9ca9c3d",
+  "remediation_head_audited": "21eea8bc8d713b8799ff4e2fc3c0365139e61de3",
+  "schema_identifier": "satnet.stage_a.execution_tooling_reaudit_input_identity.v1",
+  "stable_executable_commit_audited": "5a4bb751bc379596abd938e68db377570222ed73",
+  "verification": "PASSED"
+}

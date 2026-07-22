@@ -1,0 +1,150 @@
+{
+  "artifact_count_excluding_inventory": 27,
+  "artifacts": [
+    {
+      "byte_length": 399,
+      "relative_path": "reaudit_acceptance_binding.json",
+      "sha256": "d4e8b8baf3969b1661de7591660817fd9aa4506a0adb862610fc8c6fe9fe4a75"
+    },
+    {
+      "byte_length": 448,
+      "relative_path": "reaudit_adapter_result.json",
+      "sha256": "41d2569f93cf370eac86d8abc62bc653340b2ef024f4dfa5eb4d0dc68302aa25"
+    },
+    {
+      "byte_length": 619,
+      "relative_path": "reaudit_artifact_contract.json",
+      "sha256": "ac0365f4b98e98360669becd7d1ae3ed88cc0c8410b3c9b57c6977c699a0a3e3"
+    },
+    {
+      "byte_length": 467,
+      "relative_path": "reaudit_authorization_state.json",
+      "sha256": "f5cbdcf0edee855f1f17dcd4a50b7a5bda3ba964499d029323d3d30634ae8baa"
+    },
+    {
+      "byte_length": 522,
+      "relative_path": "reaudit_binding_closure.json",
+      "sha256": "f098d71ce921fa717c719a3b2dea059d3317786bc48b32af662b6e8aa688ac74"
+    },
+    {
+      "byte_length": 643,
+      "relative_path": "reaudit_campaign_locking.json",
+      "sha256": "337c30cb44392926895d4b03a75b1257e9d1c337f3f58364d96e7718e2654af2"
+    },
+    {
+      "byte_length": 1010,
+      "relative_path": "reaudit_development_plan.json",
+      "sha256": "271befe29a4efa3ec8b4b633e229c51de0ba5b1342a278609ed8d8e3611988da"
+    },
+    {
+      "byte_length": 587,
+      "relative_path": "reaudit_executable_identity.json",
+      "sha256": "e714f70672f1b5cafcbc96271b2c614fc203bb022617d21bc558594e9206ecb3"
+    },
+    {
+      "byte_length": 396,
+      "relative_path": "reaudit_executable_inventory.json",
+      "sha256": "b63ef37a0e01053a39f640d8dff536dce37fbaa3b3471f5ba1cb601470cae525"
+    },
+    {
+      "byte_length": 4066,
+      "relative_path": "reaudit_findings.json",
+      "sha256": "45877983a979fbf01eca38ed973470a85269d107cd39be9aa5de63ade3c6221b"
+    },
+    {
+      "byte_length": 2918,
+      "relative_path": "reaudit_frozen_evidence.json",
+      "sha256": "dd612ae47933575a2ca81fde3bacd1977fc82505570b2542acee25a61cb1eb4d"
+    },
+    {
+      "byte_length": 337,
+      "relative_path": "reaudit_frozen_evidence_preflight.json",
+      "sha256": "b9b9bab3ea3ca770b1ed77cba1001eefb265eb74b6de8c6de73cf1e0041da82c"
+    },
+    {
+      "byte_length": 514,
+      "relative_path": "reaudit_holdout_isolation.json",
+      "sha256": "184a0be4a3b2c9c581d8e8fe5dac2ffbd173485f06a10d67958b5bd176144eeb"
+    },
+    {
+      "byte_length": 999,
+      "relative_path": "reaudit_input_identity.json",
+      "sha256": "89fa21982d27885b9ae83ae25f37da1e4a8ad511a53b03a3fcb0a8f79529b344"
+    },
+    {
+      "byte_length": 323,
+      "relative_path": "reaudit_per_run_locking.json",
+      "sha256": "78918fbd40e50a59380615070b8e6ce0a45c326f9b17418c7801d11e3768e76d"
+    },
+    {
+      "byte_length": 254,
+      "relative_path": "reaudit_post_stable_diff.json",
+      "sha256": "63c6b99cce6e655d25d3612eeab9b2c677f80de9377b682ee942100131bbd6a8"
+    },
+    {
+      "byte_length": 800,
+      "relative_path": "reaudit_preflight.json",
+      "sha256": "172ffa4d0176cc98d3d1fec542be59402a89157790a5cde0bc17ba2fd952ef2f"
+    },
+    {
+      "byte_length": 1157,
+      "relative_path": "reaudit_proposal_generation.json",
+      "sha256": "871ec1625297c0a28113562adae0c9b5d6d8f125a7eae9dcaea4fc34f58ede7a"
+    },
+    {
+      "byte_length": 2325,
+      "relative_path": "reaudit_proposal_inventory.json",
+      "sha256": "8c6cbca66677b548b22a63efdea77ef42fa5304805da5bcfa1964e7c903d7098"
+    },
+    {
+      "byte_length": 1817,
+      "relative_path": "reaudit_protected_science.json",
+      "sha256": "79678693a701fa68b1dfa0dec581a796e1ea06d4eea3a28ea8f19205781d6174"
+    },
+    {
+      "byte_length": 453,
+      "relative_path": "reaudit_replay_binding.json",
+      "sha256": "c66e7488a101684e88671486779fa14bc790d75a6039f6674bf14bc8dc40beff"
+    },
+    {
+      "byte_length": 418,
+      "relative_path": "reaudit_repository_clean_state.json",
+      "sha256": "3b908ba1f86ef251df5edb268bfdcd9412c0f680bf31873e5e730b83744d81ff"
+    },
+    {
+      "byte_length": 459,
+      "relative_path": "reaudit_root_isolation.json",
+      "sha256": "e1c28057f3a7265df8bceb38d1353df6dbfd8eb3d8217926c04eec113d4ee9b5"
+    },
+    {
+      "byte_length": 597,
+      "relative_path": "reaudit_seed_binding.json",
+      "sha256": "be02344dfa4bc6fa249032bdada3fe26efd3e7e8f2036f12b5070439a21299b4"
+    },
+    {
+      "byte_length": 989,
+      "relative_path": "reaudit_simulation_nonexecution.json",
+      "sha256": "a565503c76ae6307a46527555a76274066d5e05bd3d5207b962638a019bd4ab5"
+    },
+    {
+      "byte_length": 579,
+      "relative_path": "reaudit_stale_lock_recovery.json",
+      "sha256": "f083ffadb855a3b51eccb4730de79f001632919afb837b76ce771778664229ca"
+    },
+    {
+      "byte_length": 24169,
+      "relative_path": "reaudit_windows_checkout.json",
+      "sha256": "646b924001d9c75ff32cf600b7796684273aaa3ffc063c95d3250d187f902c17"
+    }
+  ],
+  "execution_authorized": false,
+  "final_verdict": "NOT APPROVED FOR STAGE A DEVELOPMENT EXECUTION-AUTHORIZATION PREPARATION",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "reaudit_head": "46f83b7e53f14fe2e2ac74fc9a7feb82b9ca9c3d",
+  "remediation_head_audited": "21eea8bc8d713b8799ff4e2fc3c0365139e61de3",
+  "schema_identifier": "satnet.stage_a.execution_tooling_v1_reaudit_inventory.v1",
+  "self_reference_policy": "reaudit_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "stable_executable_commit_audited": "5a4bb751bc379596abd938e68db377570222ed73"
+}

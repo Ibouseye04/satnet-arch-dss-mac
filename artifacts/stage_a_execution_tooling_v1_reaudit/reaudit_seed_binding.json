@@ -1,0 +1,24 @@
+{
+  "complete_frozen_seed_set_bound": false,
+  "frozen_seed_fields": [
+    "design_construction_seed",
+    "ground_failure_seed",
+    "ground_selection_seed",
+    "satellite_failure_seed"
+  ],
+  "missing_seed_fields": [
+    "design_construction_seed"
+  ],
+  "one_field_mutation_tests": [
+    "ground_failure_seed",
+    "ground_selection_seed",
+    "satellite_failure_seed"
+  ],
+  "plan_and_ledger_seed_fields": [
+    "ground_failure_seed",
+    "ground_selection_seed",
+    "satellite_failure_seed"
+  ],
+  "schema_identifier": "satnet.stage_a.reaudit_seed_binding.v1",
+  "verification": "FAILED"
+}

@@ -1,0 +1,12 @@
+{
+  "adapter_filesystem_manifest_compared": true,
+  "arbitrary_output_rejected": true,
+  "artifact_contract_file_sha256": "ea03ce40d849815c6a5d4c0275e68e0fa1cba165a44e351e6a6e8e6db99e8fe3",
+  "artifact_contract_payload_hash": "bdda72a8e3d6cd11fb79a42c1384aae042e93ebb7c912bda2803e08061f3eda1",
+  "complete_scientific_validation_before_succeeded": false,
+  "exact_path_set_required": true,
+  "production_authoritative_replay_called_by_orchestration_validator": false,
+  "public_execution_accepts_injected_adapter": true,
+  "schema_identifier": "satnet.stage_a.reaudit_artifact_contract.v1",
+  "verification": "FAILED"
+}

@@ -1,0 +1,16 @@
+{
+  "development_duplicate_run_count": 0,
+  "development_sealed_holdout_run_count": 0,
+  "development_validation_run_count": 0,
+  "general_purpose_holdout_execution_option": false,
+  "ordinary_output_holdout_design_ids": [],
+  "ordinary_output_holdout_run_ids": [],
+  "ordinary_output_holdout_seeds": [],
+  "schema_identifier": "satnet.stage_a.reaudit_holdout_isolation.v1",
+  "sealed_holdout_aggregate": {
+    "design_count": 5,
+    "identities": "REDACTED",
+    "run_count": 25
+  },
+  "verification": "PASSED"
+}

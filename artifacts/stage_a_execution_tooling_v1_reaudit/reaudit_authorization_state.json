@@ -1,0 +1,13 @@
+{
+  "accept_without_authorization_exit_code": 2,
+  "execution_authorized": false,
+  "generate_without_authorization_exit_code": 2,
+  "hidden_bypass_found": false,
+  "production_authorized": false,
+  "proposal_status": "TOOLING_PROPOSAL",
+  "replay_without_authorization_exit_code": 2,
+  "resume_without_authorization_exit_code": 2,
+  "schema_identifier": "satnet.stage_a.reaudit_authorization_state.v1",
+  "simulation_authorized": false,
+  "verification": "PASSED"
+}

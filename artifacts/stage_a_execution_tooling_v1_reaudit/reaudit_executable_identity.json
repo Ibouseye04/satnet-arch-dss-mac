@@ -1,0 +1,13 @@
+{
+  "executable_file_count": 70,
+  "executable_inventory_sha256": "8404e0cda2864a111598bd8b1209a341a1f1ecfc1c12f7c17c611c0156a2f94a",
+  "import_resolution": "EXPECTED_REPOSITORY_FILES",
+  "independent_inventory_regeneration": "BYTE_IDENTICAL",
+  "post_stable_executable_diff": [],
+  "remediation_head": "21eea8bc8d713b8799ff4e2fc3c0365139e61de3",
+  "repository_clean": true,
+  "schema_identifier": "satnet.stage_a.reaudit_executable_identity.v1",
+  "stable_commit_is_ancestor": true,
+  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "verification": "PASSED"
+}
