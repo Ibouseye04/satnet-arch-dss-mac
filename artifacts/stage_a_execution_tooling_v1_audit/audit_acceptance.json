@@ -1,0 +1,7 @@
+{
+  "artifact_inventory_verified": true,
+  "ledger_authorization_hash_bound": false,
+  "ledger_plan_hash_bound": false,
+  "ledger_seed_set_bound": false,
+  "pass": false
+}

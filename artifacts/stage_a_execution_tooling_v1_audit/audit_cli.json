@@ -1,0 +1,16 @@
+{
+  "commands": [
+    "verify-contract",
+    "validate-authorization",
+    "plan",
+    "preflight",
+    "generate",
+    "resume",
+    "replay",
+    "accept",
+    "status"
+  ],
+  "hidden_bypass_aliases": [],
+  "mandatory_preflight": true,
+  "pass": false
+}

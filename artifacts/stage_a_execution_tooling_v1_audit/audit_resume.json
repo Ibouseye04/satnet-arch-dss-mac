@@ -1,0 +1,6 @@
+{
+  "artifact_reverification": true,
+  "explicit_retry": true,
+  "identity_validation": true,
+  "pass": true
+}

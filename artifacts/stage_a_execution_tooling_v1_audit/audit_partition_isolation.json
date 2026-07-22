@@ -1,0 +1,8 @@
+{
+  "ordinary_partitions": [
+    "development",
+    "validation"
+  ],
+  "pass": true,
+  "sealed_holdout_execution_option": false
+}

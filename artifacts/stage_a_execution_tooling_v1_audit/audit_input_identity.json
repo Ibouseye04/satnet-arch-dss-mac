@@ -1,0 +1,9 @@
+{
+  "audit_branch": "audit/stage-a-execution-tooling-v1",
+  "audit_head_at_start": "94e0a9b2ee2d5699eba172eef84cbb857f5bd4cf",
+  "frozen_contract_audit_commit": "c350d693bf47d007a0cb2a8c3b5cfb2259d2da48",
+  "frozen_tag": "stage-a-discovery-contract-v1",
+  "frozen_tag_target": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "pass": true,
+  "stable_executable_commit": "c1605fbe62c57c1968856b592185e3f08bb9541d"
+}

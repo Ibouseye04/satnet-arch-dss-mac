@@ -1,0 +1,6 @@
+{
+  "link_inventory_validator": true,
+  "pass": false,
+  "path_validator": true,
+  "root_isolation_on_execution": false
+}

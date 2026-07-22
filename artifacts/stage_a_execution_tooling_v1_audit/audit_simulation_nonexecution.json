@@ -1,0 +1,12 @@
+{
+  "acceptance_reports": [],
+  "active_real_authorization_artifacts": [],
+  "development_simulations_performed": 0,
+  "generation_ledgers": [],
+  "pass": true,
+  "replay_ledgers": [],
+  "scientific_output_roots": [],
+  "sealed_holdout_simulations_performed": 0,
+  "stage_a_simulations_performed": 0,
+  "validation_simulations_performed": 0
+}

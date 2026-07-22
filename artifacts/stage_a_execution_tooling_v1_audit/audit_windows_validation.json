@@ -1,0 +1,27 @@
+{
+  "pass": true,
+  "platform": "nt",
+  "proposal_reproduction": {
+    "byte_for_byte_regeneration": "UNAVAILABLE",
+    "exact_byte_hashes": {
+      "development_plan_preview.json": "ebea547ac5efc461658f2e4dac6c4dbc174eb5060f61ed33b955e43826ed2366",
+      "protected_science_validation.json": "d15e2c6ce16a5836fa2f5a53b85513c6c2219491f755e42c34fbcc41253a14ad",
+      "reserved_root_validation.json": "802fddd38af86a5ae6fd575ea22b636cf28aad1352f6507f55126f8f6f0b477c",
+      "simulation_nonexecution_validation.json": "64c9dab84378338c8d744f371de7d5c9c49d3439ef3d9d12bbdc9abd7b17ba62",
+      "stage_a_acceptance_report_schema.json": "76bd71212be3a24acb04a02a0a7d2ab0ffb8db6864e9b8c38e87fb79f89edab7",
+      "stage_a_execution_authorization_schema.json": "b1dab98bbab3edff6e3a5a300c1a44397066362017751dd6e70dd61b8bcdab41",
+      "stage_a_execution_ledger_schema.json": "d51e2620d02a5e1f2c27c2eb359bea6ea9793543d6998bc74cbbe59eb8a98e1d",
+      "stage_a_execution_plan_schema.json": "f2395e3486f25bf47acfce3edd65f646ad1423fd9fd393b0cf16e6d2c013e615",
+      "stage_a_execution_tooling_inventory.json": "75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17",
+      "stage_a_execution_tooling_specification.json": "157e5ec3e623c4adbf85bdd8f3d13f52f3cca02ff8c0f03de6fefd285a754485",
+      "stage_a_replay_ledger_schema.json": "2bffb3339235277ef0d60d4d4fa4640bea776a8ef5256c134e4f5af9fa2f71f4",
+      "validation_summary.json": "3ab6c87dd84a2c612957b69749dcc8726fecd44f6cbdf8b2aab5ba6f159e1fb6"
+    },
+    "execution_authorized": false,
+    "independent_generator_present": false,
+    "pass": false,
+    "production_authorized": false,
+    "simulation_authorized": false,
+    "status": "TOOLING_PROPOSAL"
+  }
+}

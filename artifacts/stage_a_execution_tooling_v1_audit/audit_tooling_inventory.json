@@ -1,0 +1,34 @@
+{
+  "artifact_count_excluding_inventory": 28,
+  "authoritative_proposal_hash": "75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17",
+  "deterministic_ordering": true,
+  "git_blob_mismatches": [
+    ".gitattributes",
+    "tests/experiments/test_final_dataset_isolation.py"
+  ],
+  "inventory_sha256": "75c7832f6adf65a3b584acdb313153dc0ebaba251d0fc3bd569efa51f86bcc17",
+  "pass": false,
+  "self_excluding": true,
+  "windows_checkout_byte_identity": false,
+  "windows_checkout_byte_mismatches": [
+    "src/satnet/experiments/stage_a_execution/__init__.py",
+    "src/satnet/experiments/stage_a_execution/__main__.py",
+    "src/satnet/experiments/stage_a_execution/acceptance.py",
+    "src/satnet/experiments/stage_a_execution/authorization.py",
+    "src/satnet/experiments/stage_a_execution/cli.py",
+    "src/satnet/experiments/stage_a_execution/common.py",
+    "src/satnet/experiments/stage_a_execution/contract.py",
+    "src/satnet/experiments/stage_a_execution/generate.py",
+    "src/satnet/experiments/stage_a_execution/integrity.py",
+    "src/satnet/experiments/stage_a_execution/ledger.py",
+    "src/satnet/experiments/stage_a_execution/paths.py",
+    "src/satnet/experiments/stage_a_execution/plan.py",
+    "src/satnet/experiments/stage_a_execution/preflight.py",
+    "src/satnet/experiments/stage_a_execution/replay.py",
+    "src/satnet/experiments/stage_a_execution/resume.py",
+    "tests/experiments/stage_a_execution/conftest.py",
+    "tests/experiments/stage_a_execution/test_contract_plan_authorization.py",
+    "tests/experiments/stage_a_execution/test_execution_replay_acceptance.py",
+    "tests/experiments/stage_a_execution/test_paths_cli_inventory.py"
+  ]
+}

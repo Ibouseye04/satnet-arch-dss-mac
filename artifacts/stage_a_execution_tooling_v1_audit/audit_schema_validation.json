@@ -1,0 +1,33 @@
+{
+  "authorization_required_fields": [
+    "authorization_date",
+    "authorization_id",
+    "authorization_sha256",
+    "authorization_status",
+    "authorization_version",
+    "authorized_acceptance_root",
+    "authorized_contract_hash",
+    "authorized_contract_tag",
+    "authorized_execution_tooling_commit",
+    "authorized_execution_tooling_inventory_hash",
+    "authorized_frozen_commit",
+    "authorized_generation_root",
+    "authorized_operation",
+    "authorized_partition",
+    "authorized_replay_root",
+    "authorized_run_count",
+    "authorized_run_ids",
+    "authorizing_decision_reference",
+    "independently_approved",
+    "schema_identifier"
+  ],
+  "hashes": {
+    "stage_a_acceptance_report_schema.json": "76bd71212be3a24acb04a02a0a7d2ab0ffb8db6864e9b8c38e87fb79f89edab7",
+    "stage_a_execution_authorization_schema.json": "b1dab98bbab3edff6e3a5a300c1a44397066362017751dd6e70dd61b8bcdab41",
+    "stage_a_execution_ledger_schema.json": "d51e2620d02a5e1f2c27c2eb359bea6ea9793543d6998bc74cbbe59eb8a98e1d",
+    "stage_a_execution_plan_schema.json": "f2395e3486f25bf47acfce3edd65f646ad1423fd9fd393b0cf16e6d2c013e615",
+    "stage_a_execution_tooling_specification.json": "157e5ec3e623c4adbf85bdd8f3d13f52f3cca02ff8c0f03de6fefd285a754485",
+    "stage_a_replay_ledger_schema.json": "2bffb3339235277ef0d60d4d4fa4640bea776a8ef5256c134e4f5af9fa2f71f4"
+  },
+  "pass": true
+}

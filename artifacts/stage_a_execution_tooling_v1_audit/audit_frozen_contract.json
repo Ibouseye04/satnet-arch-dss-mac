@@ -1,0 +1,13 @@
+{
+  "hashes": {
+    "declaration": "e0987858e1eca4d04e7008a468de232ef26eaa867f9d2a750c83fc8c89717bd4",
+    "frozen_contract_audit_inventory": "2fe074c018f69da95f29ffaca06ae45c50e7098988d7b181fe9756452db41df9",
+    "inventory": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "proposal_inventory": "69fd2a9fbcc1b461ae4230a282cfcaaadc26ba7b65563bc90a81e86e1ca98127",
+    "readiness_audit_inventory": "16ce1a1b138567a144cbf9b1d715c74b30f05e1d8262841d9580240080339d10",
+    "readme": "d4d9d8b796b194ef6bebe7ad1a4520cc38cee4f3fb40889fc922cf3705928b0c",
+    "seed_manifest": "ab37564cca81e926b6e43caf74f1ff2be641b8bc203e32c3ae6a219ea6f7bace",
+    "specification": "c1822db61182e6ff6436c767ac39a35065ff84741119bd7306b261dc2a1f7373"
+  },
+  "pass": true
+}

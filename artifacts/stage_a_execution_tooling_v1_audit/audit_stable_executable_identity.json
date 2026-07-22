@@ -1,0 +1,25 @@
+{
+  "allowlist_complete": true,
+  "current_byte_verification_present": false,
+  "execution_source_allowlist": [
+    "src/satnet/experiments/stage_a_execution/__init__.py",
+    "src/satnet/experiments/stage_a_execution/__main__.py",
+    "src/satnet/experiments/stage_a_execution/acceptance.py",
+    "src/satnet/experiments/stage_a_execution/authorization.py",
+    "src/satnet/experiments/stage_a_execution/cli.py",
+    "src/satnet/experiments/stage_a_execution/common.py",
+    "src/satnet/experiments/stage_a_execution/contract.py",
+    "src/satnet/experiments/stage_a_execution/generate.py",
+    "src/satnet/experiments/stage_a_execution/integrity.py",
+    "src/satnet/experiments/stage_a_execution/ledger.py",
+    "src/satnet/experiments/stage_a_execution/paths.py",
+    "src/satnet/experiments/stage_a_execution/plan.py",
+    "src/satnet/experiments/stage_a_execution/preflight.py",
+    "src/satnet/experiments/stage_a_execution/replay.py",
+    "src/satnet/experiments/stage_a_execution/resume.py"
+  ],
+  "execution_source_count": 15,
+  "last_execution_surface_commit": "c1605fbe62c57c1968856b592185e3f08bb9541d",
+  "pass": false,
+  "stable_executable_commit": "c1605fbe62c57c1968856b592185e3f08bb9541d"
+}

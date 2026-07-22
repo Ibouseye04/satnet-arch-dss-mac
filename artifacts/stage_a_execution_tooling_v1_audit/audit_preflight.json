@@ -1,0 +1,9 @@
+{
+  "authorization": true,
+  "contract": true,
+  "dependencies": true,
+  "disk": true,
+  "frozen_evidence": false,
+  "pass": false,
+  "root_isolation": true
+}

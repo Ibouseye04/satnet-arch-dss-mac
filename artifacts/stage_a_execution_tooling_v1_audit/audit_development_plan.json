@@ -1,0 +1,12 @@
+{
+  "byte_deterministic": true,
+  "development_design_count": 20,
+  "development_run_count": 100,
+  "first_run": "SA-D000-R00",
+  "last_run": "SA-D027-R04",
+  "ordered_global_run_ids_sha256": "94a3fa9098c01b348ced330b0d12f69fcf3d36003d47aa19294fe4637a27c732",
+  "ordering": "global_run_id ascending",
+  "pass": true,
+  "plan_hash": "b666d8c7700a10418de85180624617fae744cb80a64b675ca95d1c89c1fc61c3",
+  "validation_or_holdout_run_count": 0
+}

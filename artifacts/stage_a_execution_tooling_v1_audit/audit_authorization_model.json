@@ -1,0 +1,6 @@
+{
+  "default_deny_cli": true,
+  "exact_authorized_literal": true,
+  "operations_separate": true,
+  "pass": true
+}

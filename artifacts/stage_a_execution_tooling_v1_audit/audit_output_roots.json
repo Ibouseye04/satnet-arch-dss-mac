@@ -1,0 +1,23 @@
+{
+  "mandatory_cli_root_validation": true,
+  "pass": false,
+  "reserved_root_count": 0,
+  "reserved_roots": {
+    "acceptance": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance"
+    },
+    "evidence_freeze": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze"
+    },
+    "generation": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production"
+    },
+    "replay": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    }
+  }
+}

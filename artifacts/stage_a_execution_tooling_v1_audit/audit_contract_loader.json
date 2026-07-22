@@ -1,0 +1,32 @@
+{
+  "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "design_count": 30,
+  "duplicate_design_ids": 0,
+  "duplicate_run_ids": 0,
+  "partitions": {
+    "development": {
+      "design_count": 20,
+      "run_count": 100,
+      "sealed": false
+    },
+    "sealed_holdout": {
+      "design_count": 5,
+      "run_count": 25,
+      "sealed": true
+    },
+    "validation": {
+      "design_count": 5,
+      "run_count": 25,
+      "sealed": false
+    }
+  },
+  "pass": true,
+  "realizations_per_design": 5,
+  "regions": {
+    "boundary": 12,
+    "global_control": 6,
+    "resilient_core": 12
+  },
+  "run_count": 150,
+  "seed_count": 150
+}
