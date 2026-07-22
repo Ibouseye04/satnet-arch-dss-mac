@@ -202,9 +202,9 @@
       "sha256": "78c832ab476f496ee8f70e1a75b19fd5d06f41cc0524f0c0fa887a309cdb7f65"
     },
     {
-      "byte_length": 8072,
+      "byte_length": 8126,
       "relative_path": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py",
-      "sha256": "78be533e651e3db3ff4b1b7f77217cf24322382d0d7590b82a16c754a3438465"
+      "sha256": "8a7a79300deef038aa39daa3f20cbbfde90aee811b41161378a12312a7f62097"
     },
     {
       "byte_length": 13122,
