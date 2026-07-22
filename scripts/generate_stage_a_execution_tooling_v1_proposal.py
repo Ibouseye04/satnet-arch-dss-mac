@@ -63,6 +63,9 @@ def authorization_schema() -> dict[str, Any]:
         "authorized_tooling_proposal_hash", "authorized_artifact_contract_hash",
         "authorized_partition", "authorized_run_ids", "authorized_run_count", "authorized_operation",
         "authorized_generation_root", "authorized_replay_root", "authorized_acceptance_root",
+        "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
         "authorization_date", "authorizing_decision_reference", "independently_approved",
         "authorization_sha256",
     )
@@ -81,6 +84,12 @@ def authorization_schema() -> dict[str, Any]:
     properties["authorized_run_ids"] = {"type": "array", "minItems": 1, "uniqueItems": True, "items": {"type": "integer"}}
     properties["authorized_run_count"] = {"type": "integer", "minimum": 1}
     properties["independently_approved"] = {"const": True}
+    for field in ("source_generation_ledger_relative_path", "source_replay_ledger_relative_path"):
+        properties[field] = {"type": ["string", "null"]}
+    for field in ("source_generation_ledger_byte_length", "source_replay_ledger_byte_length"):
+        properties[field] = {"type": ["integer", "null"], "minimum": 1}
+    for field in ("source_generation_ledger_sha256", "source_replay_ledger_sha256"):
+        properties[field] = {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
     return schema_object("stage_a_execution_authorization_v1", fields, properties)
 
 
@@ -88,7 +97,11 @@ def plan_schema() -> dict[str, Any]:
     fields = (
         "schema_identifier", "contract_hash", "stable_executable_commit", "executable_inventory_hash",
         "tooling_proposal_hash", "artifact_contract_hash", "partition", "operation", "output_roots",
-        "authorization_hash", "run_count", "design_count", "runs", "campaign_manifest_hash", "plan_hash",
+        "authorization_hash", "source_generation_ledger_relative_path",
+        "source_generation_ledger_byte_length", "source_generation_ledger_sha256",
+        "source_replay_ledger_relative_path", "source_replay_ledger_byte_length",
+        "source_replay_ledger_sha256", "run_count", "design_count", "runs",
+        "campaign_manifest_hash", "plan_hash",
     )
     properties = {field: {} for field in fields}
     properties.update({
@@ -97,7 +110,22 @@ def plan_schema() -> dict[str, Any]:
         "operation": {"enum": ["PLAN", "GENERATE", "REPLAY", "ACCEPT"]},
         "run_count": {"type": "integer", "minimum": 1},
         "design_count": {"type": "integer", "minimum": 1},
-        "runs": {"type": "array", "minItems": 1},
+        "runs": {
+            "type": "array", "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "design_construction_seed", "ground_selection_seed",
+                    "satellite_failure_seed", "ground_failure_seed",
+                ],
+                "properties": {
+                    "design_construction_seed": {"type": "integer"},
+                    "ground_selection_seed": {"type": "integer"},
+                    "satellite_failure_seed": {"type": "integer"},
+                    "ground_failure_seed": {"type": "integer"},
+                },
+            },
+        },
     })
     return schema_object("stage_a_execution_plan_v2", fields, properties)
 
@@ -106,13 +134,32 @@ def ledger_schema(identifier: str) -> dict[str, Any]:
     fields = (
         "schema_identifier", "contract_hash", "plan_hash", "authorization_hash", "stable_executable_commit",
         "executable_inventory_hash", "tooling_proposal_hash", "artifact_contract_hash", "operation", "partition",
-        "campaign_manifest_hash", "expected_run_count", "output_root_identity", "records", "ledger_hash",
+        "campaign_manifest_hash", "expected_run_count", "output_root_identity",
+        "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length", "source_replay_ledger_sha256", "records", "ledger_hash",
     )
     properties = {field: {} for field in fields}
     properties.update({
         "schema_identifier": {"const": "satnet.stage_a.execution_ledger.v2"},
         "operation": {"enum": ["GENERATE", "REPLAY"]},
-        "records": {"type": "array", "minItems": 1},
+        "records": {
+            "type": "array", "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "design_construction_seed", "ground_selection_seed",
+                    "satellite_failure_seed", "ground_failure_seed", "science_completion",
+                ],
+                "properties": {
+                    "design_construction_seed": {"type": "integer"},
+                    "ground_selection_seed": {"type": "integer"},
+                    "satellite_failure_seed": {"type": "integer"},
+                    "ground_failure_seed": {"type": "integer"},
+                    "science_completion": {"type": ["object", "null"]},
+                },
+            },
+        },
     })
     return schema_object(identifier, fields, properties)
 
@@ -121,15 +168,35 @@ def acceptance_schema() -> dict[str, Any]:
     fields = (
         "schema_identifier", "contract_hash", "plan_hash", "authorization_hash", "stable_executable_commit",
         "executable_inventory_hash", "tooling_proposal_hash", "artifact_contract_hash", "generation_plan_hash",
-        "generation_authorization_hash", "replay_plan_hash", "replay_authorization_hash", "output_roots",
-        "partition", "expected_run_count", "accepted_run_count", "comparisons", "acceptance_state",
+        "generation_authorization_hash", "replay_plan_hash", "replay_authorization_hash",
+        "generation_ledger_relative_path", "generation_ledger_byte_length", "generation_ledger_sha256",
+        "replay_ledger_relative_path", "replay_ledger_byte_length", "replay_ledger_sha256",
+        "replay_recorded_source_generation_ledger_relative_path",
+        "replay_recorded_source_generation_ledger_byte_length",
+        "replay_recorded_source_generation_ledger_sha256", "output_roots", "partition",
+        "expected_run_count", "accepted_run_count", "comparisons", "acceptance_state",
         "acceptance_report_hash",
     )
     properties = {field: {} for field in fields}
     properties.update({
         "schema_identifier": {"const": "satnet.stage_a.acceptance_report.v1"},
         "acceptance_state": {"const": "PASSED"},
-        "comparisons": {"type": "array"},
+        "comparisons": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "design_construction_seed", "ground_selection_seed",
+                    "satellite_failure_seed", "ground_failure_seed",
+                ],
+                "properties": {
+                    "design_construction_seed": {"type": "integer"},
+                    "ground_selection_seed": {"type": "integer"},
+                    "satellite_failure_seed": {"type": "integer"},
+                    "ground_failure_seed": {"type": "integer"},
+                },
+            },
+        },
     })
     return schema_object("stage_a_acceptance_report_v1", fields, properties)
 
@@ -286,6 +353,8 @@ def tooling_inventory(repo_root: Path, payload_bytes: Mapping[str, bytes], stabl
         *[path.relative_to(repo_root).as_posix() for path in sorted((repo_root / "tests/experiments/stage_a_execution").glob("*.py"))],
         "tests/experiments/test_final_dataset_isolation.py",
         "tests/validation/test_stage_a_execution_tooling_v1_audit.py",
+        "scripts/validation/reaudit_stage_a_execution_tooling_v1.py",
+        "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py",
     ]
     records: list[dict[str, Any]] = []
     for relative in sorted(set(source_paths)):

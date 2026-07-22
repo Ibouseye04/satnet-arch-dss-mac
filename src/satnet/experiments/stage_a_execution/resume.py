@@ -20,6 +20,12 @@ def validate_resume_identity(ledger: dict[str, Any], plan: dict[str, Any], autho
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
         "output_root_identity": plan["output_roots"],
+        "source_generation_ledger_relative_path": plan["source_generation_ledger_relative_path"],
+        "source_generation_ledger_byte_length": plan["source_generation_ledger_byte_length"],
+        "source_generation_ledger_sha256": plan["source_generation_ledger_sha256"],
+        "source_replay_ledger_relative_path": plan["source_replay_ledger_relative_path"],
+        "source_replay_ledger_byte_length": plan["source_replay_ledger_byte_length"],
+        "source_replay_ledger_sha256": plan["source_replay_ledger_sha256"],
     }
     for field, value in expected.items():
         if ledger.get(field) != value:
@@ -29,6 +35,7 @@ def validate_resume_identity(ledger: dict[str, Any], plan: dict[str, Any], autho
             "global_run_id": row["global_run_id"],
             "run_key": row["run_key"],
             "run_record_hash": row["run_record_hash"],
+            "design_construction_seed": row["design_construction_seed"],
             "ground_selection_seed": row["ground_selection_seed"],
             "satellite_failure_seed": row["satellite_failure_seed"],
             "ground_failure_seed": row["ground_failure_seed"],
@@ -55,6 +62,12 @@ def validate_ledger_binding(ledger: dict[str, Any], plan: dict[str, Any], *, ope
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
         "output_root_identity": plan["output_roots"],
+        "source_generation_ledger_relative_path": plan["source_generation_ledger_relative_path"] if operation == "REPLAY" else None,
+        "source_generation_ledger_byte_length": plan["source_generation_ledger_byte_length"] if operation == "REPLAY" else None,
+        "source_generation_ledger_sha256": plan["source_generation_ledger_sha256"] if operation == "REPLAY" else None,
+        "source_replay_ledger_relative_path": None,
+        "source_replay_ledger_byte_length": None,
+        "source_replay_ledger_sha256": None,
     }
     for field, value in expected.items():
         if ledger.get(field) != value:
@@ -67,6 +80,7 @@ def validate_ledger_binding(ledger: dict[str, Any], plan: dict[str, Any], *, ope
             "global_run_id": row["global_run_id"],
             "run_key": row["run_key"],
             "run_record_hash": row["run_record_hash"],
+            "design_construction_seed": row["design_construction_seed"],
             "ground_selection_seed": row["ground_selection_seed"],
             "satellite_failure_seed": row["satellite_failure_seed"],
             "ground_failure_seed": row["ground_failure_seed"],

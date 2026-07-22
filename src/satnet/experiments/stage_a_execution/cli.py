@@ -6,18 +6,16 @@ from pathlib import Path
 import sys
 from typing import Any, Sequence
 
-from satnet.experiments.final_generation.contract import validate_catalog
-
 from .acceptance import evaluate_acceptance
 from .artifact_contract import artifact_contract_hash
 from .authorization import Authorization, load_authorization, validate_authorization
-from .common import canonical_json_bytes
+from .common import canonical_json_bytes, read_json_object
 from .contract import CONTRACT_RELATIVE_ROOT, FrozenStageAContract, load_frozen_contract
-from .generate import execute_generation, make_validated_production_adapter
+from .generate import execute_generation
 from .identity import tooling_identity
 from .ledger import read_ledger
-from .locking import recover_stale_lock
-from .plan import build_plan
+from .locking import campaign_identity, recover_stale_lock, run_identity
+from .plan import build_plan, validate_plan
 from .preflight import run_preflight
 from .replay import execute_replay
 
@@ -113,11 +111,10 @@ def command_generate(args: argparse.Namespace) -> None:
         generation_root=args.generation_root, replay_root=args.replay_root,
         acceptance_root=args.acceptance_root, resume=args.resume,
     )
-    adapter = make_validated_production_adapter(contract, validate_catalog())
     ledger = execute_generation(
         repo_root=_repo_root(), contract=contract, plan=plan,
         authorization_hash=authorization.sha256, preflight=certificate,
-        campaign_root=args.generation_root, adapter=adapter,
+        campaign_root=args.generation_root,
         resume=args.resume, retry_failed=args.retry_failed,
     )
     _print(ledger)
@@ -132,11 +129,10 @@ def command_replay(args: argparse.Namespace) -> None:
         generation_root=args.generation_root, replay_root=args.replay_root,
         acceptance_root=args.acceptance_root,
     )
-    adapter = make_validated_production_adapter(contract, validate_catalog())
     _print(execute_replay(
-        repo_root=_repo_root(), plan=plan, authorization_hash=authorization.sha256,
+        repo_root=_repo_root(), contract=contract, plan=plan, authorization_hash=authorization.sha256,
         preflight=certificate, generation_root=args.generation_root,
-        replay_root=args.replay_root, adapter=adapter,
+        replay_root=args.replay_root,
     ))
 
 
@@ -157,8 +153,24 @@ def command_accept(args: argparse.Namespace) -> None:
 
 
 def command_recover_lock(args: argparse.Namespace) -> None:
+    plan = read_json_object(args.plan)
+    validate_plan(plan)
+    if plan.get("authorization_hash") != args.authorization_hash:
+        raise PermissionError("Recovery authorization hash differs from the plan")
+    if args.run_key is None:
+        expected = campaign_identity(plan, args.authorization_hash)
+        expected_lock = args.campaign_root.with_name(args.campaign_root.name + ".lock")
+    else:
+        plan_run = next((row for row in plan["runs"] if row["run_key"] == args.run_key), None)
+        if plan_run is None:
+            raise ValueError("Recovery run key is absent from the plan")
+        expected = run_identity(plan, args.authorization_hash, plan_run)
+        expected_lock = args.campaign_root / "operational" / "locks" / f"{args.run_key}.lock"
+    if args.lock.resolve(strict=False) != expected_lock.resolve(strict=False):
+        raise PermissionError("Recovery lock path differs from the plan-bound lock path")
     _print(recover_stale_lock(
-        args.lock, expected_identity=args.expected_identity, recovery_log=args.recovery_log,
+        args.lock, expected_identity=expected, minimum_age_seconds=args.minimum_age_seconds,
+        campaign_root=args.campaign_root, recovery_event_root=args.recovery_event_root,
     ))
 
 
@@ -215,8 +227,12 @@ def build_parser() -> argparse.ArgumentParser:
     accept.set_defaults(handler=command_accept)
     recovery = subparsers.add_parser("recover-lock")
     recovery.add_argument("--lock", type=Path, required=True)
-    recovery.add_argument("--expected-identity", required=True)
-    recovery.add_argument("--recovery-log", type=Path, required=True)
+    recovery.add_argument("--plan", type=Path, required=True)
+    recovery.add_argument("--authorization-hash", required=True)
+    recovery.add_argument("--campaign-root", type=Path, required=True)
+    recovery.add_argument("--minimum-age-seconds", type=float, required=True)
+    recovery.add_argument("--recovery-event-root", type=Path, required=True)
+    recovery.add_argument("--run-key")
     recovery.set_defaults(handler=command_recover_lock)
     status = subparsers.add_parser("status")
     status.add_argument("--ledger", type=Path, required=True)

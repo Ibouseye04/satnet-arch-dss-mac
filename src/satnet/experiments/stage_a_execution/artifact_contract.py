@@ -26,6 +26,7 @@ class SimulationAdapterResult:
     design_id: str
     global_run_id: int
     realization_id: str
+    design_construction_seed: int
     ground_selection_seed: int
     satellite_failure_seed: int
     ground_failure_seed: int
@@ -42,6 +43,7 @@ class SimulationAdapterResult:
             "design_id": self.design_id,
             "global_run_id": self.global_run_id,
             "realization_id": self.realization_id,
+            "design_construction_seed": self.design_construction_seed,
             "ground_selection_seed": self.ground_selection_seed,
             "satellite_failure_seed": self.satellite_failure_seed,
             "ground_failure_seed": self.ground_failure_seed,
@@ -52,6 +54,28 @@ class SimulationAdapterResult:
             "validation_status": self.validation_status,
             "result_identity": self.result_identity,
         }
+
+
+@dataclass(frozen=True)
+class ScienceCompletionResult:
+    validation_status: str
+    validation_kind: str
+    verified_stages: tuple[str, ...]
+    authoritative_result_hash: str
+    completion_identity: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "validation_status": self.validation_status,
+            "validation_kind": self.validation_kind,
+            "verified_stages": list(self.verified_stages),
+            "authoritative_result_hash": self.authoritative_result_hash,
+            "completion_identity": self.completion_identity,
+        }
+
+
+def science_completion_hash(value: Mapping[str, Any]) -> str:
+    return payload_hash(dict(value), domain="satnet_stage_a_science_completion_v1")
 
 
 def adapter_result_hash(value: Mapping[str, Any]) -> str:
@@ -65,6 +89,7 @@ def make_adapter_result(plan_run: Mapping[str, Any], output_root: Path, artifact
         "design_id": plan_run["design_id"],
         "global_run_id": plan_run["global_run_id"],
         "realization_id": plan_run["realization_id"],
+        "design_construction_seed": plan_run["design_construction_seed"],
         "ground_selection_seed": plan_run["ground_selection_seed"],
         "satellite_failure_seed": plan_run["satellite_failure_seed"],
         "ground_failure_seed": plan_run["ground_failure_seed"],
@@ -102,8 +127,10 @@ def artifact_contract_definition() -> dict[str, Any]:
             "canonical_parsing",
             "schema_validation",
             "scientific_identity_match",
-            "seed_match",
+            "complete_seed_match",
             "adapter_manifest_filesystem_match",
+            "authoritative_satellite_and_g1_g5_replay",
+            "artifact_and_science_validation_before_succeeded",
         ],
     }
     value["artifact_contract_hash"] = payload_hash(value, domain=ARTIFACT_CONTRACT_DOMAIN)
@@ -143,6 +170,7 @@ def _binding_identity(plan_run: Mapping[str, Any]) -> dict[str, Any]:
         "run_record_hash": plan_run["run_record_hash"],
         "realization_id": plan_run["realization_id"],
         "realization_index": plan_run["realization_index"],
+        "design_construction_seed": plan_run["design_construction_seed"],
         "ground_selection_seed": plan_run["ground_selection_seed"],
         "satellite_failure_seed": plan_run["satellite_failure_seed"],
         "ground_failure_seed": plan_run["ground_failure_seed"],
@@ -156,7 +184,8 @@ def synthetic_artifacts(plan_run: Mapping[str, Any]) -> dict[str, dict[str, Any]
         for field in (
             "contract_hash", "partition", "design_id", "design_record_hash", "run_key",
             "global_run_id", "run_record_hash", "realization_id", "realization_index",
-            "ground_selection_seed", "satellite_failure_seed", "ground_failure_seed",
+            "design_construction_seed", "ground_selection_seed", "satellite_failure_seed",
+            "ground_failure_seed",
         )
     }
     return {
@@ -188,6 +217,7 @@ def _validate_adapter_result(plan_run: Mapping[str, Any], output_root: Path, res
         "design_id": plan_run["design_id"],
         "global_run_id": plan_run["global_run_id"],
         "realization_id": plan_run["realization_id"],
+        "design_construction_seed": plan_run["design_construction_seed"],
         "ground_selection_seed": plan_run["ground_selection_seed"],
         "satellite_failure_seed": plan_run["satellite_failure_seed"],
         "ground_failure_seed": plan_run["ground_failure_seed"],
@@ -265,6 +295,7 @@ def _validate_production(plan_run: Mapping[str, Any], root: Path, actual: list[d
         raise ValueError("Target artifact run identity mismatch")
     run_record = read_canonical_json(run_root / "input" / "run_record.json")
     seed_expectations = {
+        "design_construction_seed": plan_run["design_construction_seed"],
         "ground_selection_seed": plan_run["ground_selection_seed"],
         "satellite_seed": plan_run["satellite_failure_seed"],
         "ground_failure_seed": plan_run["ground_failure_seed"],
@@ -281,6 +312,17 @@ def _validate_production(plan_run: Mapping[str, Any], root: Path, actual: list[d
             source = path.read_text(encoding="utf-8")
             if not source.endswith("\n") or any(not isinstance(json.loads(line), dict) for line in source.splitlines()):
                 raise ValueError(f"Malformed canonical JSONL artifact: {relative}")
+
+
+def validate_science_completion_result(result: ScienceCompletionResult) -> None:
+    if result.validation_status != "PASSED":
+        raise ValueError("Authoritative science-completion validation did not pass")
+    if not result.validation_kind or not result.verified_stages or not result.authoritative_result_hash:
+        raise ValueError("Authoritative science-completion result is incomplete")
+    payload = result.as_dict()
+    claimed = payload.pop("completion_identity")
+    if claimed != science_completion_hash(payload):
+        raise ValueError("Authoritative science-completion identity mismatch")
 
 
 def validate_run_output(plan_run: Mapping[str, Any], output_root: Path, result: SimulationAdapterResult) -> list[dict[str, Any]]:

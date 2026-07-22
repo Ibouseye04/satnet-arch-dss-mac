@@ -28,6 +28,8 @@ def build_plan(
 ) -> dict[str, Any]:
     if partition not in {"development", "validation"}:
         raise PermissionError("Ordinary plans cannot access sealed holdout")
+    if operation in {"REPLAY", "ACCEPT"} and authorization is None:
+        raise PermissionError(f"{operation} plans require exact source-ledger authorization bindings")
     frozen_ids = tuple(contract.partitions[partition]["global_run_ids"])
     run_ids = frozen_ids if selected_run_ids is None else tuple(sorted(selected_run_ids))
     if run_ids != frozen_ids:
@@ -53,6 +55,7 @@ def build_plan(
             "sealed": False,
             "design_record_hash": design["design_record_hash"],
             "run_record_hash": run["run_record_hash"],
+            "design_construction_seed": seed["design_construction_seed"],
             "ground_selection_seed": seed["ground_selection_seed"],
             "satellite_failure_seed": seed["satellite_failure_seed"],
             "ground_failure_seed": seed["ground_failure_seed"],
@@ -75,6 +78,12 @@ def build_plan(
             "acceptance": str(acceptance_root.resolve(strict=False)),
         },
         "authorization_hash": None if authorization is None else authorization.sha256,
+        "source_generation_ledger_relative_path": None if authorization is None else authorization.document["source_generation_ledger_relative_path"],
+        "source_generation_ledger_byte_length": None if authorization is None else authorization.document["source_generation_ledger_byte_length"],
+        "source_generation_ledger_sha256": None if authorization is None else authorization.document["source_generation_ledger_sha256"],
+        "source_replay_ledger_relative_path": None if authorization is None else authorization.document["source_replay_ledger_relative_path"],
+        "source_replay_ledger_byte_length": None if authorization is None else authorization.document["source_replay_ledger_byte_length"],
+        "source_replay_ledger_sha256": None if authorization is None else authorization.document["source_replay_ledger_sha256"],
         "run_count": len(records),
         "design_count": len({row["design_id"] for row in records}),
         "runs": records,
@@ -82,13 +91,43 @@ def build_plan(
     campaign_manifest = {
         key: value
         for key, value in plan.items()
-        if key not in {"schema_identifier", "operation", "authorization_hash"}
+        if key not in {
+            "schema_identifier", "operation", "authorization_hash",
+            "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+            "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+            "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
+        }
     }
     plan["campaign_manifest_hash"] = payload_hash(
         campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"
     )
     plan["plan_hash"] = payload_hash(plan, domain=PLAN_HASH_DOMAIN)
     return plan
+
+
+def validate_plan_contract_binding(plan: dict[str, Any], contract: FrozenStageAContract) -> None:
+    frozen_runs = {row["run_key"]: row for row in contract.runs}
+    frozen_seeds = {row["run_key"]: row for row in contract.seeds}
+    expected_ids = tuple(contract.partitions[plan["partition"]]["global_run_ids"])
+    if tuple(row["global_run_id"] for row in plan["runs"]) != expected_ids:
+        raise ValueError("Plan run set differs from the frozen partition")
+    for row in plan["runs"]:
+        frozen_run = frozen_runs.get(row["run_key"])
+        frozen_seed = frozen_seeds.get(row["run_key"])
+        if frozen_run is None or frozen_seed is None:
+            raise ValueError("Plan run is absent from the frozen contract")
+        run_fields = (
+            "global_run_id", "design_id", "realization_id", "realization_index",
+            "design_record_hash", "run_record_hash", "partition", "sealed",
+        )
+        seed_fields = (
+            "design_construction_seed", "ground_selection_seed",
+            "satellite_failure_seed", "ground_failure_seed",
+        )
+        if any(row[field] != frozen_run[field] for field in run_fields):
+            raise ValueError("Plan run identity differs from the frozen contract")
+        if any(row[field] != frozen_seed[field] for field in seed_fields):
+            raise ValueError("Plan seed identity differs from the frozen seed manifest")
 
 
 def validate_plan(plan: dict[str, Any]) -> None:
@@ -102,10 +141,24 @@ def validate_plan(plan: dict[str, Any]) -> None:
     campaign_manifest = {
         key: value
         for key, value in payload.items()
-        if key not in {"schema_identifier", "operation", "authorization_hash", "campaign_manifest_hash"}
+        if key not in {
+            "schema_identifier", "operation", "authorization_hash", "campaign_manifest_hash",
+            "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+            "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+            "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
+        }
     }
     if plan.get("campaign_manifest_hash") != payload_hash(campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"):
         raise ValueError("Campaign manifest hash mismatch")
+    required_run_fields = {
+        "contract_hash", "design_id", "design_index", "run_key", "global_run_id",
+        "realization_id", "realization_index", "region", "partition", "sealed",
+        "design_record_hash", "run_record_hash", "design_construction_seed",
+        "ground_selection_seed", "satellite_failure_seed", "ground_failure_seed",
+        "expected_output_relative_path",
+    }
+    if any(set(row) != required_run_fields for row in runs):
+        raise ValueError("Plan run-record field set mismatch")
     ids = [row["global_run_id"] for row in runs]
     outputs = [row["expected_output_relative_path"] for row in runs]
     if ids != sorted(ids) or len(ids) != len(set(ids)) or len(outputs) != len(set(outputs)):

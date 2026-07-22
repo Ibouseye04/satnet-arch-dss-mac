@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
-from .common import atomic_write_json, payload_hash, read_json_object
+from .common import atomic_write_json, payload_hash, read_json_object, sha256_bytes
 
 LEDGER_SCHEMA = "satnet.stage_a.execution_ledger.v2"
 LEDGER_DOMAIN = "satnet_stage_a_execution_ledger_v2"
@@ -35,10 +36,12 @@ def validate_ledger(ledger: dict[str, Any]) -> None:
         if record.get("state") not in STATES:
             raise ValueError("Unknown execution ledger state")
         if record.get("state") == "SUCCEEDED":
-            if not record.get("artifacts") or not record.get("adapter_result"):
-                raise ValueError("Successful run has no verified artifacts or adapter result")
+            if not record.get("artifacts") or not record.get("adapter_result") or not record.get("science_completion"):
+                raise ValueError("Successful run lacks artifact-contract or science-completion evidence")
             if record["adapter_result"].get("validation_status") != "PASSED":
                 raise ValueError("Successful run adapter result was not validated")
+            if record["science_completion"].get("validation_status") != "PASSED":
+                raise ValueError("Successful run authoritative science completion was not validated")
 
 
 def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any]:
@@ -56,11 +59,18 @@ def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
         "output_root_identity": plan["output_roots"],
+        "source_generation_ledger_relative_path": plan["source_generation_ledger_relative_path"],
+        "source_generation_ledger_byte_length": plan["source_generation_ledger_byte_length"],
+        "source_generation_ledger_sha256": plan["source_generation_ledger_sha256"],
+        "source_replay_ledger_relative_path": plan["source_replay_ledger_relative_path"],
+        "source_replay_ledger_byte_length": plan["source_replay_ledger_byte_length"],
+        "source_replay_ledger_sha256": plan["source_replay_ledger_sha256"],
         "records": [
             {
                 "global_run_id": row["global_run_id"],
                 "run_key": row["run_key"],
                 "run_record_hash": row["run_record_hash"],
+                "design_construction_seed": row["design_construction_seed"],
                 "ground_selection_seed": row["ground_selection_seed"],
                 "satellite_failure_seed": row["satellite_failure_seed"],
                 "ground_failure_seed": row["ground_failure_seed"],
@@ -70,6 +80,7 @@ def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any
                 "artifacts": [],
                 "artifact_inventory_hash": None,
                 "adapter_result": None,
+                "science_completion": None,
                 "failure": None,
             }
             for row in plan["runs"]
@@ -77,6 +88,36 @@ def build_ledger(plan: dict[str, Any], authorization_hash: str) -> dict[str, Any
     }
     ledger["ledger_hash"] = ledger_hash(ledger)
     return ledger
+
+
+def parse_ledger_bytes(raw: bytes) -> dict[str, Any]:
+    value = json.loads(raw)
+    if not isinstance(value, dict):
+        raise ValueError("Execution ledger must be a JSON object")
+    validate_ledger(value)
+    return value
+
+
+def read_bound_ledger(
+    root: Path, *, relative_path: str, byte_length: int, sha256: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    if relative_path not in {"execution_ledger.json", "replay_ledger.json"}:
+        raise ValueError("Source ledger relative path is not canonical")
+    path = root / relative_path
+    if path.resolve(strict=True).parent != root.resolve(strict=True):
+        raise ValueError("Source ledger path escapes its authorized root")
+    raw = path.read_bytes()
+    if len(raw) != byte_length:
+        raise ValueError("Source ledger byte length mismatch")
+    observed_sha256 = sha256_bytes(raw)
+    if observed_sha256 != sha256:
+        raise ValueError("Source ledger SHA-256 mismatch")
+    identity = {
+        "relative_path": relative_path,
+        "byte_length": len(raw),
+        "sha256": observed_sha256,
+    }
+    return parse_ledger_bytes(raw), identity
 
 
 def read_ledger(path: Path) -> dict[str, Any]:
@@ -95,7 +136,7 @@ def transition(
     path: Path, *, global_run_id: int, new_state: str,
     artifacts: list[dict[str, Any]] | None = None,
     artifact_inventory_hash: str | None = None, adapter_result: dict[str, Any] | None = None,
-    failure: str | None = None,
+    science_completion: dict[str, Any] | None = None, failure: str | None = None,
 ) -> dict[str, Any]:
     ledger = read_ledger(path)
     record = next((item for item in ledger["records"] if item["global_run_id"] == global_run_id), None)
@@ -108,13 +149,16 @@ def transition(
         record["attempt_count"] += 1
         record["failure"] = None
     if new_state == "SUCCEEDED":
-        if not artifacts or not artifact_inventory_hash or not adapter_result:
-            raise ValueError("Success requires verified artifact identities and adapter result")
+        if not artifacts or not artifact_inventory_hash or not adapter_result or not science_completion:
+            raise ValueError("Success requires artifact-contract and science-completion evidence")
         if adapter_result.get("validation_status") != "PASSED" or adapter_result.get("simulation_return_status") != "SUCCEEDED":
             raise ValueError("Success requires a passed structured adapter result")
+        if science_completion.get("validation_status") != "PASSED":
+            raise ValueError("Success requires passed authoritative science completion")
         record["artifacts"] = artifacts
         record["artifact_inventory_hash"] = artifact_inventory_hash
         record["adapter_result"] = adapter_result
+        record["science_completion"] = science_completion
     if new_state in {"FAILED", "INTERRUPTED"}:
         record["failure"] = failure or new_state
     write_ledger(path, ledger, overwrite=True)

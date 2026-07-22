@@ -66,6 +66,9 @@ def validate_authorization(
         "authorized_tooling_proposal_hash", "authorized_artifact_contract_hash",
         "authorized_partition", "authorized_run_ids", "authorized_run_count", "authorized_operation",
         "authorized_generation_root", "authorized_replay_root", "authorized_acceptance_root",
+        "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
         "authorization_date", "authorizing_decision_reference", "independently_approved",
         "authorization_sha256",
     }
@@ -92,6 +95,32 @@ def validate_authorization(
         raise PermissionError("Authorization must bind one complete frozen partition")
     if any(run_id in contract.partitions["sealed_holdout"]["global_run_ids"] for run_id in expected_ids):
         raise PermissionError("Sealed-holdout authorization is prohibited")
+    ledger_fields = {
+        "source_generation_ledger_relative_path": value["source_generation_ledger_relative_path"],
+        "source_generation_ledger_byte_length": value["source_generation_ledger_byte_length"],
+        "source_generation_ledger_sha256": value["source_generation_ledger_sha256"],
+        "source_replay_ledger_relative_path": value["source_replay_ledger_relative_path"],
+        "source_replay_ledger_byte_length": value["source_replay_ledger_byte_length"],
+        "source_replay_ledger_sha256": value["source_replay_ledger_sha256"],
+    }
+    required_generation = operation in {"REPLAY", "ACCEPT"}
+    required_replay = operation == "ACCEPT"
+    expected_paths = {
+        "source_generation_ledger_relative_path": "execution_ledger.json" if required_generation else None,
+        "source_replay_ledger_relative_path": "replay_ledger.json" if required_replay else None,
+    }
+    for field, expected in expected_paths.items():
+        if ledger_fields[field] != expected:
+            raise PermissionError(f"Authorization ledger path mismatch: {field}")
+    for prefix, required_binding in (("source_generation_ledger", required_generation), ("source_replay_ledger", required_replay)):
+        length = ledger_fields[f"{prefix}_byte_length"]
+        digest = ledger_fields[f"{prefix}_sha256"]
+        if required_binding:
+            if type(length) is not int or length <= 0:
+                raise ValueError(f"{prefix}_byte_length must be a positive integer")
+            ensure_hex(digest, length=64, field=f"{prefix}_sha256")
+        elif length is not None or digest is not None:
+            raise PermissionError(f"Authorization includes an inapplicable ledger binding: {prefix}")
     expected_identity = {
         "authorized_contract_hash": contract.contract_hash,
         "authorized_contract_tag": contract.frozen_tag,

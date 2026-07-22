@@ -5,7 +5,7 @@ from typing import Any
 
 from .common import atomic_write_json, payload_hash, read_json_object
 from .integrity import verify_artifact_inventory
-from .ledger import read_ledger
+from .ledger import read_bound_ledger
 from .locking import campaign_lock
 from .paths import validate_output_roots, validate_relative_artifact_path
 from .preflight import PreflightCertificate, require_preflight
@@ -35,10 +35,27 @@ def evaluate_acceptance(
     }
     if roots != plan["output_roots"] or supplied != roots:
         raise PermissionError("Acceptance roots differ from preflight-bound plan")
-    generation = read_ledger(generation_root / "execution_ledger.json")
-    replay = read_ledger(replay_root / "replay_ledger.json")
+    generation, generation_identity = read_bound_ledger(
+        generation_root,
+        relative_path=plan["source_generation_ledger_relative_path"],
+        byte_length=plan["source_generation_ledger_byte_length"],
+        sha256=plan["source_generation_ledger_sha256"],
+    )
+    replay, replay_identity = read_bound_ledger(
+        replay_root,
+        relative_path=plan["source_replay_ledger_relative_path"],
+        byte_length=plan["source_replay_ledger_byte_length"],
+        sha256=plan["source_replay_ledger_sha256"],
+    )
     validate_ledger_binding(generation, plan, operation="GENERATE")
     validate_ledger_binding(replay, plan, operation="REPLAY")
+    replay_source_identity = {
+        "relative_path": replay["source_generation_ledger_relative_path"],
+        "byte_length": replay["source_generation_ledger_byte_length"],
+        "sha256": replay["source_generation_ledger_sha256"],
+    }
+    if replay_source_identity != generation_identity:
+        raise ValueError("Replay ledger is not bound to the accepted generation ledger bytes")
     expected_ids = [row["global_run_id"] for row in plan["runs"]]
     if [row["global_run_id"] for row in generation["records"]] != expected_ids or [row["global_run_id"] for row in replay["records"]] != expected_ids:
         raise ValueError("Acceptance run-set mismatch")
@@ -57,6 +74,9 @@ def evaluate_acceptance(
             "generation_authorization_hash": generation["authorization_hash"],
             "generation_plan_hash": generation["plan_hash"],
             "generation_campaign_manifest_hash": generation["campaign_manifest_hash"],
+            "source_generation_ledger_relative_path": generation_identity["relative_path"],
+            "source_generation_ledger_byte_length": generation_identity["byte_length"],
+            "source_generation_ledger_sha256": generation_identity["sha256"],
             "stable_executable_commit": plan["stable_executable_commit"],
             "executable_inventory_hash": plan["executable_inventory_hash"],
             "tooling_proposal_hash": plan["tooling_proposal_hash"],
@@ -64,6 +84,7 @@ def evaluate_acceptance(
             "global_run_id": plan_run["global_run_id"],
             "run_key": plan_run["run_key"],
             "run_record_hash": plan_run["run_record_hash"],
+            "design_construction_seed": plan_run["design_construction_seed"],
             "ground_selection_seed": plan_run["ground_selection_seed"],
             "satellite_failure_seed": plan_run["satellite_failure_seed"],
             "ground_failure_seed": plan_run["ground_failure_seed"],
@@ -75,6 +96,10 @@ def evaluate_acceptance(
             "global_run_id": plan_run["global_run_id"],
             "run_key": plan_run["run_key"],
             "run_record_hash": plan_run["run_record_hash"],
+            "design_construction_seed": plan_run["design_construction_seed"],
+            "ground_selection_seed": plan_run["ground_selection_seed"],
+            "satellite_failure_seed": plan_run["satellite_failure_seed"],
+            "ground_failure_seed": plan_run["ground_failure_seed"],
             "generation_replay_equal": True,
         })
     report: dict[str, Any] = {
@@ -90,6 +115,15 @@ def evaluate_acceptance(
         "generation_authorization_hash": generation["authorization_hash"],
         "replay_plan_hash": replay["plan_hash"],
         "replay_authorization_hash": replay["authorization_hash"],
+        "generation_ledger_relative_path": generation_identity["relative_path"],
+        "generation_ledger_byte_length": generation_identity["byte_length"],
+        "generation_ledger_sha256": generation_identity["sha256"],
+        "replay_ledger_relative_path": replay_identity["relative_path"],
+        "replay_ledger_byte_length": replay_identity["byte_length"],
+        "replay_ledger_sha256": replay_identity["sha256"],
+        "replay_recorded_source_generation_ledger_relative_path": replay_source_identity["relative_path"],
+        "replay_recorded_source_generation_ledger_byte_length": replay_source_identity["byte_length"],
+        "replay_recorded_source_generation_ledger_sha256": replay_source_identity["sha256"],
         "output_roots": roots,
         "partition": plan["partition"],
         "expected_run_count": plan["run_count"],
@@ -98,7 +132,7 @@ def evaluate_acceptance(
         "acceptance_state": "PASSED",
     }
     report["acceptance_report_hash"] = payload_hash(report, domain=ACCEPTANCE_DOMAIN)
-    with campaign_lock(acceptance_root, plan["plan_hash"]):
+    with campaign_lock(acceptance_root, plan, authorization_hash):
         acceptance_root.mkdir(parents=False, exist_ok=False)
         atomic_write_json(acceptance_root / "acceptance_report.json", report)
     return report

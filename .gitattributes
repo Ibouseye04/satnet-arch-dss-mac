@@ -9,4 +9,21 @@ artifacts/stage_a_discovery_contract_freeze_audit/** -text
 artifacts/stage_a_discovery_contract_frozen_audit/** -text
 artifacts/stage_a_discovery_contract_v1/** -text
 artifacts/stage_a_execution_tooling_v1_proposal/** -text
-*.py text eol=lf
+.gitattributes -text
+scripts/generate_stage_a_execution_tooling_v1_proposal.py -text
+src/satnet/experiments/stage_a_execution/** -text
+src/satnet/experiments/stage_a_contract/** -text
+src/satnet/experiments/final_generation/** -text
+src/satnet/experiments/final_class_support_audit/audit.py -text
+src/satnet/ground/** -text
+src/satnet/network/** -text
+src/satnet/simulation/tier1_rollout.py -text
+src/satnet/models/gnn_dataset.py -text
+src/satnet/models/gnn_model.py -text
+src/satnet/models/risk_model.py -text
+src/satnet/utils/graph_cache.py -text
+tests/experiments/stage_a_execution/** -text
+tests/experiments/test_final_dataset_isolation.py -text
+tests/validation/test_stage_a_execution_tooling_v1_audit.py -text
+tests/validation/test_stage_a_execution_tooling_v1_reaudit.py -text
+scripts/validation/reaudit_stage_a_execution_tooling_v1.py -text

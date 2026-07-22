@@ -9,8 +9,10 @@ from .authorization import Authorization, validate_authorization
 from .contract import FrozenStageAContract, load_frozen_contract
 from .evidence import DEFAULT_FROZEN_EVIDENCE_PATHS, FrozenEvidencePaths, verify_frozen_production_evidence
 from .identity import tooling_identity, verify_executable_identity
+from .ledger import read_bound_ledger
 from .paths import available_bytes, probe_parent, validate_output_roots
-from .plan import validate_plan
+from .plan import validate_plan, validate_plan_contract_binding
+from .resume import validate_ledger_binding
 
 MINIMUM_FREE_BYTES = 1_000_000_000
 _PREFLIGHT_SEAL = object()
@@ -53,6 +55,9 @@ def run_preflight(
     if reloaded.contract_hash != contract.contract_hash:
         raise ValueError("Frozen Stage A contract reload identity mismatch")
     validate_plan(plan)
+    validate_plan_contract_binding(plan, reloaded)
+    if plan.get("authorization_hash") != authorization.sha256:
+        raise PermissionError("Plan authorization identity mismatch")
     validate_authorization(
         authorization, contract=reloaded,
         stable_executable_commit=plan["stable_executable_commit"],
@@ -78,6 +83,32 @@ def run_preflight(
     }[plan["operation"]]
     if states != required_states:
         raise FileExistsError(f"Output-root state mismatch for {plan['operation']}: {states}")
+    source_ledgers: dict[str, dict[str, Any]] = {}
+    if plan["operation"] in {"REPLAY", "ACCEPT"}:
+        generation, generation_identity = read_bound_ledger(
+            generation_root,
+            relative_path=plan["source_generation_ledger_relative_path"],
+            byte_length=plan["source_generation_ledger_byte_length"],
+            sha256=plan["source_generation_ledger_sha256"],
+        )
+        validate_ledger_binding(generation, plan, operation="GENERATE")
+        source_ledgers["generation"] = generation_identity
+    if plan["operation"] == "ACCEPT":
+        replay, replay_identity = read_bound_ledger(
+            replay_root,
+            relative_path=plan["source_replay_ledger_relative_path"],
+            byte_length=plan["source_replay_ledger_byte_length"],
+            sha256=plan["source_replay_ledger_sha256"],
+        )
+        validate_ledger_binding(replay, plan, operation="REPLAY")
+        replay_source = {
+            "relative_path": replay["source_generation_ledger_relative_path"],
+            "byte_length": replay["source_generation_ledger_byte_length"],
+            "sha256": replay["source_generation_ledger_sha256"],
+        }
+        if replay_source != source_ledgers["generation"]:
+            raise ValueError("Acceptance preflight source-ledger cross-binding mismatch")
+        source_ledgers["replay"] = replay_identity
     evidence = verify_frozen_production_evidence(evidence_paths)
     required_modules = (
         "satnet.experiments.final_generation.orchestrator",
@@ -110,6 +141,7 @@ def run_preflight(
         "frozen_evidence_byte_count": evidence["combined"]["byte_count"],
         "frozen_evidence_verified_sha256_count": evidence["combined"]["verified_sha256_count"],
         "output_roots": roots,
+        "source_ledgers": source_ledgers,
         "plan_hash": plan["plan_hash"],
         "preflight": "PASSED",
         "simulation_executed": False,
