@@ -1,0 +1,57 @@
+{
+  "audit_commit": "4d9ad633329bd3e0710ab566a1b25c7e01af889f",
+  "audit_findings": [
+    {
+      "closure": "The stable identity now binds the exact executable inventory bytes; preflight verifies repository cleanliness, inventory membership, per-file bytes, stable ancestry, post-stable executable diff, and import origins.",
+      "control": "BINDING-001",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "All public generation, resume, replay, and acceptance APIs require an unforgeable sealed preflight certificate before lock acquisition, root creation, or scientific writes.",
+      "control": "BINDING-002",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Successful runs require a structured adapter result and exact science-artifact contract validation; arbitrary nonempty directories cannot transition to SUCCEEDED.",
+      "control": "BINDING-003",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Replay validates generation ledger integrity, operation-independent campaign identity, executable/proposal/artifact identities, roots, run set, and all three seeds before simulation.",
+      "control": "BINDING-004",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Acceptance independently validates generation and replay ledgers, source authorization and plan identities, complete run membership, all three seeds, artifact inventories, and replay reports.",
+      "control": "BINDING-005",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "The production adapter invokes authoritative per-run validation and returns a structured result that is checked against the exact artifact contract.",
+      "control": "BINDING-006",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Portable regeneration is provided by one deterministic generator; Python checkout bytes are fixed to LF and fresh Windows core.autocrlf=true validation reproduced all proposal artifacts byte-for-byte.",
+      "control": "BINDING-007",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Campaign and per-run exclusive-create locks contain PID and process-start identity; stale recovery is explicit, identity-validated, guarded, and recorded.",
+      "control": "BINDING-008",
+      "status": "CLOSED"
+    },
+    {
+      "closure": "Plan, ledger, run-binding, replay, and acceptance records bind contract, executable, proposal, artifact-contract, authorization, run-record, design-record, realization, and three-seed identities.",
+      "control": "BINDING-009",
+      "status": "CLOSED"
+    }
+  ],
+  "execution_authorized": false,
+  "production_authorized": false,
+  "required_next_task": "Independent reaudit before any separate execution authorization decision",
+  "schema_identifier": "satnet.stage_a.execution_tooling_remediation_findings.v1",
+  "simulation_authorized": false,
+  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "status": "READY_FOR_INDEPENDENT_REAUDIT"
+}

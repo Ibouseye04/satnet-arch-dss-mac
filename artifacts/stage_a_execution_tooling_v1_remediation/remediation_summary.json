@@ -1,0 +1,25 @@
+{
+  "audit_branch": "audit/stage-a-execution-tooling-v1",
+  "audit_commit": "4d9ad633329bd3e0710ab566a1b25c7e01af889f",
+  "base_production_evidence": {
+    "contract_specification_sha256": "482935e13017dc55cfbfcf2ba79ae50c09dfcffe69762806cc5448273406498b",
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "production_tooling_sha": "9ba5ea65ed718a9c50c9af776b6bcf978f9ba5ab",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd"
+  },
+  "correction_branch": "correction/stage-a-execution-tooling-v1-remediation",
+  "execution_authorized": false,
+  "frozen_stage_a_contract": {
+    "commit": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+    "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "tag": "stage-a-discovery-contract-v1"
+  },
+  "production_authorized": false,
+  "proposal_artifact_count": 16,
+  "required_next_task": "Independent reaudit of corrected Stage A execution tooling",
+  "schema_identifier": "satnet.stage_a.execution_tooling_remediation_summary.v1",
+  "simulation_authorized": false,
+  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "status": "READY_FOR_INDEPENDENT_REAUDIT"
+}

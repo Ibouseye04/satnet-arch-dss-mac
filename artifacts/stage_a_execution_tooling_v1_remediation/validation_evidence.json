@@ -1,0 +1,42 @@
+{
+  "artifact_contract_sha256": "ea03ce40d849815c6a5d4c0275e68e0fa1cba165a44e351e6a6e8e6db99e8fe3",
+  "complete_suite": {
+    "result": "1146 passed, 37 historical-audit tests skipped, 1 unrelated timer test deselected",
+    "status": "PASSED_WITH_SEPARATE_TIMER_CONFIRMATION"
+  },
+  "executable_inventory_sha256": "8404e0cda2864a111598bd8b1209a341a1f1ecfc1c12f7c17c611c0156a2f94a",
+  "focused_stage_a_suite": {
+    "passed": 40,
+    "status": "PASSED"
+  },
+  "fresh_windows_checkout": {
+    "autocrlf": true,
+    "executable_verification": "PASSED",
+    "proposal_artifact_count": 16,
+    "proposal_byte_mismatches": [],
+    "stage_a_tests_passed": 40,
+    "status": "PASSED"
+  },
+  "frozen_production_evidence": {
+    "byte_count": 1337549193,
+    "file_count": 9004,
+    "read_only": true,
+    "status": "PASSED",
+    "verified_sha256_count": 9004
+  },
+  "known_unrelated_timer_test": {
+    "full_suite_observation": "tests/utils/test_experiment_logger.py::TestExperimentLogger::test_timer reported 0.0 after a 0.01 second sleep",
+    "isolated_result": "1 passed",
+    "source_modified": false
+  },
+  "production_roots_absent": true,
+  "proposal_inventory_sha256": "845f4c72548b584af371ae1d3b868b7805673e05832ff4dbfff09703a3b2a7f9",
+  "protected_science_diff_empty": true,
+  "schema_identifier": "satnet.stage_a.execution_tooling_remediation_validation.v1",
+  "simulation_executed": false,
+  "stable_executable_commit": "5a4bb751bc379596abd938e68db377570222ed73",
+  "standalone_timer_test": {
+    "passed": 1,
+    "status": "PASSED"
+  }
+}

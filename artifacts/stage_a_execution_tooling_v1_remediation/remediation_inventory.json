@@ -1,0 +1,32 @@
+{
+  "artifact_count_excluding_inventory": 4,
+  "artifacts": [
+    {
+      "byte_length": 2931,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_remediation/finding_closure.json",
+      "sha256": "088f095d882943608b329919bab3234011e424f9d6b70a86212724f1fa627a72"
+    },
+    {
+      "byte_length": 1354,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_remediation/remediation_summary.json",
+      "sha256": "1723cfab2ce61ce066c91fc7ba478223d20d06fe49117cffa84d370d935dce85"
+    },
+    {
+      "byte_length": 1543,
+      "relative_path": "artifacts/stage_a_execution_tooling_v1_remediation/validation_evidence.json",
+      "sha256": "add2b9280462a0f134e070bdb44c6a2a9e4bd7413e418debad85100cf09565dc"
+    },
+    {
+      "byte_length": 4097,
+      "relative_path": "docs/validation/stage_a_execution_tooling_v1_remediation.md",
+      "sha256": "defe5f87d9d2c079494110a190a1d1835a3e7227bee9c4864e53c1cad8fafc5e"
+    }
+  ],
+  "execution_authorized": false,
+  "hash_algorithm": "SHA-256",
+  "production_authorized": false,
+  "schema_identifier": "satnet.stage_a.execution_tooling_remediation_inventory.v1",
+  "self_reference_policy": "remediation_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "status": "READY_FOR_INDEPENDENT_REAUDIT"
+}
