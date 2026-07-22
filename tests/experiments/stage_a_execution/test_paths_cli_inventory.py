@@ -91,8 +91,9 @@ def test_cli_plan_default_deny_and_holdout_redaction(tmp_path: Path, capsys) -> 
     assert result["authorization_status"] == "EXECUTION NOT AUTHORIZED"
     assert result["execution_authorized"] is False
     assert result["sealed_holdout"]["identities"] == "REDACTED"
-    code = cli.main(["generate", "--partition", "development", "--generation-root", str(roots[0]), "--replay-root", str(roots[1]), "--acceptance-root", str(roots[2])])
-    assert code == 2
+    with pytest.raises(SystemExit) as error:
+        cli.main(["generate", "--partition", "development", "--generation-root", str(roots[0]), "--replay-root", str(roots[1]), "--acceptance-root", str(roots[2])])
+    assert error.value.code == 2
     assert not any(root.exists() for root in roots)
 
 
