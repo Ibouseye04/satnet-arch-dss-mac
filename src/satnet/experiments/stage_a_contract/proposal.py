@@ -313,7 +313,7 @@ def build_region_bounds() -> dict[str, Any]:
 
 
 def build_output_root_manifest() -> dict[str, Any]:
-    validate_output_roots(OUTPUT_ROOTS, require_absent=True)
+    validate_output_roots(OUTPUT_ROOTS)
     return {
         "schema_identifier": ARTIFACT_SCHEMAS["stage_a_output_root_manifest.json"],
         "proposal_status": PROPOSAL_STATUS,
@@ -328,18 +328,21 @@ def build_output_root_manifest() -> dict[str, Any]:
     }
 
 
-def validate_output_roots(roots: Mapping[str, str], *, require_absent: bool) -> None:
+def validate_output_roots(roots: Mapping[str, str]) -> None:
     if set(roots) != set(OUTPUT_ROOTS):
         raise ValueError("Stage A output-root roles are incomplete")
     values = list(roots.values())
-    for index, first in enumerate(values):
-        for second in values[index + 1 :]:
+    canonical = [str(Path(value).resolve(strict=False)) for value in values]
+    if values != canonical:
+        raise ValueError("Stage A output roots are not canonical absolute paths")
+    if len(set(canonical)) != len(canonical):
+        raise ValueError("Stage A output roots are not unique")
+    for index, first in enumerate(canonical):
+        for second in canonical[index + 1 :]:
             if paths_overlap(first, second):
                 raise ValueError("Stage A output roots overlap")
         if any(paths_overlap(first, frozen) for frozen in FROZEN_ROOTS):
             raise ValueError("Stage A output root overlaps frozen evidence")
-        if require_absent and Path(first).exists():
-            raise ValueError(f"Proposed Stage A output root already exists: {first}")
 
 
 def _criterion(identifier: str, description: str, partition: str, metric: str, operator: str, threshold: Any, rationale: str, consequence: str, influence: bool) -> dict[str, Any]:
