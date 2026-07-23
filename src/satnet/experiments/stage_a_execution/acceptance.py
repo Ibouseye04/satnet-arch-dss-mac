@@ -9,7 +9,7 @@ from .ledger import read_bound_ledger
 from .locking import campaign_lock
 from .paths import validate_output_roots, validate_relative_artifact_path
 from .preflight import PreflightCertificate, require_preflight
-from .resume import validate_ledger_binding
+from .resume import ledger_provenance_from_mapping, validate_ledger_binding
 
 ACCEPTANCE_SCHEMA = "satnet.stage_a.acceptance_report.v1"
 ACCEPTANCE_DOMAIN = "satnet_stage_a_acceptance_report_v1"
@@ -47,7 +47,15 @@ def evaluate_acceptance(
         byte_length=plan["source_replay_ledger_byte_length"],
         sha256=plan["source_replay_ledger_sha256"],
     )
-    validate_ledger_binding(generation, plan, operation="GENERATE")
+    generation_provenance = ledger_provenance_from_mapping(
+        preflight.report["source_provenance"]["generation"]
+    )
+    validate_ledger_binding(
+        generation,
+        plan,
+        operation="GENERATE",
+        provenance=generation_provenance,
+    )
     validate_ledger_binding(replay, plan, operation="REPLAY")
     replay_source_identity = {
         "relative_path": replay["source_generation_ledger_relative_path"],

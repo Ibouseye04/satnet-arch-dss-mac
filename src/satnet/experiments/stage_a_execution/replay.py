@@ -16,7 +16,7 @@ from .ledger import build_ledger, read_bound_ledger, read_ledger, transition, wr
 from .locking import campaign_lock, per_run_lock
 from .paths import validate_output_roots, validate_relative_artifact_path
 from .preflight import PreflightCertificate, require_preflight
-from .resume import validate_ledger_binding
+from .resume import ledger_provenance_from_mapping, validate_ledger_binding
 
 REPLAY_SCHEMA = "satnet.stage_a.replay_report.v1"
 
@@ -55,7 +55,15 @@ def _execute_replay(
         byte_length=plan["source_generation_ledger_byte_length"],
         sha256=plan["source_generation_ledger_sha256"],
     )
-    validate_ledger_binding(generation_ledger, plan, operation="GENERATE")
+    generation_provenance = ledger_provenance_from_mapping(
+        preflight.report["source_provenance"]["generation"]
+    )
+    validate_ledger_binding(
+        generation_ledger,
+        plan,
+        operation="GENERATE",
+        provenance=generation_provenance,
+    )
     with campaign_lock(replay_root, plan, authorization_hash):
         replay_root.mkdir(parents=False, exist_ok=False)
         ledger_path = replay_root / "replay_ledger.json"

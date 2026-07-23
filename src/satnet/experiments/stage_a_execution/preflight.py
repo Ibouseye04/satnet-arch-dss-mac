@@ -5,16 +5,24 @@ import importlib.util
 from pathlib import Path
 from typing import Any
 
-from .authorization import Authorization, validate_authorization
+from .authorization import Authorization, load_authorization, validate_authorization
+from .common import read_json_object, sha256_file
 from .contract import FrozenStageAContract, load_frozen_contract
 from .evidence import DEFAULT_FROZEN_EVIDENCE_PATHS, FrozenEvidencePaths, verify_frozen_production_evidence
 from .identity import tooling_identity, verify_executable_identity
 from .ledger import read_bound_ledger
 from .paths import available_bytes, probe_parent, validate_output_roots
 from .plan import validate_plan, validate_plan_contract_binding
-from .resume import validate_ledger_binding
+from .resume import LedgerProvenance, ledger_provenance_from_mapping, validate_ledger_binding
 
 MINIMUM_FREE_BYTES = 1_000_000_000
+SOURCE_GENERATION_PROVENANCE_RELATIVE = Path(
+    "artifacts/stage_a_replay_source_ledger_binding_v1_evidence/source_generation_provenance.json"
+)
+SOURCE_GENERATION_AUTHORIZATION_RELATIVE = Path(
+    "artifacts/stage_a_development_authorization_v1_active/stage_a_development_execution_authorization.json"
+)
+SOURCE_PROVENANCE_SCHEMA = "satnet.stage_a.source_generation_provenance.v1"
 _PREFLIGHT_SEAL = object()
 
 
@@ -37,6 +45,76 @@ def require_preflight(certificate: PreflightCertificate, *, plan: dict[str, Any]
         raise PermissionError("Mandatory preflight identity mismatch")
     if certificate.operation != plan["operation"] or certificate.roots != plan["output_roots"]:
         raise PermissionError("Mandatory preflight operation or roots mismatch")
+
+
+def load_source_generation_provenance(
+    repo_root: Path,
+    *,
+    contract: FrozenStageAContract,
+    plan: dict[str, Any],
+) -> LedgerProvenance:
+    document = read_json_object(repo_root / SOURCE_GENERATION_PROVENANCE_RELATIVE)
+    if set(document) != {
+        "schema_identifier",
+        "source_authorization_relative_path",
+        "source_authorization_byte_length",
+        "source_authorization_file_sha256",
+        "source_generation_ledger_relative_path",
+        "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256",
+        "ledger_provenance",
+    }:
+        raise ValueError("Source generation provenance field set mismatch")
+    if document["schema_identifier"] != SOURCE_PROVENANCE_SCHEMA:
+        raise ValueError("Source generation provenance schema mismatch")
+    if document["source_authorization_relative_path"] != SOURCE_GENERATION_AUTHORIZATION_RELATIVE.as_posix():
+        raise ValueError("Source generation authorization path mismatch")
+    authorization_path = repo_root / SOURCE_GENERATION_AUTHORIZATION_RELATIVE
+    if authorization_path.stat().st_size != document["source_authorization_byte_length"]:
+        raise ValueError("Source generation authorization byte length mismatch")
+    if sha256_file(authorization_path) != document["source_authorization_file_sha256"]:
+        raise ValueError("Source generation authorization SHA-256 mismatch")
+    source_ledger_identity = {
+        "relative_path": document["source_generation_ledger_relative_path"],
+        "byte_length": document["source_generation_ledger_byte_length"],
+        "sha256": document["source_generation_ledger_sha256"],
+    }
+    plan_source_identity = {
+        "relative_path": plan["source_generation_ledger_relative_path"],
+        "byte_length": plan["source_generation_ledger_byte_length"],
+        "sha256": plan["source_generation_ledger_sha256"],
+    }
+    if source_ledger_identity != plan_source_identity:
+        raise PermissionError("Current authorization source-generation ledger identity mismatch")
+    provenance = ledger_provenance_from_mapping(document["ledger_provenance"])
+    if provenance.operation != "GENERATE":
+        raise ValueError("Source generation provenance operation mismatch")
+    if provenance.contract_hash != contract.contract_hash:
+        raise ValueError("Source generation provenance contract mismatch")
+    if provenance.partition != plan["partition"]:
+        raise ValueError("Source generation provenance partition mismatch")
+    if provenance.expected_run_count != plan["run_count"]:
+        raise ValueError("Source generation provenance run count mismatch")
+    if provenance.output_root_identity != plan["output_roots"]:
+        raise ValueError("Source generation provenance output-root mismatch")
+    source_authorization = load_authorization(authorization_path)
+    if source_authorization.sha256 != provenance.authorization_hash:
+        raise PermissionError("Source generation authorization semantic identity mismatch")
+    validate_authorization(
+        source_authorization,
+        contract=contract,
+        stable_executable_commit=provenance.stable_executable_commit,
+        executable_inventory_hash=provenance.executable_inventory_hash,
+        tooling_proposal_hash=provenance.tooling_proposal_hash,
+        artifact_contract_hash=provenance.artifact_contract_hash,
+        operation="GENERATE",
+        partition=provenance.partition,
+        run_ids=[row["global_run_id"] for row in plan["runs"]],
+        generation_root=Path(provenance.output_root_identity["generation"]),
+        replay_root=Path(provenance.output_root_identity["replay"]),
+        acceptance_root=Path(provenance.output_root_identity["acceptance"]),
+    )
+    return provenance
 
 
 def run_preflight(
@@ -84,15 +162,27 @@ def run_preflight(
     if states != required_states:
         raise FileExistsError(f"Output-root state mismatch for {plan['operation']}: {states}")
     source_ledgers: dict[str, dict[str, Any]] = {}
+    source_provenance: dict[str, dict[str, Any]] = {}
     if plan["operation"] in {"REPLAY", "ACCEPT"}:
+        generation_provenance = load_source_generation_provenance(
+            repo_root,
+            contract=reloaded,
+            plan=plan,
+        )
         generation, generation_identity = read_bound_ledger(
             generation_root,
             relative_path=plan["source_generation_ledger_relative_path"],
             byte_length=plan["source_generation_ledger_byte_length"],
             sha256=plan["source_generation_ledger_sha256"],
         )
-        validate_ledger_binding(generation, plan, operation="GENERATE")
+        validate_ledger_binding(
+            generation,
+            plan,
+            operation="GENERATE",
+            provenance=generation_provenance,
+        )
         source_ledgers["generation"] = generation_identity
+        source_provenance["generation"] = generation_provenance.as_dict()
     if plan["operation"] == "ACCEPT":
         replay, replay_identity = read_bound_ledger(
             replay_root,
@@ -142,6 +232,8 @@ def run_preflight(
         "frozen_evidence_verified_sha256_count": evidence["combined"]["verified_sha256_count"],
         "output_roots": roots,
         "source_ledgers": source_ledgers,
+        "source_provenance": source_provenance,
+        "current_operation_campaign_manifest_hash": plan["campaign_manifest_hash"],
         "plan_hash": plan["plan_hash"],
         "preflight": "PASSED",
         "simulation_executed": False,
