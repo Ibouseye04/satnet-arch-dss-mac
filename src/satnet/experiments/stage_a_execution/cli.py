@@ -30,7 +30,7 @@ def _print(value: dict[str, Any]) -> None:
 
 def _context(args: argparse.Namespace, operation: str) -> tuple[FrozenStageAContract, Authorization | None, dict[str, Any]]:
     repo = _repo_root()
-    contract = load_frozen_contract(repo, repo / CONTRACT_RELATIVE_ROOT)
+    contract = load_frozen_contract(repo, repo / CONTRACT_RELATIVE_ROOT, operation)
     stable_commit, executable_hash, proposal_hash = tooling_identity(repo)
     science_contract_hash = artifact_contract_hash()
     authorization = None if args.authorization is None else load_authorization(args.authorization)

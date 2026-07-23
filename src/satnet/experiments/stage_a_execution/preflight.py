@@ -51,7 +51,7 @@ def run_preflight(
         raise PermissionError("Plan stable executable identity mismatch")
     if executable["executable_inventory_sha256"] != plan["executable_inventory_hash"]:
         raise PermissionError("Plan executable inventory identity mismatch")
-    reloaded = load_frozen_contract(repo_root, contract.contract_root)
+    reloaded = load_frozen_contract(repo_root, contract.contract_root, plan["operation"])
     if reloaded.contract_hash != contract.contract_hash:
         raise ValueError("Frozen Stage A contract reload identity mismatch")
     validate_plan(plan)

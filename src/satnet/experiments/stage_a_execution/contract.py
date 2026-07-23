@@ -83,7 +83,27 @@ def verify_tag(repo_root: Path) -> None:
         raise ValueError("Frozen Stage A tag is not annotated")
 
 
-def load_frozen_contract(repo_root: Path, contract_root: Path | None = None) -> FrozenStageAContract:
+def frozen_contract_output_root_states(operation: str | None) -> dict[str, bool]:
+    states = {name: False for name in freeze.OUTPUT_ROOTS}
+    required_sources = {
+        None: (),
+        "PLAN": (),
+        "GENERATE": (),
+        "REPLAY": ("production_generation",),
+        "ACCEPT": ("production_generation", "production_replay"),
+    }
+    if operation not in required_sources:
+        raise ValueError(f"Unsupported Stage A operation: {operation}")
+    for name in required_sources[operation]:
+        states[name] = True
+    return states
+
+
+def load_frozen_contract(
+    repo_root: Path,
+    contract_root: Path | None = None,
+    operation: str | None = None,
+) -> FrozenStageAContract:
     root = (contract_root or repo_root / CONTRACT_RELATIVE_ROOT).resolve(strict=True)
     verify_tag(repo_root)
     result = freeze.validate_frozen_contract(
@@ -93,6 +113,7 @@ def load_frozen_contract(repo_root: Path, contract_root: Path | None = None) -> 
         expected_proposal_inventory=freeze.APPROVED_PROPOSAL_INVENTORY,
         expected_audit_commit=freeze.AUDIT_COMMIT,
         expected_audit_inventory=freeze.AUDIT_INVENTORY,
+        expected_output_root_states=frozen_contract_output_root_states(operation),
     )
     if result["contract_hash"] != FROZEN_CONTRACT_HASH:
         raise ValueError("Frozen contract hash mismatch")

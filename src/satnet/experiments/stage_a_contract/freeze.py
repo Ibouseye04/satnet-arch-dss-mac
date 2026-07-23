@@ -323,21 +323,36 @@ def verify_repository_boundaries(repo_root: Path) -> None:
         raise ValueError("Protected science or frozen production content changed")
 
 
-def verify_output_roots(repo_root: Path) -> dict[str, bool]:
+def verify_output_roots(
+    repo_root: Path,
+    *,
+    expected_states: Mapping[str, bool] | None = None,
+) -> dict[str, bool]:
     worktrees = [
         Path(line.removeprefix("worktree "))
         for line in git(repo_root, "worktree", "list", "--porcelain").splitlines()
         if line.startswith("worktree ")
     ]
     outputs = {name: Path(value) for name, value in OUTPUT_ROOTS.items()}
+    expected = (
+        {name: False for name in outputs}
+        if expected_states is None
+        else dict(expected_states)
+    )
+    if set(expected) != set(outputs) or any(type(state) is not bool for state in expected.values()):
+        raise ValueError("Reserved Stage A output-root expected states are invalid")
+    actual: dict[str, bool] = {}
     for name, path in outputs.items():
-        if path.exists():
+        actual[name] = path.exists()
+        if actual[name] and not expected[name]:
             raise ValueError(f"Reserved Stage A output root exists: {name}")
+        if expected[name] and not actual[name]:
+            raise ValueError(f"Required Stage A source root does not exist: {name}")
         others = [value for key, value in outputs.items() if key != name]
         protected = [repo_root, *worktrees, *(Path(value) for value in FROZEN_EVIDENCE_ROOTS)]
         if any(_overlaps(path, candidate) for candidate in [*others, *protected]):
             raise ValueError(f"Reserved Stage A output root overlaps protected path: {name}")
-    return {name: False for name in sorted(outputs)}
+    return {name: actual[name] for name in sorted(actual)}
 
 
 def _source_payloads(source_root: Path) -> dict[str, bytes]:
@@ -929,6 +944,7 @@ def validate_frozen_contract(
     expected_byte_policy_commit: str = BYTE_POLICY_COMMIT,
     enforce_repository: bool = True,
     enforce_output_roots: bool = True,
+    expected_output_root_states: Mapping[str, bool] | None = None,
 ) -> dict[str, Any]:
     if expected_proposal_inventory != APPROVED_PROPOSAL_INVENTORY:
         raise ValueError("Wrong approved proposal inventory SHA-256")
@@ -980,7 +996,10 @@ def validate_frozen_contract(
     _validate_authorization(specification, declaration)
     if declaration.get("contract_hash") != contract_hash:
         raise ValueError("Freeze declaration contract hash mismatch")
-    output_states = verify_output_roots(repo_root) if enforce_output_roots else {
+    output_states = verify_output_roots(
+        repo_root,
+        expected_states=expected_output_root_states,
+    ) if enforce_output_roots else {
         name: False for name in sorted(OUTPUT_ROOTS)
     }
     return {
