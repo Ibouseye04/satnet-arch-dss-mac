@@ -1,0 +1,16 @@
+{
+  "artifact_count_excluding_inventory": 1,
+  "artifacts": [
+    {
+      "byte_length": 5374,
+      "relative_path": "audit_report.json",
+      "sha256": "1f9382f0463630cfae80c50bdf3be68236c96911f5a85dc592a25d7a28c95cb3"
+    }
+  ],
+  "audit_branch": "audit/stage-a-replay-source-root-preflight-v1",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "remediation_commit_audited": "5fb1dd1e429c3f17965408a08418cd9b4c12a57d",
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_audit_inventory.v1",
+  "self_reference_policy": "This inventory excludes its own bytes."
+}

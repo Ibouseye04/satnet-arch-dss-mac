@@ -1,0 +1,119 @@
+{
+  "audit_branch": "audit/stage-a-replay-source-root-preflight-v1",
+  "audit_date": "2026-07-23",
+  "audit_scope": {
+    "base_commit": "314531cbb80d036cb5605ec8b1905d312152f2c0",
+    "changed_files": [
+      ".gitattributes",
+      "artifacts/stage_a_replay_source_root_preflight_v1_proposal/stage_a_corrected_executable_source_inventory.json",
+      "src/satnet/experiments/stage_a_contract/freeze.py",
+      "src/satnet/experiments/stage_a_execution/cli.py",
+      "src/satnet/experiments/stage_a_execution/contract.py",
+      "src/satnet/experiments/stage_a_execution/preflight.py",
+      "tests/experiments/stage_a_execution/test_replay_preflight_source_root.py"
+    ],
+    "expected_ancestry": [
+      "314531cbb80d036cb5605ec8b1905d312152f2c0",
+      "d9d3018df55185e5af77b59c2def1ee7f4b172a6",
+      "ea1240644bf5837367317741bae370f2d152e1a3",
+      "5fb1dd1e429c3f17965408a08418cd9b4c12a57d"
+    ],
+    "remediation_head": "5fb1dd1e429c3f17965408a08418cd9b4c12a57d"
+  },
+  "authorization_verification": {
+    "active_authorization_changed_after_base": false,
+    "active_authorization_exact_file_sha256": "1d8046f2244abdf9f010a04f3ceae0fff8f02afb53dbc169b1812b0d3f77a652",
+    "active_authorization_semantic_sha256": "ef0f2c2bf90a691bb7a479054257d3ca4d9794eb73f30ec5f5e43eda7ce2d4c9",
+    "authorized_executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "authorized_stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "corrected_executable_rejection": "Authorization identity mismatch: authorized_stable_executable_commit",
+    "prior_executable_validation": "PASSED",
+    "superseding_authorization_required": true
+  },
+  "changed_file_review": {
+    "environment_override_added": false,
+    "machine_specific_exception_added": false,
+    "out_of_scope_changed_files": [],
+    "protected_path_rejection_removed": false,
+    "repository_worktree_rejection_removed": false,
+    "root_overlap_checks_remain_unconditional": true,
+    "status": "SCOPE PASSED; REMEDIATION INCOMPLETE"
+  },
+  "corrected_executable_identity": {
+    "corrected_executable_commit": "d9d3018df55185e5af77b59c2def1ee7f4b172a6",
+    "executable_record_count": 71,
+    "fresh_checkout_core_autocrlf": true,
+    "fresh_checkout_executable_git_blob_mismatches": 0,
+    "inventory_exact_regeneration_match": true,
+    "inventory_sha256": "c0587ce812182b29e7d2f79cc35a586cab21f3ddfd3d11175b2995f23e64ab76",
+    "narrow_text_attribute": "unset",
+    "post_corrected_commit_executable_changes": []
+  },
+  "direct_authoritative_reproduction": {
+    "call_path": [
+      "load_frozen_contract(operation=REPLAY)",
+      "freeze.validate_frozen_contract",
+      "freeze.reproduce_approved_proposal",
+      "proposal.build_artifact_payloads",
+      "proposal.build_output_root_manifest",
+      "proposal.validate_output_roots(require_absent=True)"
+    ],
+    "error": "Proposed Stage A output root already exists: C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+    "result": "FAILED",
+    "simulation_executed": false
+  },
+  "finding": {
+    "cause": "The remediation makes freeze.verify_output_roots operation-aware, but frozen-contract validation still reproduces the historical proposal. Proposal reproduction calls proposal.validate_output_roots with require_absent=True, so REPLAY rejects the required existing generation root before authorization or source-ledger validation.",
+    "finding_id": "REPLAY-SOURCE-ROOT-PREFLIGHT-001",
+    "severity": "BINDING",
+    "status": "OPEN",
+    "test_gap": "The focused preflight tests monkeypatch preflight.load_frozen_contract, and the root-policy test calls freeze.verify_output_roots directly; neither executes the authoritative frozen-contract proposal-reproduction path."
+  },
+  "focused_tests": {
+    "directly_affected": "15 passed in 0.45s",
+    "replay_source_root": "8 passed in 0.59s"
+  },
+  "generation_evidence": {
+    "adapter_passed_records": 100,
+    "failed_directory_count": 0,
+    "file_count": 1902,
+    "generation_ledger_byte_length": 1060132,
+    "generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "in_progress_directory_count": 0,
+    "ledger_bound_artifact_byte_count": 365309146,
+    "ledger_bound_artifact_count": 1900,
+    "ledger_bound_artifact_hash_errors": 0,
+    "lock_count": 0,
+    "science_passed_records": 100,
+    "succeeded_records": 100,
+    "total_byte_count": 366369907,
+    "tree_identity_sha256": "30a9e07a6e513e244cd7d8e709138e65b854850a4b68b22d5eb5f33bb6adff49"
+  },
+  "root_policy_review": {
+    "accept_expected_states": {
+      "acceptance": false,
+      "generation": true,
+      "replay": true
+    },
+    "generate_expected_states": {
+      "acceptance": false,
+      "generation": false,
+      "replay": false
+    },
+    "operation_aware_freeze_layer": true,
+    "proposal_reproduction_absence_guard_operation_aware": false,
+    "replay_expected_states": {
+      "acceptance": false,
+      "generation": true,
+      "replay": false
+    },
+    "status": "FAILED"
+  },
+  "root_state_after_audit": {
+    "acceptance_root_exists": false,
+    "generation_root_exists": true,
+    "replay_root_exists": false
+  },
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_audit.v1",
+  "verdict": "NOT APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT REPLAY AUTHORIZATION"
+}
