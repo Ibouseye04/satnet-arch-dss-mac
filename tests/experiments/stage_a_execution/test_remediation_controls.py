@@ -21,7 +21,14 @@ from satnet.experiments.stage_a_execution.preflight import run_preflight
 from satnet.experiments.stage_a_execution.acceptance import evaluate_acceptance
 from scripts.generate_stage_a_execution_tooling_v1_proposal import generate
 
-from .conftest import ARTIFACT_CONTRACT, EXECUTABLE_INVENTORY, STABLE_EXECUTABLE_COMMIT, TOOLING_PROPOSAL, make_authorization
+from .conftest import (
+    ARTIFACT_CONTRACT,
+    EXECUTABLE_INVENTORY,
+    STABLE_EXECUTABLE_COMMIT,
+    TOOLING_PROPOSAL,
+    make_authorization,
+    source_provenance_from_ledger,
+)
 
 ROOT = Path(__file__).parents[3]
 
@@ -72,6 +79,13 @@ def _certificate(monkeypatch, contract, plan: dict, roots: tuple[Path, Path, Pat
     monkeypatch.setattr(preflight_module, "verify_frozen_production_evidence", lambda *_: {
         "combined": {"file_count": 9004, "byte_count": 1337549193, "verified_sha256_count": 9004},
     })
+    monkeypatch.setattr(
+        preflight_module,
+        "load_source_generation_provenance",
+        lambda *_args, **_kwargs: source_provenance_from_ledger(
+            roots[0] / "execution_ledger.json"
+        ),
+    )
     certificate = run_preflight(
         repo_root=ROOT, contract=contract, plan=plan, authorization=authorization,
         generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2], minimum_free_bytes=0,

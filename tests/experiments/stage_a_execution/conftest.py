@@ -7,6 +7,8 @@ import pytest
 
 from satnet.experiments.stage_a_execution.authorization import Authorization, authorization_digest
 from satnet.experiments.stage_a_execution.contract import FrozenStageAContract
+from satnet.experiments.stage_a_execution.ledger import read_ledger
+from satnet.experiments.stage_a_execution.resume import LedgerProvenance, ledger_provenance_from_mapping
 
 STABLE_EXECUTABLE_COMMIT = "1" * 40
 EXECUTABLE_INVENTORY = "2" * 64
@@ -14,6 +16,31 @@ TOOLING_PROPOSAL = "3" * 64
 ARTIFACT_CONTRACT = "4" * 64
 TOOLING_COMMIT = STABLE_EXECUTABLE_COMMIT
 TOOLING_INVENTORY = EXECUTABLE_INVENTORY
+LEDGER_PROVENANCE_FIELDS = (
+    "contract_hash",
+    "plan_hash",
+    "campaign_manifest_hash",
+    "authorization_hash",
+    "stable_executable_commit",
+    "executable_inventory_hash",
+    "tooling_proposal_hash",
+    "artifact_contract_hash",
+    "operation",
+    "partition",
+    "expected_run_count",
+    "output_root_identity",
+    "source_generation_ledger_relative_path",
+    "source_generation_ledger_byte_length",
+    "source_generation_ledger_sha256",
+    "source_replay_ledger_relative_path",
+    "source_replay_ledger_byte_length",
+    "source_replay_ledger_sha256",
+)
+
+
+def source_provenance_from_ledger(path: Path) -> LedgerProvenance:
+    ledger = read_ledger(path)
+    return ledger_provenance_from_mapping({field: ledger[field] for field in LEDGER_PROVENANCE_FIELDS})
 
 
 @pytest.fixture

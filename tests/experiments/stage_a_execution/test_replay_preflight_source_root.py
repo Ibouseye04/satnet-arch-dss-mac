@@ -20,6 +20,7 @@ from .conftest import (
     STABLE_EXECUTABLE_COMMIT,
     TOOLING_PROPOSAL,
     make_authorization,
+    source_provenance_from_ledger,
 )
 
 ROOT = Path(__file__).parents[3]
@@ -72,7 +73,11 @@ def _replay_context(contract: Any, roots: tuple[Path, Path, Path], identity: tup
     return authorization, _plan(contract, "REPLAY", roots, authorization)
 
 
-def _patch_preflight(monkeypatch: pytest.MonkeyPatch, contract: Any) -> list[str]:
+def _patch_preflight(
+    monkeypatch: pytest.MonkeyPatch,
+    contract: Any,
+    roots: tuple[Path, Path, Path],
+) -> list[str]:
     operations: list[str] = []
     monkeypatch.setattr(
         preflight_module,
@@ -98,6 +103,13 @@ def _patch_preflight(monkeypatch: pytest.MonkeyPatch, contract: Any) -> list[str
                 "verified_sha256_count": 9004,
             }
         },
+    )
+    monkeypatch.setattr(
+        preflight_module,
+        "load_source_generation_provenance",
+        lambda *_args, **_kwargs: source_provenance_from_ledger(
+            roots[0] / "execution_ledger.json"
+        ),
     )
     return operations
 
@@ -128,7 +140,7 @@ def test_replay_preflight_accepts_existing_bound_generation_source_only(
     source_artifact.chmod(stat.S_IREAD)
     source_before = (source_artifact.read_bytes(), source_artifact.stat().st_mode)
     authorization, plan = _replay_context(synthetic_contract, roots, identity)
-    operations = _patch_preflight(monkeypatch, synthetic_contract)
+    operations = _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     certificate = _run(synthetic_contract, roots, authorization, plan)
 
@@ -157,7 +169,7 @@ def test_replay_preflight_rejects_missing_generation_root(
         roots,
         ("execution_ledger.json", 1, "a" * 64),
     )
-    _patch_preflight(monkeypatch, synthetic_contract)
+    _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     with pytest.raises(FileExistsError, match="Output-root state mismatch for REPLAY"):
         _run(synthetic_contract, roots, authorization, plan)
@@ -179,7 +191,7 @@ def test_replay_preflight_rejects_missing_or_changed_bound_generation_ledger(
         ledger_path.unlink()
     else:
         ledger_path.write_bytes(ledger_path.read_bytes() + b"\n")
-    _patch_preflight(monkeypatch, synthetic_contract)
+    _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     with pytest.raises((FileNotFoundError, ValueError)):
         _run(synthetic_contract, roots, authorization, plan)
@@ -197,7 +209,7 @@ def test_replay_preflight_rejects_existing_replay_root(
     identity = _generation_ledger(synthetic_contract, roots)
     authorization, plan = _replay_context(synthetic_contract, roots, identity)
     roots[1].mkdir()
-    _patch_preflight(monkeypatch, synthetic_contract)
+    _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     with pytest.raises(FileExistsError, match="Output-root state mismatch for REPLAY"):
         _run(synthetic_contract, roots, authorization, plan)
@@ -214,7 +226,7 @@ def test_replay_preflight_rejects_overlapping_roots(
     roots = (generation, generation / "replay", tmp_path / "acceptance")
     identity = _generation_ledger(synthetic_contract, roots)
     authorization, plan = _replay_context(synthetic_contract, roots, identity)
-    _patch_preflight(monkeypatch, synthetic_contract)
+    _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     with pytest.raises(ValueError, match="Execution roots overlap"):
         _run(synthetic_contract, roots, authorization, plan)
@@ -240,7 +252,7 @@ def test_generate_preflight_still_rejects_existing_generation_root(
         acceptance_root=roots[2],
     )
     plan = _plan(synthetic_contract, "GENERATE", roots, authorization)
-    operations = _patch_preflight(monkeypatch, synthetic_contract)
+    operations = _patch_preflight(monkeypatch, synthetic_contract, roots)
 
     with pytest.raises(FileExistsError, match="Output-root state mismatch for GENERATE"):
         _run(synthetic_contract, roots, authorization, plan)
