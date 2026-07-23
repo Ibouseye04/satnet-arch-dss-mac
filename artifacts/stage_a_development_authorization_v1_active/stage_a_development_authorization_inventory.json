@@ -1,0 +1,29 @@
+{
+  "artifact_count_excluding_inventory": 3,
+  "artifacts": [
+    {
+      "byte_length": 3032,
+      "relative_path": "stage_a_development_authorization_activation.json",
+      "sha256": "3d0dbbeb69c8f18d4cf12615c91c94022a987bc78f98e8ab3d57d75dc7cfa2e7"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    },
+    {
+      "byte_length": 2836,
+      "relative_path": "stage_a_development_execution_authorization.json",
+      "sha256": "8c017b4e712ee4883921d327e5ee3e965c872032745949351d5df5ab7ea40bed"
+    }
+  ],
+  "authorization_active": true,
+  "authorization_status": "AUTHORIZED",
+  "execution_authorized": true,
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "schema_identifier": "satnet.stage_a.development_authorization_active_inventory.v1",
+  "self_reference_policy": "stage_a_development_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false
+}
