@@ -1,0 +1,94 @@
+{
+  "audit_base_commit": "7a9a093db8c623e20d6c969f34224a30b76852aa",
+  "audit_branch": "audit/stage-a-development-authorization-v1",
+  "authorization": {
+    "authorization_active": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "authorization_status": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "authorized_operation": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "authorized_partition": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "execution_authorized": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "production_authorized": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "simulation_authorized": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH"
+  },
+  "binding_findings": [
+    {
+      "actual_checkout_inventory_byte_length": 1217,
+      "actual_checkout_inventory_sha256": "0e6f1aecc901451457964dd114f9104b6c551d7df196b38ef956c6ff949a6b34",
+      "expected_inventory_byte_length": 1187,
+      "expected_inventory_sha256": "064becc1deab645ff017113b5a0c84213e8d1df6a1bb0ef0645c811294146241",
+      "finding_id": "AUTHORIZATION-BINDING-001",
+      "finding": "The exact authorization-proposal inventory bytes in the required fresh Windows worktree do not match the binding identity.",
+      "observed_checkout_line_endings": "30 CRLF",
+      "repository_object_line_endings": "30 LF",
+      "severity": "BINDING"
+    }
+  ],
+  "contract_identity_result": {
+    "annotated_tag": true,
+    "commit": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+    "contract_hash": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "tag": "stage-a-discovery-contract-v1",
+    "tag_target_match": true
+  },
+  "development_membership": {
+    "design_count": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "duplicates": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "extra_runs": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "first_run": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "holdout_runs_included": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "last_run": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "missing_runs": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "ordered_run_id_sha256": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "run_count": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "seed_binding_result": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+    "validation_runs_included": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH"
+  },
+  "development_plan_identity_result": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+  "executable_inventory_identity_result": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+  "final_verdict": "NOT APPROVED FOR STAGE A DEVELOPMENT AUTHORIZATION ACTIVATION",
+  "focused_tests": {
+    "reason": "Binding identity mismatch triggered the mandatory stop rule before focused tests.",
+    "result": "NOT_RUN"
+  },
+  "proposal_commit_audited": "7a9a093db8c623e20d6c969f34224a30b76852aa",
+  "proposal_inventory_result": {
+    "checkout_exact_bytes_match": false,
+    "expected_sha256": "064becc1deab645ff017113b5a0c84213e8d1df6a1bb0ef0645c811294146241",
+    "repository_object_sha256": "064becc1deab645ff017113b5a0c84213e8d1df6a1bb0ef0645c811294146241",
+    "worktree_sha256": "0e6f1aecc901451457964dd114f9104b6c551d7df196b38ef956c6ff949a6b34"
+  },
+  "repository_status_at_stop": "CLEAN",
+  "required_corrections": [
+    "Bind the four proposal paths to byte-preserving checkout behavior with narrow path-specific attributes; do not use a broad Python rule.",
+    "Create a new clean Windows worktree and require all four checkout files to match their repository-object lengths and SHA-256 values.",
+    "Repeat this narrow authorization review from the corrected proposal commit."
+  ],
+  "reserved_roots": {
+    "acceptance": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance"
+    },
+    "evidence_freeze": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-freeze"
+    },
+    "generation": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production"
+    },
+    "replay": {
+      "exists": false,
+      "path": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    },
+    "reserved_roots_created": false
+  },
+  "schema_identifier": "satnet.stage_a.development_authorization_review.v1",
+  "stable_executable_identity_result": {
+    "commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "is_ancestor_of_proposal_commit": true,
+    "verification": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH"
+  },
+  "stop_rule_triggered": true,
+  "tooling_proposal_identity_result": "NOT_EVALUATED_STOP_ON_BINDING_MISMATCH",
+  "activation_ready_instructions": "NOT_PROVIDED_PROPOSAL_NOT_APPROVED"
+}

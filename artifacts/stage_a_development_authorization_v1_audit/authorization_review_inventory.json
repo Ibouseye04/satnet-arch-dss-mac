@@ -1,0 +1,21 @@
+{
+  "artifact_count_excluding_inventory": 2,
+  "artifacts": [
+    {
+      "byte_length": 4607,
+      "relative_path": "artifacts/stage_a_development_authorization_v1_audit/authorization_review.json",
+      "sha256": "915e458f0c0bf845c32b39f7600379516c7e5a8d7028f6fc394c91c01c26c4d4"
+    },
+    {
+      "byte_length": 2874,
+      "relative_path": "docs/validation/stage_a_development_authorization_v1_audit.md",
+      "sha256": "b6f4f7808834c39aaac2dbba46b9b4c2ba54f93cb31e3d3f0facc9a705946423"
+    }
+  ],
+  "audit_base_commit": "7a9a093db8c623e20d6c969f34224a30b76852aa",
+  "final_verdict": "NOT APPROVED FOR STAGE A DEVELOPMENT AUTHORIZATION ACTIVATION",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.development_authorization_review_inventory.v1",
+  "self_reference_policy": "authorization_review_inventory.json excludes its own bytes"
+}
