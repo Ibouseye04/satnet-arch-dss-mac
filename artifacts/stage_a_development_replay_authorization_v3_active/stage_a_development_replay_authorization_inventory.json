@@ -1,0 +1,38 @@
+{
+  "artifact_count_excluding_inventory": 3,
+  "artifacts": [
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_replay_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    },
+    {
+      "byte_length": 7756,
+      "relative_path": "stage_a_development_replay_authorization_activation_supersession.json",
+      "sha256": "1fbfb2a191cdce7c105110a047e6a91884d7dbac0e144c3ed2e100dcfac9995e"
+    },
+    {
+      "byte_length": 2902,
+      "relative_path": "stage_a_development_replay_execution_authorization.json",
+      "sha256": "ef4812d27fffd44348c8bca4c8101b8b1fed476db75074c3b1c7bb3d1c371f03"
+    }
+  ],
+  "authorization_active": true,
+  "authorization_file_sha256": "ef4812d27fffd44348c8bca4c8101b8b1fed476db75074c3b1c7bb3d1c371f03",
+  "authorization_semantic_sha256": "3d8d303f2b7f1460a0b2017bdfb6fec53f7029410980de99e60ca95e8d2a157d",
+  "authorization_status": "AUTHORIZED",
+  "current_campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+  "current_plan_hash": "97e279d972dd1ba7a63253a80d6d9ae624d5f73877ba9c208b233f97c96ba70e",
+  "execution_authorized": true,
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "schema_identifier": "satnet.stage_a.development_replay_authorization_active_inventory.v3",
+  "self_reference_policy": "stage_a_development_replay_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+  "supersedes_authorization_file_sha256": "f37f334413dccbb80006364291146b01d8255e5f6884038b403a993c3c154102",
+  "supersedes_authorization_inventory_sha256": "0d9a54abf9eb9e45c62289d920974b46c3f5bb2c0c5cb3fa009faf45bea98978",
+  "supersedes_authorization_semantic_sha256": "f412f91b381dc308eb53adcd329441e7f5d2b7e6ce1fe8771193b7489829b9e7"
+}
