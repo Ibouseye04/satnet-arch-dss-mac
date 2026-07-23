@@ -110,15 +110,15 @@
       "source_role": "frozen_contract_validation"
     },
     {
-      "byte_length": 48150,
+      "byte_length": 48906,
       "relative_path": "src/satnet/experiments/stage_a_contract/freeze.py",
-      "sha256": "260406573a775991f5963e608dddc314d35fa311ae0bc7752c47811a88741310",
+      "sha256": "954f79603fa5f5bd786033b71f2a6f166afaaa1df722acb35125135c13fd8699",
       "source_role": "frozen_contract_validation"
     },
     {
-      "byte_length": 52298,
+      "byte_length": 52417,
       "relative_path": "src/satnet/experiments/stage_a_contract/proposal.py",
-      "sha256": "f1f52d549a34563bf3ecaffadbb59c87c64e123831788e8e5b579685f757cc50",
+      "sha256": "d1f5dd876b8a74ca0980b114d9573fda88945af372a815b0d96eae5bd9830448",
       "source_role": "frozen_contract_validation"
     },
     {
@@ -164,9 +164,9 @@
       "source_role": "stage_a_execution_control"
     },
     {
-      "byte_length": 12042,
+      "byte_length": 12053,
       "relative_path": "src/satnet/experiments/stage_a_execution/cli.py",
-      "sha256": "79bacddf2d19027df22d440787863aaeeec5382c70dfbefc1a4d710c097a8a65",
+      "sha256": "af0ee436bc9ec6ab8ea8e7803547a74292b6367cd885b8a31a06c2d7db18f0c3",
       "source_role": "stage_a_execution_control"
     },
     {
@@ -176,9 +176,9 @@
       "source_role": "stage_a_execution_control"
     },
     {
-      "byte_length": 6892,
+      "byte_length": 7573,
       "relative_path": "src/satnet/experiments/stage_a_execution/contract.py",
-      "sha256": "00c776b72cbabc00570ac740d023cfadb374e4ba09a13ca3d5de66013a203428",
+      "sha256": "a642bfc6fe7f641cc789483ac02b3c4bae83adaef04418c32160c8c48564ccfe",
       "source_role": "stage_a_execution_control"
     },
     {
@@ -230,9 +230,9 @@
       "source_role": "stage_a_execution_control"
     },
     {
-      "byte_length": 7895,
+      "byte_length": 7914,
       "relative_path": "src/satnet/experiments/stage_a_execution/preflight.py",
-      "sha256": "87656e4a89c5dc121abff635d18fde92d0b990d3db9d7f24d234dfead7a94b25",
+      "sha256": "366f7b7a1a1329ea4edbb6e523ac32e9c7470ac53f35c2358a84ebbf1b248552",
       "source_role": "stage_a_execution_control"
     },
     {
@@ -433,5 +433,5 @@
   "path_policy": "repository-relative forward-slash paths",
   "schema_identifier": "satnet.stage_a.executable_source_inventory.v2",
   "self_reference_policy": "inventory contains executable source only and excludes its own bytes",
-  "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7"
+  "stable_executable_commit": "957c565954443f814ae324d3cf29412dcee72319"
 }
