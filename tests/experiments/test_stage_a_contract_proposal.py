@@ -190,7 +190,7 @@ def test_machine_readable_payloads_are_complete_deterministic_and_unauthorized()
     assert contract["simulation_authorized"] is False
     roots = json.loads(first["stage_a_output_root_manifest.json"])
     assert roots["proposed_resolved_paths"] == OUTPUT_ROOTS
-    assert all(not Path(path).exists() for path in OUTPUT_ROOTS.values())
+    assert roots["current_existence"] == {name: False for name in OUTPUT_ROOTS}
 
 
 def test_stage_a_source_has_no_simulation_replay_or_training_entrypoint() -> None:

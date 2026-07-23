@@ -84,7 +84,7 @@ def test_rejects_output_root_overlap_and_frozen_evidence_write(tmp_path: Path) -
     roots = dict(OUTPUT_ROOTS)
     roots["production_replay"] = roots["production_generation"] + "\\child"
     with pytest.raises(ValueError, match="overlap"):
-        validate_output_roots(roots, require_absent=False)
+        validate_output_roots(roots)
     with pytest.raises(ValueError, match="frozen evidence"):
         write_proposal_artifacts(ROOT, Path("C:/Users/johns/satnet-final-production-20260720/correction"))
 
