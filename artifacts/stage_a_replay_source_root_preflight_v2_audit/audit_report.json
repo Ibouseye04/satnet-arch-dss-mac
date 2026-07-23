@@ -1,0 +1,171 @@
+{
+  "audit_branch": "audit/stage-a-replay-source-root-preflight-v2",
+  "audit_date": "2026-07-23",
+  "audit_scope": {
+    "base_commit": "2d46cc8a92e24d1b473fbd6d5b753f096824f130",
+    "evidence_commit": "5045c577a9c40b22c1bf331782f658fe7b9f65d5",
+    "evidence_correction_commit": "1112bf663c88e499fc9b049f931f2143b6b5cacb",
+    "expected_ancestry": [
+      "2d46cc8a92e24d1b473fbd6d5b753f096824f130",
+      "957c565954443f814ae324d3cf29412dcee72319",
+      "5045c577a9c40b22c1bf331782f658fe7b9f65d5",
+      "1112bf663c88e499fc9b049f931f2143b6b5cacb"
+    ],
+    "source_commit": "957c565954443f814ae324d3cf29412dcee72319",
+    "target_branch": "fix/stage-a-replay-source-root-preflight-v2",
+    "target_head": "1112bf663c88e499fc9b049f931f2143b6b5cacb"
+  },
+  "authorization_state": {
+    "active_authorization_changed_after_base": false,
+    "active_authorization_file_sha256": "1d8046f2244abdf9f010a04f3ceae0fff8f02afb53dbc169b1812b0d3f77a652",
+    "active_authorization_semantic_sha256": "ef0f2c2bf90a691bb7a479054257d3ca4d9794eb73f30ec5f5e43eda7ce2d4c9",
+    "authorized_executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "authorized_stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "corrected_identity_authorized": false,
+    "superseding_authorization_required": true
+  },
+  "authoritative_call_path": {
+    "contract_load": [
+      "load_frozen_contract(operation=REPLAY)",
+      "freeze.validate_frozen_contract(expected output-root state matrix)",
+      "freeze.reproduce_approved_proposal",
+      "proposal.build_artifact_payloads",
+      "proposal.build_output_root_manifest",
+      "proposal.validate_output_roots(deterministic canonicality, uniqueness, and overlap only)",
+      "freeze.verify_output_roots(expected generation=true, replay=false, acceptance=false, evidence=false)"
+    ],
+    "ledger_and_execution_order": [
+      "run_preflight reloads the frozen contract with operation=REPLAY",
+      "run_preflight validates authorization and protected root paths",
+      "run_preflight validates live operation-aware root states",
+      "run_preflight reads and verifies exact source generation ledger bytes",
+      "run_preflight returns a sealed nonexecuting preflight certificate"
+    ],
+    "proposal_reconstruction_current_generation_root_exists": true,
+    "proposal_reconstruction_result": "PASSED",
+    "replay_source_ledger_bound_before_execution": true,
+    "simulation_executed": false
+  },
+  "corrected_executable_identity": {
+    "artifact_count": 71,
+    "fresh_checkout_core_autocrlf": true,
+    "fresh_checkout_detached_head": "1112bf663c88e499fc9b049f931f2143b6b5cacb",
+    "fresh_checkout_git_blob_mismatches": [],
+    "fresh_checkout_status": "CLEAN",
+    "import_resolution": "EXPECTED_REPOSITORY_FILES",
+    "inventory_byte_length": 18040,
+    "inventory_exact_regeneration_match": true,
+    "inventory_sha256": "9f62a9c94feaaea9ce7cf315864d99a69c5127d8323e2a77c6881e0b36b1f596",
+    "narrow_text_attribute": "unset",
+    "post_stable_executable_changes": [],
+    "stable_executable_commit": "957c565954443f814ae324d3cf29412dcee72319",
+    "stable_identity_sha256": "70733e1e2b54ff12046e067101aa18f1f80fb0c0c670d259201536e97e4a43c4",
+    "verification": "PASSED"
+  },
+  "evidence_bundle_verification": {
+    "artifact_count_excluding_inventory": 6,
+    "all_recorded_lengths_match": true,
+    "all_recorded_sha256_match": true,
+    "evidence_inventory_sha256": "82b74d0b20dca7ab41bc9215f2ed6a0cf8ca0d5db0b585b8f043a2397fe6a6c1",
+    "narrow_text_attribute": "unset",
+    "verification": "PASSED"
+  },
+  "focused_tests": {
+    "authoritative_replay_preflight": "14 passed in 17.58s",
+    "directly_affected_historical_subset": "15 passed, 1 deselected in 0.76s",
+    "full_directly_affected_files": "16 passed in 0.81s",
+    "replay_source_root": "8 passed in 0.61s"
+  },
+  "frozen_contract": {
+    "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "proposal_reproduction_byte_exact": true,
+    "source_artifact_count": 11,
+    "verification": "PASSED"
+  },
+  "full_pytest": {
+    "classification": {
+      "active_authorization_or_reserved_root_state": [
+        "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_contract_loader_verifies_exact_frozen_bundle_and_partitions",
+        "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_generation_adapter_arguments_are_exactly_frozen_and_do_not_execute",
+        "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_development_plan_is_exact_ordered_and_deterministic",
+        "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_cli_plan_default_deny_and_holdout_redaction",
+        "tests/experiments/stage_a_execution/test_remediation_controls.py::test_proposal_generator_reproduces_all_artifacts_byte_for_byte",
+        "tests/experiments/test_stage_a_contract_freeze.py::test_freeze_state_is_frozen_but_fully_unauthorized",
+        "tests/experiments/test_stage_a_contract_freeze.py::test_reserved_roots_absent_and_protected_boundaries_clean",
+        "tests/experiments/test_stage_a_contract_freeze.py::test_rejects_existing_contract_root_and_conflicting_tag",
+        "tests/experiments/test_stage_a_contract_near_neighbor_resolution.py::test_proposal_remains_unauthorized_and_external_roots_absent",
+        "tests/validation/test_stage_a_discovery_contract_freeze_audit.py::test_authorization_and_output_roots_are_fail_closed",
+        "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py::test_final_control_preserves_nonexecution_holdout_and_protected_science"
+      ],
+      "historical_scope_allowlist": [
+        "tests/experiments/test_final_dataset_isolation.py::test_contract_changes_are_confined_to_approved_surfaces"
+      ],
+      "stale_superseded_identity_or_inventory": [
+        "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_tooling_identity_uses_last_executable_change",
+        "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_inventory_is_canonical_ordered_and_self_excluding",
+        "tests/validation/test_stage_a_execution_tooling_final_delta_audit.py::test_binding_008_windows_byte_policy_is_narrow_and_inventories_are_exact",
+        "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py::test_final_control_byte_policy_is_narrow_and_proposal_inventory_is_exact"
+      ]
+    },
+    "new_binding_finding": false,
+    "new_replay_correctness_failure": false,
+    "result": "16 failed, 1174 passed, 37 skipped in 90.28s",
+    "verdict_relevant_remediation_failure": false
+  },
+  "generation_evidence": {
+    "adapter_passed_records": 100,
+    "failed_directory_count": 0,
+    "file_count": 1902,
+    "generation_ledger_byte_length": 1060132,
+    "generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "in_progress_directory_count": 0,
+    "ledger_bound_artifact_byte_count": 365309146,
+    "ledger_bound_artifact_count": 1900,
+    "ledger_bound_artifact_hash_errors": 0,
+    "ledger_bound_artifact_missing_count": 0,
+    "lock_count": 0,
+    "science_passed_records": 100,
+    "succeeded_records": 100,
+    "total_byte_count": 366369907
+  },
+  "governance_verification": {
+    "active_authorization_mutated": false,
+    "acceptance_execution_during_audit": false,
+    "holdout_state_altered": false,
+    "production_execution_during_audit": false,
+    "protected_science_changes": [],
+    "replay_execution_during_audit": false,
+    "simulation_execution_during_audit": false,
+    "source_destination_roots_unchanged": true,
+    "source_generation_root_read_only_during_audit": true,
+    "superseding_authorization_created": false
+  },
+  "root_state_after_audit": {
+    "acceptance_lock_exists": false,
+    "acceptance_root_exists": false,
+    "generation_lock_exists": false,
+    "generation_root_exists": true,
+    "replay_lock_exists": false,
+    "replay_root_exists": false
+  },
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_audit.v2",
+  "source_delta_review": {
+    "deterministic_proposal_fields_changed": false,
+    "environment_override_added": false,
+    "evidence_or_authorization_bytes_changed_by_source_commit": false,
+    "hidden_bypass_added": false,
+    "live_existence_check_removed_from_proposal_reconstruction": true,
+    "machine_specific_exception_added": false,
+    "operation_aware_live_root_matrix_enforced_before_ledger_read": true,
+    "output_root_canonicality_enforced": true,
+    "output_root_overlap_enforced": true,
+    "output_root_uniqueness_enforced": true,
+    "post_stable_source_changes": [],
+    "protected_path_rejection_removed": false,
+    "repository_worktree_rejection_removed": false,
+    "source_files_changed_from_base_to_source_commit": [
+      "src/satnet/experiments/stage_a_contract/proposal.py"
+    ]
+  },
+  "verdict": "APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT REPLAY AUTHORIZATION"
+}
