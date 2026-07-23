@@ -27,3 +27,4 @@ tests/experiments/test_final_dataset_isolation.py -text
 tests/validation/test_stage_a_execution_tooling_v1_audit.py -text
 tests/validation/test_stage_a_execution_tooling_v1_reaudit.py -text
 scripts/validation/reaudit_stage_a_execution_tooling_v1.py -text
+artifacts/stage_a_development_authorization_v1_proposal/** -text
