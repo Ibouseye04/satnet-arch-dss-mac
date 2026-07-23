@@ -1,0 +1,35 @@
+{
+  "command": "python -m pytest -p no:cacheprovider -q",
+  "date": "2026-07-23",
+  "duration_seconds": 95.61,
+  "failed": 16,
+  "failures": [
+    "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_contract_loader_verifies_exact_frozen_bundle_and_partitions",
+    "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_generation_adapter_arguments_are_exactly_frozen_and_do_not_execute",
+    "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_development_plan_is_exact_ordered_and_deterministic",
+    "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_cli_plan_default_deny_and_holdout_redaction",
+    "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_tooling_identity_uses_last_executable_change",
+    "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_inventory_is_canonical_ordered_and_self_excluding",
+    "tests/experiments/stage_a_execution/test_remediation_controls.py::test_proposal_generator_reproduces_all_artifacts_byte_for_byte",
+    "tests/experiments/test_final_dataset_isolation.py::test_contract_changes_are_confined_to_approved_surfaces",
+    "tests/experiments/test_stage_a_contract_freeze.py::test_freeze_state_is_frozen_but_fully_unauthorized",
+    "tests/experiments/test_stage_a_contract_freeze.py::test_reserved_roots_absent_and_protected_boundaries_clean",
+    "tests/experiments/test_stage_a_contract_freeze.py::test_rejects_existing_contract_root_and_conflicting_tag",
+    "tests/experiments/test_stage_a_contract_near_neighbor_resolution.py::test_proposal_remains_unauthorized_and_external_roots_absent",
+    "tests/validation/test_stage_a_discovery_contract_freeze_audit.py::test_authorization_and_output_roots_are_fail_closed",
+    "tests/validation/test_stage_a_execution_tooling_final_delta_audit.py::test_binding_008_windows_byte_policy_is_narrow_and_inventories_are_exact",
+    "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py::test_final_control_byte_policy_is_narrow_and_proposal_inventory_is_exact",
+    "tests/validation/test_stage_a_execution_tooling_v1_reaudit.py::test_final_control_preserves_nonexecution_holdout_and_protected_science"
+  ],
+  "interpretation": {
+    "active_authorization_or_existing_generation_state": 11,
+    "historical_scope_audit": 1,
+    "remediation_regression_failures": 0,
+    "stale_prior_executable_identity_or_inventory": 4
+  },
+  "passed": 1174,
+  "result": "FAILED_HISTORICAL_SNAPSHOT_CONTROLS",
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_v2_full_pytest.v1",
+  "skipped": 37,
+  "test_total": 1227
+}

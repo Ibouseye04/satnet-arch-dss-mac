@@ -1,0 +1,37 @@
+{
+  "binding_finding": {
+    "audit_finding_id": "REPLAY-SOURCE-ROOT-PREFLIGHT-001",
+    "cause": "Frozen proposal reconstruction consulted current filesystem existence and rejected the required existing generation source before operation-aware validation.",
+    "closure_basis": [
+      "proposal.build_output_root_manifest performs deterministic manifest construction without Path.exists",
+      "proposal.validate_output_roots retains role, canonicalization, uniqueness, overlap, and frozen-evidence rejection",
+      "freeze.verify_output_roots remains the sole live reserved-root state verifier",
+      "load_frozen_contract(operation=REPLAY) succeeds through authoritative proposal reproduction with the generation source present",
+      "run_preflight reaches and passes exact source-generation-ledger path, byte-length, SHA-256, parsed-ledger, and plan-binding checks"
+    ],
+    "status": "CLOSED"
+  },
+  "enforcement_matrix": {
+    "ACCEPT": {
+      "acceptance": false,
+      "generation": true,
+      "replay": true
+    },
+    "GENERATE": {
+      "acceptance": false,
+      "generation": false,
+      "replay": false
+    },
+    "REPLAY": {
+      "acceptance": false,
+      "generation": true,
+      "replay": false
+    },
+    "overlap_rejection_unconditional": true,
+    "protected_path_rejection_unconditional": true,
+    "repository_worktree_rejection_unconditional": true
+  },
+  "no_bypass_flag_added": true,
+  "prior_audit_or_proposal_artifacts_modified": false,
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_v2_finding_closure.v1"
+}

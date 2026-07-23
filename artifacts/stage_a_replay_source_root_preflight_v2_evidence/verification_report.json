@@ -1,0 +1,70 @@
+{
+  "branch": "fix/stage-a-replay-source-root-preflight-v2",
+  "date": "2026-07-23",
+  "identity": {
+    "corrected_executable_inventory_byte_length": 18040,
+    "corrected_executable_inventory_sha256": "9f62a9c94feaaea9ce7cf315864d99a69c5127d8323e2a77c6881e0b36b1f596",
+    "corrected_stable_identity_byte_length": 442,
+    "corrected_stable_identity_sha256": "70733e1e2b54ff12046e067101aa18f1f80fb0c0c670d259201536e97e4a43c4",
+    "executable_file_count": 71,
+    "identity_verification": "PASSED",
+    "post_stable_executable_diff": [],
+    "stable_executable_commit": "957c565954443f814ae324d3cf29412dcee72319",
+    "test_commit": "5045c577a9c40b22c1bf331782f658fe7b9f65d5"
+  },
+  "lineage": {
+    "audit_head": "2d46cc8a92e24d1b473fbd6d5b753f096824f130",
+    "audit_remediation_head": "5fb1dd1e429c3f17965408a08418cd9b4c12a57d",
+    "base_commit": "314531cbb80d036cb5605ec8b1905d312152f2c0",
+    "expected_ancestry_verified": true,
+    "first_remediation_commits": [
+      "d9d3018df55185e5af77b59c2def1ee7f4b172a6",
+      "ea1240644bf5837367317741bae370f2d152e1a3",
+      "5fb1dd1e429c3f17965408a08418cd9b4c12a57d"
+    ]
+  },
+  "preflight": {
+    "authoritative_contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "authoritative_replay_preflight": "PASSED",
+    "generation_ledger_byte_length": 1060132,
+    "generation_ledger_relative_path": "execution_ledger.json",
+    "generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "simulation_executed": false
+  },
+  "prior_artifact_preservation": {
+    "audit_inventory_git_blob_sha256": "aadbc041126334d25d93b44376d7d60e818b7e27736b44470bf18bf7bfd3c5db",
+    "audit_report_git_blob_sha256": "1f9382f0463630cfae80c50bdf3be68236c96911f5a85dc592a25d7a28c95cb3",
+    "corrected_v1_inventory_git_blob_sha256": "c0587ce812182b29e7d2f79cc35a586cab21f3ddfd3d11175b2995f23e64ab76",
+    "git_blob_bytes_unchanged_from_audit_head": true
+  },
+  "protected_frozen_production_evidence": {
+    "combined_byte_count": 1337549193,
+    "file_count": 9004,
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd",
+    "verification": "PASSED",
+    "verified_sha256_count": 9004
+  },
+  "root_state_after_remediation": {
+    "acceptance_root_exists": false,
+    "generation_root_exists": true,
+    "replay_root_exists": false
+  },
+  "schema_identifier": "satnet.stage_a.replay_source_root_preflight_v2_verification.v1",
+  "stage_a_generation_source_preservation": {
+    "byte_count": 366369907,
+    "file_count": 1902,
+    "generation_ledger_byte_length": 1060132,
+    "generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "matches_prior_audit_counts_and_ledger_identity": true
+  },
+  "tests": {
+    "authoritative_regression": "14 passed in 18.06s",
+    "compile_import": "200 Python files compiled in memory; 5 authoritative modules imported; PASSED",
+    "full_pytest": "1174 passed, 37 skipped, 16 historical-control failures in 95.61s",
+    "prior_directly_affected": "15 passed in 0.46s",
+    "prior_replay_source_root": "8 passed in 0.61s"
+  },
+  "verdict": "BINDING FINDING CLOSED; SUPERSEDING AUTHORIZATION REQUIRED; NO EXECUTION APPROVAL"
+}

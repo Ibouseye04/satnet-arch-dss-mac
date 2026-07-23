@@ -1,0 +1,9 @@
+{
+  "executable_file_count": 71,
+  "executable_inventory_sha256": "9f62a9c94feaaea9ce7cf315864d99a69c5127d8323e2a77c6881e0b36b1f596",
+  "import_resolution_policy": "EXPECTED_REPOSITORY_FILES_ONLY",
+  "post_stable_executable_change_policy": "FORBIDDEN",
+  "repository_cleanliness_required": true,
+  "schema_identifier": "satnet.stage_a.stable_executable_identity.v2",
+  "stable_executable_commit": "957c565954443f814ae324d3cf29412dcee72319"
+}
