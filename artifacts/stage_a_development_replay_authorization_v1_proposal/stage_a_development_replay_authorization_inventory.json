@@ -1,0 +1,32 @@
+{
+  "artifact_count_excluding_inventory": 3,
+  "artifacts": [
+    {
+      "byte_length": 2148,
+      "relative_path": "README.md",
+      "sha256": "0530b49d199b950398919078cdeeb076aac72f3c3711f23976b3ff2a63886da5"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_replay_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    },
+    {
+      "byte_length": 4738,
+      "relative_path": "stage_a_development_replay_authorization_proposal.json",
+      "sha256": "241af16ddee8492848ced04bb46f65dc40f1400fa11cb69a703681cfcfac1ce5"
+    }
+  ],
+  "authorization_active": false,
+  "authorization_status": "PROPOSED",
+  "execution_authorized": false,
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "proposal_semantic_sha256": "c888168206f98f0117832c67d3a689280b0f3fc98472555c7288c49cd21ba364",
+  "schema_identifier": "satnet.stage_a.development_replay_authorization_proposal_inventory.v1",
+  "self_reference_policy": "stage_a_development_replay_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328"
+}
