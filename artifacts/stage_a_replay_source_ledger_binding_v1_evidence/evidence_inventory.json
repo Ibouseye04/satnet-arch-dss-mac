@@ -1,0 +1,44 @@
+{
+  "artifact_count_excluding_inventory": 7,
+  "artifacts": [
+    {
+      "byte_length": 8,
+      "relative_path": ".gitattributes",
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "byte_length": 1840,
+      "relative_path": "finding_closure.json",
+      "sha256": "4c16c5d8de0b7c1bf1f3f97735f1fc6994b49fd6441d508534d0e9a4a46c6113"
+    },
+    {
+      "byte_length": 2006,
+      "relative_path": "source_generation_provenance.json",
+      "sha256": "7850f24e1df0ce3249fd165bd5b9cf3f3066c67ead250c4c75c285ae708e982f"
+    },
+    {
+      "byte_length": 18042,
+      "relative_path": "stage_a_corrected_executable_source_inventory.json",
+      "sha256": "d52ffc2afa5f94268d89187afe58d4c7695bdf261ec20113644c9cb7f5840215"
+    },
+    {
+      "byte_length": 442,
+      "relative_path": "stage_a_corrected_stable_executable_identity.json",
+      "sha256": "45f0a596b073d1799de45660cfa74409daf774ca7bc98c984cb6434b89c4c279"
+    },
+    {
+      "byte_length": 1008,
+      "relative_path": "test_results.json",
+      "sha256": "a000ea746d131d4941b645e975daac1025e378482fce94bbc8f14833f054181b"
+    },
+    {
+      "byte_length": 3989,
+      "relative_path": "verification_report.json",
+      "sha256": "026e6e2bd63354e0f2f145faf18b0dd7903ff4fef836634531c9eea3f0d57a64"
+    }
+  ],
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.replay_source_ledger_binding_v1_evidence_inventory.v1",
+  "self_reference_policy": "evidence_inventory.json excludes its own bytes"
+}

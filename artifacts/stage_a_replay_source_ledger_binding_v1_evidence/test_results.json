@@ -1,0 +1,42 @@
+{
+  "additional_identity_authorization": {
+    "passed": 11,
+    "result": "PASSED"
+  },
+  "additional_path_preflight_identity": {
+    "passed": 4,
+    "result": "PASSED"
+  },
+  "additional_remediation_controls": {
+    "deselected_historical_generation_absence_control": 1,
+    "passed": 6,
+    "result": "PASSED"
+  },
+  "authoritative_replay_preflight": {
+    "duration_seconds": 17.48,
+    "passed": 14,
+    "result": "PASSED"
+  },
+  "compile_inventory": {
+    "compiled_python_files": 71,
+    "result": "PASSED"
+  },
+  "date": "2026-07-23",
+  "new_authoritative_source_ledger_binding": {
+    "duration_seconds": 0.26,
+    "passed": 16,
+    "result": "PASSED"
+  },
+  "prior_directly_affected": {
+    "deselected_outside_direct_effect": 2,
+    "duration_seconds": 1.59,
+    "passed": 15,
+    "result": "PASSED"
+  },
+  "replay_source_root": {
+    "duration_seconds": 0.63,
+    "passed": 8,
+    "result": "PASSED"
+  },
+  "schema_identifier": "satnet.stage_a.replay_source_ledger_binding_v1_test_results.v1"
+}

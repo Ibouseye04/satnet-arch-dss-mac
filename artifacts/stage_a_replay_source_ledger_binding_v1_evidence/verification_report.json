@@ -1,0 +1,77 @@
+{
+  "branch": "fix/stage-a-replay-source-ledger-binding-v1",
+  "current_replay_identity": {
+    "active_v2_authorization_file_byte_length": 2899,
+    "active_v2_authorization_file_sha256": "f37f334413dccbb80006364291146b01d8255e5f6884038b403a993c3c154102",
+    "active_v2_authorization_modified": false,
+    "active_v2_authorization_semantic_sha256": "f412f91b381dc308eb53adcd329441e7f5d2b7e6ce1fe8771193b7489829b9e7",
+    "campaign_manifest_hash": "5823c1910d5081bafa1c69fe48950bf2c9ab1f6dbbb37cb91e6246013e7ded99",
+    "executable_inventory_sha256": "9f62a9c94feaaea9ce7cf315864d99a69c5127d8323e2a77c6881e0b36b1f596",
+    "plan_hash": "98ebab2800e59f7ce7beea2948c60b1e88450ba875e7a9d7568992f61fac4558",
+    "remediated_executable_authorization_check": "REJECTED_AUTHORIZED_STABLE_EXECUTABLE_COMMIT_MISMATCH",
+    "stable_executable_commit": "957c565954443f814ae324d3cf29412dcee72319",
+    "verification": "PASSED_AS_HISTORICAL_CURRENT_REPLAY_V2_CONTEXT",
+    "v3_required_for_remediated_executable": true
+  },
+  "date": "2026-07-23",
+  "generation_evidence": {
+    "adapter_passed_count": 100,
+    "campaign_identity_byte_length": 629,
+    "campaign_identity_sha256": "587735eabd0c525313e2cf73ef9c21cc9b0359d82cadbad93bdb0d7dab587299",
+    "failed_directory_count": 0,
+    "file_count": 1902,
+    "in_progress_directory_count": 0,
+    "ledger_byte_length": 1060132,
+    "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "lock_count": 0,
+    "science_passed_count": 100,
+    "succeeded_count": 100,
+    "total_byte_count": 366369907,
+    "verified_run_artifact_count": 1900,
+    "verification": "PASSED"
+  },
+  "identity": {
+    "executable_file_count": 71,
+    "executable_inventory_byte_length": 18042,
+    "executable_inventory_sha256": "d52ffc2afa5f94268d89187afe58d4c7695bdf261ec20113644c9cb7f5840215",
+    "post_stable_executable_diff": [],
+    "stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "stable_identity_byte_length": 442,
+    "stable_identity_sha256": "45f0a596b073d1799de45660cfa74409daf774ca7bc98c984cb6434b89c4c279",
+    "verification": "PASSED"
+  },
+  "lineage": {
+    "base_commit": "d177ee7428f733591e5759ba87cdbaf35dd731c6",
+    "source_correction_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "test_commit": "c82017cfd2a8888e5f1242a64911cb435adc43cf"
+  },
+  "no_simulation": {
+    "acceptance_root_exists": false,
+    "remediated_executable_v2_preflight_exit_code": 2,
+    "replay_root_exists": false,
+    "simulation_executed": false,
+    "verification": "PASSED"
+  },
+  "schema_identifier": "satnet.stage_a.replay_source_ledger_binding_v1_verification.v1",
+  "source_generation_identity": {
+    "authorization_file_byte_length": 2836,
+    "authorization_file_sha256": "8c017b4e712ee4883921d327e5ee3e965c872032745949351d5df5ab7ea40bed",
+    "authorization_semantic_sha256": "96656da7341dada1b58626c480a9de4e3183e1e46c10dd1e96fd07bad66b6f11",
+    "campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "plan_hash": "cd32f773fe9ce2853b3a0bae699bf4a5199cfe67dc5baae767858387b0a36d2e",
+    "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "verification": "PASSED"
+  },
+  "tests": {
+    "additional_identity_authorization": "11 passed",
+    "additional_path_preflight_identity": "4 passed",
+    "additional_remediation_controls": "6 passed, 1 inapplicable historical generation-absence control deselected",
+    "authoritative_replay_preflight": "14 passed in 17.48s",
+    "compile_inventory": "71 executable Python files compiled",
+    "new_authoritative_source_ledger_binding": "16 passed in 0.26s",
+    "prior_directly_affected": "15 passed, 2 deselected in 1.59s",
+    "replay_source_root": "8 passed in 0.63s"
+  },
+  "verdict": "STAGE A REPLAY SOURCE-LEDGER BINDING REMEDIATION READY FOR NARROW INDEPENDENT AUDIT"
+}

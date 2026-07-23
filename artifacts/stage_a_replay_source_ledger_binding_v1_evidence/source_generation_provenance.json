@@ -1,0 +1,33 @@
+{
+  "ledger_provenance": {
+    "artifact_contract_hash": "cc721fd88dedcb90c0aa789b7815c7f6e35132e3aeebf2794e3e1d63a424380d",
+    "authorization_hash": "96656da7341dada1b58626c480a9de4e3183e1e46c10dd1e96fd07bad66b6f11",
+    "campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "executable_inventory_hash": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "expected_run_count": 100,
+    "operation": "GENERATE",
+    "output_root_identity": {
+      "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+      "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+      "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    },
+    "partition": "development",
+    "plan_hash": "cd32f773fe9ce2853b3a0bae699bf4a5199cfe67dc5baae767858387b0a36d2e",
+    "source_generation_ledger_byte_length": null,
+    "source_generation_ledger_relative_path": null,
+    "source_generation_ledger_sha256": null,
+    "source_replay_ledger_byte_length": null,
+    "source_replay_ledger_relative_path": null,
+    "source_replay_ledger_sha256": null,
+    "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "tooling_proposal_hash": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b"
+  },
+  "schema_identifier": "satnet.stage_a.source_generation_provenance.v1",
+  "source_authorization_byte_length": 2836,
+  "source_authorization_file_sha256": "8c017b4e712ee4883921d327e5ee3e965c872032745949351d5df5ab7ea40bed",
+  "source_authorization_relative_path": "artifacts/stage_a_development_authorization_v1_active/stage_a_development_execution_authorization.json",
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_relative_path": "execution_ledger.json",
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328"
+}

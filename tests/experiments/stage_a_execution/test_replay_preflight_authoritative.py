@@ -176,13 +176,13 @@ def test_real_replay_preflight_passes_and_binds_authoritative_generation_ledger(
         ),
         (
             {"source_generation_ledger_byte_length": 1_060_131},
-            ValueError,
-            "Source ledger byte length mismatch",
+            PermissionError,
+            "Current authorization source-generation ledger identity mismatch",
         ),
         (
             {"source_generation_ledger_sha256": "0" * 64},
-            ValueError,
-            "Source ledger SHA-256 mismatch",
+            PermissionError,
+            "Current authorization source-generation ledger identity mismatch",
         ),
     ],
 )
@@ -247,7 +247,7 @@ def test_real_path_replay_rejects_missing_changed_or_mismatched_generation_ledge
     plan = _plan(contract, authorization, "REPLAY")
     _patch_noncontract_dependencies(monkeypatch, authorization)
 
-    with pytest.raises((FileNotFoundError, ValueError)):
+    with pytest.raises((FileNotFoundError, PermissionError, ValueError)):
         _run(contract, authorization, plan)
     assert roots[0].is_dir()
     assert not roots[1].exists()

@@ -1,0 +1,36 @@
+{
+  "acceptance_reuse": {
+    "generation_provenance_validation": "SHARED_AND_ACTIVE",
+    "replay_provenance_validation": "SUPPORTED_BY_LEDGER_PROVENANCE_MODEL_BUT_REQUIRES_FUTURE_EXPLICIT_ACCEPT_AUTHORIZATION_BINDING",
+    "scope_expanded": false
+  },
+  "authorization_state": {
+    "active_replay_v2_modified": false,
+    "active_replay_v2_remains_bound_to_prior_executable": true,
+    "remediated_executable_authorized": false,
+    "superseding_v3_required_after_independent_audit": true
+  },
+  "cause": "Historical GENERATE ledger identity fields were compared to the current REPLAY plan identity fields, incorrectly requiring source_generation_campaign_manifest_hash to equal current_operation_campaign_manifest_hash.",
+  "correction": {
+    "current_operation_validation": [
+      "current replay executable and inventory",
+      "current replay campaign manifest and plan",
+      "current replay authorization",
+      "current operation and output roots"
+    ],
+    "source_generation_validation": [
+      "source ledger canonical relative path, byte length, and SHA-256",
+      "source generation contract, plan, campaign, authorization, executable, inventory, tooling, and artifact-contract identities",
+      "source generation run membership, all four seeds, successful states, and artifact inventories"
+    ]
+  },
+  "identity_separation": {
+    "current_operation_campaign_manifest_hash": "5823c1910d5081bafa1c69fe48950bf2c9ab1f6dbbb37cb91e6246013e7ded99",
+    "hashes_expected_to_differ": true,
+    "source_generation_campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164"
+  },
+  "no_bypass": true,
+  "no_identity_validation_removed": true,
+  "schema_identifier": "satnet.stage_a.replay_source_ledger_binding_v1_finding_closure.v1",
+  "status": "CLOSED_PENDING_NARROW_INDEPENDENT_AUDIT"
+}
