@@ -31,3 +31,4 @@ artifacts/stage_a_development_authorization_v1_proposal/** -text
 artifacts/stage_a_development_authorization_v1_active/** -text
 artifacts/stage_a_development_replay_authorization_v1_proposal/** -text
 artifacts/stage_a_development_replay_authorization_v1_active/** -text
+artifacts/stage_a_replay_source_root_preflight_v1_proposal/** -text

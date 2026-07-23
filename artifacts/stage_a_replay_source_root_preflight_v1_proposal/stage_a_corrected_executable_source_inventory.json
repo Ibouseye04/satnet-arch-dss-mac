@@ -1,0 +1,437 @@
+{
+  "artifact_count": 71,
+  "artifacts": [
+    {
+      "byte_length": 74194,
+      "relative_path": "src/satnet/experiments/final_class_support_audit/audit.py",
+      "sha256": "4c65e1edffbacf8aa75f48be681fe4edc321effbe0fc39f21a5bf59435794a3e",
+      "source_role": "frozen_production_evidence_verification"
+    },
+    {
+      "byte_length": 42,
+      "relative_path": "src/satnet/experiments/final_generation/__init__.py",
+      "sha256": "a0ab02a688904925f1e7b0c6b3655f63378ed6e9094317469d5fb6842dc12343",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 48,
+      "relative_path": "src/satnet/experiments/final_generation/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 7659,
+      "relative_path": "src/satnet/experiments/final_generation/acceptance.py",
+      "sha256": "5f1b0cc607c547dbdecfde36659454cf0f39b6268aa9efdd8cea75b30197b144",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 12892,
+      "relative_path": "src/satnet/experiments/final_generation/artifacts.py",
+      "sha256": "77b6c129c2afa80c1032fb4b585826112590f5fbc0cfacf1d47e37a154922655",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 15725,
+      "relative_path": "src/satnet/experiments/final_generation/cli.py",
+      "sha256": "a7cd59fc2022ec09233c638df5593f89b5180c4c4ab82a01595d2428dcc9c659",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 4301,
+      "relative_path": "src/satnet/experiments/final_generation/constants.py",
+      "sha256": "5a2020429feba039f810368af1824e17cc05847a23cca947dc76dfd8824d3d4f",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 15931,
+      "relative_path": "src/satnet/experiments/final_generation/contract.py",
+      "sha256": "6e3fce7fc0b478d31c5306b15f807fc08d8ccbbefb7d2e07de0cd03bf6a2d872",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 10497,
+      "relative_path": "src/satnet/experiments/final_generation/evidence.py",
+      "sha256": "f3c2a25eab02d852e1f49a3ba19f25e34da463fef909dd56a8597e40d82b093c",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 3586,
+      "relative_path": "src/satnet/experiments/final_generation/io.py",
+      "sha256": "3f6778e42486050597b6a50e056278a94c25d9f77676605832e884af88981793",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 5054,
+      "relative_path": "src/satnet/experiments/final_generation/ledgers.py",
+      "sha256": "dc3c4c3eff522d49c9bcb2033a5b5fd212b6c36eb5b23b517701c6539538697d",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 5650,
+      "relative_path": "src/satnet/experiments/final_generation/mapping.py",
+      "sha256": "96169b2960a91667c2130e959ac120f0a8b4d21b855b10630cdae74d25dd75e2",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 18883,
+      "relative_path": "src/satnet/experiments/final_generation/orchestrator.py",
+      "sha256": "1138f4d59367222087c8ee0cef365b7e917a4d59c200f3012b879c8b94bcf3b4",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 1904,
+      "relative_path": "src/satnet/experiments/final_generation/repeat.py",
+      "sha256": "5c54026f3655f87c0b1d5b54c49265bdbf7a1cd9e6228456b613b56dc20444c8",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 4364,
+      "relative_path": "src/satnet/experiments/final_generation/replay.py",
+      "sha256": "28da86c9ae7adaa5a1d1244396144a1fe068df2f0fadf0812df83631bf8e6b66",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 7569,
+      "relative_path": "src/satnet/experiments/final_generation/run_validation.py",
+      "sha256": "dcb6c48d93fc7a75b5c7c369845bacab6c5c8c591ce6e54a01f30d3b4c24f855",
+      "source_role": "validated_generation_pipeline"
+    },
+    {
+      "byte_length": 1005,
+      "relative_path": "src/satnet/experiments/stage_a_contract/__init__.py",
+      "sha256": "f1420c060ce3ac20883629d957c6c51ce1009a58800e7775e811d693a4b17a44",
+      "source_role": "frozen_contract_validation"
+    },
+    {
+      "byte_length": 12506,
+      "relative_path": "src/satnet/experiments/stage_a_contract/designs.py",
+      "sha256": "29cf819573893ae5a0adfc068f526df37b46f55750e2ebab13184a5a15aabe79",
+      "source_role": "frozen_contract_validation"
+    },
+    {
+      "byte_length": 48906,
+      "relative_path": "src/satnet/experiments/stage_a_contract/freeze.py",
+      "sha256": "954f79603fa5f5bd786033b71f2a6f166afaaa1df722acb35125135c13fd8699",
+      "source_role": "frozen_contract_validation"
+    },
+    {
+      "byte_length": 52298,
+      "relative_path": "src/satnet/experiments/stage_a_contract/proposal.py",
+      "sha256": "f1f52d549a34563bf3ecaffadbb59c87c64e123831788e8e5b579685f757cc50",
+      "source_role": "frozen_contract_validation"
+    },
+    {
+      "byte_length": 7865,
+      "relative_path": "src/satnet/experiments/stage_a_contract/semantics.py",
+      "sha256": "57b2178be00a9f94b8bc332f204c961a564dca43fd76524443ed9f711b3c8eb6",
+      "source_role": "frozen_contract_validation"
+    },
+    {
+      "byte_length": 758,
+      "relative_path": "src/satnet/experiments/stage_a_execution/__init__.py",
+      "sha256": "2e2699680223bbd35197cb52e62d40601056a780c1e00d4285b81e80b8a25132",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 48,
+      "relative_path": "src/satnet/experiments/stage_a_execution/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 3673,
+      "relative_path": "src/satnet/experiments/stage_a_execution/_synthetic_harness.py",
+      "sha256": "09defdd8da77bd0eb45019d45c0154745012034b85222b0156817331a160f15c",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 8290,
+      "relative_path": "src/satnet/experiments/stage_a_execution/acceptance.py",
+      "sha256": "42dc98bbdfd1a2f6f61b189c332c4beee89a973ddec3845e63e861b75e22135f",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 16161,
+      "relative_path": "src/satnet/experiments/stage_a_execution/artifact_contract.py",
+      "sha256": "ae753305225e389f24ee555eb07f0cf661945ca9a5b1f050f52e2c6e4bb3eb77",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 7827,
+      "relative_path": "src/satnet/experiments/stage_a_execution/authorization.py",
+      "sha256": "9ddf5532ea1161eb911d2d9e7de3dab4443aaa965f0f01d821430a9181660303",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 12053,
+      "relative_path": "src/satnet/experiments/stage_a_execution/cli.py",
+      "sha256": "af0ee436bc9ec6ab8ea8e7803547a74292b6367cd885b8a31a06c2d7db18f0c3",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 2577,
+      "relative_path": "src/satnet/experiments/stage_a_execution/common.py",
+      "sha256": "3ffb40772415735a5169d7aee5d909119df9bc52014e462d0f5f0943e4c104c1",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 7573,
+      "relative_path": "src/satnet/experiments/stage_a_execution/contract.py",
+      "sha256": "a642bfc6fe7f641cc789483ac02b3c4bae83adaef04418c32160c8c48564ccfe",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 3923,
+      "relative_path": "src/satnet/experiments/stage_a_execution/evidence.py",
+      "sha256": "d79d6ac0524f28a34869b6a77ba1a95939135c995d57de91894239cb22416bb1",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 17528,
+      "relative_path": "src/satnet/experiments/stage_a_execution/generate.py",
+      "sha256": "b481032fcf6279c44638c6e7ccd825dcc377db383cf1ea20101c36ec18390638",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 9285,
+      "relative_path": "src/satnet/experiments/stage_a_execution/identity.py",
+      "sha256": "e743d39cf3a2fb6a25f7cc127ef715c4d6f068a67f2be2c372e4f28598101225",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 1296,
+      "relative_path": "src/satnet/experiments/stage_a_execution/integrity.py",
+      "sha256": "dc96a35b7f6af0ef5702b6699203f3712279e4d20db06f5ac4074032ba9b23f8",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 7817,
+      "relative_path": "src/satnet/experiments/stage_a_execution/ledger.py",
+      "sha256": "2f0e66f3170ae6b4687ffff41bc5245d7e73ea00225ca9756156fc884d2731a9",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 15562,
+      "relative_path": "src/satnet/experiments/stage_a_execution/locking.py",
+      "sha256": "104ca3054556ab59b0ef37b3863a9cedd89eea4b8d5c92a0e6f6ea9f8e59d6d9",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 4111,
+      "relative_path": "src/satnet/experiments/stage_a_execution/paths.py",
+      "sha256": "5f5ca60f0226098881e6ec438851f1efdbbbb774a32d9454d35146edf46ab164",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 8696,
+      "relative_path": "src/satnet/experiments/stage_a_execution/plan.py",
+      "sha256": "4102a91e3cc1c8185b2ace152679c4ad48197441bb21c1f48a3af282330360b4",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 7914,
+      "relative_path": "src/satnet/experiments/stage_a_execution/preflight.py",
+      "sha256": "366f7b7a1a1329ea4edbb6e523ac32e9c7470ac53f35c2358a84ebbf1b248552",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 8155,
+      "relative_path": "src/satnet/experiments/stage_a_execution/replay.py",
+      "sha256": "8f64efc98b43473b5cac2af450d352ff6a168d7d1a30d5dd6e246139274a2e92",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 5554,
+      "relative_path": "src/satnet/experiments/stage_a_execution/resume.py",
+      "sha256": "8416ee6b5cb13b13f1012f4602319d606daba9119a92acb46b0523cedd1ba8e7",
+      "source_role": "stage_a_execution_control"
+    },
+    {
+      "byte_length": 10588,
+      "relative_path": "src/satnet/ground/__init__.py",
+      "sha256": "afebe975b65816badbb2aa00561a54bf66b96ee5ad2fdc44b4dc7936eebaa688",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 2436,
+      "relative_path": "src/satnet/ground/canonical.py",
+      "sha256": "c347531cf880e0ff0ac7d550c24a5a7e2cad99fe919e36b2bffcda668000c0e3",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 9577,
+      "relative_path": "src/satnet/ground/catalog.py",
+      "sha256": "b1ac352170139507fc73223baed7fb810d982c38c09d459fe9eb0e895cd1ead6",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 5040,
+      "relative_path": "src/satnet/ground/coordinates.py",
+      "sha256": "180399c08de12107660a516ab07a56daea8facde58b48d01c351a669a82c9507",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 2459,
+      "relative_path": "src/satnet/ground/failure_policy.py",
+      "sha256": "411230e32720926ffbc7cf0c0345cb34023c998046521f3537dfd5b526dd55fe",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 15518,
+      "relative_path": "src/satnet/ground/failure_realization.py",
+      "sha256": "93734f9766f582765ad932e65ecaf6827703a2e21314fc05f37463f2c303eefd",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 31831,
+      "relative_path": "src/satnet/ground/failure_service_aggregation.py",
+      "sha256": "42f4e88f572f85a307d140d63ed56113da5c089e450c914a69a22892e500567e",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 32593,
+      "relative_path": "src/satnet/ground/failure_service_metrics.py",
+      "sha256": "e6db188e72a5ac4e3d625d3907989487c7d22e30b18ec0b9a126652586040843",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 26602,
+      "relative_path": "src/satnet/ground/failure_service_persistence.py",
+      "sha256": "e589d83d752885a04584a70d7af893a2c0543d5f0ecf9b7b6090ac0c7ed80937",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 4652,
+      "relative_path": "src/satnet/ground/graph_attributes.py",
+      "sha256": "22f3c1d1673554d3c5d57ae4b6e5f84468180f82fd16aeda737548695e3fa98a",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 10778,
+      "relative_path": "src/satnet/ground/integrated_builder.py",
+      "sha256": "64e260eadb5bb1bfa0e17d7123dabedfe23cca93750e70adc7dd2f4949c7cefb",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 23857,
+      "relative_path": "src/satnet/ground/integrated_graph.py",
+      "sha256": "c39b4b8f79e17ccdaa81b8a1cf06e092848ed1b4e7aef51e2067891d9e657d95",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 22563,
+      "relative_path": "src/satnet/ground/integrated_persistence.py",
+      "sha256": "d0795d77e33ba79772bb596dbed757214a9766b543cd9367d73ac5a8ae3b1b3e",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 20277,
+      "relative_path": "src/satnet/ground/persistence.py",
+      "sha256": "50bd7ee3ea056e9503d22334c38f6c11d97c560a12298587d46a8d998b8e3b6d",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 5231,
+      "relative_path": "src/satnet/ground/position_adapter.py",
+      "sha256": "e6fa6b55862cd6bd290dd6a07e9fa71a5d71f9611a3743603effddbf360ca41c",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 3513,
+      "relative_path": "src/satnet/ground/satellite_graph_adapter.py",
+      "sha256": "a48ed554310ff75f89ab5c659ea6197ab3fa8098f99eda1fae68980e9ca2344f",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 1500,
+      "relative_path": "src/satnet/ground/scenario.py",
+      "sha256": "00b246045e44f17b4dabf120194824866f7582251a8f9aff4168c81c23e61bab",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 8992,
+      "relative_path": "src/satnet/ground/selection.py",
+      "sha256": "4cee97d63a82b8f88d796945be53fe1c0c504780f9d7858f593ce43ce8730902",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 19491,
+      "relative_path": "src/satnet/ground/service_aggregation.py",
+      "sha256": "eecf343b78195343ef07e41b2404d1809334d6ffd90a82f48b8452d1906f9438",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 21535,
+      "relative_path": "src/satnet/ground/service_metrics.py",
+      "sha256": "e2237832885cc4a577abcac3a577054555fd095fc82465ec6d414ad56f55f221",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 22263,
+      "relative_path": "src/satnet/ground/service_persistence.py",
+      "sha256": "6efd77db0f5067c2218f26e558f7afc2ca631082a9759ce72de9bcf9701c4c83",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 2137,
+      "relative_path": "src/satnet/ground/service_policy.py",
+      "sha256": "7113edb8f5e52b16cfa636c5646a29d1889f1bae8b5f8b8c8328de543b0c9fe7",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 20936,
+      "relative_path": "src/satnet/ground/visibility.py",
+      "sha256": "1bc6086dd1313d026bc38e614484720b25a03612384587cd72dad11e381efbb9",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 22256,
+      "relative_path": "src/satnet/ground/visibility_persistence.py",
+      "sha256": "88c91f3e577139e8535867f68cf3fc94cdfec245e42be81ecf158ab57a35b177",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 25143,
+      "relative_path": "src/satnet/models/gnn_dataset.py",
+      "sha256": "478ad08ca5895f8761122ca43371b09e9cf45391a9a6d45d55e973505c2fe823",
+      "source_role": "protected_scientific_adapter"
+    },
+    {
+      "byte_length": 6673,
+      "relative_path": "src/satnet/models/gnn_model.py",
+      "sha256": "095dd046fed6e502341f55d1c8679bf53108deaedb82f94a75187e6814929154",
+      "source_role": "protected_scientific_adapter"
+    },
+    {
+      "byte_length": 32505,
+      "relative_path": "src/satnet/models/risk_model.py",
+      "sha256": "4436c834d9946a61b1402cf0a53ca17f412e8611ec0c8b47c130336f13434075",
+      "source_role": "protected_scientific_adapter"
+    },
+    {
+      "byte_length": 61124,
+      "relative_path": "src/satnet/network/hypatia_adapter.py",
+      "sha256": "c60a94e33ff28d5bdab99e56e09beeb68d419478732cb339055a85bf93d4141c",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 17738,
+      "relative_path": "src/satnet/simulation/tier1_rollout.py",
+      "sha256": "7d46ba43df6b990bb627eb5f88a9d1c5b42f37abc782a0167506151db6070eed",
+      "source_role": "protected_simulation_science"
+    },
+    {
+      "byte_length": 12708,
+      "relative_path": "src/satnet/utils/graph_cache.py",
+      "sha256": "bde5f7b6eea25e1329c786ea86cbcee31a7219bbf55da111156c073b668e380a",
+      "source_role": "protected_scientific_adapter"
+    }
+  ],
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "path_policy": "repository-relative forward-slash paths",
+  "schema_identifier": "satnet.stage_a.executable_source_inventory.v2",
+  "self_reference_policy": "inventory contains executable source only and excludes its own bytes",
+  "stable_executable_commit": "d9d3018df55185e5af77b59c2def1ee7f4b172a6"
+}
