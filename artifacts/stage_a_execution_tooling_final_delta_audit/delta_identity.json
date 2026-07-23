@@ -1,0 +1,25 @@
+{
+  "audit_base_head": "6ba2d84c2b23bb4daa8f3b590e7486df9ebff480",
+  "audit_branch": "audit/stage-a-execution-tooling-final-delta",
+  "audit_test_commit": "df550de13b5f64b166cd12e13020915143588ccc",
+  "development_plan_hash": "8c93bb7485eb6874a78690d2591ae030abef80a925d08d44972da464d938f8ad",
+  "executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+  "failed_reaudit_head": "6ec3c66b17c1efecf784aac15de6e6e8196fc38d",
+  "failed_reaudit_inventory_sha256": "cff1772ae3d3053e3f1139478537d514d03b141136ebf643db1790e5aaf49e1f",
+  "focused_test_commit": "bc1152bf0cd5ec0cc78766b490a9be4387e87c09",
+  "frozen_contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+  "frozen_contract_tag": "stage-a-discovery-contract-v1",
+  "frozen_contract_tag_target": "301d8a224daa070b15ecc6447f503d42d5d1e70a",
+  "frozen_top_level_evidence": {
+    "all_read_only": true,
+    "freeze_archive_sha256": "375e181e1a21a71386a3bad3c0f51de450203eb53d2a01853b517b5a86fa50cc",
+    "full_9004_file_rehash_performed": false,
+    "generation_ledger_sha256": "a887a9bad660945a3585369b2652511d4c9030cfdcbfbb09decb4721def15cb1",
+    "replay_ledger_sha256": "4e15b33545a1bee63298a1597b8effab2f4ba8d26730b75b53a90ee132e501dd"
+  },
+  "ordered_run_id_sha256": "94a3fa9098c01b348ced330b0d12f69fcf3d36003d47aa19294fe4637a27c732",
+  "schema_identifier": "satnet.stage_a.execution_tooling_final_delta_identity.v1",
+  "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+  "tooling_proposal_sha256": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b",
+  "verification": "PASSED"
+}

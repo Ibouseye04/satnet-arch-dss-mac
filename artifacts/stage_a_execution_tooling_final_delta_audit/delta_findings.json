@@ -1,0 +1,50 @@
+{
+  "binding_findings_remaining": [],
+  "delta_verdict": "FINAL EXECUTION-TOOLING CONTROLS APPROVED",
+  "execution_authorized": false,
+  "final_verdict": "TARGETED CONTROLS APPROVED \u2014 INACTIVE DEVELOPMENT AUTHORIZATION PROPOSAL PREPARED",
+  "findings": [
+    {
+      "finding_id": "BINDING-003",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "finding_id": "BINDING-004",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "finding_id": "BINDING-005",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "finding_id": "BINDING-007",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    },
+    {
+      "finding_id": "BINDING-008",
+      "severity": "BINDING",
+      "status": "CLOSED"
+    }
+  ],
+  "minimal_regression_controls": {
+    "BINDING-001": "PRESENT",
+    "BINDING-002": "PRESENT",
+    "BINDING-006": "PRESENT",
+    "BINDING-009": "PRESENT"
+  },
+  "production_authorized": false,
+  "required_correction": null,
+  "schema_identifier": "satnet.stage_a.execution_tooling_final_delta_findings.v1",
+  "scope": [
+    "BINDING-003",
+    "BINDING-004",
+    "BINDING-005",
+    "BINDING-007",
+    "BINDING-008"
+  ],
+  "simulation_authorized": false
+}

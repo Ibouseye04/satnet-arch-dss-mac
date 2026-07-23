@@ -1,0 +1,46 @@
+{
+  "active_authorization_absent": true,
+  "dataset_repository_isolation_tests": {
+    "failed": 0,
+    "passed": 4
+  },
+  "direct_final_and_remediation_controls": {
+    "failed": 0,
+    "passed": 18,
+    "subset_of_stage_a_execution_focused_tests": true
+  },
+  "executable_inventory": {
+    "files": 71,
+    "verification": "PASSED"
+  },
+  "frozen_contract_diff": "EMPTY",
+  "full_frozen_evidence_rehash_run": false,
+  "full_repository_suite_run": false,
+  "historical_final_control_regression_tests": {
+    "failed": 0,
+    "passed": 5
+  },
+  "independent_delta_tests": {
+    "failed": 0,
+    "passed": 5
+  },
+  "proposal_generator": {
+    "byte_mismatches": 0,
+    "generated_artifacts": 16,
+    "verification": "PASSED"
+  },
+  "proposal_inventory": {
+    "sha256": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b",
+    "verification": "PASSED"
+  },
+  "protected_science_diff": "EMPTY",
+  "reserved_roots_absent": true,
+  "schema_identifier": "satnet.stage_a.execution_tooling_final_delta_test_results.v1",
+  "stage_a_execution_focused_tests": {
+    "failed": 0,
+    "passed": 51
+  },
+  "stage_a_simulations_performed": 0,
+  "synthetic_generation_replay_acceptance_flow": "PASSED",
+  "verification": "PASSED"
+}

@@ -1,0 +1,15 @@
+{
+  "bound_file_count": 100,
+  "byte_mismatch_count": 0,
+  "checkout_clean": true,
+  "checkout_head": "6ba2d84c2b23bb4daa8f3b590e7486df9ebff480",
+  "checkout_root": "C:\\Users\\johns\\satnet-stage-a-execution-final-delta-windows-20260722",
+  "core_autocrlf": true,
+  "executable_file_count": 71,
+  "executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+  "proposal_generated_artifact_count": 16,
+  "proposal_generation_mismatch_count": 0,
+  "proposal_inventory_sha256": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b",
+  "schema_identifier": "satnet.stage_a.execution_tooling_final_delta_windows_result.v1",
+  "verification": "PASSED"
+}

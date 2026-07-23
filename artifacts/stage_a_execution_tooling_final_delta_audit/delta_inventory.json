@@ -1,0 +1,66 @@
+{
+  "artifact_count_excluding_inventory": 11,
+  "artifacts": [
+    {
+      "byte_length": 450,
+      "relative_path": "artifacts/stage_a_development_authorization_v1_proposal/STAGE_A_DEVELOPMENT_AUTHORIZATION_PROPOSAL_README.txt",
+      "sha256": "3ff68c795065026c395c6708ed551ca8ec45535a65c9d94dc93e0efc6431d742"
+    },
+    {
+      "byte_length": 1187,
+      "relative_path": "artifacts/stage_a_development_authorization_v1_proposal/stage_a_development_authorization_inventory.json",
+      "sha256": "064becc1deab645ff017113b5a0c84213e8d1df6a1bb0ef0645c811294146241"
+    },
+    {
+      "byte_length": 2869,
+      "relative_path": "artifacts/stage_a_development_authorization_v1_proposal/stage_a_development_authorization_proposal.json",
+      "sha256": "b9cae4d56b55a56ca7a8bbbece868b7cf95dec538b16ea3e86d79a508628255f"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "artifacts/stage_a_development_authorization_v1_proposal/stage_a_development_authorized_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    },
+    {
+      "byte_length": 1228,
+      "relative_path": "artifacts/stage_a_execution_tooling_final_delta_audit/delta_findings.json",
+      "sha256": "615b82140137209f5f639c2aab65d01641b4c79580218b0cf0b7d3263d76c43c"
+    },
+    {
+      "byte_length": 1647,
+      "relative_path": "artifacts/stage_a_execution_tooling_final_delta_audit/delta_identity.json",
+      "sha256": "66cf9884835454321fb57ec90080fc2e915239ed456a389636af98aa4063c072"
+    },
+    {
+      "byte_length": 1232,
+      "relative_path": "artifacts/stage_a_execution_tooling_final_delta_audit/delta_test_results.json",
+      "sha256": "b8f2f585beb32d966842d6ad3573ee40bb6777cfcfe59a47ff099aa45b4a4ab4"
+    },
+    {
+      "byte_length": 700,
+      "relative_path": "artifacts/stage_a_execution_tooling_final_delta_audit/delta_windows_result.json",
+      "sha256": "65fe27e564075fb68193bdfb80ae28d156010a51b5c0e07cd49a50aed8db6446"
+    },
+    {
+      "byte_length": 2440,
+      "relative_path": "docs/validation/stage_a_execution_tooling_final_delta_audit.md",
+      "sha256": "aad1de2247f924e5fe00af3386aeb6d068cdeb3b015215cd4f4d74813b737b0a"
+    },
+    {
+      "byte_length": 5383,
+      "relative_path": "tests/experiments/test_final_dataset_isolation.py",
+      "sha256": "9b07782705ff47acf7cc3d3c6f77e0c94d2c4937725d269f7004b538f9f463d8"
+    },
+    {
+      "byte_length": 36044,
+      "relative_path": "tests/validation/test_stage_a_execution_tooling_final_delta_audit.py",
+      "sha256": "9fe9ab8bc85eaa3e7a66571f6f37637e18954a8ec40c1ffbb92113f08dc7a085"
+    }
+  ],
+  "authorization_proposal_inventory_sha256": "064becc1deab645ff017113b5a0c84213e8d1df6a1bb0ef0645c811294146241",
+  "final_verdict": "TARGETED CONTROLS APPROVED \u2014 INACTIVE DEVELOPMENT AUTHORIZATION PROPOSAL PREPARED",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.execution_tooling_final_delta_inventory.v1",
+  "self_reference_policy": "delta_inventory.json excludes its own bytes"
+}
