@@ -30,3 +30,4 @@ scripts/validation/reaudit_stage_a_execution_tooling_v1.py -text
 artifacts/stage_a_development_authorization_v1_proposal/** -text
 artifacts/stage_a_development_authorization_v1_active/** -text
 artifacts/stage_a_development_replay_authorization_v1_proposal/** -text
+artifacts/stage_a_development_replay_authorization_v1_active/** -text
