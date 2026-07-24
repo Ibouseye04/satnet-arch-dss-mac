@@ -1,0 +1,227 @@
+{
+  "audit_branch": "audit/stage-a-development-acceptance-authorization-v2-final",
+  "audit_scope": {
+    "campaign_identity_audit_repeated": false,
+    "executable_audit_repeated": false,
+    "frozen_contract_audit_repeated": false,
+    "proposal_files_reviewed": 5,
+    "remediation_audit_repeated": false,
+    "scientific_audit_repeated": false,
+    "source_evidence_review": "exact ledger identities, schemas, records, cross-binding, manifest membership, ordering, IDs, run-record hashes, all four seeds, replay reports, artifact rehashes, immutable source-tree identities, roots, temporary and failed directories, and locks only",
+    "scope_result": "PASS"
+  },
+  "binding_findings": [],
+  "current_accept_identity": {
+    "campaign_differs_from_historical_replay_legacy_v1": true,
+    "campaign_differs_from_operation_bound_replay_v2": true,
+    "campaign_manifest_algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+    "campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+    "campaign_manifest_version": "2",
+    "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+    "executable_record_count": 71,
+    "historical_replay_legacy_v1_campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "operation_bound_replay_v2_campaign_manifest_hash": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44",
+    "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+    "stable_identity_sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9",
+    "verification": "PASS"
+  },
+  "final_verdict": "APPROVED FOR EXPLICIT USER-CONTROLLED STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION V2 ACTIVATION",
+  "focused_tests": {
+    "command_scope": "tests/validation/test_stage_a_development_acceptance_authorization_v2_final_review.py only",
+    "passed": 6,
+    "result": "PASS",
+    "total": 6
+  },
+  "fresh_windows_checkout": {
+    "checkout_clean": true,
+    "core_autocrlf": true,
+    "gitattributes_rule": "artifacts/stage_a_development_acceptance_authorization_v2_proposal/** -text",
+    "head": "fc9250aa702ddf8da1814da32fe06977af4afc44",
+    "parent": "9c85fc614949b1b99eb57473751e46cc0b598665",
+    "proposal_files": [
+      {
+        "byte_length": 6696,
+        "exact_git_blob_match": true,
+        "relative_path": "README.md",
+        "sha256": "b421fef9af5686cabb53339fde257cb374885013d1bd1b1d9ac7845826b9df67",
+        "text_attribute": "unset"
+      },
+      {
+        "byte_length": 2489,
+        "exact_git_blob_match": true,
+        "relative_path": "stage_a_development_acceptance_authorization_inventory.json",
+        "sha256": "ee6f180d6a3e628c50a9a8d2b1bfe35b975981dbc2149aa959f5c4703d7b3d72",
+        "text_attribute": "unset"
+      },
+      {
+        "byte_length": 9888,
+        "exact_git_blob_match": true,
+        "relative_path": "stage_a_development_acceptance_authorization_proposal.json",
+        "sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+        "text_attribute": "unset"
+      },
+      {
+        "byte_length": 5845,
+        "exact_git_blob_match": true,
+        "relative_path": "stage_a_development_acceptance_authorization_supersession.json",
+        "sha256": "b476d446bc84a5ff4f74f8522abc23d0b108082de1b348229a06f1b328edef54",
+        "text_attribute": "unset"
+      },
+      {
+        "byte_length": 25122,
+        "exact_git_blob_match": true,
+        "relative_path": "stage_a_development_authorized_acceptance_run_manifest.csv",
+        "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642",
+        "text_attribute": "unset"
+      }
+    ],
+    "result": "PASS"
+  },
+  "historical_provenance": {
+    "generation_campaign_identity_algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "generation_campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "generation_verification": "PASS",
+    "replay_campaign_identity_algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "replay_campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "replay_verification": "PASS"
+  },
+  "manifest_review": {
+    "design_count": 20,
+    "duplicate_design_realization_pair_count": 0,
+    "duplicate_global_run_id_count": 0,
+    "duplicate_run_key_count": 0,
+    "extra_run_count": 0,
+    "first_run": "SA-D000-R00",
+    "last_run": "SA-D027-R04",
+    "missing_run_count": 0,
+    "ordered_global_run_ids_sha256": "94a3fa9098c01b348ced330b0d12f69fcf3d36003d47aa19294fe4637a27c732",
+    "partition": "development",
+    "run_count": 100,
+    "sealed_holdout_run_count": 0,
+    "seed_fields_checked_per_run": 4,
+    "seed_mismatch_count": 0,
+    "validation_run_count": 0
+  },
+  "nonactions": {
+    "acceptance_comparison_executed": false,
+    "acceptance_executed": false,
+    "acceptance_root_created": false,
+    "authorization_activated": false,
+    "merge_performed": false,
+    "proposal_modified": false,
+    "push_performed": false,
+    "simulation_executed": false,
+    "source_evidence_modified": false,
+    "tag_created_or_modified": false
+  },
+  "planning_reference_review": {
+    "activation_must_construct_new_runtime_authorization": true,
+    "activation_must_construct_runtime_plan_from_new_authorization": true,
+    "planning_authorization_sha256": "2e1942e8d1ab1f6b3e8fd62eef25b72dcdf2eb3a141d8725085631c0345becb8",
+    "planning_identity_execution_authority": false,
+    "planning_plan_hash": "4d90038ed8f95a76285b73e9ea32ccedc4536964d2a73a4e5420530642e74dea",
+    "planning_reference_policy": "AUDIT_COMMIT_DETERMINISTIC_PLANNING_REFERENCE_ONLY_NOT_RUNTIME_AUTHORIZATION",
+    "reproduced_from_checked_in_plan_construction": true,
+    "verification": "PASS"
+  },
+  "proposal_commit_audited": "fc9250aa702ddf8da1814da32fe06977af4afc44",
+  "proposal_parent_commit": "9c85fc614949b1b99eb57473751e46cc0b598665",
+  "proposal_review": {
+    "authorization_active": false,
+    "authorization_operation": "ACCEPT",
+    "authorization_status": "PROPOSED",
+    "authorized_partition": "development",
+    "execution_authorized": false,
+    "explicitly_not_authorized": [
+      "GENERATE",
+      "REPLAY",
+      "validation partition",
+      "sealed_holdout",
+      "Stage B",
+      "RF training",
+      "TGNN training"
+    ],
+    "governance_supersession_sha256": "b476d446bc84a5ff4f74f8522abc23d0b108082de1b348229a06f1b328edef54",
+    "independently_approved": false,
+    "inventory_regeneration_exact": true,
+    "inventory_sha256": "ee6f180d6a3e628c50a9a8d2b1bfe35b975981dbc2149aa959f5c4703d7b3d72",
+    "production_authorized": false,
+    "proposal_exact_file_sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+    "proposal_semantic_sha256": "0fc3b4eb0be9e8cb046f4198876402f386de014ed29422bf8395981150210d7b",
+    "proposal_semantic_sha256_reproduced": true,
+    "simulation_authorized": false
+  },
+  "proposal_v1_preservation": {
+    "inventory_modified": false,
+    "proposal_exact_file_sha256": "68fe8890e1c4eabc283ea3954f966388c6a92897b138d51666ae6a9bdef186f4",
+    "proposal_files_modified": false,
+    "proposal_inventory_sha256": "b908d7fe1aedd33b2476d4f562d3b442054ff93d0119aa53faf46ad3e8255dd7",
+    "proposal_semantic_sha256": "d6d1d6b4cf1679f341a934372de07bc5a6e1f28cab647cfd10b373f482f9a00d",
+    "superseded_only_in_v2_governance_record": true,
+    "v1_embedded_authorization_status": "PROPOSED",
+    "verification": "PASS"
+  },
+  "root_review": {
+    "acceptance_root_absent": true,
+    "all_roots_canonical": true,
+    "all_roots_distinct": true,
+    "all_roots_non_overlapping": true,
+    "campaign_lock_count": 0,
+    "failed_directory_count": 0,
+    "generation_root_exists": true,
+    "in_progress_directory_count": 0,
+    "recovery_lock_count": 0,
+    "replay_root_exists": true,
+    "run_lock_count": 0
+  },
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_v2_review.v1",
+  "source_generation_evidence": {
+    "adapter_validation_passed_count": 100,
+    "artifact_error_count": 0,
+    "artifact_file_count_rehashed": 1900,
+    "artifact_total_bytes_rehashed": 365309146,
+    "first_run": "SA-D000-R00",
+    "last_run": "SA-D027-R04",
+    "ledger_byte_length": 1060132,
+    "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "ledger_schema": "satnet.stage_a.execution_ledger.v2",
+    "record_count": 100,
+    "root_file_count": 1902,
+    "root_total_bytes": 366369907,
+    "root_tree_sha256": "1be2fe3523d40a900a0283f41b55f8f7fbdeba1ea9c394325c0003d914169e23",
+    "science_validation_passed_count": 100,
+    "state_succeeded_count": 100
+  },
+  "source_identity_comparison": {
+    "design_id_mismatch_count": 0,
+    "global_run_id_mismatch_count": 0,
+    "ordering_mismatch_count": 0,
+    "realization_id_mismatch_count": 0,
+    "run_id_mismatch_count": 0,
+    "run_record_hash_mismatch_count": 0,
+    "seed_mismatch_count": 0
+  },
+  "source_replay_evidence": {
+    "adapter_validation_passed_count": 100,
+    "artifact_error_count": 0,
+    "artifact_file_count_rehashed": 2000,
+    "artifact_total_bytes_rehashed": 365491986,
+    "first_run": "SA-D000-R00",
+    "generation_ledger_binding_result": "PASS",
+    "last_run": "SA-D027-R04",
+    "ledger_byte_length": 1079014,
+    "ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+    "ledger_schema": "satnet.stage_a.execution_ledger.v2",
+    "record_count": 100,
+    "replay_report_count": 100,
+    "root_file_count": 2001,
+    "root_total_bytes": 366571000,
+    "root_tree_sha256": "e5dcd6d51d55f072b2531e7cbd684b712e605f56be6f9332d051ebb9cdba06a3",
+    "science_validation_passed_count": 100,
+    "source_generation_ledger_byte_length": 1060132,
+    "source_generation_ledger_relative_path": "execution_ledger.json",
+    "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "state_succeeded_count": 100
+  },
+  "stop_rule_triggered": false
+}
