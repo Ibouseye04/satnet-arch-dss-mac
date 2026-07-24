@@ -4,27 +4,33 @@
     "artifact_file_count": 1900,
     "artifact_mismatch_count": 0,
     "artifact_total_bytes": 365309146,
+    "creation_time_utc": "2026-07-23T12:02:16.096469+00:00",
     "ledger_byte_length": 1060132,
     "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "modification_time_utc": "2026-07-23T12:09:39.054301+00:00",
     "root_file_count": 1902,
     "root_total_bytes": 366369907,
     "science_passed_count": 100,
     "succeeded_count": 100,
-    "tree_sha256": "1be2fe3523d40a900a0283f41b55f8f7fbdeba1ea9c394325c0003d914169e23"
+    "tree_sha256": "1be2fe3523d40a900a0283f41b55f8f7fbdeba1ea9c394325c0003d914169e23",
+    "unchanged_from_pre_remediation_snapshot": true
   },
   "replay": {
     "adapter_passed_count": 100,
     "artifact_file_count": 2000,
     "artifact_mismatch_count": 0,
     "artifact_total_bytes": 365491986,
+    "creation_time_utc": "2026-07-23T22:46:53.261092+00:00",
     "ledger_byte_length": 1079014,
     "ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+    "modification_time_utc": "2026-07-23T22:54:05.519458+00:00",
     "replay_report_count": 100,
     "root_file_count": 2001,
     "root_total_bytes": 366571000,
     "science_passed_count": 100,
     "succeeded_count": 100,
-    "tree_sha256": "e5dcd6d51d55f072b2531e7cbd684b712e605f56be6f9332d051ebb9cdba06a3"
+    "tree_sha256": "e5dcd6d51d55f072b2531e7cbd684b712e605f56be6f9332d051ebb9cdba06a3",
+    "unchanged_from_pre_remediation_snapshot": true
   },
   "schema_identifier": "satnet.stage_a.acceptance_remediation_source_evidence_verification.v1",
   "verification": "PASSED"

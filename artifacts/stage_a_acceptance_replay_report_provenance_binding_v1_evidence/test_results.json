@@ -1,0 +1,60 @@
+{
+  "historical_snapshot_results": [
+    {
+      "classification": "EXPECTED_HISTORICAL_ROOT_AND_PROPOSAL_IDENTITY_SNAPSHOTS",
+      "command": "python -B -m pytest -p no:cacheprovider tests/experiments/stage_a_execution -q",
+      "failed": 18,
+      "passed": 103,
+      "reason": "Unchanged historical tests require completed generation/replay roots to be absent or pin superseded proposal inventory bytes."
+    },
+    {
+      "classification": "EXPECTED_HISTORICAL_ROOT_ABSENCE_SNAPSHOTS",
+      "command": "python -B -m pytest -p no:cacheprovider tests/experiments/stage_a_execution/test_contract_plan_authorization.py tests/experiments/stage_a_execution/test_final_controls.py tests/experiments/stage_a_execution/test_replay_preflight_source_root.py -q",
+      "failed": 3,
+      "passed": 35,
+      "reason": "Three unchanged frozen-contract tests require the completed production generation root to be absent."
+    }
+  ],
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_remediation_test_results.v1",
+  "successful_results": [
+    {
+      "command": "python -B -m pytest -p no:cacheprovider tests/experiments/stage_a_execution/test_acceptance_replay_report_provenance.py -q",
+      "failed": 0,
+      "passed": 23,
+      "result": "PASSED"
+    },
+    {
+      "command": "python -B -m pytest -p no:cacheprovider tests/experiments/stage_a_execution/test_acceptance_replay_report_provenance.py tests/experiments/stage_a_execution/test_execution_replay_acceptance.py tests/experiments/stage_a_execution/test_replay_source_ledger_campaign_binding.py tests/experiments/stage_a_execution/test_operation_bound_campaign_identity.py -q",
+      "failed": 0,
+      "passed": 54,
+      "result": "PASSED"
+    },
+    {
+      "command": "compile() over sealed executable inventory",
+      "failed": 0,
+      "passed": 71,
+      "result": "PASSED"
+    },
+    {
+      "command": "verify_executable_identity",
+      "post_stable_executable_changes": 0,
+      "result": "PASSED",
+      "verified_records": 71
+    },
+    {
+      "command": "read-only immutable generation/replay artifact rehash",
+      "generation_artifact_bytes": 365309146,
+      "generation_artifact_files": 1900,
+      "hash_mismatches": 0,
+      "replay_artifact_bytes": 365491986,
+      "replay_artifact_files": 2000,
+      "replay_reports": 100,
+      "result": "PASSED"
+    },
+    {
+      "command": "active v2 authorization validation against remediated executable",
+      "expected_failure": "Authorization identity mismatch: authorized_stable_executable_commit",
+      "result": "FAILED_CLOSED_AS_REQUIRED"
+    }
+  ]
+}
