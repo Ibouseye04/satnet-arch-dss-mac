@@ -1,0 +1,17 @@
+{
+  "artifact_count_excluding_inventory": 1,
+  "artifacts": [
+    {
+      "byte_length": 8731,
+      "relative_path": "artifacts/stage_a_development_acceptance_authorization_v3_audit/acceptance_authorization_v3_review.json",
+      "sha256": "49088e9cfa6671322ccc48a5cea69dc92cab0a7b6751795008c550ef49758d09"
+    }
+  ],
+  "audit_base_commit": "0a3349453b40dec008965f4731e0acce182824a9",
+  "final_verdict": "APPROVED FOR EXPLICIT USER-CONTROLLED STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION V3 ACTIVATION",
+  "hash_algorithm": "SHA-256",
+  "hash_domain": "canonical committed Git blob bytes",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_v3_review_inventory.v1",
+  "self_reference_policy": "acceptance_authorization_v3_review_inventory.json excludes its own bytes"
+}
