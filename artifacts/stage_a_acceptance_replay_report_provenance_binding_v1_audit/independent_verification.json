@@ -1,0 +1,81 @@
+{
+  "active_v2_authorization": {
+    "authorization_unconsumed": true,
+    "exact_file_sha256": "d111680ece3391d89d6cf8f359907b724f5f8f56015d1663a11b307ac73eff51",
+    "fails_closed_against_remediated_executable": true,
+    "failure": "Authorization identity mismatch: authorized_stable_executable_commit",
+    "inventory_sha256": "9c553e4ecaecc4fe19873885bdea657df0b3acc5bc32027a84f2843c4727a426",
+    "remains_byte_unchanged": true,
+    "semantic_sha256": "0e99fd3ff210309049d97abb989652d747fa5f05c561a6566b25cda3d0eb8f74",
+    "separate_proposal_review_activation_required": true
+  },
+  "acceptance_root": {
+    "directory_count": 0,
+    "exists": false,
+    "file_count": 0,
+    "lock_count": 0,
+    "related_entry_count": 0,
+    "total_bytes": 0
+  },
+  "executable": {
+    "compiled_records": 71,
+    "executable_inventory_sha256": "2927c74a38fc9baf1456dd91f5c1c9ca42a89d10fcd8f63227d40858faff1c00",
+    "git_blob_worktree_mismatches": 0,
+    "import_resolution": "EXPECTED_REPOSITORY_FILES",
+    "post_stable_executable_changes": 0,
+    "records": 71,
+    "stable_executable_commit": "1efd7fcea6a1ba7feb318edbd53577126dd94ae4",
+    "stable_identity_sha256": "cbe2e66888c11a6f8f39b6f975acdd3e230b9214921eb98740d84ec41449fc47"
+  },
+  "generation": {
+    "adapter_passed": 100,
+    "artifact_bytes": 365309146,
+    "artifact_files": 1900,
+    "artifact_mismatches": 0,
+    "ledger_bytes": 1060132,
+    "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "root_bytes": 366369907,
+    "root_files": 1902,
+    "root_membership_exact": true,
+    "science_passed": 100,
+    "succeeded": 100,
+    "tree_sha256": "1be2fe3523d40a900a0283f41b55f8f7fbdeba1ea9c394325c0003d914169e23"
+  },
+  "historical_replay_report": {
+    "current_accept_executable_not_required": true,
+    "incorrect_prior_expected_stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+    "recorded_stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "replay_executable_field_validated": true
+  },
+  "replay": {
+    "adapter_passed": 100,
+    "artifact_bytes": 365491986,
+    "artifact_files": 2000,
+    "artifact_mismatches": 0,
+    "generation_cross_binding_exact": true,
+    "ledger_bytes": 1079014,
+    "ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+    "provenance_or_cross_binding_errors": 0,
+    "replay_reports": 100,
+    "root_bytes": 366571000,
+    "root_files": 2001,
+    "root_membership_exact": true,
+    "science_passed": 100,
+    "succeeded": 100,
+    "tree_sha256": "e5dcd6d51d55f072b2531e7cbd684b712e605f56be6f9332d051ebb9cdba06a3"
+  },
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_binding_v1_independent_verification.v1",
+  "tests": {
+    "authoritative_failed": 0,
+    "authoritative_passed": 23,
+    "complete_directory_expected_snapshot_failures": 18,
+    "complete_directory_passed": 103,
+    "focused_failed": 0,
+    "focused_passed": 54
+  },
+  "windows_checkout": {
+    "core_autocrlf": true,
+    "detached_head": "34d153316e85c7cca91c9a494d94356368588ed6",
+    "repository_clean": true
+  }
+}

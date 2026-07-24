@@ -1,0 +1,41 @@
+{
+  "audit_branch": "audit/stage-a-acceptance-replay-report-provenance-v1",
+  "audit_date": "2026-07-24",
+  "base_commit": "26f2a89d42bba1788cb0d6634c6d6fa0bdbd9580",
+  "commit_sequence": [
+    "1efd7fcea6a1ba7feb318edbd53577126dd94ae4",
+    "d92669e33bc109b069f32afd9fd8a4032698455c",
+    "e3d288bc1ba5a1ffff77b87b476377a2c5242952",
+    "34d153316e85c7cca91c9a494d94356368588ed6"
+  ],
+  "findings": {
+    "active_v2_authorization": "UNCHANGED_UNCONSUMED_AND_FAILS_CLOSED_AGAINST_REMEDIATED_EXECUTABLE",
+    "acceptance_root": "ABSENT_WITH_NO_LOCKS_OR_PARTIAL_OUTPUTS",
+    "bypass_review": "NO_KNOWN_HASH_ENVIRONMENT_MACHINE_COMPATIBILITY_OR_ACCEPTANCE_SKIP",
+    "executable_identity": "PASSED",
+    "failed_comparison_transactionality": "PASSED",
+    "generation_provenance": "INDEPENDENTLY_VALIDATED",
+    "generation_replay_cross_binding": "PASSED",
+    "historical_snapshot_failures": "18_CLASSIFIED_NONREGRESSIONS",
+    "immutable_generation_evidence": "PASSED",
+    "immutable_replay_evidence": "PASSED",
+    "original_defect": "CONFIRMED",
+    "replay_report_provenance_correction": "PASSED",
+    "three_provenance_domains": "PASSED"
+  },
+  "governance": {
+    "accept_executed": false,
+    "acceptance_authorization_created_or_reused": false,
+    "acceptance_proposal_created": false,
+    "acceptance_root_created": false,
+    "generation_executed": false,
+    "merge_performed": false,
+    "push_performed": false,
+    "replay_executed": false,
+    "tag_created": false
+  },
+  "remediation_head": "34d153316e85c7cca91c9a494d94356368588ed6",
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_binding_v1_independent_audit.v1",
+  "scope": "NARROW_ACCEPT_REPLAY_REPORT_PROVENANCE_REMEDIATION_ONLY",
+  "verdict": "APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION V3 PROPOSAL"
+}

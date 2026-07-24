@@ -1,0 +1,29 @@
+{
+  "artifact_count_excluding_inventory": 4,
+  "artifacts": [
+    {
+      "byte_length": 8,
+      "relative_path": ".gitattributes",
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "byte_length": 1830,
+      "relative_path": "audit_report.json",
+      "sha256": "bd4a680bec82d678e83f93b0ec91cb7ecfb3f4af04f91b1d6465cffc47907637"
+    },
+    {
+      "byte_length": 1905,
+      "relative_path": "failure_classification.json",
+      "sha256": "a7f45496fb2f3ea5e3a1a53a82184b0149853e07bc101dfd6bd338c8516a1255"
+    },
+    {
+      "byte_length": 3126,
+      "relative_path": "independent_verification.json",
+      "sha256": "b91047770ecde14dfb8e71a235e4f1337cc7229c69837ba9d1d254cfdbd5be9b"
+    }
+  ],
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_binding_v1_independent_audit_inventory.v1",
+  "self_reference_policy": "audit_inventory.json excludes its own bytes"
+}

@@ -1,0 +1,41 @@
+{
+  "classification": "EXPECTED_UNCHANGED_HISTORICAL_SNAPSHOTS_ONLY",
+  "failed": 18,
+  "failures": [
+    {
+      "count": 3,
+      "module": "tests/experiments/stage_a_execution/test_contract_plan_authorization.py",
+      "reason": "Unchanged frozen-contract tests require the completed production generation root to be absent."
+    },
+    {
+      "count": 1,
+      "module": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_cli_plan_default_deny_and_holdout_redaction",
+      "reason": "Unchanged PLAN snapshot requires the completed production generation root to be absent."
+    },
+    {
+      "count": 1,
+      "module": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_inventory_is_canonical_ordered_and_self_excluding",
+      "reason": "Unchanged historical proposal inventory pins superseded file bytes."
+    },
+    {
+      "count": 1,
+      "module": "tests/experiments/stage_a_execution/test_remediation_controls.py::test_proposal_generator_reproduces_all_artifacts_byte_for_byte",
+      "reason": "Unchanged proposal-generation snapshot requires the completed production generation root to be absent."
+    },
+    {
+      "count": 12,
+      "module": "tests/experiments/stage_a_execution/test_replay_preflight_authoritative.py",
+      "reason": "Unchanged historical replay-preflight tests require the completed replay root to be absent or reconstruct obsolete root-state snapshots."
+    }
+  ],
+  "nonregression_confirmation": {
+    "acceptance_comparison_defect": false,
+    "altered_generation_or_replay_evidence": false,
+    "failed_historical_ledger_reconstruction": false,
+    "replay_report_provenance_regression": false,
+    "transactional_output_defect": false,
+    "weakened_fail_closed_validation": false
+  },
+  "passed": 103,
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_binding_v1_failure_classification.v1"
+}
