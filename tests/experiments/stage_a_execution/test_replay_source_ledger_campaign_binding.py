@@ -214,11 +214,7 @@ def test_generate_binding_behavior_remains_unchanged() -> None:
         byte_length=1_060_132,
         sha256=SOURCE_LEDGER_SHA256,
     )
-    provenance = load_source_generation_provenance(
-        ROOT,
-        contract=_contract(),
-        plan=generation_plan,
-    )
+    _, _, provenance = _source()
     validate_legacy_campaign_manifest_identity(ledger, generation_plan, operation="GENERATE")
     validate_ledger_binding(
         ledger,
