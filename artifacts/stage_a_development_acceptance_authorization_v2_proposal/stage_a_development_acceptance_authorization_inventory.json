@@ -1,0 +1,46 @@
+{
+  "artifact_count_excluding_inventory": 4,
+  "artifacts": [
+    {
+      "byte_length": 6696,
+      "relative_path": "README.md",
+      "sha256": "b421fef9af5686cabb53339fde257cb374885013d1bd1b1d9ac7845826b9df67"
+    },
+    {
+      "byte_length": 9888,
+      "relative_path": "stage_a_development_acceptance_authorization_proposal.json",
+      "sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea"
+    },
+    {
+      "byte_length": 5845,
+      "relative_path": "stage_a_development_acceptance_authorization_supersession.json",
+      "sha256": "b476d446bc84a5ff4f74f8522abc23d0b108082de1b348229a06f1b328edef54"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_acceptance_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    }
+  ],
+  "authorization_active": false,
+  "authorization_status": "PROPOSED",
+  "current_accept_campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+  "current_accept_plan_hash": "4d90038ed8f95a76285b73e9ea32ccedc4536964d2a73a4e5420530642e74dea",
+  "execution_authorized": false,
+  "governance_supersession_record_sha256": "b476d446bc84a5ff4f74f8522abc23d0b108082de1b348229a06f1b328edef54",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "proposal_exact_file_sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+  "proposal_semantic_sha256": "0fc3b4eb0be9e8cb046f4198876402f386de014ed29422bf8395981150210d7b",
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_proposal_inventory.v2",
+  "self_reference_policy": "stage_a_development_acceptance_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+  "source_replay_ledger_byte_length": 1079014,
+  "source_replay_ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+  "supersedes_proposal_v1_exact_file_sha256": "68fe8890e1c4eabc283ea3954f966388c6a92897b138d51666ae6a9bdef186f4",
+  "supersedes_proposal_v1_inventory_sha256": "b908d7fe1aedd33b2476d4f562d3b442054ff93d0119aa53faf46ad3e8255dd7",
+  "supersedes_proposal_v1_semantic_sha256": "d6d1d6b4cf1679f341a934372de07bc5a6e1f28cab647cfd10b373f482f9a00d"
+}

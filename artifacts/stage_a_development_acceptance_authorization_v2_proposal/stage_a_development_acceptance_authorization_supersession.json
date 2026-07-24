@@ -1,0 +1,102 @@
+{
+  "authorization_active": false,
+  "authorization_status": "PROPOSED",
+  "current_accept_identity": {
+    "campaign_manifest_algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+    "campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+    "campaign_manifest_version": "2",
+    "executable_file_count": 71,
+    "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+    "plan_hash": "4d90038ed8f95a76285b73e9ea32ccedc4536964d2a73a4e5420530642e74dea",
+    "plan_identity_policy": "AUDIT_COMMIT_DETERMINISTIC_PLANNING_REFERENCE_ONLY_NOT_RUNTIME_AUTHORIZATION",
+    "planning_authorization_sha256": "2e1942e8d1ab1f6b3e8fd62eef25b72dcdf2eb3a141d8725085631c0345becb8",
+    "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+    "stable_identity_sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9",
+    "verification": "PASSED"
+  },
+  "current_proposal": {
+    "authorization_active": false,
+    "authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V2-PROPOSAL",
+    "authorization_status": "PROPOSED",
+    "execution_authorized": false,
+    "proposal_exact_file_sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+    "proposal_relative_path": "artifacts/stage_a_development_acceptance_authorization_v2_proposal/stage_a_development_acceptance_authorization_proposal.json",
+    "proposal_semantic_sha256": "0fc3b4eb0be9e8cb046f4198876402f386de014ed29422bf8395981150210d7b",
+    "supersedes_authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V1-PROPOSAL"
+  },
+  "execution_authorized": false,
+  "explicitly_not_authorized": [
+    "GENERATE",
+    "REPLAY",
+    "validation partition",
+    "sealed_holdout",
+    "Stage B",
+    "RF training",
+    "TGNN training"
+  ],
+  "governance_review": {
+    "independent_audit_commit": "9c85fc614949b1b99eb57473751e46cc0b598665",
+    "independent_audit_verdict": "APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION PROPOSAL",
+    "remediation_head": "3c8389252f46af81102df1dd10cffd95c21fc01f"
+  },
+  "historical_evidence_preservation": {
+    "policy": "UNCHANGED_HISTORICAL_EVIDENCE",
+    "preserved_proposal_root": "artifacts/stage_a_development_acceptance_authorization_v1_proposal",
+    "proposal_v1_files_modified": false,
+    "source_generation_root_policy": "IMMUTABLE_READ_ONLY_EVIDENCE",
+    "source_replay_root_policy": "IMMUTABLE_READ_ONLY_EVIDENCE"
+  },
+  "historical_generation_provenance": {
+    "authorization_semantic_sha256": "96656da7341dada1b58626c480a9de4e3183e1e46c10dd1e96fd07bad66b6f11",
+    "campaign_identity_algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "plan_hash": "cd32f773fe9ce2853b3a0bae699bf4a5199cfe67dc5baae767858387b0a36d2e",
+    "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "verification": "PASSED"
+  },
+  "historical_replay_provenance": {
+    "authorization_exact_file_sha256": "ef4812d27fffd44348c8bca4c8101b8b1fed476db75074c3b1c7bb3d1c371f03",
+    "authorization_inventory_sha256": "e6ffcd3520497a4145703d7d4369ba14740a68481a06a099c086eecd9b702656",
+    "authorization_semantic_sha256": "3d8d303f2b7f1460a0b2017bdfb6fec53f7029410980de99e60ca95e8d2a157d",
+    "campaign_identity_algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "executable_inventory_sha256": "d52ffc2afa5f94268d89187afe58d4c7695bdf261ec20113644c9cb7f5840215",
+    "operation_bound_v2_campaign_manifest_hash": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44",
+    "plan_hash": "97e279d972dd1ba7a63253a80d6d9ae624d5f73877ba9c208b233f97c96ba70e",
+    "stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "stable_identity_sha256": "45f0a596b073d1799de45660cfa74409daf774ca7bc98c984cb6434b89c4c279",
+    "verification": "PASSED"
+  },
+  "independently_approved": false,
+  "production_authorized": false,
+  "proposal_date": "2026-07-24",
+  "reserved_roots": {
+    "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+    "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+    "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+  },
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_proposal_supersession.v2",
+  "simulation_authorized": false,
+  "source_generation_ledger": {
+    "byte_length": 1060132,
+    "sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328"
+  },
+  "source_replay_ledger": {
+    "byte_length": 1079014,
+    "sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb"
+  },
+  "superseded_proposal": {
+    "authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V1-PROPOSAL",
+    "authorization_status": "SUPERSEDED",
+    "inventory_modified": false,
+    "proposal_exact_file_sha256": "68fe8890e1c4eabc283ea3954f966388c6a92897b138d51666ae6a9bdef186f4",
+    "proposal_files_modified": false,
+    "proposal_inventory_sha256": "b908d7fe1aedd33b2476d4f562d3b442054ff93d0119aa53faf46ad3e8255dd7",
+    "proposal_relative_path": "artifacts/stage_a_development_acceptance_authorization_v1_proposal/stage_a_development_acceptance_authorization_proposal.json",
+    "proposal_semantic_sha256": "d6d1d6b4cf1679f341a934372de07bc5a6e1f28cab647cfd10b373f482f9a00d",
+    "superseded_by_authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V2-PROPOSAL"
+  },
+  "supersession_status": "INACTIVE_SUPERSEDING_PROPOSAL",
+  "tooling_proposal_sha256": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b"
+}
