@@ -1,0 +1,44 @@
+{
+  "artifact_count": 7,
+  "artifacts": [
+    {
+      "byte_length": 8,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/.gitattributes",
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "byte_length": 1477,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/campaign_identity_design.json",
+      "sha256": "4367a9c10e30a39ce85c5e7f5193b83d26f5b859a21bc99faaa86adb4e12e3f7"
+    },
+    {
+      "byte_length": 2083,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/source_replay_provenance.json",
+      "sha256": "f43ca2e6f8f837fdb99ac2a13c3bd90a20c55e90fdf25da0df8f4f2272a2b94b"
+    },
+    {
+      "byte_length": 18043,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/stage_a_corrected_executable_source_inventory.json",
+      "sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56"
+    },
+    {
+      "byte_length": 442,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/stage_a_corrected_stable_executable_identity.json",
+      "sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9"
+    },
+    {
+      "byte_length": 3047,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/test_results.json",
+      "sha256": "2851eeda6662f9206a1e83ea8ee3297061d16cb0de736ab96546858f2e246999"
+    },
+    {
+      "byte_length": 3595,
+      "relative_path": "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/verification_report.json",
+      "sha256": "fb072b208cd285daf0cc9e4a9c8d001d9d2e99ace4c5474285efe74601c5e111"
+    }
+  ],
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "schema_identifier": "satnet.stage_a.operation_bound_campaign_identity_evidence_inventory.v1",
+  "self_reference_policy": "evidence_inventory.json excludes its own bytes"
+}

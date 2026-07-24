@@ -1,0 +1,73 @@
+{
+  "base_commit": "4fd46f10984957a20037fa3a2f5b0db86b8149c4",
+  "branch": "fix/stage-a-operation-bound-campaign-identity-v1",
+  "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+  "executable_record_count": 71,
+  "governance": {
+    "acceptance_authorization_created_or_modified": false,
+    "acceptance_proposal_created_or_modified": false,
+    "environment_override_added": false,
+    "hash_specific_bypass_added": false,
+    "historical_generation_or_replay_ledger_modified": false
+  },
+  "legacy_campaign_manifest_v1": {
+    "algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "generation_campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "historical_identities_reinterpreted_as_v2": false,
+    "historical_ledgers_rewritten": false,
+    "replay_campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "validation_result": "PASSED"
+  },
+  "narrow_audit_scope": [
+    "versioned campaign-manifest identity construction and validation",
+    "historical generation and replay legacy-v1 provenance validation",
+    "ACCEPT preflight source-ledger cross-binding without execution",
+    "corrected 71-record executable inventory and stable identity",
+    "regression tests and deterministic evidence bundle"
+  ],
+  "operation_bound_campaign_manifest_v2": {
+    "accept_differs_from_historical_replay": true,
+    "accept_differs_from_operation_bound_replay": true,
+    "algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+    "distinct_operation_count": 3,
+    "generate_campaign_manifest_hash": "2112215254ee7bb72569b9fbb87cb7ed1be46107452fc0ac13838af5d6892e9e",
+    "prospective_accept_campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+    "replay_campaign_manifest_hash": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44",
+    "validation_result": "PASSED"
+  },
+  "schema_identifier": "satnet.stage_a.operation_bound_campaign_identity_verification.v1",
+  "source_evidence": {
+    "artifact_hash_mismatch_count": 0,
+    "frozen_evidence_bytes_verified": 1337549193,
+    "frozen_evidence_files_sha256_verified": 9004,
+    "generation_adapter_passed_count": 100,
+    "generation_artifact_bytes_rehashed": 365309146,
+    "generation_artifact_files_rehashed": 1900,
+    "generation_ledger_byte_length": 1060132,
+    "generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "generation_science_passed_count": 100,
+    "generation_succeeded_count": 100,
+    "replay_adapter_passed_count": 100,
+    "replay_artifact_bytes_rehashed": 365491986,
+    "replay_artifact_files_rehashed": 2000,
+    "replay_ledger_byte_length": 1079014,
+    "replay_ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+    "replay_report_count": 100,
+    "replay_science_passed_count": 100,
+    "replay_succeeded_count": 100,
+    "result": "PASSED"
+  },
+  "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+  "stable_identity_sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9",
+  "state": {
+    "acceptance_executed": false,
+    "acceptance_root_absent": true,
+    "campaign_recovery_run_lock_count": 0,
+    "comparison_executed": false,
+    "failed_directory_count": 0,
+    "in_progress_directory_count": 0,
+    "replay_executed": false,
+    "simulation_executed": false
+  },
+  "verdict": "STAGE A OPERATION-BOUND CAMPAIGN IDENTITY REMEDIATION READY FOR NARROW INDEPENDENT AUDIT"
+}

@@ -1,0 +1,74 @@
+{
+  "current_authoritative_results": [
+    {
+      "command": "python -B -m pytest tests/experiments/stage_a_execution/test_operation_bound_campaign_identity.py -q",
+      "failed": 0,
+      "passed": 9,
+      "result": "PASSED"
+    },
+    {
+      "command": "python -B -m pytest tests/experiments/stage_a_execution -q --ignore=test_replay_preflight_authoritative.py with six obsolete pre-campaign snapshots deselected",
+      "deselected": 6,
+      "failed": 0,
+      "passed": 78,
+      "result": "PASSED"
+    },
+    {
+      "command": "python -B compile() over corrected executable inventory",
+      "failed": 0,
+      "inventory_records": 71,
+      "python_files_compiled": 71,
+      "result": "PASSED"
+    },
+    {
+      "command": "verify_executable_identity",
+      "post_stable_executable_changes": 0,
+      "result": "PASSED",
+      "verified_records": 71
+    },
+    {
+      "acceptance_root_created": false,
+      "command": "real unmocked ACCEPT preflight with nonpersisted test-only authorization",
+      "comparison_executed": false,
+      "frozen_evidence_sha256_verified_count": 9004,
+      "generation_provenance": "PASSED",
+      "replay_provenance": "PASSED",
+      "result": "PASSED",
+      "simulation_executed": false
+    },
+    {
+      "command": "immutable generation and replay artifact inventory rehash",
+      "generation_verified_bytes": 365309146,
+      "generation_verified_files": 1900,
+      "hash_mismatches": 0,
+      "replay_verified_bytes": 365491986,
+      "replay_verified_files": 2000,
+      "result": "PASSED"
+    }
+  ],
+  "schema_identifier": "satnet.stage_a.operation_bound_campaign_identity_test_results.v1",
+  "unchanged_historical_snapshot_results": [
+    {
+      "command": "python -B -m pytest tests/experiments/stage_a_execution/test_replay_preflight_authoritative.py -q",
+      "failed": 12,
+      "failure_classification": "EXPECTED_HISTORICAL_STATE_SNAPSHOT",
+      "passed": 2,
+      "reason": "The unchanged tests require the replay root to be absent, but the immutable replay campaign is completed and its root is required for ACCEPT preflight."
+    },
+    {
+      "command": "python -B -m pytest tests/validation/test_stage_a_execution_tooling_final_delta_audit.py tests/validation/test_stage_a_execution_tooling_v1_reaudit.py tests/validation/test_stage_a_execution_tooling_v1_audit.py -q",
+      "failed": 4,
+      "failure_classification": "EXPECTED_HISTORICAL_IDENTITY_AND_NONEXECUTION_SNAPSHOTS",
+      "passed": 6,
+      "reason": "The unchanged historical audits pin superseded executable inventory bytes, pre-execution root state, and old synthetic provenance hooks.",
+      "skipped": 37
+    },
+    {
+      "command": "python -B -m pytest tests/validation/test_stage_a_development_acceptance_authorization_final_review.py -q",
+      "failed": 1,
+      "failure_classification": "MISSING_EXTERNAL_AUDIT_ENVIRONMENT",
+      "passed": 5,
+      "reason": "SATNET_ACCEPTANCE_AUTHORIZATION_FRESH_CHECKOUT was not set; all five self-contained historical proposal checks passed."
+    }
+  ]
+}
