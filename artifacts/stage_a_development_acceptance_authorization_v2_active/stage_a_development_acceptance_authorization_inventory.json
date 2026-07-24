@@ -1,0 +1,46 @@
+{
+  "artifact_count_excluding_inventory": 3,
+  "artifacts": [
+    {
+      "byte_length": 10050,
+      "relative_path": "stage_a_development_acceptance_authorization_activation_supersession.json",
+      "sha256": "de6ca1b742870f1a8878b3ef7c8ca2a5e2b9f8aac7c24a1bc9aa7ff901287c8e"
+    },
+    {
+      "byte_length": 3015,
+      "relative_path": "stage_a_development_acceptance_execution_authorization.json",
+      "sha256": "d111680ece3391d89d6cf8f359907b724f5f8f56015d1663a11b307ac73eff51"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_acceptance_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    }
+  ],
+  "authorization_active": true,
+  "authorization_file_sha256": "d111680ece3391d89d6cf8f359907b724f5f8f56015d1663a11b307ac73eff51",
+  "authorization_semantic_sha256": "0e99fd3ff210309049d97abb989652d747fa5f05c561a6566b25cda3d0eb8f74",
+  "authorization_status": "AUTHORIZED",
+  "current_campaign_manifest_algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+  "current_campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+  "current_campaign_manifest_version": "2",
+  "current_plan_hash": "b572befbadd7abb817c736fab140362d48da633619241744ee9102acbbda6f02",
+  "execution_authorized": true,
+  "governance_activation_supersession_sha256": "de6ca1b742870f1a8878b3ef7c8ca2a5e2b9f8aac7c24a1bc9aa7ff901287c8e",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "production_authorized": false,
+  "proposal_v1_semantic_sha256": "d6d1d6b4cf1679f341a934372de07bc5a6e1f28cab647cfd10b373f482f9a00d",
+  "proposal_v1_status_in_governance": "SUPERSEDED",
+  "proposal_v2_exact_file_sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+  "proposal_v2_inventory_sha256": "ee6f180d6a3e628c50a9a8d2b1bfe35b975981dbc2149aa959f5c4703d7b3d72",
+  "proposal_v2_semantic_sha256": "0fc3b4eb0be9e8cb046f4198876402f386de014ed29422bf8395981150210d7b",
+  "proposal_v2_status_in_governance": "ACTIVATED",
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_active_inventory.v2",
+  "self_reference_policy": "stage_a_development_acceptance_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+  "source_replay_ledger_byte_length": 1079014,
+  "source_replay_ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb"
+}
