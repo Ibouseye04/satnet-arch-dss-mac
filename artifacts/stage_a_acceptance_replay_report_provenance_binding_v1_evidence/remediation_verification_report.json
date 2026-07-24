@@ -1,0 +1,38 @@
+{
+  "active_v2_authorization_modified": false,
+  "authorization_consumed_by_failed_execution": false,
+  "authorization_reuse": {
+    "implementation_has_consumption_state": false,
+    "legally_reusable_with_corrected_executable": false,
+    "reason": "The active v2 authorization remains byte-unchanged and unconsumed, but it binds b1da92c3184ee86997079f1eb458fae95d994c22 and inventory 2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56 rather than this remediation identity.",
+    "separate_future_authorization_required": true
+  },
+  "branch": "fix/stage-a-acceptance-replay-report-provenance-binding-v1",
+  "corrected_provenance_domains": {
+    "ACCEPT": "Current ACCEPT plan, campaign, authorization, executable, and output evidence only",
+    "GENERATE": "Historical generation ledger and validated generation provenance",
+    "REPLAY": "Historical replay ledger, replay reports, and validated replay provenance"
+  },
+  "executable_inventory_sha256": "2927c74a38fc9baf1456dd91f5c1c9ca42a89d10fcd8f63227d40858faff1c00",
+  "executable_record_count": 71,
+  "failed_root_recovery_required": false,
+  "governance": {
+    "accept_executed_or_resumed": false,
+    "acceptance_comparison_executed_against_real_roots": false,
+    "authorization_proposal_or_activation_created": false,
+    "generation_or_replay_simulation_invoked": false,
+    "historical_ledger_or_report_rewritten": false,
+    "known_hash_or_environment_bypass_added": false
+  },
+  "narrow_audit_scope": [
+    "replay-report provenance-domain comparison in evaluate_acceptance",
+    "historical replay executable and generation provenance fail-closed validation",
+    "synthetic ACCEPT success and transactional failure behavior",
+    "current ACCEPT authorization, plan, campaign, and executable isolation",
+    "71-record executable inventory and stable identity",
+    "read-only generation/replay evidence rehash and failed-root forensics"
+  ],
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_remediation_verification.v1",
+  "stable_executable_commit": "1efd7fcea6a1ba7feb318edbd53577126dd94ae4",
+  "stable_identity_sha256": "cbe2e66888c11a6f8f39b6f975acdd3e230b9214921eb98740d84ec41449fc47"
+}

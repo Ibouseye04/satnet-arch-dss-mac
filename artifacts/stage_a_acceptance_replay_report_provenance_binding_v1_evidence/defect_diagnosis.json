@@ -1,0 +1,12 @@
+{
+  "actual_historical_replay_report_stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+  "base_commit": "26f2a89d42bba1788cb0d6634c6d6fa0bdbd9580",
+  "corrected_expected_value_source": "validated historical replay provenance from preflight source_provenance.replay, cross-validated against replay_ledger.json",
+  "corrected_source_location": "src/satnet/experiments/stage_a_execution/acceptance.py:89-114",
+  "defect": "Historical replay-report executable fields were compared to current ACCEPT plan executable fields instead of historical replay provenance.",
+  "incorrect_expected_stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+  "incorrect_expected_value_source": "current ACCEPT runtime plan stable_executable_commit",
+  "original_comparison_location": "src/satnet/experiments/stage_a_execution/acceptance.py at base lines 88-110; stable_executable_commit expectation at line 96 and exception at line 110",
+  "report_field": "stable_executable_commit",
+  "schema_identifier": "satnet.stage_a.acceptance_replay_report_provenance_defect.v1"
+}

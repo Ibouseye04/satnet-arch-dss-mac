@@ -1,0 +1,23 @@
+{
+  "acceptance_root": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+  "campaign_lock_count": 0,
+  "completed_artifact_count": 0,
+  "creation_time": null,
+  "directories": [],
+  "failed_artifact_count": 0,
+  "file_count": 0,
+  "files": [],
+  "in_progress_artifact_count": 0,
+  "ledger_count": 0,
+  "modification_time": null,
+  "partial_acceptance_result_created": false,
+  "recovery_lock_count": 0,
+  "report_count": 0,
+  "root_exists": false,
+  "run_lock_count": 0,
+  "schema_identifier": "satnet.stage_a.failed_acceptance_root_forensics.v1",
+  "staging_artifact_count": 0,
+  "temporary_artifact_count": 0,
+  "total_bytes": 0,
+  "tree_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}
