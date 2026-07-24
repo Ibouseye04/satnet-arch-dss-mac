@@ -9,6 +9,7 @@ from .ledger import read_bound_ledger
 from .locking import campaign_lock
 from .paths import validate_output_roots, validate_relative_artifact_path
 from .preflight import PreflightCertificate, require_preflight
+from .replay import REPLAY_SCHEMA
 from .resume import ledger_provenance_from_mapping, validate_ledger_binding
 
 ACCEPTANCE_SCHEMA = "satnet.stage_a.acceptance_report.v1"
@@ -86,17 +87,20 @@ def evaluate_acceptance(
         if report.get("generation_replay_equal") is not True or report.get("replay_state") != "SUCCEEDED":
             raise ValueError("Replay mismatch cannot be accepted")
         expected_report = {
-            "contract_hash": plan["contract_hash"],
+            "schema_identifier": REPLAY_SCHEMA,
+            "contract_hash": replay_provenance.contract_hash,
+            "plan_hash": replay_provenance.plan_hash,
+            "authorization_hash": replay_provenance.authorization_hash,
             "generation_authorization_hash": generation["authorization_hash"],
             "generation_plan_hash": generation["plan_hash"],
             "generation_campaign_manifest_hash": generation["campaign_manifest_hash"],
             "source_generation_ledger_relative_path": generation_identity["relative_path"],
             "source_generation_ledger_byte_length": generation_identity["byte_length"],
             "source_generation_ledger_sha256": generation_identity["sha256"],
-            "stable_executable_commit": plan["stable_executable_commit"],
-            "executable_inventory_hash": plan["executable_inventory_hash"],
-            "tooling_proposal_hash": plan["tooling_proposal_hash"],
-            "artifact_contract_hash": plan["artifact_contract_hash"],
+            "stable_executable_commit": replay_provenance.stable_executable_commit,
+            "executable_inventory_hash": replay_provenance.executable_inventory_hash,
+            "tooling_proposal_hash": replay_provenance.tooling_proposal_hash,
+            "artifact_contract_hash": replay_provenance.artifact_contract_hash,
             "global_run_id": plan_run["global_run_id"],
             "run_key": plan_run["run_key"],
             "run_record_hash": plan_run["run_record_hash"],
