@@ -70,6 +70,13 @@ def _certificate(monkeypatch, contract, plan, roots, authorization, *, resume: b
             roots[0] / "execution_ledger.json"
         ),
     )
+    monkeypatch.setattr(
+        preflight_module,
+        "load_source_replay_provenance",
+        lambda *_args, **_kwargs: source_provenance_from_ledger(
+            roots[1] / "replay_ledger.json"
+        ),
+    )
     certificate = run_preflight(
         repo_root=ROOT, contract=contract, plan=plan, authorization=authorization,
         generation_root=roots[0], replay_root=roots[1], acceptance_root=roots[2],

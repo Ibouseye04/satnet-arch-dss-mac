@@ -21,7 +21,14 @@ from satnet.experiments.stage_a_execution.contract import (
 )
 from satnet.experiments.stage_a_execution.integrity import verify_artifact_inventory
 from satnet.experiments.stage_a_execution.ledger import read_bound_ledger
-from satnet.experiments.stage_a_execution.plan import PLAN_HASH_DOMAIN, build_plan, validate_plan
+from satnet.experiments.stage_a_execution.plan import (
+    OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM,
+    OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION,
+    PLAN_HASH_DOMAIN,
+    build_plan,
+    validate_legacy_campaign_manifest_identity,
+    validate_plan,
+)
 from satnet.experiments.stage_a_execution.preflight import load_source_generation_provenance
 from satnet.experiments.stage_a_execution.resume import ledger_provenance_from_mapping, validate_ledger_binding
 
@@ -34,7 +41,6 @@ PROVENANCE_PATH = ROOT / "artifacts/stage_a_replay_source_ledger_binding_v1_evid
 GENERATION_AUTHORIZATION_PATH = ROOT / "artifacts/stage_a_development_authorization_v1_active/stage_a_development_execution_authorization.json"
 REPLAY_AUTHORIZATION_PATH = ROOT / "artifacts/stage_a_development_replay_authorization_v2_active/stage_a_development_replay_execution_authorization.json"
 SOURCE_CAMPAIGN_HASH = "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164"
-CURRENT_REPLAY_CAMPAIGN_HASH = "5823c1910d5081bafa1c69fe48950bf2c9ab1f6dbbb37cb91e6246013e7ded99"
 SOURCE_PLAN_HASH = "cd32f773fe9ce2853b3a0bae699bf4a5199cfe67dc5baae767858387b0a36d2e"
 SOURCE_LEDGER_SHA256 = "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328"
 
@@ -96,7 +102,9 @@ def test_replay_source_binding_accepts_distinct_historical_and_current_campaigns
     validate_plan(replay_plan)
     validate_ledger_binding(ledger, replay_plan, operation="GENERATE", provenance=provenance)
     assert provenance.campaign_manifest_hash == SOURCE_CAMPAIGN_HASH
-    assert replay_plan["campaign_manifest_hash"] == CURRENT_REPLAY_CAMPAIGN_HASH
+    assert replay_plan["campaign_manifest_version"] == OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION
+    assert replay_plan["campaign_manifest_algorithm"] == OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM
+    assert replay_plan["campaign_manifest_operation"] == "REPLAY"
     assert provenance.campaign_manifest_hash != replay_plan["campaign_manifest_hash"]
     assert provenance.plan_hash == SOURCE_PLAN_HASH
 
@@ -206,9 +214,21 @@ def test_generate_binding_behavior_remains_unchanged() -> None:
         byte_length=1_060_132,
         sha256=SOURCE_LEDGER_SHA256,
     )
-    validate_ledger_binding(ledger, generation_plan, operation="GENERATE")
-    assert generation_plan["campaign_manifest_hash"] == SOURCE_CAMPAIGN_HASH
-    assert generation_plan["plan_hash"] == SOURCE_PLAN_HASH
+    provenance = load_source_generation_provenance(
+        ROOT,
+        contract=_contract(),
+        plan=generation_plan,
+    )
+    validate_legacy_campaign_manifest_identity(ledger, generation_plan, operation="GENERATE")
+    validate_ledger_binding(
+        ledger,
+        generation_plan,
+        operation="GENERATE",
+        provenance=provenance,
+    )
+    assert ledger["campaign_manifest_hash"] == SOURCE_CAMPAIGN_HASH
+    assert ledger["plan_hash"] == SOURCE_PLAN_HASH
+    assert generation_plan["campaign_manifest_hash"] != SOURCE_CAMPAIGN_HASH
     assert ledger["authorization_hash"] == authorization.sha256
 
 
@@ -218,7 +238,7 @@ def test_binding_validation_creates_no_roots_and_executes_no_simulation() -> Non
     validate_ledger_binding(ledger, replay_plan, operation="GENERATE", provenance=provenance)
     after = (GENERATION_LEDGER.read_bytes(), REPLAY_ROOT.exists(), ACCEPTANCE_ROOT.exists())
     assert after == before
-    assert not REPLAY_ROOT.exists()
+    assert REPLAY_ROOT.exists()
     assert not ACCEPTANCE_ROOT.exists()
 
 
