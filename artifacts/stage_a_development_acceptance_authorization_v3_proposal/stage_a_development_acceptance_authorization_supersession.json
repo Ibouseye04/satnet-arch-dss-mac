@@ -1,0 +1,148 @@
+{
+  "authorization_active": false,
+  "authorization_status": "PROPOSED",
+  "corrected_accept_identity": {
+    "campaign_manifest_algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+    "campaign_manifest_hash": "7b6226dc4bd939a8f6cda50662f6ac4f1e4865c04e59a7b695a9100eea51c229",
+    "campaign_manifest_version": "2",
+    "executable_file_count": 71,
+    "executable_inventory_sha256": "2927c74a38fc9baf1456dd91f5c1c9ca42a89d10fcd8f63227d40858faff1c00",
+    "planning_authorization_sha256": "878265a1def0fea5e8ec89139d587153956a6176172f3af98731964e56a35db7",
+    "planning_plan_hash": "9c0149dd441f177e4f104eec17687e817a66d4a42cd2cac7d1703ae4f33fb64e",
+    "planning_reference_execution_authority": false,
+    "stable_executable_commit": "1efd7fcea6a1ba7feb318edbd53577126dd94ae4",
+    "stable_identity_sha256": "cbe2e66888c11a6f8f39b6f975acdd3e230b9214921eb98740d84ec41449fc47",
+    "verification": "PASSED"
+  },
+  "execution_authorized": false,
+  "explicitly_not_authorized": [
+    "GENERATE",
+    "REPLAY",
+    "validation partition",
+    "sealed_holdout",
+    "Stage B",
+    "RF training",
+    "TGNN training"
+  ],
+  "failed_attempt": {
+    "acceptance_evidence_produced": false,
+    "acceptance_root_absent": true,
+    "authorization_consumed": false,
+    "campaign_lock_count": 0,
+    "console_error": "Replay report identity or seed mismatch: stable_executable_commit",
+    "first_authorized_accept_attempt_status": "FAILED BEFORE ROOT CREATION",
+    "no_partial_acceptance_evidence": true,
+    "recovery_lock_count": 0,
+    "recovery_required": false,
+    "run_lock_count": 0,
+    "successful_acceptance": false
+  },
+  "governance_review": {
+    "independent_audit_commit": "26abed7e28c94bbd46176d1cc77dbee7ebbcebe6",
+    "independent_audit_verdict": "APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION V3 PROPOSAL",
+    "remediation_head": "34d153316e85c7cca91c9a494d94356368588ed6"
+  },
+  "historical_active_authorization_v2": {
+    "authorization_semantic_sha256": "0e99fd3ff210309049d97abb989652d747fa5f05c561a6566b25cda3d0eb8f74",
+    "authorization_status": "SUPERSEDED",
+    "campaign_manifest_hash": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+    "governance_status": "SUPERSEDED / NOT REUSABLE",
+    "exact_authorization_file_sha256": "d111680ece3391d89d6cf8f359907b724f5f8f56015d1663a11b307ac73eff51",
+    "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+    "historical_artifact_modified": false,
+    "inventory_sha256": "9c553e4ecaecc4fe19873885bdea657df0b3acc5bc32027a84f2843c4727a426",
+    "not_reusable": true,
+    "not_reusable_reason": "Executable binding differs from corrected stable executable and corrected inventory",
+    "plan_hash": "b572befbadd7abb817c736fab140362d48da633619241744ee9102acbbda6f02",
+    "relative_path": "artifacts/stage_a_development_acceptance_authorization_v2_active/stage_a_development_acceptance_execution_authorization.json",
+    "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22"
+  },
+  "historical_evidence_preservation": {
+    "all_prior_authorization_and_governance_artifacts_modified": false,
+    "all_remediation_and_audit_evidence_modified": false,
+    "generation_evidence_modified": false,
+    "policy": "UNCHANGED_HISTORICAL_EVIDENCE",
+    "proposal_v1_files_modified": false,
+    "proposal_v2_files_modified": false,
+    "replay_evidence_modified": false
+  },
+  "historical_generation_provenance": {
+    "authorization_semantic_sha256": "96656da7341dada1b58626c480a9de4e3183e1e46c10dd1e96fd07bad66b6f11",
+    "campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "executable_inventory_sha256": "1066d17645d4975a40a93a80c1ca9797b1b28cf37531337355ccb3297fd13b2d",
+    "ledger_byte_length": 1060132,
+    "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "plan_hash": "cd32f773fe9ce2853b3a0bae699bf4a5199cfe67dc5baae767858387b0a36d2e",
+    "stable_executable_commit": "fafe3fe36eac4429c860bd6d281923fed2980ea7",
+    "verification": "PASSED"
+  },
+  "historical_proposal_v1": {
+    "authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V1-PROPOSAL",
+    "authorization_status": "SUPERSEDED",
+    "exact_proposal_file_sha256": "68fe8890e1c4eabc283ea3954f966388c6a92897b138d51666ae6a9bdef186f4",
+    "historical_artifact_modified": false,
+    "inventory_sha256": "b908d7fe1aedd33b2476d4f562d3b442054ff93d0119aa53faf46ad3e8255dd7",
+    "proposal_semantic_sha256": "d6d1d6b4cf1679f341a934372de07bc5a6e1f28cab647cfd10b373f482f9a00d",
+    "relative_path": "artifacts/stage_a_development_acceptance_authorization_v1_proposal/stage_a_development_acceptance_authorization_proposal.json"
+  },
+  "historical_proposal_v2": {
+    "authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V2-PROPOSAL",
+    "authorization_status": "SUPERSEDED",
+    "authorized_run_manifest_sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642",
+    "exact_proposal_file_sha256": "5b101b34d0a9f7edf3a13f8394c8e8f2275cc628ba4accbde038febf9801afea",
+    "governance_sha256": "b476d446bc84a5ff4f74f8522abc23d0b108082de1b348229a06f1b328edef54",
+    "historical_artifact_modified": false,
+    "inventory_sha256": "ee6f180d6a3e628c50a9a8d2b1bfe35b975981dbc2149aa959f5c4703d7b3d72",
+    "proposal_commit": "fc9250aa702ddf8da1814da32fe06977af4afc44",
+    "proposal_semantic_sha256": "0fc3b4eb0be9e8cb046f4198876402f386de014ed29422bf8395981150210d7b",
+    "relative_path": "artifacts/stage_a_development_acceptance_authorization_v2_proposal/stage_a_development_acceptance_authorization_proposal.json"
+  },
+  "historical_replay_provenance": {
+    "authorization_exact_file_sha256": "ef4812d27fffd44348c8bca4c8101b8b1fed476db75074c3b1c7bb3d1c371f03",
+    "authorization_inventory_sha256": "e6ffcd3520497a4145703d7d4369ba14740a68481a06a099c086eecd9b702656",
+    "authorization_semantic_sha256": "3d8d303f2b7f1460a0b2017bdfb6fec53f7029410980de99e60ca95e8d2a157d",
+    "campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "executable_inventory_sha256": "d52ffc2afa5f94268d89187afe58d4c7695bdf261ec20113644c9cb7f5840215",
+    "ledger_byte_length": 1079014,
+    "ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+    "operation_bound_v2_campaign_manifest_hash": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44",
+    "plan_hash": "97e279d972dd1ba7a63253a80d6d9ae624d5f73877ba9c208b233f97c96ba70e",
+    "stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "stable_identity_sha256": "45f0a596b073d1799de45660cfa74409daf774ca7bc98c984cb6434b89c4c279",
+    "verification": "PASSED"
+  },
+  "independently_approved": false,
+  "production_authorized": false,
+  "proposal_date": "2026-07-24",
+  "proposal_v3": {
+    "authorization_active": false,
+    "authorization_id": "STAGE-A-DEVELOPMENT-ACCEPTANCE-V3-PROPOSAL",
+    "authorization_status": "PROPOSED",
+    "execution_authorized": false,
+    "proposal_relative_path": "artifacts/stage_a_development_acceptance_authorization_v3_proposal/stage_a_development_acceptance_authorization_proposal.json",
+    "proposal_semantic_sha256": "edf868d994675d3fd25ed0d2a3f9f5a1b8442e29ae4c8dfa3cb5214a2f295ef2",
+    "separate_activation_required": true,
+    "separate_independent_review_required": true
+  },
+  "remediation_binding": {
+    "corrected_executable_inventory_sha256": "2927c74a38fc9baf1456dd91f5c1c9ca42a89d10fcd8f63227d40858faff1c00",
+    "corrected_executable_record_count": 71,
+    "corrected_stable_executable_commit": "1efd7fcea6a1ba7feb318edbd53577126dd94ae4",
+    "corrected_stable_identity_sha256": "cbe2e66888c11a6f8f39b6f975acdd3e230b9214921eb98740d84ec41449fc47",
+    "defect_diagnosis": "Historical replay-report executable fields were compared to current ACCEPT plan executable fields instead of historical replay provenance.",
+    "remediation_audit_commit": "26abed7e28c94bbd46176d1cc77dbee7ebbcebe6",
+    "remediation_head": "34d153316e85c7cca91c9a494d94356368588ed6",
+    "replay_report_expected_provenance": "validated historical replay provenance from preflight source_provenance.replay, cross-validated against replay_ledger.json",
+    "replay_report_historical_stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "replay_report_provenance_domain_result": "PASSED_HISTORICAL_REPLAY_PROVENANCE"
+  },
+  "reserved_roots": {
+    "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+    "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+    "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+  },
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_proposal_supersession.v3",
+  "simulation_authorized": false,
+  "supersession_status": "INACTIVE_SUPERSEDING_PROPOSAL",
+  "tooling_proposal_sha256": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b"
+}

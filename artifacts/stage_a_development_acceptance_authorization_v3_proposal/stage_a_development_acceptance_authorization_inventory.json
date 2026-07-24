@@ -1,0 +1,44 @@
+{
+  "artifact_count_excluding_inventory": 4,
+  "artifacts": [
+    {
+      "byte_length": 5366,
+      "relative_path": "README.md",
+      "sha256": "0d1392fe34feb0cdef9b86472492adf63c18e5d1dc8f8b1aacf423a8016eb4a2"
+    },
+    {
+      "byte_length": 11331,
+      "relative_path": "stage_a_development_acceptance_authorization_proposal.json",
+      "sha256": "c03285456abad57f115872befa6b6fe973bbf12153c4d9320d34ddaf54d7c583"
+    },
+    {
+      "byte_length": 8988,
+      "relative_path": "stage_a_development_acceptance_authorization_supersession.json",
+      "sha256": "33df3a6fbfa8c1918b13efc858ba5aef12a835f0fa85c6594b74dc84a70ee70a"
+    },
+    {
+      "byte_length": 25122,
+      "relative_path": "stage_a_development_authorized_acceptance_run_manifest.csv",
+      "sha256": "7f6013872824552bac32ebb76a5d26eda85f645f339b0eaa0a2fdd8577018642"
+    }
+  ],
+  "authorization_active": false,
+  "authorization_status": "PROPOSED",
+  "execution_authorized": false,
+  "governance_supersession_record_sha256": "33df3a6fbfa8c1918b13efc858ba5aef12a835f0fa85c6594b74dc84a70ee70a",
+  "hash_algorithm": "SHA-256",
+  "ordering": "relative_path ordinal lexical ascending",
+  "planning_reference_authorization_sha256": "878265a1def0fea5e8ec89139d587153956a6176172f3af98731964e56a35db7",
+  "planning_reference_plan_hash": "9c0149dd441f177e4f104eec17687e817a66d4a42cd2cac7d1703ae4f33fb64e",
+  "production_authorized": false,
+  "proposal_exact_file_sha256": "c03285456abad57f115872befa6b6fe973bbf12153c4d9320d34ddaf54d7c583",
+  "proposal_semantic_sha256": "edf868d994675d3fd25ed0d2a3f9f5a1b8442e29ae4c8dfa3cb5214a2f295ef2",
+  "prospective_accept_campaign_manifest_hash": "7b6226dc4bd939a8f6cda50662f6ac4f1e4865c04e59a7b695a9100eea51c229",
+  "schema_identifier": "satnet.stage_a.development_acceptance_authorization_proposal_inventory.v3",
+  "self_reference_policy": "stage_a_development_acceptance_authorization_inventory.json excludes its own bytes",
+  "simulation_authorized": false,
+  "source_generation_ledger_byte_length": 1060132,
+  "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+  "source_replay_ledger_byte_length": 1079014,
+  "source_replay_ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb"
+}
