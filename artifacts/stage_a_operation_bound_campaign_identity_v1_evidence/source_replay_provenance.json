@@ -1,0 +1,33 @@
+{
+  "ledger_provenance": {
+    "artifact_contract_hash": "cc721fd88dedcb90c0aa789b7815c7f6e35132e3aeebf2794e3e1d63a424380d",
+    "authorization_hash": "3d8d303f2b7f1460a0b2017bdfb6fec53f7029410980de99e60ca95e8d2a157d",
+    "campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "contract_hash": "e88b2f3f3fd545a2876e79262be73901eb77a656e08835ff01aeb52d6a9ba51a",
+    "executable_inventory_hash": "d52ffc2afa5f94268d89187afe58d4c7695bdf261ec20113644c9cb7f5840215",
+    "expected_run_count": 100,
+    "operation": "REPLAY",
+    "output_root_identity": {
+      "acceptance": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-acceptance",
+      "generation": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-production",
+      "replay": "C:\\Users\\johns\\satnet-stage-a-discovery-v1-replay"
+    },
+    "partition": "development",
+    "plan_hash": "97e279d972dd1ba7a63253a80d6d9ae624d5f73877ba9c208b233f97c96ba70e",
+    "source_generation_ledger_byte_length": 1060132,
+    "source_generation_ledger_relative_path": "execution_ledger.json",
+    "source_generation_ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+    "source_replay_ledger_byte_length": null,
+    "source_replay_ledger_relative_path": null,
+    "source_replay_ledger_sha256": null,
+    "stable_executable_commit": "8bde92da762269998632eb6c3e3cb2565a6ca971",
+    "tooling_proposal_hash": "7b21af1bad6faa10696d1417b28b75300727033446c84424beb94d263510778b"
+  },
+  "schema_identifier": "satnet.stage_a.source_replay_provenance.v1",
+  "source_authorization_byte_length": 2902,
+  "source_authorization_file_sha256": "ef4812d27fffd44348c8bca4c8101b8b1fed476db75074c3b1c7bb3d1c371f03",
+  "source_authorization_relative_path": "artifacts/stage_a_development_replay_authorization_v3_active/stage_a_development_replay_execution_authorization.json",
+  "source_replay_ledger_byte_length": 1079014,
+  "source_replay_ledger_relative_path": "replay_ledger.json",
+  "source_replay_ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb"
+}

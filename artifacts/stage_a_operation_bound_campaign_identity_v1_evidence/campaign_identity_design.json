@@ -1,0 +1,28 @@
+{
+  "acceptance_executed": false,
+  "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+  "executable_record_count": 71,
+  "legacy_campaign_manifest_v1": {
+    "algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+    "domain": "satnet_stage_a_campaign_manifest_v2",
+    "historical_generation_campaign_manifest_hash": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+    "historical_replay_campaign_manifest_hash": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+    "operation_in_payload": false
+  },
+  "operation_bound_campaign_manifest_v2": {
+    "algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+    "campaign_manifest_hashes": {
+      "ACCEPT": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+      "GENERATE": "2112215254ee7bb72569b9fbb87cb7ed1be46107452fc0ac13838af5d6892e9e",
+      "REPLAY": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44"
+    },
+    "distinct_campaign_manifest_hash_count": 3,
+    "domain": "satnet_stage_a_campaign_manifest_operation_bound_v2",
+    "operation_in_payload": true
+  },
+  "replay_executed": false,
+  "schema_identifier": "satnet.stage_a.operation_bound_campaign_identity_evidence.v1",
+  "simulation_executed": false,
+  "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+  "stable_identity_sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9"
+}
