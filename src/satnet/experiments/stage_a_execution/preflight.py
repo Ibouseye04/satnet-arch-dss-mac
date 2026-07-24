@@ -12,7 +12,11 @@ from .evidence import DEFAULT_FROZEN_EVIDENCE_PATHS, FrozenEvidencePaths, verify
 from .identity import tooling_identity, verify_executable_identity
 from .ledger import read_bound_ledger
 from .paths import available_bytes, probe_parent, validate_output_roots
-from .plan import validate_plan, validate_plan_contract_binding
+from .plan import (
+    validate_legacy_campaign_manifest_identity,
+    validate_plan,
+    validate_plan_contract_binding,
+)
 from .resume import LedgerProvenance, ledger_provenance_from_mapping, validate_ledger_binding
 
 MINIMUM_FREE_BYTES = 1_000_000_000
@@ -22,7 +26,14 @@ SOURCE_GENERATION_PROVENANCE_RELATIVE = Path(
 SOURCE_GENERATION_AUTHORIZATION_RELATIVE = Path(
     "artifacts/stage_a_development_authorization_v1_active/stage_a_development_execution_authorization.json"
 )
+SOURCE_REPLAY_PROVENANCE_RELATIVE = Path(
+    "artifacts/stage_a_operation_bound_campaign_identity_v1_evidence/source_replay_provenance.json"
+)
+SOURCE_REPLAY_AUTHORIZATION_RELATIVE = Path(
+    "artifacts/stage_a_development_replay_authorization_v3_active/stage_a_development_replay_execution_authorization.json"
+)
 SOURCE_PROVENANCE_SCHEMA = "satnet.stage_a.source_generation_provenance.v1"
+SOURCE_REPLAY_PROVENANCE_SCHEMA = "satnet.stage_a.source_replay_provenance.v1"
 _PREFLIGHT_SEAL = object()
 
 
@@ -114,6 +125,87 @@ def load_source_generation_provenance(
         replay_root=Path(provenance.output_root_identity["replay"]),
         acceptance_root=Path(provenance.output_root_identity["acceptance"]),
     )
+    validate_legacy_campaign_manifest_identity(
+        provenance.as_dict(),
+        plan,
+        operation="GENERATE",
+    )
+    return provenance
+
+
+def load_source_replay_provenance(
+    repo_root: Path,
+    *,
+    contract: FrozenStageAContract,
+    plan: dict[str, Any],
+    ledger: dict[str, Any],
+) -> LedgerProvenance:
+    document = read_json_object(repo_root / SOURCE_REPLAY_PROVENANCE_RELATIVE)
+    if set(document) != {
+        "schema_identifier",
+        "source_authorization_relative_path",
+        "source_authorization_byte_length",
+        "source_authorization_file_sha256",
+        "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length",
+        "source_replay_ledger_sha256",
+        "ledger_provenance",
+    }:
+        raise ValueError("Source replay provenance field set mismatch")
+    if document["schema_identifier"] != SOURCE_REPLAY_PROVENANCE_SCHEMA:
+        raise ValueError("Source replay provenance schema mismatch")
+    if document["source_authorization_relative_path"] != SOURCE_REPLAY_AUTHORIZATION_RELATIVE.as_posix():
+        raise ValueError("Source replay authorization path mismatch")
+    authorization_path = repo_root / SOURCE_REPLAY_AUTHORIZATION_RELATIVE
+    if authorization_path.stat().st_size != document["source_authorization_byte_length"]:
+        raise ValueError("Source replay authorization byte length mismatch")
+    if sha256_file(authorization_path) != document["source_authorization_file_sha256"]:
+        raise ValueError("Source replay authorization SHA-256 mismatch")
+    source_ledger_identity = {
+        "relative_path": document["source_replay_ledger_relative_path"],
+        "byte_length": document["source_replay_ledger_byte_length"],
+        "sha256": document["source_replay_ledger_sha256"],
+    }
+    plan_source_identity = {
+        "relative_path": plan["source_replay_ledger_relative_path"],
+        "byte_length": plan["source_replay_ledger_byte_length"],
+        "sha256": plan["source_replay_ledger_sha256"],
+    }
+    if source_ledger_identity != plan_source_identity:
+        raise PermissionError("Current authorization source-replay ledger identity mismatch")
+    provenance = ledger_provenance_from_mapping(document["ledger_provenance"])
+    if provenance.operation != "REPLAY":
+        raise ValueError("Source replay provenance operation mismatch")
+    if provenance.contract_hash != contract.contract_hash:
+        raise ValueError("Source replay provenance contract mismatch")
+    if provenance.partition != plan["partition"]:
+        raise ValueError("Source replay provenance partition mismatch")
+    if provenance.expected_run_count != plan["run_count"]:
+        raise ValueError("Source replay provenance run count mismatch")
+    if provenance.output_root_identity != plan["output_roots"]:
+        raise ValueError("Source replay provenance output-root mismatch")
+    source_authorization = load_authorization(authorization_path)
+    if source_authorization.sha256 != provenance.authorization_hash:
+        raise PermissionError("Source replay authorization semantic identity mismatch")
+    validate_authorization(
+        source_authorization,
+        contract=contract,
+        stable_executable_commit=provenance.stable_executable_commit,
+        executable_inventory_hash=provenance.executable_inventory_hash,
+        tooling_proposal_hash=provenance.tooling_proposal_hash,
+        artifact_contract_hash=provenance.artifact_contract_hash,
+        operation="REPLAY",
+        partition=provenance.partition,
+        run_ids=[row["global_run_id"] for row in plan["runs"]],
+        generation_root=Path(provenance.output_root_identity["generation"]),
+        replay_root=Path(provenance.output_root_identity["replay"]),
+        acceptance_root=Path(provenance.output_root_identity["acceptance"]),
+    )
+    validate_legacy_campaign_manifest_identity(
+        ledger,
+        plan,
+        operation="REPLAY",
+    )
     return provenance
 
 
@@ -190,7 +282,18 @@ def run_preflight(
             byte_length=plan["source_replay_ledger_byte_length"],
             sha256=plan["source_replay_ledger_sha256"],
         )
-        validate_ledger_binding(replay, plan, operation="REPLAY")
+        replay_provenance = load_source_replay_provenance(
+            repo_root,
+            contract=reloaded,
+            plan=plan,
+            ledger=replay,
+        )
+        validate_ledger_binding(
+            replay,
+            plan,
+            operation="REPLAY",
+            provenance=replay_provenance,
+        )
         replay_source = {
             "relative_path": replay["source_generation_ledger_relative_path"],
             "byte_length": replay["source_generation_ledger_byte_length"],
@@ -199,6 +302,7 @@ def run_preflight(
         if replay_source != source_ledgers["generation"]:
             raise ValueError("Acceptance preflight source-ledger cross-binding mismatch")
         source_ledgers["replay"] = replay_identity
+        source_provenance["replay"] = replay_provenance.as_dict()
     evidence = verify_frozen_production_evidence(evidence_paths)
     required_modules = (
         "satnet.experiments.final_generation.orchestrator",

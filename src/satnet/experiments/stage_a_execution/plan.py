@@ -9,6 +9,128 @@ from .contract import FrozenStageAContract
 
 PLAN_SCHEMA = "satnet.stage_a.execution_plan.v2"
 PLAN_HASH_DOMAIN = "satnet_stage_a_execution_plan_v2"
+CAMPAIGN_MANIFEST_HASH_ALGORITHM = "SHA-256"
+LEGACY_CAMPAIGN_MANIFEST_VERSION = "1"
+LEGACY_CAMPAIGN_MANIFEST_ALGORITHM = "satnet.stage_a.campaign_manifest.legacy.v1"
+LEGACY_CAMPAIGN_MANIFEST_DOMAIN = "satnet_stage_a_campaign_manifest_v2"
+OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION = "2"
+OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM = (
+    "satnet.stage_a.campaign_manifest.operation_bound.v2"
+)
+OPERATION_BOUND_CAMPAIGN_MANIFEST_DOMAIN = (
+    "satnet_stage_a_campaign_manifest_operation_bound_v2"
+)
+CAMPAIGN_OPERATIONS = frozenset({"PLAN", "GENERATE", "REPLAY", "ACCEPT"})
+_CAMPAIGN_EXCLUDED_FIELDS = frozenset(
+    {
+        "schema_identifier",
+        "operation",
+        "authorization_hash",
+        "source_generation_ledger_relative_path",
+        "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256",
+        "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length",
+        "source_replay_ledger_sha256",
+        "campaign_manifest_version",
+        "campaign_manifest_algorithm",
+        "campaign_manifest_operation",
+        "campaign_manifest_hash",
+        "plan_hash",
+    }
+)
+
+
+def campaign_manifest_hash(
+    plan: dict[str, Any],
+    *,
+    version: str,
+    algorithm: str,
+    operation: str,
+) -> str:
+    if operation not in CAMPAIGN_OPERATIONS:
+        raise ValueError("Campaign manifest operation is invalid")
+    payload = {
+        key: value
+        for key, value in plan.items()
+        if key not in _CAMPAIGN_EXCLUDED_FIELDS
+    }
+    if version == LEGACY_CAMPAIGN_MANIFEST_VERSION:
+        if algorithm != LEGACY_CAMPAIGN_MANIFEST_ALGORITHM:
+            raise ValueError("Legacy campaign manifest algorithm mismatch")
+        domain = LEGACY_CAMPAIGN_MANIFEST_DOMAIN
+    elif version == OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION:
+        if algorithm != OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM:
+            raise ValueError("Operation-bound campaign manifest algorithm mismatch")
+        payload.update(
+            {
+                "campaign_manifest_algorithm": algorithm,
+                "campaign_manifest_hash_algorithm": CAMPAIGN_MANIFEST_HASH_ALGORITHM,
+                "campaign_manifest_operation": operation,
+                "campaign_manifest_version": version,
+                "operation": operation,
+            }
+        )
+        domain = OPERATION_BOUND_CAMPAIGN_MANIFEST_DOMAIN
+    else:
+        raise ValueError("Campaign manifest version is unsupported")
+    return payload_hash(payload, domain=domain)
+
+
+def campaign_manifest_hash_for_ledger(
+    ledger: dict[str, Any],
+    plan: dict[str, Any],
+    *,
+    version: str,
+    algorithm: str,
+    operation: str,
+) -> str:
+    historical = dict(plan)
+    replacements = {
+        "contract_hash": "contract_hash",
+        "stable_executable_commit": "stable_executable_commit",
+        "executable_inventory_hash": "executable_inventory_hash",
+        "tooling_proposal_hash": "tooling_proposal_hash",
+        "artifact_contract_hash": "artifact_contract_hash",
+        "partition": "partition",
+        "output_roots": "output_root_identity",
+        "run_count": "expected_run_count",
+        "source_generation_ledger_relative_path": "source_generation_ledger_relative_path",
+        "source_generation_ledger_byte_length": "source_generation_ledger_byte_length",
+        "source_generation_ledger_sha256": "source_generation_ledger_sha256",
+        "source_replay_ledger_relative_path": "source_replay_ledger_relative_path",
+        "source_replay_ledger_byte_length": "source_replay_ledger_byte_length",
+        "source_replay_ledger_sha256": "source_replay_ledger_sha256",
+    }
+    for plan_field, ledger_field in replacements.items():
+        historical[plan_field] = ledger[ledger_field]
+    historical["operation"] = operation
+    historical["design_count"] = len({row["design_id"] for row in plan["runs"]})
+    return campaign_manifest_hash(
+        historical,
+        version=version,
+        algorithm=algorithm,
+        operation=operation,
+    )
+
+
+def validate_legacy_campaign_manifest_identity(
+    source: dict[str, Any],
+    plan: dict[str, Any],
+    *,
+    operation: str,
+) -> None:
+    if source.get("operation") != operation:
+        raise ValueError("Historical campaign manifest operation mismatch")
+    expected = campaign_manifest_hash_for_ledger(
+        source,
+        plan,
+        version=LEGACY_CAMPAIGN_MANIFEST_VERSION,
+        algorithm=LEGACY_CAMPAIGN_MANIFEST_ALGORITHM,
+        operation=operation,
+    )
+    if source.get("campaign_manifest_hash") != expected:
+        raise ValueError("Historical legacy campaign manifest hash mismatch")
 
 
 def build_plan(
@@ -72,6 +194,9 @@ def build_plan(
         "artifact_contract_hash": artifact_contract_hash,
         "partition": partition,
         "operation": operation,
+        "campaign_manifest_version": OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION,
+        "campaign_manifest_algorithm": OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM,
+        "campaign_manifest_operation": operation,
         "output_roots": {
             "generation": str(generation_root.resolve(strict=False)),
             "replay": str(replay_root.resolve(strict=False)),
@@ -88,18 +213,11 @@ def build_plan(
         "design_count": len({row["design_id"] for row in records}),
         "runs": records,
     }
-    campaign_manifest = {
-        key: value
-        for key, value in plan.items()
-        if key not in {
-            "schema_identifier", "operation", "authorization_hash",
-            "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
-            "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
-            "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
-        }
-    }
-    plan["campaign_manifest_hash"] = payload_hash(
-        campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"
+    plan["campaign_manifest_hash"] = campaign_manifest_hash(
+        plan,
+        version=OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION,
+        algorithm=OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM,
+        operation=operation,
     )
     plan["plan_hash"] = payload_hash(plan, domain=PLAN_HASH_DOMAIN)
     return plan
@@ -138,17 +256,19 @@ def validate_plan(plan: dict[str, Any]) -> None:
     runs = plan.get("runs")
     if not isinstance(runs, list) or len(runs) != plan.get("run_count"):
         raise ValueError("Plan run count mismatch")
-    campaign_manifest = {
-        key: value
-        for key, value in payload.items()
-        if key not in {
-            "schema_identifier", "operation", "authorization_hash", "campaign_manifest_hash",
-            "source_generation_ledger_relative_path", "source_generation_ledger_byte_length",
-            "source_generation_ledger_sha256", "source_replay_ledger_relative_path",
-            "source_replay_ledger_byte_length", "source_replay_ledger_sha256",
-        }
-    }
-    if plan.get("campaign_manifest_hash") != payload_hash(campaign_manifest, domain="satnet_stage_a_campaign_manifest_v2"):
+    if plan.get("campaign_manifest_version") != OPERATION_BOUND_CAMPAIGN_MANIFEST_VERSION:
+        raise ValueError("Current campaign manifest version mismatch")
+    if plan.get("campaign_manifest_algorithm") != OPERATION_BOUND_CAMPAIGN_MANIFEST_ALGORITHM:
+        raise ValueError("Current campaign manifest algorithm mismatch")
+    if plan.get("campaign_manifest_operation") != plan.get("operation"):
+        raise ValueError("Current campaign manifest operation mismatch")
+    expected_campaign_hash = campaign_manifest_hash(
+        payload,
+        version=plan["campaign_manifest_version"],
+        algorithm=plan["campaign_manifest_algorithm"],
+        operation=plan["campaign_manifest_operation"],
+    )
+    if plan.get("campaign_manifest_hash") != expected_campaign_hash:
         raise ValueError("Campaign manifest hash mismatch")
     required_run_fields = {
         "contract_hash", "design_id", "design_index", "run_key", "global_run_id",

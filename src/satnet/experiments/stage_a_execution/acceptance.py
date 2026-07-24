@@ -56,7 +56,15 @@ def evaluate_acceptance(
         operation="GENERATE",
         provenance=generation_provenance,
     )
-    validate_ledger_binding(replay, plan, operation="REPLAY")
+    replay_provenance = ledger_provenance_from_mapping(
+        preflight.report["source_provenance"]["replay"]
+    )
+    validate_ledger_binding(
+        replay,
+        plan,
+        operation="REPLAY",
+        provenance=replay_provenance,
+    )
     replay_source_identity = {
         "relative_path": replay["source_generation_ledger_relative_path"],
         "byte_length": replay["source_generation_ledger_byte_length"],
