@@ -1,0 +1,257 @@
+{
+  "audit_branch": "audit/stage-a-operation-bound-campaign-identity-v1",
+  "audit_date": "2026-07-24",
+  "audit_scope": {
+    "approved_acceptance_audit_base": "4fd46f10984957a20037fa3a2f5b0db86b8149c4",
+    "expected_ancestry": [
+      "4fd46f10984957a20037fa3a2f5b0db86b8149c4",
+      "b1da92c3184ee86997079f1eb458fae95d994c22",
+      "5bed52b8a9f0831432da22f189357069c70492c5",
+      "40337b161ba10b1288804199434fa373ba1f3b3a",
+      "fbbad12ffb5caddb580705be737751e423672156",
+      "3c8389252f46af81102df1dd10cffd95c21fc01f"
+    ],
+    "full_execution_tooling_audit_repeated": false,
+    "full_frozen_contract_audit_repeated": false,
+    "full_scientific_audit_repeated": false,
+    "remediation_head": "3c8389252f46af81102df1dd10cffd95c21fc01f",
+    "runtime_files_reviewed": [
+      "src/satnet/experiments/stage_a_execution/acceptance.py",
+      "src/satnet/experiments/stage_a_execution/plan.py",
+      "src/satnet/experiments/stage_a_execution/preflight.py"
+    ],
+    "test_files_reviewed": [
+      "tests/experiments/stage_a_execution/test_execution_replay_acceptance.py",
+      "tests/experiments/stage_a_execution/test_operation_bound_campaign_identity.py",
+      "tests/experiments/stage_a_execution/test_remediation_controls.py",
+      "tests/experiments/stage_a_execution/test_replay_source_ledger_campaign_binding.py"
+    ]
+  },
+  "binding_findings": [],
+  "campaign_identity_design": {
+    "fail_closed_validation": {
+      "hash_mismatch_rejected": true,
+      "identity_algorithm_mismatch_rejected": true,
+      "identity_version_mismatch_rejected": true,
+      "invalid_operation_rejected": true,
+      "plan_operation_disagreement_rejected": true
+    },
+    "hidden_bypass_review": {
+      "environment_override_added": false,
+      "hard_coded_known_hash_compatibility_added": false,
+      "hidden_bypass_added": false,
+      "machine_specific_exception_added": false
+    },
+    "legacy_v1": {
+      "algorithm": "satnet.stage_a.campaign_manifest.legacy.v1",
+      "historical_operation_excluding_payload_preserved": true,
+      "historical_reconstruction_only": true,
+      "version": "1"
+    },
+    "operation_bound_v2": {
+      "algorithm": "satnet.stage_a.campaign_manifest.operation_bound.v2",
+      "canonical_identity_fields": [
+        "campaign_manifest_version",
+        "campaign_manifest_algorithm",
+        "campaign_manifest_hash_algorithm",
+        "campaign_manifest_operation",
+        "operation"
+      ],
+      "deterministic_repeated_construction": true,
+      "hash_algorithm": "SHA-256",
+      "version": "2"
+    }
+  },
+  "campaign_identities": {
+    "historical_legacy_v1": {
+      "GENERATE": "af76d64bbabdb055d413a1c3e2f28809749710d67f7819465d45c0ef0769e164",
+      "REPLAY": "3a8a62a5e73c81503e5b75d0c44a820eb545596968d837aa72e7e1719a7e3a50",
+      "completed_ledgers_reconstructed_without_modification": true,
+      "reinterpreted_as_v2": false,
+      "verification": "PASSED"
+    },
+    "operation_bound_v2": {
+      "ACCEPT": "c7020e85471d12a5cdb1ff33df614bbd3d04ff58f422ad5c4d60d87328bc3bf6",
+      "GENERATE": "2112215254ee7bb72569b9fbb87cb7ed1be46107452fc0ac13838af5d6892e9e",
+      "REPLAY": "cc50220189cc849431319fc9ce80b486e76beb6de3c25164ec24f74ff024cb44",
+      "distinct_identity_count": 3,
+      "prospective_accept_differs_from_historical_replay": true,
+      "prospective_accept_differs_from_operation_bound_replay": true,
+      "verification": "PASSED"
+    }
+  },
+  "deselected_obsolete_snapshots": {
+    "count": 6,
+    "remediation_failure_hidden": false,
+    "snapshots": [
+      {
+        "classification": "HISTORICAL_ROOT_STATE_ASSUMPTION",
+        "node_id": "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_contract_loader_verifies_exact_frozen_bundle_and_partitions"
+      },
+      {
+        "classification": "HISTORICAL_ROOT_STATE_ASSUMPTION",
+        "node_id": "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_generation_adapter_arguments_are_exactly_frozen_and_do_not_execute"
+      },
+      {
+        "classification": "HISTORICAL_ROOT_STATE_ASSUMPTION",
+        "node_id": "tests/experiments/stage_a_execution/test_contract_plan_authorization.py::test_development_plan_is_exact_ordered_and_deterministic"
+      },
+      {
+        "classification": "HISTORICAL_ROOT_STATE_ASSUMPTION",
+        "node_id": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_cli_plan_default_deny_and_holdout_redaction"
+      },
+      {
+        "classification": "SUPERSEDED_EXECUTABLE_IDENTITY_SNAPSHOT",
+        "node_id": "tests/experiments/stage_a_execution/test_paths_cli_inventory.py::test_inventory_is_canonical_ordered_and_self_excluding"
+      },
+      {
+        "classification": "HISTORICAL_ROOT_STATE_ASSUMPTION",
+        "node_id": "tests/experiments/stage_a_execution/test_remediation_controls.py::test_proposal_generator_reproduces_all_artifacts_byte_for_byte"
+      }
+    ]
+  },
+  "evidence_bundle": {
+    "artifact_count_excluding_inventory": 7,
+    "evidence_inventory_sha256": "046764edd17a2069322479e8e5a56dd8f611417dab90496640d9aa694f389f16",
+    "fresh_checkout_git_blob_mismatch_count": 0,
+    "membership_exact": true,
+    "recorded_byte_length_mismatch_count": 0,
+    "recorded_sha256_mismatch_count": 0,
+    "text_attribute": "unset",
+    "verification": "PASSED"
+  },
+  "executable_identity": {
+    "artifact_count": 71,
+    "exact_byte_length_sha256_and_git_blob_mismatch_count": 0,
+    "exact_membership_regenerated": true,
+    "executable_inventory_sha256": "2ebac3bb615ed3204edc1359a78f78e4354495364fa1f76dfd1648b417df7b56",
+    "fresh_checkout_core_autocrlf": true,
+    "fresh_checkout_detached_head": "3c8389252f46af81102df1dd10cffd95c21fc01f",
+    "fresh_checkout_status": "CLEAN",
+    "import_resolution": "EXPECTED_REPOSITORY_FILES",
+    "post_stable_executable_changes": [],
+    "python_files_compiled_in_memory": 71,
+    "stable_executable_commit": "b1da92c3184ee86997079f1eb458fae95d994c22",
+    "stable_identity_sha256": "1902a91a38e87faef6fe99c2e1f7aa4c3aa8dd6febf38e6a5b43a272b190c7f9",
+    "verification": "PASSED"
+  },
+  "historical_snapshot_results": {
+    "acceptance_review": {
+      "classification": "MISSING_OPTIONAL_EXTERNAL_CHECKOUT_ENVIRONMENT",
+      "current_regression_represented": false,
+      "failed_or_not_run": 1,
+      "passed": 5,
+      "reason": "The sole external-checkout node requires SATNET_ACCEPTANCE_AUTHORIZATION_FRESH_CHECKOUT, which was intentionally unset."
+    },
+    "replay_preflight": {
+      "classification": "HISTORICAL_REPLAY_ROOT_STATE_ASSUMPTIONS",
+      "current_regression_represented": false,
+      "failed": 12,
+      "passed": 2,
+      "reason": "The unchanged snapshot expects the now-completed replay root to be absent."
+    },
+    "tooling_audits": {
+      "classifications": [
+        "OBSOLETE_SYNTHETIC_PROVENANCE_HOOK",
+        "SUPERSEDED_EXECUTABLE_IDENTITY_SNAPSHOT",
+        "HISTORICAL_PREEXECUTION_ROOT_AND_AUTHORIZATION_STATE"
+      ],
+      "current_regression_represented": false,
+      "failed": 4,
+      "passed": 6,
+      "skipped": 37
+    }
+  },
+  "historical_snapshot_safety_conclusion": {
+    "accept_provenance_or_comparison_defect": false,
+    "changed_generation_or_replay_evidence": false,
+    "failed_historical_ledger_reconstruction": false,
+    "historical_tests_or_evidence_modified_to_force_green": false,
+    "weakened_fail_closed_validation": false
+  },
+  "immutable_source_evidence": {
+    "generation": {
+      "adapter_passed_count": 100,
+      "artifact_byte_count": 365309146,
+      "artifact_file_count": 1900,
+      "artifact_mismatch_count": 0,
+      "ledger_byte_length": 1060132,
+      "ledger_sha256": "9df1448612d4719d164cf014a2ab60d932d82ab07a90e05c50a0c1650b097328",
+      "root_file_count": 1902,
+      "root_total_bytes": 366369907,
+      "science_passed_count": 100,
+      "succeeded_count": 100
+    },
+    "membership_order_run_record_hash_and_four_seed_mismatch_count": 0,
+    "replay": {
+      "adapter_passed_count": 100,
+      "artifact_byte_count": 365491986,
+      "artifact_file_count": 2000,
+      "artifact_mismatch_count": 0,
+      "generation_ledger_cross_binding": "PASSED",
+      "ledger_byte_length": 1079014,
+      "ledger_sha256": "140bda39b3f519d7baeae09d222cd3f6c80791ff03215c11c48dd66fb6e8b9bb",
+      "replay_report_count": 100,
+      "root_file_count": 2001,
+      "root_total_bytes": 366571000,
+      "science_passed_count": 100,
+      "succeeded_count": 100
+    },
+    "source_snapshots_unchanged_during_audit": true,
+    "verification": "PASSED"
+  },
+  "preflight_control_review": {
+    "acceptance_root_absent": true,
+    "authorization_enforced": true,
+    "comparison_executed": false,
+    "dependencies_available": true,
+    "disk_control_enforced": true,
+    "executable_identity_enforced": true,
+    "frozen_evidence_byte_count": 1337549193,
+    "frozen_evidence_sha256_verified_file_count": 9004,
+    "generation_and_replay_campaigns_not_compared_to_current_accept_campaign": true,
+    "generation_and_replay_roots_immutable_sources": true,
+    "generation_provenance": "PASSED",
+    "lock_controls_enforced": true,
+    "preflight": "PASSED",
+    "preflight_created_acceptance_root": false,
+    "protected_path_controls_enforced": true,
+    "replay_generation_ledger_cross_binding": "PASSED",
+    "replay_provenance": "PASSED",
+    "repository_and_worktree_controls_enforced": true,
+    "root_overlap_controls_enforced": true,
+    "simulation_executed": false,
+    "source_artifact_validation_fail_closed": true,
+    "source_ledger_path_length_sha256_membership_and_seed_validation_fail_closed": true
+  },
+  "root_and_governance_state": {
+    "accept_executed": false,
+    "acceptance_authorization_created_or_modified": false,
+    "acceptance_proposal_created_or_modified": false,
+    "acceptance_root_exists": false,
+    "campaign_recovery_or_run_lock_count": 0,
+    "comparison_executed": false,
+    "failed_directory_count": 0,
+    "generate_executed": false,
+    "generation_evidence_modified": false,
+    "generation_root_exists": true,
+    "in_progress_directory_count": 0,
+    "merge_performed": false,
+    "push_performed": false,
+    "replay_evidence_modified": false,
+    "replay_executed": false,
+    "replay_root_exists": true,
+    "simulation_executed": false,
+    "tag_created_or_modified": false
+  },
+  "schema_identifier": "satnet.stage_a.operation_bound_campaign_identity_v1_independent_audit.v1",
+  "test_results": {
+    "authoritative_regression": "9 passed",
+    "current_directly_affected": "78 passed, 6 deselected",
+    "full_current_collection_before_deselection": "78 passed, 6 obsolete snapshot failures",
+    "historical_acceptance_review": "5 passed, 1 optional external-checkout node not run/failed because environment was unset",
+    "historical_replay_preflight": "2 passed, 12 failed",
+    "historical_tooling_audits": "6 passed, 4 failed, 37 skipped"
+  },
+  "verdict": "APPROVED FOR SUPERSEDING STAGE A DEVELOPMENT ACCEPTANCE AUTHORIZATION PROPOSAL"
+}
