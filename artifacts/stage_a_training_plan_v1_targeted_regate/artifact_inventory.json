@@ -1,0 +1,38 @@
+{
+  "inventory_version": "1",
+  "inventory_scope": "artifacts/stage_a_training_plan_v1_targeted_regate",
+  "self_excluding": true,
+  "artifact_count_excluding_inventory": 6,
+  "artifacts": [
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/preprocessing_serialization_verification.json",
+      "bytes": 4286,
+      "sha256": "6accd48075273c5e175ab961a1223254790bda0a0d7d1f51a8328d0aa17d9901"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/README.md",
+      "bytes": 3093,
+      "sha256": "70b87bf87c51d09f31f84d2fe8a6aba7ceff3702b1e31b9c3a8f5d43e6762035"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/regression_formula_verification.json",
+      "bytes": 3526,
+      "sha256": "7cf6f8f92c500943ea04eef956e4f242ca2b42005341e73c0a331d599899febb"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/rf_parameter_completeness_verification.json",
+      "bytes": 4361,
+      "sha256": "c660885c9d7b5e74c45d878d2ed7fd26156eaae9edcbe3387573fe6988601808"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/rf_simplicity_order_verification.json",
+      "bytes": 2654,
+      "sha256": "0a68e8ad823624df8e719baaaf6197c9a80b95a0e2042d3b8ac6608aea8c0a1e"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_targeted_regate/targeted_regate_report.json",
+      "bytes": 5118,
+      "sha256": "8af13a485767eb4179483daec8620c3f427c2f93cd375dc1ba9bba8987dc9c34"
+    }
+  ]
+}

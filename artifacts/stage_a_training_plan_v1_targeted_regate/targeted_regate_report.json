@@ -1,0 +1,101 @@
+{
+  "gate_id": "stage_a_training_plan_v1_targeted_independent_regate",
+  "gate_scope": "Only the four defects identified by the prior blocked gate; no full training-plan re-audit",
+  "evaluated_at": "2026-08-03",
+  "plan_id": "stage_a_training_plan_v1",
+  "plan_root": "artifacts/stage_a_training_plan_v1",
+  "remediated_training_plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+  "original_training_plan_head": "7607eb88156862706e74710fc8da42db66abc862",
+  "prior_blocked_gate_commit": "67e2633e10d942165b64008570e3f7cb1396e0f6",
+  "prior_blocked_gate_report_sha256": "75560841527dae6c3526bafc1c41d8adbfcf9e00f491a9d05a819f39e3b409df",
+  "targeted_checks": {
+    "rf_parameter_completeness": {
+      "result": "passed",
+      "candidates_per_task": 24,
+      "total_candidates": 48,
+      "successful_constructor_validations": 48,
+      "missing_parameter_count": 0,
+      "extra_parameter_count": 0,
+      "constructor_failure_count": 0,
+      "n_jobs_violation_count": 0,
+      "fit_called": false
+    },
+    "rf_simplicity_order": {
+      "result": "passed",
+      "exact_key": "(n_estimators, max_depth_is_none, max_depth_value_if_not_none_else_0, -min_samples_leaf, max_features_simplicity_rank, candidate_index)",
+      "finite_depth_precedes_none": true,
+      "fewer_estimators_is_simpler": true,
+      "larger_min_samples_leaf_is_simpler": true,
+      "sqrt_rank": 0,
+      "max_features_0_75_rank": 1,
+      "candidate_index_final_tie_break": true,
+      "all_48_keys_unique": true,
+      "fixed_none_parameters_do_not_create_comparisons": true
+    },
+    "regression_metric_formulas": {
+      "result": "passed",
+      "run_level_formulas_exact": true,
+      "design_level_formulas_exact": true,
+      "exactly_five_realizations_per_design": true,
+      "residual_sign_exact": true,
+      "population_residual_denominator_N": true,
+      "zero_r2_denominator_is_null_without_zero_substitution": true,
+      "design_bootstrap_contract_exact": true,
+      "deterministic_record_order_exact": true,
+      "interpretation_required": false,
+      "test_targets_read": false
+    },
+    "preprocessing_serialization": {
+      "result": "passed",
+      "artifact_type": "stage_a_tgnn_preprocessing_statistics_v1",
+      "schema_and_feature_contract_exact": true,
+      "canonical_json_byte_contract_exact": true,
+      "float64_hex_contract_exact": true,
+      "sha256_byte_domain_and_external_byte_count_exact": true,
+      "zero_variance_and_sentinel_policy_exact": true,
+      "synthetic_constant_only_probe_used": true,
+      "production_data_or_fitted_statistics_read_or_calculated": false
+    }
+  },
+  "change_scope": {
+    "result": "passed",
+    "declared_plan_artifacts_compared": 13,
+    "updated_plan_artifacts_expected": 7,
+    "updated_plan_artifacts_observed": 7,
+    "updated_plan_artifact_paths": [
+      "artifacts/stage_a_training_plan_v1/README.md",
+      "artifacts/stage_a_training_plan_v1/artifact_inventory.json",
+      "artifacts/stage_a_training_plan_v1/model_selection_policy.json",
+      "artifacts/stage_a_training_plan_v1/preprocessing_specification.json",
+      "artifacts/stage_a_training_plan_v1/regression_metric_policy.json",
+      "artifacts/stage_a_training_plan_v1/rf_training_specification.json",
+      "artifacts/stage_a_training_plan_v1/stage_a_training_plan.json"
+    ],
+    "unchanged_plan_artifacts_expected": 6,
+    "unchanged_plan_artifacts_observed": 6,
+    "unchanged_artifact_identity_result": "byte-identical to original plan",
+    "unchanged_artifacts": {
+      "classification_metric_and_imbalance_policy.json": "5b4dae673920520fb752e4d805e5dd7ca6f899937c2c1ddb34548452759b7792",
+      "common_split_usage_policy.json": "487e4b1d14c23eb09be9175ecb05f7fa692763f03033ca8ef7af6c9fa458b3d5",
+      "compute_budget.json": "5981bd2e66dc3a3fbc5c0771094a1db16f0e000e3f58c2a240270a72a3c0b188",
+      "final_test_opening_protocol.json": "c1e243f99b0371045a4a8fe38b7fc4755a044813d4de05d16d6b8b4bb205d1c0",
+      "reproducibility_and_seed_schedule.json": "9fbd4cde8089f4811d6b886c8105c947535282b12d83d7667d93bb60e57e27a3",
+      "tgnn_training_specification.json": "ee9c386b30babe356ddc680d34b9a1c38b965e4bbef146ce921bd57be956f654"
+    },
+    "prior_blocked_gate_artifacts_modified": false,
+    "accepted_datasets_modified": false,
+    "dataset_gate_artifacts_modified": false,
+    "torch_sparse_modified": false
+  },
+  "non_execution_confirmation": {
+    "rf_fit_called": false,
+    "tgnn_epoch_executed": false,
+    "training_optimizer_instantiated": false,
+    "checkpoint_created": false,
+    "fitted_preprocessing_statistics_created": false,
+    "test_target_read_or_materialized": false,
+    "production_dataset_read_or_materialized": false,
+    "gate_operations": "Plan-artifact reads, JSON contract inspection, SHA-256 and byte-count identity checks, git identity/scope checks, installed scikit-learn version and get_params(deep=False) inspection, 48 RF constructor calls without fit, and an in-memory synthetic canonical-serialization probe only."
+  },
+  "verdict": "STAGE A TRAINING PLAN V1 ACCEPTED — READY FOR RF CLASSIFICATION TRAINING AUTHORIZATION"
+}
