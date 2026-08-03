@@ -1,0 +1,19 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_artifact_inventory",
+  "status": "complete",
+  "self_excluding": true,
+  "inventory_scope": "All committed Stage A TGNN CPU runtime preparation evidence files; this inventory intentionally excludes its own SHA-256.",
+  "artifacts": [
+    {"path": "environment_setup_commands.ps1", "bytes": 2211, "sha256": "d92e5ef6dde887a6cb3d9789694e1b6307dfd63a4c9b24f52e3aed49b7df864c"},
+    {"path": "gclstm_import_and_constructor_report.json", "bytes": 1600, "sha256": "336150c826050060c7f1a09990ffb1f05dbc560caa607d91639067e023f49fe5"},
+    {"path": "installed_package_inventory.json", "bytes": 4852, "sha256": "a57632c1cc89c5ab728c8c309fd43dc614d143a37a9354bf1f965ae65df7c660"},
+    {"path": "native_extension_verification.json", "bytes": 2665, "sha256": "7064a9b34ce47d06db104e3c104affb94d7019a8f06fc86f852dc88af94620bd"},
+    {"path": "README.md", "bytes": 3259, "sha256": "311936effb0e8347b438506c6b044fe5d8941792255b5c5f0840a7086cc2a2ae"},
+    {"path": "runtime_environment_manifest.json", "bytes": 2421, "sha256": "b12281b6ea90ad7e777b2ed75f23955abc9e4b9791454046af1eea5bb15f8bf1"},
+    {"path": "synthetic_zero_edge_smoke_report.json", "bytes": 1453, "sha256": "247cc656872ed2434c91a33194b2b278e03cc28e2398fa53461ebd180b856b58"}
+  ],
+  "required_outputs_present": true,
+  "training_performed": false,
+  "dataset_sequences_opened": false,
+  "independent_runtime_gate_performed": false
+}

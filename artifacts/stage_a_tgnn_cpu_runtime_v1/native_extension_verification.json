@@ -1,0 +1,66 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_native_extension_verification",
+  "status": "pass",
+  "environment_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "imports": {
+    "import torch": "pass",
+    "import torch_geometric": "pass",
+    "import torch_geometric_temporal": "pass",
+    "import torch_sparse": "pass",
+    "import torch_scatter": "pass",
+    "from torch_geometric_temporal.nn.recurrent import GCLSTM": "pass"
+  },
+  "native_loader_result": {
+    "torch_sparse_version_extension": "torch_sparse\\_version_cpu.pyd loaded successfully",
+    "torch_scatter_version_extension": "torch_scatter\\_version_cpu.pyd loaded successfully",
+    "winerror_127": false,
+    "missing_dll_error": false,
+    "cuda_dll_load": false,
+    "cuda_version_mismatch_warning": false,
+    "warnings_during_import": []
+  },
+  "native_extension_inventory": {
+    "torch_sparse": {
+      "wheel": "torch_sparse-0.6.18+pt212cpu-cp311-cp311-win_amd64.whl",
+      "distribution_version": "0.6.18+pt212cpu",
+      "native_files": [
+        "torch_sparse\\_convert_cpu.pyd",
+        "torch_sparse\\_diag_cpu.pyd",
+        "torch_sparse\\_ego_sample_cpu.pyd",
+        "torch_sparse\\_hgt_sample_cpu.pyd",
+        "torch_sparse\\_metis_cpu.pyd",
+        "torch_sparse\\_neighbor_sample_cpu.pyd",
+        "torch_sparse\\_relabel_cpu.pyd",
+        "torch_sparse\\_rw_cpu.pyd",
+        "torch_sparse\\_saint_cpu.pyd",
+        "torch_sparse\\_sample_cpu.pyd",
+        "torch_sparse\\_spmm_cpu.pyd",
+        "torch_sparse\\_version_cpu.pyd"
+      ],
+      "cuda_native_files": []
+    },
+    "torch_scatter": {
+      "wheel": "torch_scatter-2.1.2+pt212cpu-cp311-cp311-win_amd64.whl",
+      "distribution_version": "2.1.2+pt212cpu",
+      "native_files": [
+        "torch_scatter\\_scatter_cpu.pyd",
+        "torch_scatter\\_segment_coo_cpu.pyd",
+        "torch_scatter\\_segment_csr_cpu.pyd",
+        "torch_scatter\\_version_cpu.pyd"
+      ],
+      "cuda_native_files": []
+    }
+  },
+  "native_file_sha256": {
+    "torch_sparse\\_version_cpu.pyd": "4ec99ee36bcafe94f8620544641a8e920a2bea264b1b608c21aab0db65273b9a",
+    "torch_scatter\\_version_cpu.pyd": "af4648a37caca673292980aac33d5208ce1bb300df8e8f9b570ec31c83de3538"
+  },
+  "cuda_dependency_check": {
+    "torch_version_cuda": null,
+    "torch_cuda_is_available": false,
+    "nvidia_distributions": [],
+    "site_packages_cuda_runtime_dlls": [],
+    "interpretation": "The CPU wheel contains CUDA-related headers/source names, but no CUDA runtime DLLs, NVIDIA distributions, or CUDA-tagged PyG native extensions were installed or loaded."
+  },
+  "no_training_or_dataset_access": true
+}
