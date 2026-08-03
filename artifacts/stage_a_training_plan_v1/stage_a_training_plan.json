@@ -1,7 +1,7 @@
 {
   "plan_id": "stage_a_training_plan_v1",
   "status": "frozen",
-  "verdict": "STAGE A TRAINING PLAN V1 FROZEN — READY FOR NARROW INDEPENDENT PLAN GATE",
+  "verdict": "STAGE A TRAINING PLAN V1 REMEDIATED — READY FOR TARGETED INDEPENDENT RE-GATE",
   "freeze_date": "2026-08-03",
   "scope": "Training, validation, model selection, preprocessing, reproducibility, and final-test authorization only.",
   "prohibited_in_this_task": [
@@ -13,6 +13,19 @@
     "modification of unrelated worktree files",
     "independent training-plan gate execution"
   ],
+  "remediation_provenance": {
+    "original_plan_head": "7607eb88156862706e74710fc8da42db66abc862",
+    "blocked_gate_commit": "67e2633e10d942165b64008570e3f7cb1396e0f6",
+    "blocked_gate_report_sha256": "75560841527dae6c3526bafc1c41d8adbfcf9e00f491a9d05a819f39e3b409df",
+    "remediated_defects": [
+      "Freeze every RandomForestClassifier and RandomForestRegressor estimator parameter returned by installed scikit-learn 1.9.0 get_params(deep=False), including n_jobs=1, in all 48 executable candidate dictionaries.",
+      "Define the complete deterministic RF simplicity lexicographic key, including max_features sqrt rank 0 and 0.75 rank 1 and explicit None handling.",
+      "Freeze exact regression run-level, design-level, residual, and design-aware bootstrap metric formulas and record ordering.",
+      "Freeze the exact future TGNN preprocessing statistics artifact schema, canonical JSON serialization, float64 hex statistics representation, SHA-256 byte domain, and byte-count recording."
+    ],
+    "all_other_frozen_policies_unchanged": true,
+    "amendment_scope": "Only the four listed defects and their necessary cross-references are amended; accepted datasets, dataset gates, and prior blocked gate artifacts are unchanged."
+  },
   "authoritative_inputs": {
     "rf": {
       "dataset_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_rf_dataset_v1",

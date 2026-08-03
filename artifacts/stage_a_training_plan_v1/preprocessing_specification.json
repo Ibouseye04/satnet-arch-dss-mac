@@ -2,7 +2,7 @@
   "specification_id": "stage_a_preprocessing_v1",
   "status": "frozen",
   "fit_boundary": "Every fitted statistic is computed from training split examples only, after split assignment and before validation evaluation. Validation and test use the frozen training-derived transform.",
-  "fitted_artifact_policy": "No fitted preprocessing artifact, statistics file, or transformed dataset is created by this planning task.",
+  "fitted_artifact_policy": "No fitted preprocessing artifact, statistics file, or transformed dataset is created by this planning task; no fitted statistic is calculated here.",
   "rf": {
     "transform": "none",
     "reason": "The accepted RF predictors are numeric design/configuration fields and the selected estimators are tree-based; no scaling is required or permitted."
@@ -36,16 +36,128 @@
       "ground_station_class_military",
       "operational_indicator"
     ],
-    "transform": "training-only standardization z=(x-training_mean)/training_population_std for applicable values",
-    "statistic_convention": "one global training-derived mean and population standard deviation per scaled feature across training designs, realizations, snapshots, and applicable nodes; if a fitted standard deviation is exactly zero, use scale=1.0 and record that degenerate-feature rule",
-    "applicability_masks": {
-      "ground_only_features": "latitude_deg, longitude_deg, altitude_m, ecef_x_km, ecef_y_km, ecef_z_km are fitted only on ground-station nodes",
-      "satellite_only_indices": "plane_index and satellite_within_plane_index remain unscaled and are zero on ground-station nodes",
-      "one_hot_and_status": "node-type, station-class, and operational_indicator fields remain binary and unscaled"
-    },
-    "sentinel_zero_policy": "Canonical positive zero for a non-applicable field remains exactly zero after transformation; it is excluded from fitted statistics through the applicability mask. An applicable physical value equal to zero is included using its node-type applicability mask, so sentinel and physical zero are not conflated.",
-    "temporal_policy": "Statistics are pooled over training snapshots only; no validation/test snapshot contributes to fitting, and no per-run or per-snapshot refit is allowed."
+    "transform": "training-only standardization z=(x-training_mean)/training_population_std for applicable values"
   },
+  "future_fitted_artifact": {
+    "artifact_type": "stage_a_tgnn_preprocessing_statistics_v1",
+    "schema_version": "stage_a_tgnn_preprocessing_statistics_v1",
+    "top_level_field_order_is_not_semantic": "Canonical serialization sorts object keys lexicographically; arrays retain the defined semantic order.",
+    "required_fields": [
+      "schema_version",
+      "dataset_manifest_identities",
+      "training_index_sha256",
+      "accepted_node_feature_order",
+      "scaled_feature_order",
+      "applicability_masks",
+      "per_feature_statistics",
+      "zero_variance_policy",
+      "fit_split",
+      "fit_sample_count",
+      "fit_design_count"
+    ],
+    "forbidden_fields": ["timestamp", "created_at", "absolute_path", "machine_specific_path"],
+    "path_policy": "The future artifact contains no machine-specific absolute paths; dataset identity is represented by accepted manifest SHA-256 values only.",
+    "field_definitions": {
+      "schema_version": "The literal string stage_a_tgnn_preprocessing_statistics_v1.",
+      "dataset_manifest_identities": "The accepted RF and TGNN dataset manifest SHA-256 identities used by the fit; no machine-specific absolute paths.",
+      "training_index_sha256": "SHA-256 of the exact canonical UTF-8 bytes of the frozen training index consumed by fitting.",
+      "accepted_node_feature_order": "The exact 14-feature order frozen in tgnn_node_features.exact_order.",
+      "scaled_feature_order": "The exact six-feature order frozen in tgnn_node_features.scaled_features.",
+      "applicability_masks": "Named node-type masks that determine which values are fitted and transformed for each scaled feature.",
+      "per_feature_statistics": "An array in scaled_feature_order; each record has exactly the required per-feature fields.",
+      "zero_variance_policy": "The frozen behavior for population standard deviation equal to zero.",
+      "fit_split": "The literal string train.",
+      "fit_sample_count": "The number of training samples/realization sequences included in the fit, recorded as an integer.",
+      "fit_design_count": "The number of distinct training design_id values included in the fit, recorded as an integer."
+    },
+    "dataset_manifest_identities": {
+      "rf_manifest_sha256": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+      "tgnn_manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e"
+    },
+    "accepted_node_feature_order": [
+      "node_type_satellite",
+      "node_type_ground_station",
+      "plane_index",
+      "satellite_within_plane_index",
+      "ground_station_class_civilian",
+      "ground_station_class_government",
+      "ground_station_class_military",
+      "latitude_deg",
+      "longitude_deg",
+      "altitude_m",
+      "ecef_x_km",
+      "ecef_y_km",
+      "ecef_z_km",
+      "operational_indicator"
+    ],
+    "scaled_feature_order": ["latitude_deg", "longitude_deg", "altitude_m", "ecef_x_km", "ecef_y_km", "ecef_z_km"],
+    "applicability_masks": {
+      "latitude_deg": "node_type_ground_station is true",
+      "longitude_deg": "node_type_ground_station is true",
+      "altitude_m": "node_type_ground_station is true",
+      "ecef_x_km": "node_type_ground_station is true",
+      "ecef_y_km": "node_type_ground_station is true",
+      "ecef_z_km": "node_type_ground_station is true",
+      "mask_source": "Node type and these frozen masks determine applicability; value == 0 never determines applicability."
+    },
+    "per_feature_statistics_record": {
+      "required_fields": [
+        "feature_name",
+        "applicability_node_type",
+        "applicable_value_count",
+        "mean_float64_hex",
+        "population_std_float64_hex",
+        "zero_variance"
+      ],
+      "field_definitions": {
+        "feature_name": "One feature from scaled_feature_order.",
+        "applicability_node_type": "The node type accepted by the corresponding applicability mask; ground_station.",
+        "applicable_value_count": "Count of applicable training values used for that feature's statistics.",
+        "mean_float64_hex": "Python float.hex() string after conversion to IEEE-754 float64.",
+        "population_std_float64_hex": "Python float.hex() string for the population standard deviation after conversion to IEEE-754 float64.",
+        "zero_variance": "Boolean true exactly when the population standard deviation is zero."
+      },
+      "array_order": "Records appear in exactly scaled_feature_order."
+    },
+    "fit_split": "train",
+    "fit_sample_count": "Integer populated by the future fit; no value is calculated in this planning task.",
+    "fit_design_count": "Integer populated by the future fit; no value is calculated in this planning task.",
+    "zero_variance_policy": {
+      "retain_feature": true,
+      "transformed_applicable_value": 0.0,
+      "record_zero_variance": true,
+      "division_by_zero": "never divide by zero; use transformed value 0.0 for applicable values when population standard deviation is zero"
+    },
+    "serialization": {
+      "format": "JSON",
+      "encoding": "UTF-8",
+      "byte_order_mark": false,
+      "ensure_ascii": false,
+      "allow_nan": false,
+      "sort_keys": true,
+      "separators": [",", ":"],
+      "indentation": null,
+      "trailing_spaces": false,
+      "trailing_newline": false,
+      "array_order": "Defined semantic array order is retained; sort_keys applies only to JSON object keys.",
+      "canonical_bytes": "Encode the exact JSON text using UTF-8 after applying these settings, with no byte-order mark and no final newline."
+    },
+    "hashing": {
+      "algorithm": "SHA-256",
+      "input": "The exact canonical UTF-8 JSON bytes of the statistics artifact.",
+      "self_hash_field": false,
+      "record_locations": ["training artifact inventory", "execution manifest"],
+      "record_exact_file_byte_count": true
+    }
+  },
+  "statistic_convention": "One global training-derived mean and population standard deviation per scaled feature across training designs, realizations, snapshots, and applicable nodes; no validation or test value contributes to fitting.",
+  "applicability_masks": {
+    "ground_only_features": "latitude_deg, longitude_deg, altitude_m, ecef_x_km, ecef_y_km, ecef_z_km are fitted only on ground-station nodes",
+    "satellite_only_indices": "plane_index and satellite_within_plane_index remain unscaled and are zero on ground-station nodes",
+    "one_hot_and_status": "node-type, station-class, and operational_indicator fields remain binary and unscaled"
+  },
+  "sentinel_zero_policy": "Canonical positive zero for a non-applicable field remains exactly zero after transformation; it is excluded from fitted statistics through the applicability mask. An applicable physical value equal to zero is included using its node-type applicability mask, so sentinel and physical zero are not conflated. Non-applicable values remain exactly 0.0 after transformation.",
+  "temporal_policy": "Statistics are pooled over training snapshots only; no validation/test snapshot contributes to fitting, and no per-run or per-snapshot refit is allowed.",
   "tgnn_edge_attributes": {
     "dimension": 10,
     "exact_order": [
