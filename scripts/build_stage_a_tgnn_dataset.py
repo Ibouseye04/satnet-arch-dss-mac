@@ -480,7 +480,7 @@ def build_dataset(freeze_bundle: Path, production_root: Path, contract_root: Pat
     sequence_dir.mkdir(exist_ok=True)
     indexes: dict[str, list[dict[str, Any]]] = defaultdict(list)
     provenance: list[dict[str, Any]] = []
-    structural: dict[str, Any] = {"all_sequences": True, "train_validation_sequences_load": True, "timesteps_ordered": True, "node_schema_valid": True, "edge_schema_valid": True, "feature_dimensions_consistent": True, "edge_indexes_valid": True, "target_fields_in_graph_inputs": 0, "future_information_leakage": 0, "missing_train_validation_targets": 0}
+    structural: dict[str, Any] = {"all_sequences_load": True, "train_validation_sequences_load": True, "timesteps_ordered": True, "node_schema_valid": True, "edge_schema_valid": True, "feature_dimensions_consistent": True, "edge_indexes_valid": True, "target_fields_in_graph_inputs": 0, "future_information_leakage": 0, "missing_train_validation_targets": 0}
     sequence_stats: list[dict[str, Any]] = []
     source_hash_checks = {"freeze_manifest": True, "contract_specification": True, "design_manifest": True, "run_manifest": True, "split_manifest_exact_file": True, "generation_ledger": True, "source_result_files": 0, "source_scientific_inventory_files": 0, "source_graph_files": 0, "source_ground_failure_realization_files": 0, "source_target_files_train_validation": 0, "test_targets_read": False}
     for run in sorted(runs, key=lambda row: row["run_id"]):
@@ -563,22 +563,28 @@ def build_dataset(freeze_bundle: Path, production_root: Path, contract_root: Pat
     require(all("partition_any" not in row and "gcc_frac_min" not in row for row in indexes["test"]), "Test targets were materialized")
     write_jsonl(output_dir / "tgnn_provenance_manifest.jsonl", sorted(provenance, key=lambda row: row["run_id"]))
 
-    for row in indexes["train"] + indexes["validation"]:
-        header, arrays = load_sequence(output_dir / row["sequence_artifact"])
-        require(header["targets_in_graph_artifact"] is False, f"Target marker present in graph artifact: {row['run_key']}")
-        require(header["sequence"]["run_key"] == row["run_key"], f"Sequence identity mismatch: {row['run_key']}")
-        require(arrays["node_features"].shape[1] == len(NODE_FEATURE_NAMES), f"Node feature dimension mismatch: {row['run_key']}")
-        require(arrays["edge_attr"].shape[1] == len(EDGE_FEATURE_NAMES), f"Edge feature dimension mismatch: {row['run_key']}")
-        node_offsets = arrays["snapshot_node_offsets"]
-        edge_offsets = arrays["snapshot_edge_offsets"]
-        for snapshot_index in range(len(node_offsets) - 1):
-            node_count = int(node_offsets[snapshot_index + 1] - node_offsets[snapshot_index])
-            edge_start = int(edge_offsets[snapshot_index])
-            edge_end = int(edge_offsets[snapshot_index + 1])
-            snapshot_edges = arrays["edge_index"][:, edge_start:edge_end]
-            require(snapshot_edges.size == 0 or (int(snapshot_edges.min()) >= 0 and int(snapshot_edges.max()) < node_count), f"Edge index out of range: {row['run_key']} timestep {snapshot_index}")
-            identity_values = arrays["node_identity_index"][node_offsets[snapshot_index]:node_offsets[snapshot_index + 1]]
-            require(identity_values.size == 0 or int(identity_values.max()) < len(header["node_identity"]), f"Node identity index out of range: {row['run_key']}")
+    for split in EXPECTED_SPLIT_RUNS:
+        for row in indexes[split]:
+            header, arrays = load_sequence(output_dir / row["sequence_artifact"])
+            require(header["targets_in_graph_artifact"] is False, f"Target marker present in graph artifact: {row['run_key']}")
+            require(header["sequence"]["run_key"] == row["run_key"] and header["sequence"]["split"] == split, f"Sequence identity mismatch: {row['run_key']}")
+            require(header["sequence_length"] == EXPECTED_TIMESTEPS, f"Sequence length mismatch: {row['run_key']}")
+            require(arrays["node_features"].shape[1] == len(NODE_FEATURE_NAMES), f"Node feature dimension mismatch: {row['run_key']}")
+            require(arrays["edge_attr"].shape[1] == len(EDGE_FEATURE_NAMES), f"Edge feature dimension mismatch: {row['run_key']}")
+            require(tuple(arrays["timestep_index"].tolist()) == tuple(range(EXPECTED_TIMESTEPS)), f"Serialized timestep ordering mismatch: {row['run_key']}")
+            node_offsets = arrays["snapshot_node_offsets"]
+            edge_offsets = arrays["snapshot_edge_offsets"]
+            require(len(node_offsets) == EXPECTED_TIMESTEPS + 1 and len(edge_offsets) == EXPECTED_TIMESTEPS + 1, f"Serialized offset length mismatch: {row['run_key']}")
+            for snapshot_index in range(len(node_offsets) - 1):
+                node_count = int(node_offsets[snapshot_index + 1] - node_offsets[snapshot_index])
+                edge_start = int(edge_offsets[snapshot_index])
+                edge_end = int(edge_offsets[snapshot_index + 1])
+                snapshot_edges = arrays["edge_index"][:, edge_start:edge_end]
+                require(snapshot_edges.size == 0 or (int(snapshot_edges.min()) >= 0 and int(snapshot_edges.max()) < node_count), f"Edge index out of range: {row['run_key']} timestep {snapshot_index}")
+                identity_values = arrays["node_identity_index"][node_offsets[snapshot_index]:node_offsets[snapshot_index + 1]]
+                require(identity_values.size == 0 or (int(identity_values.min()) >= 0 and int(identity_values.max()) < len(header["node_identity"])), f"Node identity index out of range: {row['run_key']}")
+            require(tuple(int(value) for value in np.diff(node_offsets)) == tuple(header["node_count_by_timestep"]), f"Node offsets disagree with header: {row['run_key']}")
+            require(tuple(int(value) for value in np.diff(edge_offsets)) == tuple(header["directed_edge_count_by_timestep"]), f"Edge offsets disagree with header: {row['run_key']}")
     structural["target_fields_in_graph_inputs"] = 0
     structural["future_information_leakage"] = 0
     require(all(row.get("partition_any") is not None and row.get("gcc_frac_min") is not None for row in indexes["train"] + indexes["validation"]), "Missing train/validation target")
@@ -693,6 +699,7 @@ def build_dataset(freeze_bundle: Path, production_root: Path, contract_root: Pat
             "zero_run_overlap": len({row["run_id"] for split in EXPECTED_SPLIT_RUNS for row in indexes[split]}) == 500,
             "zero_duplicate_run_keys": duplicate_run_keys == 0,
             "zero_duplicate_design_realization_pairs": duplicate_pairs == 0,
+            "all_sequence_artifacts_load": structural["all_sequences_load"],
             "all_train_validation_sequences_load": structural["train_validation_sequences_load"],
             "all_sequence_timesteps_ordered": structural["timesteps_ordered"],
             "all_graph_snapshots_node_schema_valid": structural["node_schema_valid"],
