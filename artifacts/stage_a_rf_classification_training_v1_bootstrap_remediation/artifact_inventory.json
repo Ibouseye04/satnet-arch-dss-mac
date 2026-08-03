@@ -1,0 +1,26 @@
+{
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "bytes": 808,
+      "path": "README.md",
+      "sha256": "3a3394a103d133c5a024e892b6c6272de3b0dbe27de44db38dbf0c81e043f25c"
+    },
+    {
+      "bytes": 1645,
+      "path": "bootstrap_reporting_remediation_report.json",
+      "sha256": "d0b15a790d2e0f08828ecb63b3cb13458ba54786b281bb7aacb20464bec70f4a"
+    },
+    {
+      "bytes": 25466,
+      "path": "bootstrap_semantic_verification.json",
+      "sha256": "978f551ab31dfef95e2b0353ede1b6d939cc4c712b5f0486c24bd7a1bfe9dbf5"
+    },
+    {
+      "bytes": 6887,
+      "path": "original_and_corrected_identity.json",
+      "sha256": "8fbe78aa4b765dcedecd2d664846d4ca67e139049ea54b2aa76a8c12baf80fe0"
+    }
+  ],
+  "self_excluding": true
+}

@@ -1,0 +1,817 @@
+{
+  "all_validity_counts_sum_to_replicates": true,
+  "bootstrap_unit": "design",
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "corrected_value_metrics": [
+    "class_0_recall_specificity"
+  ],
+  "defined_interval_finiteness_verified": true,
+  "explicit_confusion_matrix_labels": [
+    0,
+    1
+  ],
+  "other_potentially_single_class_metrics_verified": [
+    "roc_auc"
+  ],
+  "percentile_bounds": [
+    2.5,
+    97.5
+  ],
+  "realizations_retained_per_selected_design": 5,
+  "replicates_attempted_per_seed": 10000,
+  "seed": 63001,
+  "seeds": {
+    "51001": {
+      "class_0_specificity": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "design_count": 15,
+      "intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0010709782602773968,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1447421762230462,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "observed_labels": [
+        1
+      ],
+      "realizations_per_design": [
+        5
+      ],
+      "replicates_attempted": 10000,
+      "roc_auc": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "validity": {
+        "accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    "51002": {
+      "class_0_specificity": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "design_count": 15,
+      "intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.001201308942468754,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.13188891219853094,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "observed_labels": [
+        1
+      ],
+      "realizations_per_design": [
+        5
+      ],
+      "replicates_attempted": 10000,
+      "roc_auc": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "validity": {
+        "accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    "51003": {
+      "class_0_specificity": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "design_count": 15,
+      "intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.00083177429090525,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1333340344513383,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "observed_labels": [
+        1
+      ],
+      "realizations_per_design": [
+        5
+      ],
+      "replicates_attempted": 10000,
+      "roc_auc": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "validity": {
+        "accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    "51004": {
+      "class_0_specificity": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "design_count": 15,
+      "intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0009204913850644175,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1369659675654124,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "observed_labels": [
+        1
+      ],
+      "realizations_per_design": [
+        5
+      ],
+      "replicates_attempted": 10000,
+      "roc_auc": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "validity": {
+        "accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    "51005": {
+      "class_0_specificity": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "design_count": 15,
+      "intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0012950402778095951,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.14541684090792611,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "observed_labels": [
+        1
+      ],
+      "realizations_per_design": [
+        5
+      ],
+      "replicates_attempted": 10000,
+      "roc_auc": {
+        "lower_2_5_percent": null,
+        "total_replicates": 10000,
+        "undefined_replicates": 10000,
+        "upper_97_5_percent": null,
+        "valid_replicates": 0
+      },
+      "validity": {
+        "accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 10000,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "all_valid_values_finite": true,
+          "bounds_null_when_undefined": true,
+          "undefined_replicates": 0,
+          "valid_replicates": 10000
+        }
+      }
+    }
+  },
+  "undefined_numeric_zero_count": 0,
+  "validation_designs": 15
+}
