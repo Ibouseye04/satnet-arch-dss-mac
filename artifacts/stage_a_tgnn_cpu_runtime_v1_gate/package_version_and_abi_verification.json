@@ -1,0 +1,65 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_package_version_and_abi_verification",
+  "status": "pass",
+  "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "python": {
+    "full_version": "3.11.9",
+    "implementation": "CPython"
+  },
+  "versions": {
+    "frozen_logical": {
+      "torch": "2.12.1",
+      "torch-geometric": "2.8.0",
+      "torch-geometric-temporal": "0.56.2",
+      "torch-sparse": "0.6.18",
+      "torch-scatter": "2.1.2",
+      "scikit-learn": "1.9.0",
+      "joblib": "1.5.3",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3",
+      "scipy": "1.17.1"
+    },
+    "full_installed": {
+      "torch": "2.12.1+cpu",
+      "torch-geometric": "2.8.0",
+      "torch-geometric-temporal": "0.56.2",
+      "torch-sparse": "0.6.18+pt212cpu",
+      "torch-scatter": "2.1.2+pt212cpu",
+      "scikit-learn": "1.9.0",
+      "joblib": "1.5.3",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3",
+      "scipy": "1.17.1"
+    },
+    "normalized_public_base": {
+      "torch": "2.12.1",
+      "torch-geometric": "2.8.0",
+      "torch-geometric-temporal": "0.56.2",
+      "torch-sparse": "0.6.18",
+      "torch-scatter": "2.1.2",
+      "scikit-learn": "1.9.0",
+      "joblib": "1.5.3",
+      "numpy": "1.26.4",
+      "pandas": "2.3.3",
+      "scipy": "1.17.1"
+    },
+    "all_normalized_versions_match_frozen": true
+  },
+  "local_suffix_policy": {
+    "accepted_suffixes": ["+cpu", "+pt212cpu"],
+    "criteria": ["public/base version matches", "wheel is CPU-only", "native target is PyTorch 2.12", "native imports/operations succeed", "no CUDA dependency is present"],
+    "criteria_satisfied": true
+  },
+  "abi_conclusions": {
+    "torch_2_12_1_plus_cpu": {"compatible": true, "reason": "Base version 2.12.1 and CPU-only build; torch.version.cuda is null and torch.cuda.is_available() is false."},
+    "torch_sparse_0_6_18_plus_pt212cpu": {"compatible": true, "reason": "Base version 0.6.18, pt212cpu target, CPU native operations pass, and torch_sparse CUDA-version operator reports -1."},
+    "torch_scatter_2_1_2_plus_pt212cpu": {"compatible": true, "reason": "Base version 2.1.2, pt212cpu target, and CPU native scatter operation passes."}
+  },
+  "pip_check": {
+    "passed": true,
+    "returncode": 0,
+    "stdout": "No broken requirements found.",
+    "repository_pythonpath_removed_for_check": true
+  },
+  "no_version_or_abi_incompatibility": true
+}

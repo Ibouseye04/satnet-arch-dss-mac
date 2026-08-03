@@ -1,0 +1,40 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_native_extension_import_verification",
+  "status": "pass",
+  "imports": {
+    "import torch": "pass",
+    "import torch_geometric": "pass",
+    "import torch_geometric_temporal": "pass",
+    "import torch_sparse": "pass",
+    "import torch_scatter": "pass",
+    "from torch_geometric_temporal.nn.recurrent import GCLSTM": "pass"
+  },
+  "native_loader": "torch_sparse and torch_scatter package loaders selected and loaded their CPU .pyd libraries; package-supported native operations were executed successfully.",
+  "resolved_native_extension_files": {
+    "torch_sparse._version_cpu.pyd": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Lib\\site-packages\\torch_sparse\\_version_cpu.pyd", "bytes": 96768, "sha256": "4ec99ee36bcafe94f8620544641a8e920a2bea264b1b608c21aab0db65273b9a"},
+    "torch_sparse._spmm_cpu.pyd": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Lib\\site-packages\\torch_sparse\\_spmm_cpu.pyd", "bytes": 542720, "sha256": "e8fde294508c92e624ebabfae904f9ea08f6d2f325adf54607b3463e1143b7e2"},
+    "torch_scatter._version_cpu.pyd": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Lib\\site-packages\\torch_scatter\\_version_cpu.pyd", "bytes": 199168, "sha256": "af4648a37caca673292980aac33d5208ce1bb300df8e8f9b570ec31c83de3538"},
+    "torch_scatter._scatter_cpu.pyd": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Lib\\site-packages\\torch_scatter\\_scatter_cpu.pyd", "bytes": 433152, "sha256": "61c6423315884d08ad410cb875b208bc6ad38e9eff273674678cf8a8541ee183"}
+  },
+  "native_file_inventory": {
+    "torch_sparse": ["_convert_cpu.pyd", "_diag_cpu.pyd", "_ego_sample_cpu.pyd", "_hgt_sample_cpu.pyd", "_metis_cpu.pyd", "_neighbor_sample_cpu.pyd", "_relabel_cpu.pyd", "_rw_cpu.pyd", "_saint_cpu.pyd", "_sample_cpu.pyd", "_spmm_cpu.pyd", "_version_cpu.pyd"],
+    "torch_scatter": ["_scatter_cpu.pyd", "_segment_coo_cpu.pyd", "_segment_csr_cpu.pyd", "_version_cpu.pyd"]
+  },
+  "native_operation_checks": {
+    "torch_sparse.matmul": {"passed": true, "output": [[2.0], [1.0]]},
+    "torch_scatter.scatter_add": {"passed": true, "output": [4.0, 2.0]},
+    "torch_sparse_cuda_version_operator": -1
+  },
+  "failure_checks": {
+    "winerror_127": false,
+    "missing_dll": false,
+    "cuda_dll_load": false,
+    "cuda_linked_extension_loaded": false,
+    "cuda_named_native_files": [],
+    "nvidia_distributions": [],
+    "cuda_runtime_dlls": [],
+    "warnings_during_runtime_probe": ["sgp4 not available. Canonical SGP4 propagation is unavailable."],
+    "warning_scope": "Emitted by source reader import dependency discovery; no SGP4 propagation or dataset access was performed."
+  },
+  "pip_check_passed": true
+}

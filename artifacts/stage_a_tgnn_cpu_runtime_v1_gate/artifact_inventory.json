@@ -1,0 +1,20 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_gate_artifact_inventory",
+  "status": "complete",
+  "self_excluding": true,
+  "inventory_scope": "All committed Stage A TGNN CPU runtime v1 independent gate artifacts; this inventory intentionally excludes its own SHA-256.",
+  "artifacts": [
+    {"path": "environment_isolation_and_test_seal.json", "bytes": 2159, "sha256": "0a7b0e530709bd33099a8a63a6705a8e8cc2b1a025b9461df41445763992824a"},
+    {"path": "gclstm_runtime_verification.json", "bytes": 1223, "sha256": "e39fa2136b98e8473950cae46fb10e68b2a5e5810cf1af4daf50d0cab6dd7210"},
+    {"path": "native_extension_import_verification.json", "bytes": 2753, "sha256": "01735aee0f18ca0a19186fdd7bb544aab54db3a1bd12cf91fb0bf2f68b2045bf"},
+    {"path": "package_version_and_abi_verification.json", "bytes": 2412, "sha256": "21cd92fb2f571380d6deb4256a5368e5cfb11687f62fe437416b1043c2addb79"},
+    {"path": "README.md", "bytes": 3406, "sha256": "79a5081168d9a26568d78263b68e9ff805ee7db27bb3abcecd925864a66f6f62"},
+    {"path": "tgnn_cpu_runtime_gate_report.json", "bytes": 3331, "sha256": "53697c95bdc5ae049b1317d3c988cf97d4a8bb7b3f369c09bbd5130bebbb91f1"},
+    {"path": "zero_edge_runtime_verification.json", "bytes": 1278, "sha256": "8e587bb72919fc6a0bd05d076b840efd45dd61e6670c1c9653c471fed41287ed"}
+  ],
+  "required_outputs_present": true,
+  "gate_verdict": "STAGE A TGNN CPU RUNTIME V1 ACCEPTED — READY FOR TGNN CLASSIFICATION TRAINING AUTHORIZATION",
+  "training_performed": false,
+  "dataset_sequences_opened": false,
+  "independent_runtime_gate_performed": true
+}

@@ -1,0 +1,58 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_gate_report",
+  "status": "accepted",
+  "verdict": "STAGE A TGNN CPU RUNTIME V1 ACCEPTED — READY FOR TGNN CLASSIFICATION TRAINING AUTHORIZATION",
+  "gate_scope": "Narrow independent environment-validation gate only; no training or production sequence access.",
+  "implementation_commit": "f102111",
+  "runtime_identity": {
+    "environment_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1",
+    "venv": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv",
+    "python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+    "python_version": "3.11.9"
+  },
+  "evidence_bindings": {
+    "runtime_environment_manifest.json": "b12281b6ea90ad7e777b2ed75f23955abc9e4b9791454046af1eea5bb15f8bf1",
+    "native_extension_verification.json": "7064a9b34ce47d06db104e3c104affb94d7019a8f06fc86f852dc88af94620bd",
+    "gclstm_import_and_constructor_report.json": "336150c826050060c7f1a09990ffb1f05dbc560caa607d91639067e023f49fe5",
+    "synthetic_zero_edge_smoke_report.json": "247cc656872ed2434c91a33194b2b278e03cc28e2398fa53461ebd180b856b58",
+    "installed_package_inventory.json": "a57632c1cc89c5ab728c8c309fd43dc614d143a37a9354bf1f965ae65df7c660",
+    "environment_setup_commands.ps1": "d92e5ef6dde887a6cb3d9789694e1b6307dfd63a4c9b24f52e3aed49b7df864c",
+    "README.md": "311936effb0e8347b438506c6b044fe5d8941792255b5c5f0840a7086cc2a2ae",
+    "artifact_inventory.json": "fd4fda83e74e3c34fc5712659623587fee0b653206c7c41cf3deb6d22c3635cf"
+  },
+  "evidence_identity": {
+    "all_declared_sha256_match": true,
+    "inventory_complete": true,
+    "inventory_self_excluding": true,
+    "evidence_committed_in_implementation_commit": true,
+    "only_runtime_evidence_directory_committed": true
+  },
+  "checks": {
+    "1_evidence_identity": "pass",
+    "2_version_compatibility": "pass",
+    "3_native_extensions": "pass",
+    "4_cpu_only_and_determinism": "pass",
+    "5_contracted_gclstm": "pass",
+    "6_synthetic_structural_smoke": "pass",
+    "7_serialization_reader": "pass",
+    "8_environment_isolation": "pass"
+  },
+  "compatibility_conclusions": {
+    "pytorch_2_12_1_cpu": "Compatible: installed full version 2.12.1+cpu has public/base version 2.12.1, is CPU-only, has no CUDA runtime, and CPU operations succeed.",
+    "torch_sparse_0_6_18_pt212cpu": "Compatible: installed full version 0.6.18+pt212cpu has public/base version 0.6.18, CPU native files load through the package loader, torch_sparse CPU operation succeeds, and its CUDA-version operator reports -1.",
+    "torch_scatter_2_1_2_pt212cpu": "Compatible: installed full version 2.1.2+pt212cpu has public/base version 2.1.2, CPU native files load through the package loader, and torch_scatter CPU operation succeeds."
+  },
+  "serialization_and_training_seal": {
+    "sequence_artifacts_opened": 0,
+    "train_indexes_opened": 0,
+    "validation_indexes_opened": 0,
+    "test_indexes_or_targets_opened": 0,
+    "preprocessing_statistics_calculated": false,
+    "training_performed": false,
+    "loss_calculated": false,
+    "optimizer_created": false,
+    "backward_performed": false,
+    "checkpoint_created": false
+  },
+  "artifact_scope": "Only artifacts/stage_a_tgnn_cpu_runtime_v1_gate/ is introduced by this gate; pre-existing worktree changes are preserved and not included."
+}
