@@ -723,6 +723,7 @@ def build_dataset(freeze_bundle: Path, production_root: Path, contract_root: Pat
         "test_seal": {"status": "sealed", "targets_materialized": False, "outcome_summaries_materialized": False, "outcome_fields_used": False, "test_targets_read": False},
         "independent_acceptance_gate_run": False,
     }
+    construction_report = json.loads(canonical_json(construction_report))
     construction_report["construction_report_hash"] = semantic_hash(construction_report, "construction_report_hash")
     write_json(output_dir / "tgnn_construction_report.json", construction_report)
     dataset_manifest = {
