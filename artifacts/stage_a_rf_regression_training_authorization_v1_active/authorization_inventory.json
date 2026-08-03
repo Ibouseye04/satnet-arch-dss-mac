@@ -1,0 +1,13 @@
+{
+  "schema": "satnet.stage_a.rf_regression.authorization_inventory.v1",
+  "inventory_scope": "artifacts/stage_a_rf_regression_training_authorization_v1_active",
+  "self_excluding": true,
+  "artifact_count": 5,
+  "artifacts": [
+    {"path": "active_authorization.json", "bytes": 4007, "sha256": "df7a5aa421c2f13f49843df212750b16ff2bab4f8ff85c34bd3c141574db8241"},
+    {"path": "preflight_certificate.json", "bytes": 4181, "sha256": "19af54bb01053f262b3ed61506ea45ef735fdaab10d4a76d0b945a6d54bf4cb9"},
+    {"path": "README.md", "bytes": 2685, "sha256": "cce1bfbb853a8be6563683c9245798ded41b68e7b6a9de721ddcbd4040acf012"},
+    {"path": "rf_regression_training_command.ps1", "bytes": 2907, "sha256": "4857c598bcd028918e6a95cf49ce95ec2189af98fce7ed386cae5c5e6544a708"},
+    {"path": "runtime_plan.json", "bytes": 1777, "sha256": "a16030ab2041ab23e5aea3b925a260d3c05643d21add70fb23671b2afec0245b"}
+  ]
+}

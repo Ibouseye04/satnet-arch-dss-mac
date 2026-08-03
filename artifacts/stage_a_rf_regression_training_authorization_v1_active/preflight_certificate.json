@@ -1,0 +1,140 @@
+{
+  "accepted_dataset_gate_commit": "5ca5d984645466321a8733c59a2dd5a879d8ce50",
+  "accepted_rf_classification_gate_commit": "4efc799dc6263f71c55cd9395a0047abdbabf48a",
+  "accepted_training_plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+  "accepted_training_plan_regate": "4f9e5e3a2534fc9dbe1e8fb9613cbc041d03e489",
+  "activation_head": "bcad45c5edf07bdea4c0eab322ee1cbf7bf5472d",
+  "bootstrap": {
+    "replicates": 10000,
+    "seed": 63002
+  },
+  "bootstrap_called": false,
+  "checkpoint_created": false,
+  "constructor_validation": {
+    "candidate_count": 24,
+    "candidate_seeds": [
+      41000,
+      41001,
+      41002,
+      41003,
+      41004,
+      41005,
+      41006,
+      41007,
+      41008,
+      41009,
+      41010,
+      41011,
+      41012,
+      41013,
+      41014,
+      41015,
+      41016,
+      41017,
+      41018,
+      41019,
+      41020,
+      41021,
+      41022,
+      41023
+    ],
+    "fit_called": false,
+    "parameter_names": [
+      "bootstrap",
+      "ccp_alpha",
+      "criterion",
+      "max_depth",
+      "max_features",
+      "max_leaf_nodes",
+      "max_samples",
+      "min_impurity_decrease",
+      "min_samples_leaf",
+      "min_samples_split",
+      "min_weight_fraction_leaf",
+      "monotonic_cst",
+      "n_estimators",
+      "n_jobs",
+      "oob_score",
+      "random_state",
+      "verbose",
+      "warm_start"
+    ],
+    "prediction_called": false
+  },
+  "final_seeds": [
+    51001,
+    51002,
+    51003,
+    51004,
+    51005
+  ],
+  "fit_called": false,
+  "input_validation": {
+    "classification_gate": {
+      "sha256": "71dbe8a7185456e752bf02631be574c19653b146727653bf1438bd6bc68bf3f8",
+      "verdict": "STAGE A RF CLASSIFICATION TRAINING V1 ACCEPTED \u2014 READY FOR RF REGRESSION TRAINING AUTHORIZATION"
+    },
+    "hashes": {
+      "gate_report": "9f47a7a1beeceef5907025f93930ef1b15c1976ac5af049abd3474678dc81414",
+      "manifest": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+      "train": "b5098f3cafebef97e71425a79bd75bc0625d63ca3578e2d7d6b7bbc57b1aa4b9",
+      "validation": "376d615efbf8a538456975fb3f932d83e7b9bab254066fb4bfcc08aa3cb40c6d"
+    },
+    "plan_hashes": {
+      "compute_budget": "5981bd2e66dc3a3fbc5c0771094a1db16f0e000e3f58c2a240270a72a3c0b188",
+      "regression_policy": "883843df7d0dd43e4b404573b79bd4224e62ac85be22c245f4d4fcd3b96ea873",
+      "reproducibility": "9fbd4cde8089f4811d6b886c8105c947535282b12d83d7667d93bb60e57e27a3",
+      "rf_spec": "f738ec0922d08c67e63250c692b80e4a3107591d9773b3cb005e63068e923f75",
+      "selection_policy": "ced6fe7d13bc94dfcaf2b5780d993f3ca32a31305a20ffaa2472e6bec5b28ba4"
+    },
+    "predictor_count": 12,
+    "predictors": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "ground_station_failure_probability"
+    ],
+    "sealed_index_sha256_from_gate": "40e9120ed3b735bf94711cce7d44952680a10733f623245c17960c7f8e923bc2",
+    "target": {
+      "alias": "gcc_frac_min",
+      "source_field": "space_gcc_fraction_original_min"
+    },
+    "target_distributions": {
+      "train": {
+        "max": 1.0,
+        "mean": 0.4783976757369614,
+        "min": 0.0208333333333333,
+        "population_std": 0.3942638717671106
+      },
+      "validation": {
+        "max": 1.0,
+        "mean": 0.4028518518518518,
+        "min": 0.0476190476190476,
+        "population_std": 0.3512245198776528
+      }
+    },
+    "test_target_sources_opened": false,
+    "train_designs": 70,
+    "train_rows": 350,
+    "validation_designs": 15,
+    "validation_rows": 75,
+    "zero_design_overlap": true,
+    "zero_run_overlap": true
+  },
+  "output_root_absent": true,
+  "prediction_called": false,
+  "preflight_execution": "read-only",
+  "test_target_sources_opened": false,
+  "training_lock_count": 0,
+  "unrelated_main_worktree_touched": false,
+  "verdict": "STAGE A RF REGRESSION TRAINING AUTHORIZED \u2014 PREFLIGHT PASSED \u2014 READY TO EXECUTE",
+  "worktree_clean": true
+}
