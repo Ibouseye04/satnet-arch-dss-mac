@@ -1,0 +1,36 @@
+{
+  "artifact_count": 6,
+  "artifacts": [
+    {
+      "bytes": 3437,
+      "path": "bootstrap_targeted_regate_report.json",
+      "sha256": "71dbe8a7185456e752bf02631be574c19653b146727653bf1438bd6bc68bf3f8"
+    },
+    {
+      "bytes": 2728,
+      "path": "corrected_identity_verification.json",
+      "sha256": "6a74e61c5260eb5080159ff37ec95e893b98f2010a7171dfd019e9653f776cd6"
+    },
+    {
+      "bytes": 1065,
+      "path": "README.md",
+      "sha256": "f3da1fc6ee1dc4ca781f3d74009da7fbe890ed402663e0a18c4a1448f7f80941"
+    },
+    {
+      "bytes": 1379,
+      "path": "test_seal_verification.json",
+      "sha256": "f5c5d0fac3996421ef612321491f5ebabd0da43d782ea6a0feb0c77639d98193"
+    },
+    {
+      "bytes": 1951,
+      "path": "unchanged_model_and_output_verification.json",
+      "sha256": "df1efc109ef8263d5b26c8747a6dbe69a4e02d3ec46581232c66d2fe7e157a34"
+    },
+    {
+      "bytes": 4741,
+      "path": "undefined_metric_semantics_verification.json",
+      "sha256": "5eefc00515965a538a3b7a8b4fd3b2a5f315fad2809d858c89af39784a7c78a5"
+    }
+  ],
+  "self_excluding": true
+}

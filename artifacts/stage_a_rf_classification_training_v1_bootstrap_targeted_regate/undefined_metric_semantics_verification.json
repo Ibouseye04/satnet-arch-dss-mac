@@ -1,0 +1,56 @@
+{
+  "schema": "satnet.stage_a.rf_classification.bootstrap_targeted_regate.undefined_metric_semantics.v1",
+  "source_artifact": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1\\validation_bootstrap_intervals.json",
+  "source_sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54",
+  "bootstrap_metrics_reviewed": [
+    "accuracy",
+    "balanced_accuracy",
+    "class_0_recall_specificity",
+    "class_1_precision",
+    "class_1_recall",
+    "macro_f1",
+    "weighted_f1",
+    "roc_auc",
+    "pr_auc_average_precision",
+    "brier_score"
+  ],
+  "policy_checks": {
+    "mathematically_undefined_replicates_excluded_from_percentiles": true,
+    "undefined_values_never_converted_to_zero": true,
+    "null_preserved_through_json_parsing": true,
+    "defined_percentile_bounds_finite": true,
+    "lower_bound_less_than_or_equal_to_upper_bound": true,
+    "valid_plus_undefined_equals_10000_for_every_metric": true,
+    "defined_numeric_zero_values_preserved": true,
+    "defined_numeric_zero_interval_bounds_observed": [],
+    "result": "PASS"
+  },
+  "per_seed": {
+    "51001": {
+      "class_0_recall_specificity": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "roc_auc": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "all_other_metrics": {"metrics": ["accuracy", "balanced_accuracy", "class_1_precision", "class_1_recall", "macro_f1", "weighted_f1", "pr_auc_average_precision", "brier_score"], "valid_replicates": 10000, "undefined_replicates": 0, "finite_bounds": true, "ordered_bounds": true, "counts_sum_to_10000": true}
+    },
+    "51002": {
+      "class_0_recall_specificity": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "roc_auc": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "all_other_metrics": {"metrics": ["accuracy", "balanced_accuracy", "class_1_precision", "class_1_recall", "macro_f1", "weighted_f1", "pr_auc_average_precision", "brier_score"], "valid_replicates": 10000, "undefined_replicates": 0, "finite_bounds": true, "ordered_bounds": true, "counts_sum_to_10000": true}
+    },
+    "51003": {
+      "class_0_recall_specificity": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "roc_auc": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "all_other_metrics": {"metrics": ["accuracy", "balanced_accuracy", "class_1_precision", "class_1_recall", "macro_f1", "weighted_f1", "pr_auc_average_precision", "brier_score"], "valid_replicates": 10000, "undefined_replicates": 0, "finite_bounds": true, "ordered_bounds": true, "counts_sum_to_10000": true}
+    },
+    "51004": {
+      "class_0_recall_specificity": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "roc_auc": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "all_other_metrics": {"metrics": ["accuracy", "balanced_accuracy", "class_1_precision", "class_1_recall", "macro_f1", "weighted_f1", "pr_auc_average_precision", "brier_score"], "valid_replicates": 10000, "undefined_replicates": 0, "finite_bounds": true, "ordered_bounds": true, "counts_sum_to_10000": true}
+    },
+    "51005": {
+      "class_0_recall_specificity": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "roc_auc": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000, "counts_sum_to_10000": true, "undefined_not_zero": true},
+      "all_other_metrics": {"metrics": ["accuracy", "balanced_accuracy", "class_1_precision", "class_1_recall", "macro_f1", "weighted_f1", "pr_auc_average_precision", "brier_score"], "valid_replicates": 10000, "undefined_replicates": 0, "finite_bounds": true, "ordered_bounds": true, "counts_sum_to_10000": true}
+    }
+  },
+  "result": "PASS"
+}

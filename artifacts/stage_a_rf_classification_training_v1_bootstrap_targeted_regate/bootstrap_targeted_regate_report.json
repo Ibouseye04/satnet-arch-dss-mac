@@ -1,0 +1,43 @@
+{
+  "schema": "satnet.stage_a.rf_classification.bootstrap_targeted_independent_regate.v1",
+  "gate_id": "stage_a_rf_classification_training_v1_bootstrap_targeted_independent_regate",
+  "evaluated_at": "2026-08-03",
+  "gate_scope": "Prior bootstrap-reporting defect only; no candidate search, fit, retraining, prediction generation, test access, or unrelated artifact changes.",
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1",
+  "selected_candidate": 20,
+  "decision_threshold": 0.5,
+  "blocked_gate": {"commit": "c61f6166cdf4053b89e05459ca1b87b84b0d50ad", "report_sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08"},
+  "remediation": {"commit": "b5290c52980c393d0951e56dc220fa9a151ca254", "corrected_bootstrap_sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54", "corrected_inventory_sha256": "f7174a9e3fa35251b3b3c5c978c85c3dd6054c75c9029415d2d604d9025978ae"},
+  "targeted_checks": {
+    "corrected_identity": "PASS",
+    "corrected_inventory_linkage": "PASS",
+    "class_0_specificity": {
+      "51001": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51002": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51003": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51004": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51005": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000}
+    },
+    "roc_auc": {
+      "51001": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51002": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51003": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51004": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000},
+      "51005": {"lower_2_5_percent": null, "upper_97_5_percent": null, "valid_replicates": 0, "undefined_replicates": 10000}
+    },
+    "other_undefined_metric_review": "PASS",
+    "bootstrap_semantics": {"unit": "design", "validation_designs": 15, "realizations_per_selected_design": 5, "replicates": 10000, "seed": 63001, "percentile_levels": [2.5, 97.5], "explicit_labels": [0, 1], "final_model_seeds": [51001, 51002, 51003, 51004, 51005]},
+    "unchanged_five_model_identity": "PASS",
+    "unchanged_ordinary_validation_artifacts": "PASS",
+    "test_seal": "PASS",
+    "no_fitting_occurred": true
+  },
+  "artifact_references": {
+    "corrected_identity_verification.json": "corrected identity and inventory linkage",
+    "undefined_metric_semantics_verification.json": "all bootstrap metrics and undefined-value policy",
+    "unchanged_model_and_output_verification.json": "model and ordinary-output identities",
+    "test_seal_verification.json": "non-execution and test-access seal"
+  },
+  "verdict": "STAGE A RF CLASSIFICATION TRAINING V1 ACCEPTED — READY FOR RF REGRESSION TRAINING AUTHORIZATION"
+}

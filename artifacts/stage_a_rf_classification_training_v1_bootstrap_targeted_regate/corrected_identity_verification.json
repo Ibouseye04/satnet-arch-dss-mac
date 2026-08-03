@@ -1,0 +1,57 @@
+{
+  "schema": "satnet.stage_a.rf_classification.bootstrap_targeted_regate.corrected_identity.v1",
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1",
+  "remediation_commit": "b5290c52980c393d0951e56dc220fa9a151ca254",
+  "blocked_gate_commit": "c61f6166cdf4053b89e05459ca1b87b84b0d50ad",
+  "blocked_gate_report_sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08",
+  "corrected_bootstrap": {
+    "path": "validation_bootstrap_intervals.json",
+    "actual_bytes": 14629,
+    "actual_sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54",
+    "expected_bytes": 14629,
+    "expected_sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54",
+    "identity_match": true
+  },
+  "corrected_training_inventory": {
+    "path": "artifact_inventory.json",
+    "actual_bytes": 2556,
+    "actual_sha256": "f7174a9e3fa35251b3b3c5c978c85c3dd6054c75c9029415d2d604d9025978ae",
+    "expected_bytes": 2556,
+    "expected_sha256": "f7174a9e3fa35251b3b3c5c978c85c3dd6054c75c9029415d2d604d9025978ae",
+    "identity_match": true,
+    "bootstrap_entry": {
+      "bytes": 14629,
+      "path": "validation_bootstrap_intervals.json",
+      "sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54"
+    },
+    "binds_corrected_bootstrap": true
+  },
+  "original_identities_recorded": {
+    "bootstrap": {
+      "bytes": 12626,
+      "path": "validation_bootstrap_intervals.json",
+      "sha256": "c387dd0e9d10b412a42f1fd04dfd707ae3d1c0b62060aeca980e04487b26c20b"
+    },
+    "training_inventory": {
+      "bytes": 2556,
+      "path": "artifact_inventory.json",
+      "sha256": "9fca4f776b380504c4f1f3d71d2b7ac23ad7b95a4675d029d58f1b8b14df0431"
+    },
+    "evidence_file": "../stage_a_rf_classification_training_v1_bootstrap_remediation/original_and_corrected_identity.json",
+    "result": "PASS"
+  },
+  "remediation_commit_scope": {
+    "expected_files_only": true,
+    "observed_files": [
+      "artifacts/stage_a_rf_classification_training_v1_bootstrap_remediation/README.md",
+      "artifacts/stage_a_rf_classification_training_v1_bootstrap_remediation/artifact_inventory.json",
+      "artifacts/stage_a_rf_classification_training_v1_bootstrap_remediation/bootstrap_reporting_remediation_report.json",
+      "artifacts/stage_a_rf_classification_training_v1_bootstrap_remediation/bootstrap_semantic_verification.json",
+      "artifacts/stage_a_rf_classification_training_v1_bootstrap_remediation/original_and_corrected_identity.json",
+      "tools/remediate_stage_a_rf_bootstrap_reporting.py"
+    ],
+    "result": "PASS"
+  },
+  "result": "PASS"
+}

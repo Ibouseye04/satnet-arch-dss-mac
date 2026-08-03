@@ -1,0 +1,23 @@
+{
+  "schema": "satnet.stage_a.rf_classification.bootstrap_targeted_regate.unchanged_outputs.v1",
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "selected_candidate": 20,
+  "decision_threshold": 0.5,
+  "models": {
+    "rf_classification_seed_51001.joblib": {"bytes": 225100, "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14", "unchanged": true},
+    "rf_classification_seed_51002.joblib": {"bytes": 223357, "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4", "unchanged": true},
+    "rf_classification_seed_51003.joblib": {"bytes": 220460, "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea", "unchanged": true},
+    "rf_classification_seed_51004.joblib": {"bytes": 219158, "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9", "unchanged": true},
+    "rf_classification_seed_51005.joblib": {"bytes": 219609, "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da", "unchanged": true}
+  },
+  "ordinary_validation_and_selection_artifacts": {
+    "selected_configuration.json": {"bytes": 708, "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c", "unchanged": true},
+    "validation_predictions.jsonl": {"bytes": 59690, "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4", "unchanged": true},
+    "validation_metrics.json": {"bytes": 7116, "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db", "unchanged": true},
+    "candidate_search_results.json": {"bytes": 36760, "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86", "unchanged": true},
+    "training_report.json": {"bytes": 248, "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00", "unchanged": true}
+  },
+  "model_identity_result": "PASS",
+  "ordinary_validation_artifact_result": "PASS",
+  "result": "PASS"
+}
