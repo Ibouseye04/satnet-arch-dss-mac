@@ -1,0 +1,88 @@
+{
+  "gate_id": "stage_a_training_plan_v1_narrow_independent_acceptance_gate",
+  "gate_scope": "Read-only plan validation; no training, fitting, checkpoint creation, fitted preprocessing, test-target access, or accepted-artifact modification",
+  "evaluated_at": "2026-08-03",
+  "plan_id": "stage_a_training_plan_v1",
+  "plan_root": "artifacts/stage_a_training_plan_v1",
+  "declared_plan_head": "7607eb88156862706e74710fc8da42db66abc862",
+  "observed_plan_head": "7607eb88156862706e74710fc8da42db66abc862",
+  "artifact_identity": {
+    "all_13_declared_artifact_hashes_match": true,
+    "inventory_self_excluding": true,
+    "inventory_binds_other_12_files": true,
+    "plan_artifacts_committed_at_declared_head": true,
+    "rf_gate_commit_present_and_ancestor_of_plan_head": true,
+    "tgnn_gate_commit_present_and_ancestor_of_plan_head": true,
+    "rf_gate_report_sha256_match": true,
+    "rf_dataset_manifest_sha256_match": true,
+    "tgnn_gate_report_sha256_match": true,
+    "tgnn_dataset_manifest_sha256_match": true,
+    "accepted_dataset_gates_remain_accepted": true,
+    "accepted_artifacts_modified": false
+  },
+  "accepted_inputs": {
+    "rf_gate_commit": "5ca5d984645466321a8733c59a2dd5a879d8ce50",
+    "rf_gate_report_sha256": "9f47a7a1beeceef5907025f93930ef1b15c1976ac5af049abd3474678dc81414",
+    "rf_dataset_manifest_sha256": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+    "tgnn_gate_commit": "ea32faab3945f24e5ed234947b03cda56dbdd95f",
+    "tgnn_gate_report_sha256": "8d095dbd3b184c8ba6d00d474cf75bb921060034bc45258f3e9aca3bfb4afe6a",
+    "tgnn_dataset_manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "rf_status": "accepted",
+    "tgnn_status": "accepted"
+  },
+  "gate_checks": {
+    "common_split_policy": "passed",
+    "model_coverage": "passed",
+    "rf_search_consistency": "blocked_by_unspecified_parameters",
+    "tgnn_search_consistency": "passed",
+    "runtime_compatibility": "environment_preparation_required_for_tgnn",
+    "classification_policy": "passed",
+    "regression_policy": "blocked_by_missing_exact_formulas",
+    "preprocessing_policy": "blocked_by_missing_artifact_serialization_rule",
+    "model_selection_and_early_stopping": "blocked_by_incomplete_rf_simplicity_order",
+    "reproducibility": "passed",
+    "final_test_opening_protocol": "passed",
+    "non_execution_confirmation": "passed"
+  },
+  "plan_blockers": [
+    {
+      "id": "RF-PARAMETER-CLOSURE",
+      "finding": "The RF specification does not explicitly freeze all estimator parameters. The installed scikit-learn 1.9.0 signatures expose min_weight_fraction_leaf, min_impurity_decrease, verbose, warm_start, ccp_alpha, and monotonic_cst, and the plan also does not explicitly bind n_jobs=1 as an estimator parameter.",
+      "minimum_remediation": "Add explicit frozen values for every omitted RF estimator parameter, including n_jobs=1: min_weight_fraction_leaf=0.0, min_impurity_decrease=0.0, verbose=0, warm_start=false, ccp_alpha=0.0, monotonic_cst=null, and n_jobs=1 for both applicable estimator specifications."
+    },
+    {
+      "id": "RF-SIMPLICITY-ORDER",
+      "finding": "The RF tie-break says lower max_features complexity but does not define the exact ordering of the two frozen values sqrt and 0.75.",
+      "minimum_remediation": "Declare an explicit total order for max_features tie-breaking, for example sqrt before 0.75, and retain it as part of the frozen candidate-order/tie-break contract."
+    },
+    {
+      "id": "REGRESSION-FORMULAS",
+      "finding": "The regression policy names RMSE, MAE, and R2 and gives aggregation descriptions, but does not state exact run-level and design-level formulas.",
+      "minimum_remediation": "Add explicit equations, denominators, and aggregation sequence for run-level RMSE/MAE/R2 and design-level RMSE/MAE/R2, including the stated population residual-standard-deviation convention."
+    },
+    {
+      "id": "PREPROCESSING-SERIALIZATION",
+      "finding": "The plan requires preprocessing hashes and a preprocessing identity but does not specify the serialization format, canonical byte representation, field ordering, or exact hash input produced during training.",
+      "minimum_remediation": "Freeze the preprocessing artifact schema and canonical serialization/hash procedure, including scaled-feature order, means, scales, applicability-mask rule, zero-variance substitutions, encoding, and SHA-256 input bytes."
+    }
+  ],
+  "execution_environment_preparation_required": [
+    {
+      "id": "TGNN-NATIVE-IMPORT",
+      "finding": "All requested versions are installed exactly, but importing torch_geometric_temporal/GCLSTM fails because torch_sparse _version_cuda.pyd raises WinError 127 while loading.",
+      "classification": "execution-environment preparation requirement, not a plan contradiction",
+      "minimum_remediation": "Prepare a compatible CPU-only PyG/Torch-Sparse native installation and re-run the read-only import/signature gate before TGNN training authorization. RF imports are currently usable."
+    }
+  ],
+  "non_execution_confirmation": {
+    "rf_fit_called": false,
+    "tgnn_epoch_executed": false,
+    "optimizer_for_training_instantiated": false,
+    "checkpoint_created": false,
+    "fitted_preprocessing_statistic_created": false,
+    "test_target_opened_or_materialized": false,
+    "accepted_artifact_modified": false,
+    "gate_operations": "Plan JSON reads, accepted gate-report reads, hashing, git identity/status checks, package imports/version checks, estimator constructor validation without fit, and deterministic-setting validation only."
+  },
+  "verdict": "STAGE A TRAINING PLAN V1 BLOCKED — TARGETED REMEDIATION REQUIRED"
+}
