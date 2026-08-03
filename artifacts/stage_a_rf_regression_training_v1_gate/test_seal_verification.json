@@ -1,0 +1,17 @@
+{
+  "checked_input_paths": [
+    "rf_validation.csv",
+    "five final joblib models",
+    "training output JSON/JSONL artifacts"
+  ],
+  "prohibited_test_paths_opened": [],
+  "result": "PASS",
+  "sealed_test_index_opened": false,
+  "test_access": false,
+  "test_metric_exists": false,
+  "test_metrics": false,
+  "test_prediction_exists": false,
+  "test_predictions": false,
+  "test_record_in_prediction_artifact": false,
+  "test_target_source_opened": false
+}

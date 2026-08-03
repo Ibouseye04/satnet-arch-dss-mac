@@ -1,0 +1,121 @@
+{
+  "bootstrap_failures": [],
+  "bootstrap_unit": "design_id",
+  "candidate_selection_affected_by_bootstrap_warning": false,
+  "computed_intervals": {
+    "design_level": {
+      "mae": {
+        "lower_2_5_percent": 0.07515300970754897,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.251264883113118,
+        "valid_replicates": 10000
+      },
+      "r2": {
+        "lower_2_5_percent": 0.13358625596927834,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.9076213166654348,
+        "valid_replicates": 10000
+      },
+      "rmse": {
+        "lower_2_5_percent": 0.08976496459010508,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.3452937828386257,
+        "valid_replicates": 10000
+      }
+    },
+    "run_level": {
+      "mae": {
+        "lower_2_5_percent": 0.0798682279603424,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.25669484734950776,
+        "valid_replicates": 10000
+      },
+      "r2": {
+        "lower_2_5_percent": 0.12827030290644048,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.8771462281458887,
+        "valid_replicates": 10000
+      },
+      "rmse": {
+        "lower_2_5_percent": 0.10387034537659605,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.3495539734785802,
+        "valid_replicates": 10000
+      }
+    }
+  },
+  "percentile_levels": [
+    2.5,
+    97.5
+  ],
+  "percentile_order_valid": true,
+  "r2_undefined_replicates": {
+    "design_level": 0,
+    "run_level": 0
+  },
+  "r2_undefined_values_remain_null": true,
+  "r2_valid_replicates": {
+    "design_level": 10000,
+    "run_level": 10000
+  },
+  "realizations_per_selected_design": 5,
+  "replicates": 10000,
+  "result": "PASS",
+  "retains_five_realizations": true,
+  "seed": 63002,
+  "stored_intervals": {
+    "design_level": {
+      "mae": {
+        "lower_2_5_percent": 0.07515300970754897,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.251264883113118,
+        "valid_replicates": 10000
+      },
+      "r2": {
+        "lower_2_5_percent": 0.13358625596927834,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.9076213166654348,
+        "valid_replicates": 10000
+      },
+      "rmse": {
+        "lower_2_5_percent": 0.08976496459010508,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.3452937828386257,
+        "valid_replicates": 10000
+      }
+    },
+    "run_level": {
+      "mae": {
+        "lower_2_5_percent": 0.0798682279603424,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.25669484734950776,
+        "valid_replicates": 10000
+      },
+      "r2": {
+        "lower_2_5_percent": 0.12827030290644048,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.8771462281458887,
+        "valid_replicates": 10000
+      },
+      "rmse": {
+        "lower_2_5_percent": 0.10387034537659605,
+        "total_replicates": 10000,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.3495539734785802,
+        "valid_replicates": 10000
+      }
+    }
+  },
+  "validation_designs": 15
+}
