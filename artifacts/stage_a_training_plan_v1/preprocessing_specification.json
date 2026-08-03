@@ -1,0 +1,79 @@
+{
+  "specification_id": "stage_a_preprocessing_v1",
+  "status": "frozen",
+  "fit_boundary": "Every fitted statistic is computed from training split examples only, after split assignment and before validation evaluation. Validation and test use the frozen training-derived transform.",
+  "fitted_artifact_policy": "No fitted preprocessing artifact, statistics file, or transformed dataset is created by this planning task.",
+  "rf": {
+    "transform": "none",
+    "reason": "The accepted RF predictors are numeric design/configuration fields and the selected estimators are tree-based; no scaling is required or permitted."
+  },
+  "tgnn_node_features": {
+    "dimension": 14,
+    "exact_order": [
+      "node_type_satellite",
+      "node_type_ground_station",
+      "plane_index",
+      "satellite_within_plane_index",
+      "ground_station_class_civilian",
+      "ground_station_class_government",
+      "ground_station_class_military",
+      "latitude_deg",
+      "longitude_deg",
+      "altitude_m",
+      "ecef_x_km",
+      "ecef_y_km",
+      "ecef_z_km",
+      "operational_indicator"
+    ],
+    "scaled_features": ["latitude_deg", "longitude_deg", "altitude_m", "ecef_x_km", "ecef_y_km", "ecef_z_km"],
+    "unscaled_features": [
+      "node_type_satellite",
+      "node_type_ground_station",
+      "plane_index",
+      "satellite_within_plane_index",
+      "ground_station_class_civilian",
+      "ground_station_class_government",
+      "ground_station_class_military",
+      "operational_indicator"
+    ],
+    "transform": "training-only standardization z=(x-training_mean)/training_population_std for applicable values",
+    "statistic_convention": "one global training-derived mean and population standard deviation per scaled feature across training designs, realizations, snapshots, and applicable nodes; if a fitted standard deviation is exactly zero, use scale=1.0 and record that degenerate-feature rule",
+    "applicability_masks": {
+      "ground_only_features": "latitude_deg, longitude_deg, altitude_m, ecef_x_km, ecef_y_km, ecef_z_km are fitted only on ground-station nodes",
+      "satellite_only_indices": "plane_index and satellite_within_plane_index remain unscaled and are zero on ground-station nodes",
+      "one_hot_and_status": "node-type, station-class, and operational_indicator fields remain binary and unscaled"
+    },
+    "sentinel_zero_policy": "Canonical positive zero for a non-applicable field remains exactly zero after transformation; it is excluded from fitted statistics through the applicability mask. An applicable physical value equal to zero is included using its node-type applicability mask, so sentinel and physical zero are not conflated.",
+    "temporal_policy": "Statistics are pooled over training snapshots only; no validation/test snapshot contributes to fitting, and no per-run or per-snapshot refit is allowed."
+  },
+  "tgnn_edge_attributes": {
+    "dimension": 10,
+    "exact_order": [
+      "distance_km",
+      "margin_db",
+      "elevation_deg",
+      "slant_range_km",
+      "link_type_intra_plane",
+      "link_type_inter_plane",
+      "link_type_seam_link",
+      "link_mode_optical",
+      "edge_type_inter_satellite",
+      "edge_type_satellite_ground"
+    ],
+    "scaled_features": [],
+    "unscaled_features": "all ten accepted attributes remain in canonical source units and binary one-hot form",
+    "reason": "The contracted v1 GCLSTM consumes accepted edge_index connectivity and no edge_attr-derived scalar; scaling or reducing edge_attr would not be used by this architecture and would alter the accepted input contract.",
+    "sentinel_zero_policy": "Positive zero remains the non-applicable value for attributes of the other edge type; edge-type applicability is represented by the accepted one-hot fields. No missing edge is represented by a fabricated edge or imputed attribute.",
+    "zero_edge_snapshots": "edge_attr remains shape [0,10] with no statistics fitted from its empty population."
+  },
+  "targets": {
+    "classification": {"normalization": "none", "transformation": "none"},
+    "regression": {"normalization": "none", "transformation": "none", "reversible": true}
+  },
+  "leakage_controls": [
+    "No target, target derivative, whole-run summary, split label, identifier, or hash is a feature.",
+    "No statistic is fitted from validation or test data.",
+    "No target normalization or regression-target transformation is permitted in v1.",
+    "Any future change to scaling, sentinel handling, or target transformation requires a new frozen plan."
+  ]
+}

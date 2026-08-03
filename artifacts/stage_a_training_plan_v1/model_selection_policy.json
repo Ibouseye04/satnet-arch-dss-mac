@@ -1,0 +1,51 @@
+{
+  "policy_id": "stage_a_model_selection_v1",
+  "status": "frozen",
+  "scope": ["rf_classification", "rf_regression", "tgnn_classification", "tgnn_regression"],
+  "candidate_evaluation": {
+    "fit_only": "train split",
+    "selection_only": "validation split",
+    "test_access": false,
+    "candidate_order": "the exact order declared in each family specification",
+    "failed_candidate": "record failure and stop the affected experiment; do not silently replace its configuration or inspect test data"
+  },
+  "classification": {
+    "hierarchy": [
+      "training-weighted validation log loss, lower is better",
+      "macro-F1, higher is better",
+      "balanced accuracy, higher is better",
+      "class-0 recall/specificity, higher is better",
+      "simpler model or architecture if still tied"
+    ],
+    "threshold": 0.5,
+    "threshold_selection": "no optimization; threshold is frozen before training and test authorization",
+    "class_weights": "computed from training labels only",
+    "tie_breaker_definition": "RF: lower n_estimators, shallower max_depth (None is treated as most complex), larger min_samples_leaf, then lower max_features complexity; TGNN: lower hidden dimension, fewer layers, lower dropout, then earlier candidate index."
+  },
+  "regression": {
+    "hierarchy": [
+      "validation RMSE, lower is better",
+      "validation MAE, lower is better",
+      "validation R2, higher is better",
+      "simpler model or architecture if still tied"
+    ],
+    "tie_breaker_definition": "RF: use the RF simplicity order; TGNN: use the TGNN simplicity order; then earlier candidate index."
+  },
+  "final_identity_freeze": {
+    "required_fields": [
+      "model family and task",
+      "target alias and source field",
+      "accepted dataset manifest SHA-256",
+      "exact predictor/node/edge order",
+      "preprocessing specification identity",
+      "selected hyperparameters",
+      "threshold for classification",
+      "library and environment versions",
+      "fixed final seed list",
+      "checkpoint/serialization format"
+    ],
+    "freeze_event": "After the four independent model-specific training gates accept their outputs and before any test target is opened.",
+    "after_test_opening": "No retuning, recalibration, feature change, architecture change, seed change, or model replacement."
+  },
+  "selection_outputs": "For each task, retain a complete candidate table with candidate index, configuration, seed, train/validation sizes, primary and secondary metrics, tie-break decisions, and immutable selected identity."
+}

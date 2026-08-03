@@ -1,0 +1,132 @@
+{
+  "specification_id": "stage_a_rf_training_v1",
+  "status": "frozen",
+  "dataset": {
+    "manifest_sha256": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+    "row_granularity": "one complete simulation run",
+    "predictor_count": 12,
+    "predictor_order": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "ground_station_failure_probability"
+    ],
+    "classification_target": "partition_any",
+    "regression_target": "gcc_frac_min",
+    "predictor_policy": "The exact accepted 12-column order is mandatory; no additional or replacement predictor is allowed."
+  },
+  "implementation": {
+    "classification_estimator": "sklearn.ensemble.RandomForestClassifier",
+    "regression_estimator": "sklearn.ensemble.RandomForestRegressor",
+    "scikit_learn_version": "1.9.0",
+    "python_version": "3.11.9",
+    "feature_scaling": "disabled; tree estimators operate on the accepted raw predictor values",
+    "random_state_parameter": "set on every estimator",
+    "parallel_workers": 1,
+    "reason_for_single_worker": "deterministic tree construction and stable candidate ordering on the Windows CPU machine"
+  },
+  "fixed_estimator_parameters": {
+    "classification": {
+      "criterion": "gini",
+      "class_weight": "balanced",
+      "bootstrap": true,
+      "min_samples_split": 2,
+      "max_leaf_nodes": null,
+      "oob_score": false,
+      "max_samples": null
+    },
+    "regression": {
+      "criterion": "squared_error",
+      "bootstrap": true,
+      "min_samples_split": 2,
+      "max_leaf_nodes": null,
+      "oob_score": false,
+      "max_samples": null
+    }
+  },
+  "candidate_search": {
+    "strategy": "exhaustive evaluation of a finite, predeclared Cartesian candidate list; no adaptive search",
+    "candidate_count_per_task": 24,
+    "candidate_order": "candidate_index ascending; n_estimators, max_depth, min_samples_leaf, then max_features vary in the listed order",
+    "search_space": {
+      "n_estimators": [200, 400],
+      "max_depth": [null, 16, 32],
+      "min_samples_leaf": [1, 2],
+      "max_features": ["sqrt", 0.75]
+    },
+    "candidate_configurations": [
+      {"n_estimators": 200, "max_depth": null, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": null, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 200, "max_depth": null, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": null, "min_samples_leaf": 2, "max_features": 0.75},
+      {"n_estimators": 200, "max_depth": 16, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": 16, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 200, "max_depth": 16, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": 16, "min_samples_leaf": 2, "max_features": 0.75},
+      {"n_estimators": 200, "max_depth": 32, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": 32, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 200, "max_depth": 32, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 200, "max_depth": 32, "min_samples_leaf": 2, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": null, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": null, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": null, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": null, "min_samples_leaf": 2, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": 16, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": 16, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": 16, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": 16, "min_samples_leaf": 2, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": 32, "min_samples_leaf": 1, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": 32, "min_samples_leaf": 1, "max_features": 0.75},
+      {"n_estimators": 400, "max_depth": 32, "min_samples_leaf": 2, "max_features": "sqrt"},
+      {"n_estimators": 400, "max_depth": 32, "min_samples_leaf": 2, "max_features": 0.75}
+    ],
+    "search_seed_schedule": {
+      "formula": "random_state = 41000 + candidate_index",
+      "candidate_index_base": 0,
+      "classification_seed_range": [41000, 41023],
+      "regression_seed_range": [41000, 41023]
+    },
+    "candidate_artifacts": "Record metrics and configuration only; do not retain candidate model files."
+  },
+  "validation_evaluation": {
+    "fit_split": "train only",
+    "selection_split": "validation only",
+    "classification_primary": "training-weighted validation log loss",
+    "regression_primary": "validation RMSE",
+    "metrics_and_ties": "Use classification_metric_and_imbalance_policy.json and regression_metric_policy.json exactly.",
+    "threshold": 0.5,
+    "test_access": false
+  },
+  "final_models": {
+    "repeated_seed_runs_per_task": 5,
+    "seed_schedule": [51001, 51002, 51003, 51004, 51005],
+    "fit_data": "training split only; no train/validation merge",
+    "identity": "selected candidate configuration plus target alias, accepted predictor order, preprocessing identity, library versions, and the five final seeds",
+    "aggregation": "For final reporting, classification probabilities and regression predictions are averaged across the five fixed seed runs before thresholding or metric calculation.",
+    "test_evaluation": "one evaluation of the frozen five-seed ensemble after authorization"
+  },
+  "serialization": {
+    "format": "joblib serialized estimator",
+    "library": "joblib 1.5.3",
+    "protocol": 5,
+    "compression": 0,
+    "metadata_required": ["target", "task_type", "predictor_order", "selected_configuration", "seed", "package_versions", "source_manifest_sha256", "config_hash"]
+  },
+  "feature_importance": {
+    "method": "mean decrease in impurity from estimator.feature_importances_",
+    "scope": "reported for frozen training-fitted final forests; no test-derived importance",
+    "permutation_importance": "disabled for v1"
+  },
+  "probability_calibration": {
+    "enabled": false,
+    "reason": "No calibration split or post-selection calibration is introduced; raw forest probabilities are used with the threshold frozen at 0.5."
+  }
+}

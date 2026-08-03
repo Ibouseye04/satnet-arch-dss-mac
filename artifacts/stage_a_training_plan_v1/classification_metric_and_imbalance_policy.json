@@ -1,0 +1,66 @@
+{
+  "policy_id": "stage_a_classification_metrics_imbalance_v1",
+  "status": "frozen",
+  "target": {"alias": "partition_any", "source_field": "overall_threshold_breach_any", "positive_class": 1, "negative_class": 0},
+  "accepted_distribution": {
+    "train": {"runs": 350, "class_0": 49, "class_1": 301},
+    "validation": {"runs": 75, "class_0": 2, "class_1": 73},
+    "test": {"runs": 75, "status": "sealed"}
+  },
+  "imbalance_handling": {
+    "policy": "balanced training loss using training labels only",
+    "class_weight_formula": "w_c = N_train / (2 * n_train_c)",
+    "class_weight_source": "training labels only",
+    "expected_training_counts": {"class_0": 49, "class_1": 301},
+    "validation_or_test_influence": false,
+    "accuracy_role": "descriptive only; never the primary selection metric"
+  },
+  "loss_and_threshold": {
+    "selection_loss": "training-weighted validation log loss",
+    "validation_log_loss_sample_weight": "apply the training-derived class weight corresponding to each validation label; normalize by the sum of validation sample weights as implemented by the metric",
+    "decision_threshold": 0.5,
+    "threshold_rule": "fixed default threshold; no validation optimization and no test optimization",
+    "alternative_threshold": "none permitted for v1"
+  },
+  "selection_hierarchy": [
+    {"rank": 1, "metric": "weighted_validation_log_loss", "direction": "lower_is_better"},
+    {"rank": 2, "metric": "macro_f1", "direction": "higher_is_better"},
+    {"rank": 3, "metric": "balanced_accuracy", "direction": "higher_is_better"},
+    {"rank": 4, "metric": "class_0_recall_specificity", "direction": "higher_is_better"},
+    {"rank": 5, "metric": "simpler_model_or_architecture", "direction": "preferred_if_still_tied"}
+  ],
+  "reported_metrics": [
+    "weighted_validation_log_loss",
+    "confusion_matrix",
+    "accuracy",
+    "balanced_accuracy",
+    "precision",
+    "recall_class_1",
+    "specificity_class_0_recall",
+    "macro_f1",
+    "weighted_f1",
+    "roc_auc_when_both_classes_are_present",
+    "pr_auc_average_precision",
+    "brier_score",
+    "run_level_results",
+    "design_level_aggregated_results",
+    "design_level_uncertainty_intervals"
+  ],
+  "aggregation": {
+    "selection_level": "run-level validation predictions",
+    "design_level_classification": "for each design, aggregate predicted breach probability as max over its five realization probabilities and aggregate observed label as max over its five realization labels; report separately from run-level selection",
+    "confusion_matrix_axis_order": "rows observed [0,1], columns predicted [0,1]",
+    "specificity_definition": "TN / (TN + FP), explicitly reported as class-0 recall"
+  },
+  "uncertainty": {
+    "method": "design-level nonparametric bootstrap with replacement",
+    "replicates": 10000,
+    "confidence_level": 0.95,
+    "interval": "percentile 2.5th and 97.5th percentiles",
+    "bootstrap_seed": 63001,
+    "resampling_unit": "design_id, never an individual realization",
+    "undefined_metric_rule": "If a resample lacks a required class, record NaN for that replicate and report the valid-replicate count; never manufacture a class.",
+    "limited_negative_warning": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and any metric requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates; this limitation must appear in every validation report."
+  },
+  "test_reporting": "Apply the frozen threshold and report all listed metrics once; test metrics cannot trigger a new threshold, model, or preprocessing decision."
+}

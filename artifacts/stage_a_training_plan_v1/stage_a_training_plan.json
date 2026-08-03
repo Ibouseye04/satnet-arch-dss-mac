@@ -1,0 +1,99 @@
+{
+  "plan_id": "stage_a_training_plan_v1",
+  "status": "frozen",
+  "verdict": "STAGE A TRAINING PLAN V1 FROZEN — READY FOR NARROW INDEPENDENT PLAN GATE",
+  "freeze_date": "2026-08-03",
+  "scope": "Training, validation, model selection, preprocessing, reproducibility, and final-test authorization only.",
+  "prohibited_in_this_task": [
+    "RF or TGNN training",
+    "checkpoint creation",
+    "fitted normalization-statistics calculation",
+    "opening or materializing test targets",
+    "modification of accepted datasets or evidence",
+    "modification of unrelated worktree files",
+    "independent training-plan gate execution"
+  ],
+  "authoritative_inputs": {
+    "rf": {
+      "dataset_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_rf_dataset_v1",
+      "manifest": "artifacts/stage_a_rf_dataset_v1/rf_dataset_manifest.json",
+      "manifest_sha256": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+      "gate_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_rf_dataset_v1_gate",
+      "gate_report": "artifacts/stage_a_rf_dataset_v1_gate/rf_dataset_gate_report.json",
+      "gate_report_sha256": "9f47a7a1beeceef5907025f93930ef1b15c1976ac5af049abd3474678dc81414",
+      "gate_commit": "5ca5d984645466321a8733c59a2dd5a879d8ce50",
+      "status": "accepted"
+    },
+    "tgnn": {
+      "dataset_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_dataset_v1",
+      "manifest": "artifacts/stage_a_tgnn_dataset_v1/tgnn_dataset_manifest.json",
+      "manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+      "gate_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_dataset_v1_gate",
+      "gate_report": "artifacts/stage_a_tgnn_dataset_v1_gate/tgnn_dataset_gate_report.json",
+      "gate_report_sha256": "8d095dbd3b184c8ba6d00d474cf75bb921060034bc45258f3e9aca3bfb4afe6a",
+      "gate_commit": "ea32faab3945f24e5ed234947b03cda56dbdd95f",
+      "status": "accepted"
+    }
+  },
+  "data_identities": {
+    "splits": {
+      "train": {"designs": 70, "runs": 350},
+      "validation": {"designs": 15, "runs": 75},
+      "test": {"designs": 15, "runs": 75, "status": "sealed"}
+    },
+    "realizations_per_design": 5,
+    "targets": {
+      "classification": {"alias": "partition_any", "source_field": "overall_threshold_breach_any"},
+      "regression": {"alias": "gcc_frac_min", "source_field": "space_gcc_fraction_original_min"}
+    }
+  },
+  "models": [
+    {"id": "rf_classification", "family": "RandomForestClassifier", "target": "partition_any"},
+    {"id": "rf_regression", "family": "RandomForestRegressor", "target": "gcc_frac_min"},
+    {"id": "tgnn_classification", "family": "contracted GCLSTM", "target": "partition_any"},
+    {"id": "tgnn_regression", "family": "contracted GCLSTM", "target": "gcc_frac_min"}
+  ],
+  "execution_order": [
+    "RF classification training",
+    "independent RF-classification training gate",
+    "RF regression training",
+    "independent RF-regression training gate",
+    "TGNN classification training",
+    "independent TGNN-classification training gate",
+    "TGNN regression training",
+    "independent TGNN-regression training gate",
+    "freeze four final model identities",
+    "authorize one-time test opening",
+    "evaluate all four models on the test split once",
+    "prohibit retuning after test evaluation"
+  ],
+  "invariants": [
+    "Design-level split assignments are immutable.",
+    "All five realizations of every design remain in one split.",
+    "Train, validation, and sealed test identities are never mixed.",
+    "Training-only fitting is required for class weights and preprocessing statistics.",
+    "Validation is used only for model selection and TGNN early stopping.",
+    "Test targets are unavailable until all four final specifications and final fitted weights are frozen.",
+    "No model, threshold, preprocessing rule, architecture, or hyperparameter may change after test results are opened."
+  ],
+  "child_specifications": [
+    "common_split_usage_policy.json",
+    "classification_metric_and_imbalance_policy.json",
+    "regression_metric_policy.json",
+    "rf_training_specification.json",
+    "tgnn_training_specification.json",
+    "preprocessing_specification.json",
+    "reproducibility_and_seed_schedule.json",
+    "model_selection_policy.json",
+    "final_test_opening_protocol.json",
+    "compute_budget.json"
+  ],
+  "verification_boundary": {
+    "dataset_gates_verified": true,
+    "test_target_files_opened": false,
+    "fitted_statistics_calculated": false,
+    "training_executed": false,
+    "checkpoints_created": false,
+    "accepted_dataset_or_evidence_modified": false
+  }
+}

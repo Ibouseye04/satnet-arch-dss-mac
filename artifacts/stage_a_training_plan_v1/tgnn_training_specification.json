@@ -1,0 +1,121 @@
+{
+  "specification_id": "stage_a_tgnn_training_v1",
+  "status": "frozen",
+  "dataset": {
+    "manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "graph_scope": "combined satellite-ground heterogeneous temporal graph",
+    "sequence_unit": "one complete run with 11 ordered valid snapshots",
+    "node_features": {
+      "dimension": 14,
+      "exact_order": [
+        "node_type_satellite",
+        "node_type_ground_station",
+        "plane_index",
+        "satellite_within_plane_index",
+        "ground_station_class_civilian",
+        "ground_station_class_government",
+        "ground_station_class_military",
+        "latitude_deg",
+        "longitude_deg",
+        "altitude_m",
+        "ecef_x_km",
+        "ecef_y_km",
+        "ecef_z_km",
+        "operational_indicator"
+      ]
+    },
+    "edge_attributes": {
+      "dimension": 10,
+      "exact_order": [
+        "distance_km",
+        "margin_db",
+        "elevation_deg",
+        "slant_range_km",
+        "link_type_intra_plane",
+        "link_type_inter_plane",
+        "link_type_seam_link",
+        "link_mode_optical",
+        "edge_type_inter_satellite",
+        "edge_type_satellite_ground"
+      ],
+      "directionality": "each undirected physical edge is serialized as two directed COO entries with duplicated attributes"
+    },
+    "targets": {
+      "classification": {"alias": "partition_any", "source_field": "overall_threshold_breach_any"},
+      "regression": {"alias": "gcc_frac_min", "source_field": "space_gcc_fraction_original_min"}
+    }
+  },
+  "graph_handling": {
+    "node_order": "canonical G3 order: satellite numeric ascending, then ground_station_id lexical ascending",
+    "variable_node_counts": "preserve exact per-snapshot node counts using snapshot_node_offsets and node_identity_index; no padding and no masking",
+    "failed_satellites": "absent under accepted G3 operational graph semantics",
+    "failed_ground_stations": "retained as nodes with operational_indicator=0 under the accepted persistent G5 overlay",
+    "zero_edge_snapshots": "preserve exact edge_index shape [2,0] and edge_attr shape [0,10]; do not add self-loops, dummy edges, or fabricated edge weights",
+    "accepted_zero_edge_snapshot_count": 27,
+    "edge_attributes_in_contracted_model": "edge_attr is preserved, validated, and serialized in the accepted schema. The contracted existing GCLSTM call consumes edge_index and no edge_attr-derived scalar edge_weight; no edge-aware redesign or scalar reduction is introduced in v1.",
+    "temporal_state": "reset hidden and cell state at the beginning of every independent run; process snapshots in accepted temporal order; pool the final snapshot state"
+  },
+  "architecture": {
+    "model": "satnet.models.gnn_model.SatelliteGNN with torch_geometric_temporal.nn.recurrent.GCLSTM",
+    "input_mode": "full",
+    "gclstm_layers": 1,
+    "chebyshev_K": 2,
+    "chebyshev_constraint": "K > 1; K=2 is frozen",
+    "hidden_dimension_search": [32, 64],
+    "dropout_search": [0.0],
+    "layer_count_search": [1],
+    "pooling": "global mean pooling over final-timestep node embeddings",
+    "prediction_head": "one Linear(hidden_dimension, 2) head for classification logits or one Linear(hidden_dimension, 1) head for regression scalar",
+    "activation": "the contracted GCLSTM implementation and linear head; no additional activation or architectural block",
+    "architecture_change_policy": "No attention, message-passing redesign, edge encoder, extra recurrent layer, or alternate pooling is permitted in v1."
+  },
+  "optimization": {
+    "learning_rate_search": [0.001, 0.003],
+    "batch_size_search": [1],
+    "batching": "one complete temporal sequence per batch; batch size 1 is required by the contracted sequence-forward implementation",
+    "optimizer": "torch.optim.Adam",
+    "optimizer_parameters": {"betas": [0.9, 0.999], "eps": 1e-08, "weight_decay": 1e-05},
+    "maximum_epochs_per_configuration": 60,
+    "early_stopping": {
+      "enabled": true,
+      "classification_metric": "training-weighted validation log loss",
+      "regression_metric": "validation RMSE",
+      "patience": 12,
+      "minimum_delta": 0.0,
+      "restore_best_checkpoint": true
+    },
+    "learning_rate_scheduler": {"enabled": false, "type": null},
+    "gradient_clipping": {"enabled": false, "max_norm": null},
+    "classification_loss": "CrossEntropyLoss with weights computed from training labels only",
+    "regression_loss": "SmoothL1Loss(beta=1.0) with unnormalized target"
+  },
+  "candidate_search": {
+    "strategy": "exhaustive evaluation of the four predeclared Cartesian configurations; no adaptive search",
+    "candidate_count_per_task": 4,
+    "candidate_order": "hidden_dimension outer loop, learning_rate inner loop; all fixed singleton dimensions remain constant",
+    "candidate_configurations": [
+      {"hidden_dimension": 32, "layers": 1, "dropout": 0.0, "chebyshev_K": 2, "learning_rate": 0.001, "batch_size": 1, "weight_decay": 1e-05},
+      {"hidden_dimension": 32, "layers": 1, "dropout": 0.0, "chebyshev_K": 2, "learning_rate": 0.003, "batch_size": 1, "weight_decay": 1e-05},
+      {"hidden_dimension": 64, "layers": 1, "dropout": 0.0, "chebyshev_K": 2, "learning_rate": 0.001, "batch_size": 1, "weight_decay": 1e-05},
+      {"hidden_dimension": 64, "layers": 1, "dropout": 0.0, "chebyshev_K": 2, "learning_rate": 0.003, "batch_size": 1, "weight_decay": 1e-05}
+    ],
+    "search_seed_schedule": {
+      "formula": "seed = 61000 + candidate_index",
+      "candidate_index_base": 0,
+      "seed_range": [61000, 61003]
+    }
+  },
+  "checkpoint_selection": {
+    "format": "torch.save dictionary containing model_state_dict, optimizer_state_dict, epoch, selected configuration, target, preprocessing identity, seed, validation primary metric, and environment identity",
+    "candidate_rule": "retain the epoch with the best primary validation metric; use the full task selection hierarchy for equal primary values; if still tied, choose the earliest epoch",
+    "final_repeated_seed_rule": "each of five final seed runs uses the same frozen configuration and its validation-selected checkpoint; no test metric participates",
+    "candidate_checkpoint_retention": "candidate checkpoints are temporary execution artifacts and are not part of this planning commit"
+  },
+  "final_models": {
+    "repeated_seed_runs_per_task": 5,
+    "seed_schedule": [62001, 62002, 62003, 62004, 62005],
+    "fit_data": "training split only; validation remains a selection and early-stopping split; no train/validation merge",
+    "aggregation": "classification soft probabilities and regression predictions are averaged across the five frozen seed runs before final test metrics",
+    "test_evaluation": "one evaluation of the frozen five-seed ensemble after one-time authorization"
+  }
+}

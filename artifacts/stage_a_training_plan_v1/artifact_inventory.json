@@ -1,0 +1,20 @@
+{
+  "inventory_version": "1",
+  "inventory_scope": "artifacts/stage_a_training_plan_v1",
+  "self_excluding": true,
+  "artifact_count_excluding_inventory": 12,
+  "artifacts": [
+    {"path": "artifacts/stage_a_training_plan_v1/classification_metric_and_imbalance_policy.json", "bytes": 3640, "sha256": "5b4dae673920520fb752e4d805e5dd7ca6f899937c2c1ddb34548452759b7792"},
+    {"path": "artifacts/stage_a_training_plan_v1/common_split_usage_policy.json", "bytes": 3058, "sha256": "487e4b1d14c23eb09be9175ecb05f7fa692763f03033ca8ef7af6c9fa458b3d5"},
+    {"path": "artifacts/stage_a_training_plan_v1/compute_budget.json", "bytes": 1850, "sha256": "5981bd2e66dc3a3fbc5c0771094a1db16f0e000e3f58c2a240270a72a3c0b188"},
+    {"path": "artifacts/stage_a_training_plan_v1/final_test_opening_protocol.json", "bytes": 3272, "sha256": "c1e243f99b0371045a4a8fe38b7fc4755a044813d4de05d16d6b8b4bb205d1c0"},
+    {"path": "artifacts/stage_a_training_plan_v1/model_selection_policy.json", "bytes": 2567, "sha256": "f19d106e934ed5aceadc33ee9f87edb0c9775f74804b2e6892185852c78e59ae"},
+    {"path": "artifacts/stage_a_training_plan_v1/preprocessing_specification.json", "bytes": 4548, "sha256": "2bec8f3d9a9870d3b2caf6a7d989dfb515cb07b62a77ab1a934f208a4bd8b8cd"},
+    {"path": "artifacts/stage_a_training_plan_v1/README.md", "bytes": 4599, "sha256": "1d5ad7398b7aa38020199837d2055954cdac7ccd63a127b8b37e4b7c13165aac"},
+    {"path": "artifacts/stage_a_training_plan_v1/regression_metric_policy.json", "bytes": 2062, "sha256": "fff940cee334b51af4b3cacbf09a045915c476c3c84b9f86db0708a1ba346777"},
+    {"path": "artifacts/stage_a_training_plan_v1/reproducibility_and_seed_schedule.json", "bytes": 3462, "sha256": "9fbd4cde8089f4811d6b886c8105c947535282b12d83d7667d93bb60e57e27a3"},
+    {"path": "artifacts/stage_a_training_plan_v1/rf_training_specification.json", "bytes": 6756, "sha256": "2addd564c7d316ae318150492dcfe4667bd59ce4bb45b0085d7f0048175312e7"},
+    {"path": "artifacts/stage_a_training_plan_v1/stage_a_training_plan.json", "bytes": 4750, "sha256": "8b6a6f0f58c9c9ed4ad6a3407ee813be07dbfdb906a5c9967ed3565d7913b964"},
+    {"path": "artifacts/stage_a_training_plan_v1/tgnn_training_specification.json", "bytes": 6841, "sha256": "ee9c386b30babe356ddc680d34b9a1c38b965e4bbef146ce921bd57be956f654"}
+  ]
+}
