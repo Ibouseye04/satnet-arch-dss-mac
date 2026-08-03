@@ -1,0 +1,794 @@
+{
+  "replicates_attempted": 10000,
+  "result": "FAIL",
+  "retains_five_realizations": true,
+  "seed": 63001,
+  "seeds": {
+    "51001": {
+      "computed_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0010709782602773968,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1447421762230462,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "interval_mismatches": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ],
+      "stored_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0010709782602773968,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.1447421762230462,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+    },
+    "51002": {
+      "computed_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.001201308942468754,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.13188891219853094,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "interval_mismatches": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ],
+      "stored_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.001201308942468754,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.13188891219853094,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+    },
+    "51003": {
+      "computed_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.00083177429090525,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1333340344513383,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "interval_mismatches": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ],
+      "stored_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.00083177429090525,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.1333340344513383,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+    },
+    "51004": {
+      "computed_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0009204913850644175,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.1369659675654124,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "interval_mismatches": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ],
+      "stored_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0009204913850644175,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.1369659675654124,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+    },
+    "51005": {
+      "computed_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0012950402778095951,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 0.14541684090792611,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "undefined_replicates": 0,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "interval_mismatches": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ],
+      "stored_intervals": {
+        "accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "balanced_accuracy": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "brier_score": {
+          "lower_2_5_percent": 0.0012950402778095951,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.14541684090792611,
+          "valid_replicates": 10000
+        },
+        "class_0_recall_specificity": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        },
+        "class_1_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "class_1_recall": {
+          "lower_2_5_percent": 0.8,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "macro_f1": {
+          "lower_2_5_percent": 0.4444444444444444,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "pr_auc_average_precision": {
+          "lower_2_5_percent": 1.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        },
+        "roc_auc": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "weighted_f1": {
+          "lower_2_5_percent": 0.8888888888888888,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 1.0,
+          "valid_replicates": 10000
+        }
+      },
+      "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+    }
+  },
+  "unit": "design_id"
+}

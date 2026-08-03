@@ -1,0 +1,1833 @@
+{
+  "artifact_identity": {
+    "result": "PASS",
+    "source_artifacts": {
+      "artifact_inventory.json": {
+        "actual": {
+          "bytes": 2556,
+          "exists": true,
+          "sha256": "9fca4f776b380504c4f1f3d71d2b7ac23ad7b95a4675d029d58f1b8b14df0431"
+        },
+        "declared": {},
+        "expected": {
+          "bytes": 2556,
+          "sha256": "9fca4f776b380504c4f1f3d71d2b7ac23ad7b95a4675d029d58f1b8b14df0431"
+        }
+      },
+      "candidate_search_results.json": {
+        "actual": {
+          "bytes": 36760,
+          "exists": true,
+          "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86"
+        },
+        "declared": {
+          "bytes": 36760,
+          "path": "candidate_search_results.json",
+          "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86"
+        },
+        "expected": {
+          "bytes": 36760,
+          "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86"
+        }
+      },
+      "environment_manifest.json": {
+        "actual": {
+          "bytes": 495,
+          "exists": true,
+          "sha256": "6c459e7f08f12b6221a79349544d4c5a4d98769dbc3411e2dc6a3d9f3da75b54"
+        },
+        "declared": {
+          "bytes": 495,
+          "path": "environment_manifest.json",
+          "sha256": "6c459e7f08f12b6221a79349544d4c5a4d98769dbc3411e2dc6a3d9f3da75b54"
+        },
+        "expected": {
+          "bytes": 495,
+          "sha256": "6c459e7f08f12b6221a79349544d4c5a4d98769dbc3411e2dc6a3d9f3da75b54"
+        }
+      },
+      "execution_manifest.json": {
+        "actual": {
+          "bytes": 520,
+          "exists": true,
+          "sha256": "e75abe1cd7cb5f2f3da14de675651f862541c5f39c61e5dd8a8d13e5ae505853"
+        },
+        "declared": {
+          "bytes": 520,
+          "path": "execution_manifest.json",
+          "sha256": "e75abe1cd7cb5f2f3da14de675651f862541c5f39c61e5dd8a8d13e5ae505853"
+        },
+        "expected": {
+          "bytes": 520,
+          "sha256": "e75abe1cd7cb5f2f3da14de675651f862541c5f39c61e5dd8a8d13e5ae505853"
+        }
+      },
+      "final_seed_training_results.json": {
+        "actual": {
+          "bytes": 7057,
+          "exists": true,
+          "sha256": "1e7abb7fa2c7b025ed54224bdefd037c2e70949636bb3a690aa7765a11986e6b"
+        },
+        "declared": {
+          "bytes": 7057,
+          "path": "final_seed_training_results.json",
+          "sha256": "1e7abb7fa2c7b025ed54224bdefd037c2e70949636bb3a690aa7765a11986e6b"
+        },
+        "expected": {
+          "bytes": 7057,
+          "sha256": "1e7abb7fa2c7b025ed54224bdefd037c2e70949636bb3a690aa7765a11986e6b"
+        }
+      },
+      "rf_classification_seed_51001.joblib": {
+        "actual": {
+          "bytes": 225100,
+          "exists": true,
+          "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+        },
+        "declared": {
+          "bytes": 225100,
+          "path": "rf_classification_seed_51001.joblib",
+          "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+        },
+        "expected": {
+          "bytes": 225100,
+          "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+        }
+      },
+      "rf_classification_seed_51002.joblib": {
+        "actual": {
+          "bytes": 223357,
+          "exists": true,
+          "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+        },
+        "declared": {
+          "bytes": 223357,
+          "path": "rf_classification_seed_51002.joblib",
+          "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+        },
+        "expected": {
+          "bytes": 223357,
+          "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+        }
+      },
+      "rf_classification_seed_51003.joblib": {
+        "actual": {
+          "bytes": 220460,
+          "exists": true,
+          "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+        },
+        "declared": {
+          "bytes": 220460,
+          "path": "rf_classification_seed_51003.joblib",
+          "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+        },
+        "expected": {
+          "bytes": 220460,
+          "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+        }
+      },
+      "rf_classification_seed_51004.joblib": {
+        "actual": {
+          "bytes": 219158,
+          "exists": true,
+          "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+        },
+        "declared": {
+          "bytes": 219158,
+          "path": "rf_classification_seed_51004.joblib",
+          "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+        },
+        "expected": {
+          "bytes": 219158,
+          "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+        }
+      },
+      "rf_classification_seed_51005.joblib": {
+        "actual": {
+          "bytes": 219609,
+          "exists": true,
+          "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+        },
+        "declared": {
+          "bytes": 219609,
+          "path": "rf_classification_seed_51005.joblib",
+          "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+        },
+        "expected": {
+          "bytes": 219609,
+          "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+        }
+      },
+      "selected_configuration.json": {
+        "actual": {
+          "bytes": 708,
+          "exists": true,
+          "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c"
+        },
+        "declared": {
+          "bytes": 708,
+          "path": "selected_configuration.json",
+          "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c"
+        },
+        "expected": {
+          "bytes": 708,
+          "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c"
+        }
+      },
+      "training_report.json": {
+        "actual": {
+          "bytes": 248,
+          "exists": true,
+          "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00"
+        },
+        "declared": {
+          "bytes": 248,
+          "path": "training_report.json",
+          "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00"
+        },
+        "expected": {
+          "bytes": 248,
+          "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00"
+        }
+      },
+      "validation_bootstrap_intervals.json": {
+        "actual": {
+          "bytes": 12626,
+          "exists": true,
+          "sha256": "c387dd0e9d10b412a42f1fd04dfd707ae3d1c0b62060aeca980e04487b26c20b"
+        },
+        "declared": {
+          "bytes": 12626,
+          "path": "validation_bootstrap_intervals.json",
+          "sha256": "c387dd0e9d10b412a42f1fd04dfd707ae3d1c0b62060aeca980e04487b26c20b"
+        },
+        "expected": {
+          "bytes": 12626,
+          "sha256": "c387dd0e9d10b412a42f1fd04dfd707ae3d1c0b62060aeca980e04487b26c20b"
+        }
+      },
+      "validation_design_metrics.json": {
+        "actual": {
+          "bytes": 18713,
+          "exists": true,
+          "sha256": "5c3dfddfb29f0dd7275914accc65fe40adc62c9916edecf82afd367275da49cd"
+        },
+        "declared": {
+          "bytes": 18713,
+          "path": "validation_design_metrics.json",
+          "sha256": "5c3dfddfb29f0dd7275914accc65fe40adc62c9916edecf82afd367275da49cd"
+        },
+        "expected": {
+          "bytes": 18713,
+          "sha256": "5c3dfddfb29f0dd7275914accc65fe40adc62c9916edecf82afd367275da49cd"
+        }
+      },
+      "validation_metrics.json": {
+        "actual": {
+          "bytes": 7116,
+          "exists": true,
+          "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db"
+        },
+        "declared": {
+          "bytes": 7116,
+          "path": "validation_metrics.json",
+          "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db"
+        },
+        "expected": {
+          "bytes": 7116,
+          "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db"
+        }
+      },
+      "validation_predictions.jsonl": {
+        "actual": {
+          "bytes": 59690,
+          "exists": true,
+          "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+        },
+        "declared": {
+          "bytes": 59690,
+          "path": "validation_predictions.jsonl",
+          "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+        },
+        "expected": {
+          "bytes": 59690,
+          "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+        }
+      }
+    },
+    "training_artifacts_unchanged_during_gate": true
+  },
+  "bootstrap": {
+    "details": {
+      "replicates_attempted": 10000,
+      "result": "FAIL",
+      "retains_five_realizations": true,
+      "seed": 63001,
+      "seeds": {
+        "51001": {
+          "computed_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0010709782602773968,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 0.1447421762230462,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "interval_mismatches": [
+            {
+              "computed": null,
+              "field": "lower_2_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": null,
+              "field": "upper_97_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": 0,
+              "field": "valid_replicates",
+              "metric": "class_0_recall_specificity",
+              "stored": 10000
+            }
+          ],
+          "stored_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0010709782602773968,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.1447421762230462,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": 0.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.0,
+              "valid_replicates": 10000
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+        },
+        "51002": {
+          "computed_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.001201308942468754,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 0.13188891219853094,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "interval_mismatches": [
+            {
+              "computed": null,
+              "field": "lower_2_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": null,
+              "field": "upper_97_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": 0,
+              "field": "valid_replicates",
+              "metric": "class_0_recall_specificity",
+              "stored": 10000
+            }
+          ],
+          "stored_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.001201308942468754,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.13188891219853094,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": 0.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.0,
+              "valid_replicates": 10000
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+        },
+        "51003": {
+          "computed_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.00083177429090525,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 0.1333340344513383,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "interval_mismatches": [
+            {
+              "computed": null,
+              "field": "lower_2_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": null,
+              "field": "upper_97_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": 0,
+              "field": "valid_replicates",
+              "metric": "class_0_recall_specificity",
+              "stored": 10000
+            }
+          ],
+          "stored_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.00083177429090525,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.1333340344513383,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": 0.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.0,
+              "valid_replicates": 10000
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+        },
+        "51004": {
+          "computed_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0009204913850644175,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 0.1369659675654124,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "interval_mismatches": [
+            {
+              "computed": null,
+              "field": "lower_2_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": null,
+              "field": "upper_97_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": 0,
+              "field": "valid_replicates",
+              "metric": "class_0_recall_specificity",
+              "stored": 10000
+            }
+          ],
+          "stored_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0009204913850644175,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.1369659675654124,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": 0.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.0,
+              "valid_replicates": 10000
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+        },
+        "51005": {
+          "computed_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0012950402778095951,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 0.14541684090792611,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "undefined_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "undefined_replicates": 0,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "interval_mismatches": [
+            {
+              "computed": null,
+              "field": "lower_2_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": null,
+              "field": "upper_97_5_percent",
+              "metric": "class_0_recall_specificity",
+              "stored": 0.0
+            },
+            {
+              "computed": 0,
+              "field": "valid_replicates",
+              "metric": "class_0_recall_specificity",
+              "stored": 10000
+            }
+          ],
+          "stored_intervals": {
+            "accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "balanced_accuracy": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "brier_score": {
+              "lower_2_5_percent": 0.0012950402778095951,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.14541684090792611,
+              "valid_replicates": 10000
+            },
+            "class_0_recall_specificity": {
+              "lower_2_5_percent": 0.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 0.0,
+              "valid_replicates": 10000
+            },
+            "class_1_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "class_1_recall": {
+              "lower_2_5_percent": 0.8,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "macro_f1": {
+              "lower_2_5_percent": 0.4444444444444444,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "pr_auc_average_precision": {
+              "lower_2_5_percent": 1.0,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            },
+            "roc_auc": {
+              "lower_2_5_percent": null,
+              "total_replicates": 10000,
+              "upper_97_5_percent": null,
+              "valid_replicates": 0
+            },
+            "weighted_f1": {
+              "lower_2_5_percent": 0.8888888888888888,
+              "total_replicates": 10000,
+              "upper_97_5_percent": 1.0,
+              "valid_replicates": 10000
+            }
+          },
+          "stored_limitation": "Validation contains only two negative runs. Class-0 recall, specificity, ROC-AUC, and metrics requiring negative support have high sampling uncertainty and may be undefined in design bootstrap replicates."
+        }
+      },
+      "unit": "design_id"
+    },
+    "replicates_attempted": 10000,
+    "result": "FAIL",
+    "seed": 63001,
+    "unit": "design_id",
+    "warning_policy": "single-class sklearn warnings are non-defects only when stored undefined metrics remain null"
+  },
+  "candidate_selection": {
+    "calibration_enabled": false,
+    "candidate_count": 24,
+    "candidate_seeds": [
+      41000,
+      41001,
+      41002,
+      41003,
+      41004,
+      41005,
+      41006,
+      41007,
+      41008,
+      41009,
+      41010,
+      41011,
+      41012,
+      41013,
+      41014,
+      41015,
+      41016,
+      41017,
+      41018,
+      41019,
+      41020,
+      41021,
+      41022,
+      41023
+    ],
+    "recomputed_candidate_order": [
+      20,
+      0,
+      8,
+      10,
+      16,
+      11,
+      12,
+      22,
+      14,
+      2,
+      4,
+      18,
+      21,
+      6,
+      7,
+      13,
+      1,
+      5,
+      9,
+      23,
+      17,
+      19,
+      15,
+      3
+    ],
+    "recorded_candidate_order": [
+      20,
+      0,
+      8,
+      10,
+      16,
+      11,
+      12,
+      22,
+      14,
+      2,
+      4,
+      18,
+      21,
+      6,
+      7,
+      13,
+      1,
+      5,
+      9,
+      23,
+      17,
+      19,
+      15,
+      3
+    ],
+    "result": "PASS",
+    "selected_candidate_index": 20,
+    "selected_parameters": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "class_weight": "balanced",
+      "criterion": "gini",
+      "max_depth": 32,
+      "max_features": "sqrt",
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 1,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 400,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": null,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "selection_hierarchy": [
+      "weighted_validation_log_loss asc",
+      "macro-F1 desc",
+      "balanced accuracy desc",
+      "class-0 recall desc",
+      "rf_simplicity_key asc"
+    ],
+    "train_only_fit": true,
+    "validation_only_selection": true
+  },
+  "execution_identity": {
+    "accepted_rf_dataset_gate_commit": "5ca5d984645466321a8733c59a2dd5a879d8ce50",
+    "accepted_training_plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+    "accepted_training_plan_regate_commit": "4f9e5e3a2534fc9dbe1e8fb9613cbc041d03e489",
+    "activation_head": "e21f7b854203792316919c89d5a5c3cadb79f52f",
+    "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+    "committed_training_tooling_sha": "255aca4a0b56a6d3c2746d5b33c19cc10316bfdc",
+    "output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1"
+  },
+  "failures": [
+    {
+      "check": "bootstrap_numeric_percentiles:51001",
+      "detail": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ]
+    },
+    {
+      "check": "bootstrap_class0_specificity_null_handling:51001",
+      "detail": {
+        "computed": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "stored": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    {
+      "check": "bootstrap_numeric_percentiles:51002",
+      "detail": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ]
+    },
+    {
+      "check": "bootstrap_class0_specificity_null_handling:51002",
+      "detail": {
+        "computed": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "stored": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    {
+      "check": "bootstrap_numeric_percentiles:51003",
+      "detail": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ]
+    },
+    {
+      "check": "bootstrap_class0_specificity_null_handling:51003",
+      "detail": {
+        "computed": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "stored": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    {
+      "check": "bootstrap_numeric_percentiles:51004",
+      "detail": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ]
+    },
+    {
+      "check": "bootstrap_class0_specificity_null_handling:51004",
+      "detail": {
+        "computed": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "stored": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        }
+      }
+    },
+    {
+      "check": "bootstrap_numeric_percentiles:51005",
+      "detail": [
+        {
+          "computed": null,
+          "field": "lower_2_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": null,
+          "field": "upper_97_5_percent",
+          "metric": "class_0_recall_specificity",
+          "stored": 0.0
+        },
+        {
+          "computed": 0,
+          "field": "valid_replicates",
+          "metric": "class_0_recall_specificity",
+          "stored": 10000
+        }
+      ]
+    },
+    {
+      "check": "bootstrap_class0_specificity_null_handling:51005",
+      "detail": {
+        "computed": {
+          "lower_2_5_percent": null,
+          "total_replicates": 10000,
+          "undefined_replicates": 10000,
+          "upper_97_5_percent": null,
+          "valid_replicates": 0
+        },
+        "stored": {
+          "lower_2_5_percent": 0.0,
+          "total_replicates": 10000,
+          "upper_97_5_percent": 0.0,
+          "valid_replicates": 10000
+        }
+      }
+    }
+  ],
+  "final_model_identity": {
+    "feature_order": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "ground_station_failure_probability"
+    ],
+    "identities": {
+      "51001": {
+        "all_tree_sample_indices_within_training_rows": true,
+        "bootstrap_sample_index_min_max": [
+          0,
+          349
+        ],
+        "classes": [
+          0,
+          1
+        ],
+        "deterministic_repeat_probability_match": true,
+        "estimator_type": "sklearn.ensemble._forest.RandomForestClassifier",
+        "feature_names_in": [
+          "num_planes",
+          "sats_per_plane",
+          "configured_satellite_count",
+          "altitude_km",
+          "inclination_deg",
+          "satellite_node_failure_probability",
+          "satellite_edge_failure_probability",
+          "civilian_count",
+          "government_count",
+          "military_count",
+          "total_ground_station_count",
+          "ground_station_failure_probability"
+        ],
+        "fitted_tree_count": 400,
+        "n_estimators": 400,
+        "n_features_in": 12,
+        "n_outputs": 1,
+        "parameter_differences": {},
+        "parameters_match_candidate_20": true,
+        "path": "rf_classification_seed_51001.joblib",
+        "random_state": 51001,
+        "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14",
+        "training_sample_count": 350
+      },
+      "51002": {
+        "all_tree_sample_indices_within_training_rows": true,
+        "bootstrap_sample_index_min_max": [
+          0,
+          349
+        ],
+        "classes": [
+          0,
+          1
+        ],
+        "deterministic_repeat_probability_match": true,
+        "estimator_type": "sklearn.ensemble._forest.RandomForestClassifier",
+        "feature_names_in": [
+          "num_planes",
+          "sats_per_plane",
+          "configured_satellite_count",
+          "altitude_km",
+          "inclination_deg",
+          "satellite_node_failure_probability",
+          "satellite_edge_failure_probability",
+          "civilian_count",
+          "government_count",
+          "military_count",
+          "total_ground_station_count",
+          "ground_station_failure_probability"
+        ],
+        "fitted_tree_count": 400,
+        "n_estimators": 400,
+        "n_features_in": 12,
+        "n_outputs": 1,
+        "parameter_differences": {},
+        "parameters_match_candidate_20": true,
+        "path": "rf_classification_seed_51002.joblib",
+        "random_state": 51002,
+        "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4",
+        "training_sample_count": 350
+      },
+      "51003": {
+        "all_tree_sample_indices_within_training_rows": true,
+        "bootstrap_sample_index_min_max": [
+          0,
+          349
+        ],
+        "classes": [
+          0,
+          1
+        ],
+        "deterministic_repeat_probability_match": true,
+        "estimator_type": "sklearn.ensemble._forest.RandomForestClassifier",
+        "feature_names_in": [
+          "num_planes",
+          "sats_per_plane",
+          "configured_satellite_count",
+          "altitude_km",
+          "inclination_deg",
+          "satellite_node_failure_probability",
+          "satellite_edge_failure_probability",
+          "civilian_count",
+          "government_count",
+          "military_count",
+          "total_ground_station_count",
+          "ground_station_failure_probability"
+        ],
+        "fitted_tree_count": 400,
+        "n_estimators": 400,
+        "n_features_in": 12,
+        "n_outputs": 1,
+        "parameter_differences": {},
+        "parameters_match_candidate_20": true,
+        "path": "rf_classification_seed_51003.joblib",
+        "random_state": 51003,
+        "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea",
+        "training_sample_count": 350
+      },
+      "51004": {
+        "all_tree_sample_indices_within_training_rows": true,
+        "bootstrap_sample_index_min_max": [
+          0,
+          349
+        ],
+        "classes": [
+          0,
+          1
+        ],
+        "deterministic_repeat_probability_match": true,
+        "estimator_type": "sklearn.ensemble._forest.RandomForestClassifier",
+        "feature_names_in": [
+          "num_planes",
+          "sats_per_plane",
+          "configured_satellite_count",
+          "altitude_km",
+          "inclination_deg",
+          "satellite_node_failure_probability",
+          "satellite_edge_failure_probability",
+          "civilian_count",
+          "government_count",
+          "military_count",
+          "total_ground_station_count",
+          "ground_station_failure_probability"
+        ],
+        "fitted_tree_count": 400,
+        "n_estimators": 400,
+        "n_features_in": 12,
+        "n_outputs": 1,
+        "parameter_differences": {},
+        "parameters_match_candidate_20": true,
+        "path": "rf_classification_seed_51004.joblib",
+        "random_state": 51004,
+        "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9",
+        "training_sample_count": 350
+      },
+      "51005": {
+        "all_tree_sample_indices_within_training_rows": true,
+        "bootstrap_sample_index_min_max": [
+          0,
+          349
+        ],
+        "classes": [
+          0,
+          1
+        ],
+        "deterministic_repeat_probability_match": true,
+        "estimator_type": "sklearn.ensemble._forest.RandomForestClassifier",
+        "feature_names_in": [
+          "num_planes",
+          "sats_per_plane",
+          "configured_satellite_count",
+          "altitude_km",
+          "inclination_deg",
+          "satellite_node_failure_probability",
+          "satellite_edge_failure_probability",
+          "civilian_count",
+          "government_count",
+          "military_count",
+          "total_ground_station_count",
+          "ground_station_failure_probability"
+        ],
+        "fitted_tree_count": 400,
+        "n_estimators": 400,
+        "n_features_in": 12,
+        "n_outputs": 1,
+        "parameter_differences": {},
+        "parameters_match_candidate_20": true,
+        "path": "rf_classification_seed_51005.joblib",
+        "random_state": 51005,
+        "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da",
+        "training_sample_count": 350
+      }
+    },
+    "model_count": 5,
+    "result": "PASS",
+    "seeds": [
+      51001,
+      51002,
+      51003,
+      51004,
+      51005
+    ]
+  },
+  "gate_mode": "read-only completed-training acceptance gate",
+  "non_execution": {
+    "accepted_datasets_plans_gates_or_evidence_modified": false,
+    "fit_calls_during_gate": 0,
+    "models_modified_or_replaced": false,
+    "output_root_modified": false,
+    "rf_regression_training": false,
+    "tgnn_training": false
+  },
+  "schema": "satnet.stage_a.rf_classification.training_gate.v1",
+  "test_seal": {
+    "forbidden_test_named_artifacts": [],
+    "test_metrics_present": false,
+    "test_predictions_present": false,
+    "test_rows_loaded": 0,
+    "test_source_reads": 0,
+    "test_target_paths_opened": [],
+    "train_and_validation_records_only": true,
+    "training_report_flags": {
+      "test_access": false,
+      "test_metrics": false,
+      "test_predictions": false
+    }
+  },
+  "training_report": {
+    "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+    "model_count": 5,
+    "selected_candidate_index": 20,
+    "test_access": false,
+    "test_metrics": false,
+    "test_predictions": false,
+    "verdict": "COMPLETED"
+  },
+  "validation_recomputation": {
+    "class_weights": {
+      "0": 3.5714285714285716,
+      "1": 0.5813953488372093
+    },
+    "expected_common_metrics": {
+      "accuracy": 0.96,
+      "balanced_accuracy": 0.9794520547945205,
+      "class_0_precision": 0.4,
+      "class_0_recall_specificity": 1.0,
+      "class_1_precision": 1.0,
+      "class_1_recall": 0.958904109589041,
+      "macro_f1": 0.7752247752247752,
+      "pr_auc_average_precision": 0.9989041095890412,
+      "roc_auc": 0.9794520547945205,
+      "weighted_f1": 0.9681518481518481
+    },
+    "expected_confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        3,
+        70
+      ]
+    ],
+    "feature_order": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "ground_station_failure_probability"
+    ],
+    "per_seed": {
+      "51001": {
+        "metrics": {
+          "accuracy": 0.96,
+          "balanced_accuracy": 0.9794520547945205,
+          "brier_score": 0.0318363033138163,
+          "class_0_precision": 0.4,
+          "class_0_recall_specificity": 1.0,
+          "class_1_precision": 1.0,
+          "class_1_recall": 0.958904109589041,
+          "confusion_matrix": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              70
+            ]
+          ],
+          "decision_threshold": 0.5,
+          "macro_f1": 0.7752247752247752,
+          "pr_auc_average_precision": 0.9989041095890412,
+          "roc_auc": 0.9794520547945205,
+          "weighted_f1": 0.9681518481518481,
+          "weighted_validation_log_loss": 0.11965080203731042
+        },
+        "probability_max": 1.0,
+        "probability_min": 0.15993937373900619,
+        "probability_sum_to_one": true
+      },
+      "51002": {
+        "metrics": {
+          "accuracy": 0.96,
+          "balanced_accuracy": 0.9794520547945205,
+          "brier_score": 0.029880781947883843,
+          "class_0_precision": 0.4,
+          "class_0_recall_specificity": 1.0,
+          "class_1_precision": 1.0,
+          "class_1_recall": 0.958904109589041,
+          "confusion_matrix": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              70
+            ]
+          ],
+          "decision_threshold": 0.5,
+          "macro_f1": 0.7752247752247752,
+          "pr_auc_average_precision": 0.9989041095890412,
+          "roc_auc": 0.9794520547945205,
+          "weighted_f1": 0.9681518481518481,
+          "weighted_validation_log_loss": 0.11973290136973447
+        },
+        "probability_max": 1.0,
+        "probability_min": 0.20043160412858554,
+        "probability_sum_to_one": true
+      },
+      "51003": {
+        "metrics": {
+          "accuracy": 0.96,
+          "balanced_accuracy": 0.9794520547945205,
+          "brier_score": 0.029884132618624087,
+          "class_0_precision": 0.4,
+          "class_0_recall_specificity": 1.0,
+          "class_1_precision": 1.0,
+          "class_1_recall": 0.958904109589041,
+          "confusion_matrix": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              70
+            ]
+          ],
+          "decision_threshold": 0.5,
+          "macro_f1": 0.7752247752247752,
+          "pr_auc_average_precision": 0.9989041095890412,
+          "roc_auc": 0.9794520547945205,
+          "weighted_f1": 0.9681518481518481,
+          "weighted_validation_log_loss": 0.11701180598222932
+        },
+        "probability_max": 1.0,
+        "probability_min": 0.1950238031876964,
+        "probability_sum_to_one": true
+      },
+      "51004": {
+        "metrics": {
+          "accuracy": 0.96,
+          "balanced_accuracy": 0.9794520547945205,
+          "brier_score": 0.030659951082928984,
+          "class_0_precision": 0.4,
+          "class_0_recall_specificity": 1.0,
+          "class_1_precision": 1.0,
+          "class_1_recall": 0.958904109589041,
+          "confusion_matrix": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              70
+            ]
+          ],
+          "decision_threshold": 0.5,
+          "macro_f1": 0.7752247752247752,
+          "pr_auc_average_precision": 0.9989041095890412,
+          "roc_auc": 0.9794520547945205,
+          "weighted_f1": 0.9681518481518481,
+          "weighted_validation_log_loss": 0.11972335864514548
+        },
+        "probability_max": 1.0,
+        "probability_min": 0.1844560297158983,
+        "probability_sum_to_one": true
+      },
+      "51005": {
+        "metrics": {
+          "accuracy": 0.96,
+          "balanced_accuracy": 0.9794520547945205,
+          "brier_score": 0.03217438466814877,
+          "class_0_precision": 0.4,
+          "class_0_recall_specificity": 1.0,
+          "class_1_precision": 1.0,
+          "class_1_recall": 0.958904109589041,
+          "confusion_matrix": [
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              70
+            ]
+          ],
+          "decision_threshold": 0.5,
+          "macro_f1": 0.7752247752247752,
+          "pr_auc_average_precision": 0.9989041095890412,
+          "roc_auc": 0.9794520547945205,
+          "weighted_f1": 0.9681518481518481,
+          "weighted_validation_log_loss": 0.12137886882484951
+        },
+        "probability_max": 1.0,
+        "probability_min": 0.15873492438933623,
+        "probability_sum_to_one": true
+      }
+    },
+    "result": "PASS",
+    "validation_rows": 75
+  },
+  "verdict": "STAGE A RF CLASSIFICATION TRAINING V1 BLOCKED \u2014 TARGETED REMEDIATION REQUIRED"
+}

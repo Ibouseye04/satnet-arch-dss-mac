@@ -1,0 +1,41 @@
+{
+  "artifact_count": 7,
+  "artifacts": [
+    {
+      "bytes": 26247,
+      "path": "bootstrap_verification.json",
+      "sha256": "09670d9d5a9eb4c60c6a71718f87da6112a61514eb4e72c6790f67534dab0c84"
+    },
+    {
+      "bytes": 1721,
+      "path": "candidate_selection_verification.json",
+      "sha256": "059559e34f6cbf6270e5605e8dcde9bc35fb65a8bcb58735cecbe95a9f3fdfdd"
+    },
+    {
+      "bytes": 6473,
+      "path": "final_model_identity_verification.json",
+      "sha256": "532712009928f5fd12276acdcf6ccb846f5cf816d6b1bf9459b64a8672a32c6b"
+    },
+    {
+      "bytes": 1150,
+      "path": "README.md",
+      "sha256": "4fce02b6bdb6860c70d87b64b0c42ddb267b09d2116d185cd3c18f99e95ffc29"
+    },
+    {
+      "bytes": 61188,
+      "path": "rf_classification_training_gate_report.json",
+      "sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08"
+    },
+    {
+      "bytes": 374,
+      "path": "test_seal_verification.json",
+      "sha256": "9969d1d94c80da1073aad9bb2aae4db78fe3c0f8a04b599a22180c635f9e7a69"
+    },
+    {
+      "bytes": 5518,
+      "path": "validation_metric_recomputation.json",
+      "sha256": "6e46ed44ee0061a89cd22e141e25cff6d238fad678ddc6f48fb98617c77ee533"
+    }
+  ],
+  "self_excluding": true
+}
