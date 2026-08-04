@@ -1,0 +1,82 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_finalization_resume_authorization.v1",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_resume_authorization_v1_active",
+  "status": "active",
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING FINALIZATION RESUME AUTHORIZED — STAGED OUTPUTS PRESERVED — READY TO PUBLISH ONCE",
+  "scope": "resume-only publication of preserved staged reports and one accepted selected-checkpoint replacement; no report generation or training",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "7e28c1118ef1a7404a11d9f8b0d7c3b94187e7ae",
+    "tree_plan_correction_commit": "6ba45044a415529590006cc87b5240b4442a8692",
+    "resume_script_sha256": "e91da7f344e1841b1c79c39428194cd2005ae2e810b20fa6ef538fad754da797",
+    "finalization_script_sha256": "2d683dd1fe9d4640172f2bbc964f6a90acd33b91d5681657258ec2a846d59d56"
+  },
+  "runtime": {
+    "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+    "cpu_only": true
+  },
+  "campaign": {
+    "hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+    "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "pre_finalization_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "recovery_tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5",
+    "corrected_planned_post_publication_tree_hash": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0"
+  },
+  "accepted_checkpoint": {
+    "staged_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "bytes": 470803,
+    "destination": "checkpoints\\candidate_3.pt",
+    "superseded_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "superseded_bytes": 470803
+  },
+  "planned_tree_identities": {
+    "manifest_excluding_tree_hash": "ad01a0101ba48bf1d4ed60026cd07eff5c6077c411850866fa30ee748251e4ab",
+    "artifact_inventory_excluding_self_hash": "91b78ca6bb941f7f2eb6c1812f98811efa6491d3b30025fa2ceac8c69a765ba3",
+    "complete_post_publication_hash": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0",
+    "complete_post_publication_file_count": 22,
+    "complete_post_publication_bytes": 3755617
+  },
+  "publication_allowlist": [
+    "validation_design_metrics.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "reporting_recovery_manifest.json",
+    "artifact_inventory.json"
+  ],
+  "required_guards": {
+    "existing_unchanged_public_output_root": true,
+    "existing_unchanged_recovery_root": true,
+    "expected_public_pre_finalization_tree_hash": true,
+    "expected_recovery_tree_hash": true,
+    "accepted_checkpoint_sha256": true,
+    "superseded_checkpoint_sha256": true,
+    "exact_activation_head": true,
+    "dedicated_cpu_python": true,
+    "absent_resume_lock": true,
+    "absent_completion_marker": true,
+    "clean_activation_worktree": true
+  },
+  "prohibited_operations": [
+    "training",
+    "optimizer construction",
+    "optimizer.step()",
+    "backward()",
+    "preprocessing refit",
+    "prediction generation",
+    "bootstrap rerun",
+    "final-seed reporting rerun",
+    "test index access",
+    "test target access",
+    "modification of non-allowlisted public files"
+  ],
+  "publication_semantics": {
+    "checkpoint_operation": "atomic replacement from a copied staged accepted checkpoint",
+    "report_operation": "atomic copy of existing staged bytes only",
+    "staged_reports_regenerated": false,
+    "one_time_completion_marker": "recovery_root\\resume_publication_completed.json",
+    "subsequent_execution": "refused after completion marker or resume lock is present"
+  }
+}

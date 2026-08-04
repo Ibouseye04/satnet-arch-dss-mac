@@ -1,0 +1,107 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_finalization_resume_preflight_certificate.v1",
+  "preflight_mode": "read-only",
+  "executed_publication": false,
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING RESUME PREFLIGHT PASSED",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "7e28c1118ef1a7404a11d9f8b0d7c3b94187e7ae",
+    "clean_worktree": true,
+    "resume_script_sha256": "e91da7f344e1841b1c79c39428194cd2005ae2e810b20fa6ef538fad754da797",
+    "corrected_finalization_script_sha256": "2d683dd1fe9d4640172f2bbc964f6a90acd33b91d5681657258ec2a846d59d56"
+  },
+  "runtime": {
+    "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+    "python_identity_verified": true,
+    "cpu_only": true
+  },
+  "public_output": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "file_count": 16,
+    "bytes": 3742138,
+    "pre_publication_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "unchanged": true
+  },
+  "recovery_root": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "file_count": 8,
+    "bytes": 955085,
+    "tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5",
+    "staged_outputs_preserved": true,
+    "resume_lock_absent": true,
+    "completion_marker_absent": true
+  },
+  "staged_checkpoint": {
+    "path": "staging\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "accepted": true
+  },
+  "superseded_checkpoint": {
+    "path": "superseded_checkpoints\\candidate_3_overwritten_by_final_seed_62005.pt",
+    "bytes": 470803,
+    "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "preserved": true
+  },
+  "staged_reports": {
+    "validation_design_metrics.json": {"bytes":2387,"sha256":"f8db8f564188f350f650220a56f89608056cb58fb11906d854fc0f827dc540a6","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "validation_bootstrap_intervals.json": {"bytes":1291,"sha256":"578d599c6dd094543d9a1607738c00dcad3c8368eae2a8f9af10fccecdf5eb5c","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "final_seed_training_results.json": {"bytes":2628,"sha256":"89a7fcebda852c43a312849a696fdcc0270e080182c6c7021b79a5b805290bfc","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "training_report.json": {"bytes":1178,"sha256":"6e1cba52549f6ad356f57866cfa3d1ef47319336dcd05d7e5c32454330519454","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "reporting_recovery_manifest.json": {"bytes":1652,"sha256":"5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "artifact_inventory.json": {"bytes":4343,"sha256":"e1a543d630114ca1ce83ecdc662db4a11d2be672b274dc0ede123dc767cad8d5","parse_valid":true,"finite":true,"allow_nan_false":true}
+  },
+  "frozen_validation": {
+    "path": "validation_predictions.jsonl",
+    "bytes": 13539,
+    "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210",
+    "records": 75,
+    "designs": 15,
+    "test_records": false
+  },
+  "training_report_binding": {
+    "candidate_count": 4,
+    "model_count": 5,
+    "selected_candidate": 3,
+    "validation_prediction_count": 75,
+    "training_completed": true,
+    "reporting_recovered": true,
+    "test_access": false,
+    "test_metrics": false,
+    "test_predictions": false,
+    "verdict": "COMPLETED"
+  },
+  "tree_plan": {
+    "manifest_excluding_tree_hash": "ad01a0101ba48bf1d4ed60026cd07eff5c6077c411850866fa30ee748251e4ab",
+    "artifact_inventory_excluding_self_hash": "91b78ca6bb941f7f2eb6c1812f98811efa6491d3b30025fa2ceac8c69a765ba3",
+    "planned_post_publication_tree_hash": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0",
+    "planned_file_count": 22,
+    "planned_bytes": 3755617,
+    "independent_recomputation_agrees": true,
+    "destination_paths_are_canonical": true,
+    "path_separator": "Windows backslash",
+    "path_case_handling": "preserved case, ordinal path ordering",
+    "line_separator": "LF",
+    "encoding": "UTF-8",
+    "file_size_representation": "decimal byte count",
+    "sha256_representation": "lowercase hexadecimal"
+  },
+  "safety": {
+    "training_function_reachable": false,
+    "optimizer_instantiated": false,
+    "optimizer_step": false,
+    "backward_pass": false,
+    "prediction_generated": false,
+    "bootstrap_rerun": false,
+    "report_generation": false,
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "test_source_opened": false,
+    "public_file_written": false
+  },
+  "staged_identity_correction": {
+    "required": false,
+    "other_four_reports_regenerated": false
+  }
+}

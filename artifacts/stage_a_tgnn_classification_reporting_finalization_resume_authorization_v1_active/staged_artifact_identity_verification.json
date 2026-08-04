@@ -1,0 +1,70 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.staged_artifact_identity_verification.v1",
+  "verification_mode": "read-only",
+  "public_output": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "file_count": 16,
+    "bytes": 3742138,
+    "tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a"
+  },
+  "recovery_root": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "file_count": 8,
+    "bytes": 955085,
+    "tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5"
+  },
+  "staged_checkpoint": {
+    "path": "staging\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "accepted": true
+  },
+  "preserved_superseded_checkpoint": {
+    "path": "superseded_checkpoints\\candidate_3_overwritten_by_final_seed_62005.pt",
+    "bytes": 470803,
+    "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "preserved": true
+  },
+  "staged_reports": {
+    "validation_design_metrics.json": {"path":"staging\\reports\\validation_design_metrics.json","bytes":2387,"sha256":"f8db8f564188f350f650220a56f89608056cb58fb11906d854fc0f827dc540a6"},
+    "validation_bootstrap_intervals.json": {"path":"staging\\reports\\validation_bootstrap_intervals.json","bytes":1291,"sha256":"578d599c6dd094543d9a1607738c00dcad3c8368eae2a8f9af10fccecdf5eb5c"},
+    "final_seed_training_results.json": {"path":"staging\\reports\\final_seed_training_results.json","bytes":2628,"sha256":"89a7fcebda852c43a312849a696fdcc0270e080182c6c7021b79a5b805290bfc"},
+    "training_report.json": {"path":"staging\\reports\\training_report.json","bytes":1178,"sha256":"6e1cba52549f6ad356f57866cfa3d1ef47319336dcd05d7e5c32454330519454"},
+    "reporting_recovery_manifest.json": {"path":"staging\\reports\\reporting_recovery_manifest.json","bytes":1652,"sha256":"5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5"},
+    "artifact_inventory.json": {"path":"staging\\reports\\artifact_inventory.json","bytes":4343,"sha256":"e1a543d630114ca1ce83ecdc662db4a11d2be672b274dc0ede123dc767cad8d5"}
+  },
+  "report_validation": {
+    "all_six_exist": true,
+    "all_six_parse": true,
+    "all_six_recursive_finite": true,
+    "all_six_allow_nan_false_serializable": true,
+    "test_results_present": false,
+    "generated_from_existing_frozen_validation_predictions": true,
+    "frozen_validation_prediction_count": 75,
+    "frozen_validation_prediction_sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210"
+  },
+  "training_report_binding": {
+    "candidate_count": 4,
+    "model_count": 5,
+    "selected_candidate": 3,
+    "validation_prediction_count": 75,
+    "training_completed": true,
+    "reporting_recovered": true,
+    "test_access": false,
+    "test_metrics": false,
+    "test_predictions": false,
+    "verdict": "COMPLETED"
+  },
+  "staged_identity_correction": {
+    "required": false,
+    "artifact_inventory_before": {"bytes":4343,"sha256":"e1a543d630114ca1ce83ecdc662db4a11d2be672b274dc0ede123dc767cad8d5"},
+    "artifact_inventory_after": {"bytes":4343,"sha256":"e1a543d630114ca1ce83ecdc662db4a11d2be672b274dc0ede123dc767cad8d5"},
+    "reporting_recovery_manifest_before": {"bytes":1652,"sha256":"5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5"},
+    "reporting_recovery_manifest_after": {"bytes":1652,"sha256":"5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5"}
+  },
+  "prohibited_sources": {
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "test_source_opened": false
+  }
+}
