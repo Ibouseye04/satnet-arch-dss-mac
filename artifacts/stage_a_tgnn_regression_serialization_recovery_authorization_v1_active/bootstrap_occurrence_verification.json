@@ -1,0 +1,22 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression.bootstrap_occurrence_verification.v1",
+  "status": "pass",
+  "replicates": 10000,
+  "seed": 63002,
+  "resampling_unit": "design draw occurrence",
+  "designs_per_replicate": 15,
+  "realizations_retained_per_occurrence": 5,
+  "occurrence_id_format": "<draw_index>:<design_id>",
+  "duplicate_design_multiplicity_preserved": true,
+  "undefined_r2": "null",
+  "population_standard_deviation_denominator": "N",
+  "percentiles": [2.5, 97.5],
+  "corrected_deterministic_bootstrap_probe_sha256": "4f53f6b86b646d91666a45197a535dba797a5154e259f3b990707ddef5be0ee0",
+  "defective_grouping_rejected": true,
+  "no_nan_or_infinity": true,
+  "prediction_source": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\validation_predictions.jsonl",
+    "records": 75,
+    "sha256": "8b7eccb87da4d0d5e2f7dcde3a1b07a478994484a4ce554c908c7fbba36f677f"
+  }
+}

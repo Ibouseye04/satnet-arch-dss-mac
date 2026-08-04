@@ -1,0 +1,32 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression.checkpoint_semantic_acceptance.v1",
+  "classification": "SERIALIZATION_ONLY",
+  "assessment_commit": "628b9a1",
+  "historical_declared_exact_sha256": "89455aeca56ff169f9dbe4d7d8a22ae08339ab60a7e7ef392262ebe11bcabda1",
+  "recovered_exact_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2",
+  "candidate_index": 1,
+  "search_seed": 61001,
+  "best_epoch": 36,
+  "hidden_dimension": 32,
+  "learning_rate": 0.003,
+  "history_sha256": "c6e37e8cb7bd1d31b0056093bc16a10506ee22c0c3361d15bb4ff1d5dccd0dcd",
+  "semantic_sha256": {
+    "model_state": "4265d32cb33473c9b3f47a53cd8abafa13454f72bb0763e9ad6fd9be7b8113ef",
+    "optimizer_state": "4d69fc43793fbdbaeee141eed43a4666366285a3148b463e46a2eeb9ca5b97c6",
+    "metadata": "c52d90c413704aa69b961c0245cf35c746be1ad26799c65002e9074e35a860ae",
+    "preprocessing_binding": "1e4bee37b7ca35fee93418c1a7d63c356235f7ab07b0b9ad81a5d9b4a4bf5644"
+  },
+  "state_structure": {
+    "model_state_entries": 22,
+    "optimizer_parameter_state_entries": 22,
+    "scheduler_present": false,
+    "gradient_clipping_present": false,
+    "all_tensors_finite": true
+  },
+  "scientific_equivalence": {
+    "confirmed": true,
+    "basis": "all 49 epoch-history rows, epochs 0-48, losses, validation metrics, improvement flags, best tracking, best epoch 36, stopping epoch 48, and counter 12 match exactly",
+    "inference_performed": false
+  },
+  "identity_limit": "The historical declared exact file is unavailable; the recovered checkpoint is not claimed byte-identical to it."
+}
