@@ -1,0 +1,39 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.selected_checkpoint_overwrite_root_cause.v1",
+  "assessment_mode": "read-only diagnosis; no training, optimizer construction, backward pass, prediction generation, checkpoint rewrite, or finalize command",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "failed_execution_head": "fa314c07cdb3c60186365888e9c726a0e4a567e3",
+  "recovery_implementation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "selected_candidate": {"candidate_index": 3, "seed": 61003, "hidden_dim": 64, "learning_rate": 0.003, "best_epoch": 38},
+  "source_locations": [
+    {"file": "scripts/run_stage_a_tgnn_classification_training.py", "function": "train_configuration", "lines": "445-480", "finding": "Constructs the selected configuration model and optimizer, trains it, restores best_state, builds checkpoint metadata, and writes output_root/checkpoints/candidate_<candidate_index>.pt with torch.save at line 479."},
+    {"file": "scripts/run_stage_a_tgnn_classification_training.py", "function": "execute", "lines": "525-537", "finding": "Runs the four search configurations, then calculates selected_checkpoint_identity.json SHA-256 at line 537 after the search checkpoint has been written."},
+    {"file": "scripts/run_stage_a_tgnn_classification_training.py", "function": "execute", "lines": "538-549", "finding": "Sets selected_config, loops over FINAL_SEEDS, changes only seed, calls train_configuration again, then saves the returned bundle to final_seed_<seed>.pt."},
+    {"file": "scripts/run_stage_a_tgnn_classification_training.py", "constants": "93-99", "finding": "Defines candidate index 3 as hidden_dim 64, learning_rate 0.003, seed 61003 and final seeds 62001-62005."}
+  ],
+  "execution_stage_order": [
+    {"stage": 1, "operation": "preprocessing", "location": "execute:525-526", "result": "preprocessing_statistics.json written"},
+    {"stage": 2, "operation": "candidate search", "location": "execute:527-531", "result": "Each CANDIDATES entry invokes train_configuration; candidate_3.pt is initially written by train_configuration:479 during the candidate_index=3, seed=61003 call."},
+    {"stage": 3, "operation": "selected identity calculation", "location": "execute:532-537", "result": "candidate_search_results.json, candidate_epoch_histories.jsonl, selected_configuration.json, and selected_checkpoint_identity.json are written; expected identity e94c94... is calculated from candidate_3.pt at line 537."},
+    {"stage": 4, "operation": "final seed loop", "location": "execute:541-543", "result": "For every final seed, config is dict(selected_config, seed=seed), preserving candidate_index=3."},
+    {"stage": 5, "operation": "overwrite", "location": "train_configuration:474-479 called from execute:543", "result": "Each final-seed invocation writes its checkpoint dictionary to the same candidate_3.pt path before execute saves the same returned dictionary to its final_seed_<seed>.pt path."},
+    {"stage": 6, "operation": "last overwrite", "location": "execute:541-549", "result": "The seed=62005 invocation is last; candidate_3.pt therefore contains seed 62005, epoch 43, and candidate_index 3 metadata. final_seed_62005.pt is then written from the same checkpoint dictionary."}
+  ],
+  "root_cause": "The final-seed loop reused train_configuration with the selected search configuration and passed the existing output_root. train_configuration unconditionally derives its checkpoint path from configuration.candidate_index and writes candidate_3.pt. The final loop did not redirect or suppress that write before saving the distinct final-seed path.",
+  "path_vulnerability": {
+    "generic_code_scope": "The implementation would overwrite the candidate path for whichever candidate_index was selected; it does not overwrite all candidate paths during the final loop.",
+    "this_execution": "Only candidate_3.pt was vulnerable because selected_configuration.json selected candidate_index 3.",
+    "candidate_0": {"retains_search_metadata": true, "seed": 61000, "epoch": 51, "sha256": "e27d3dcb54249fa7ba3096fe9954035e4b7929df1331af4f52e488a20dc8a1c5"},
+    "candidate_1": {"retains_search_metadata": true, "seed": 61001, "epoch": 46, "sha256": "0271fb76cd4b6031c2af71812531f0cf554a859cc460b530dabdb6fa0880a0a4"},
+    "candidate_2": {"retains_search_metadata": true, "seed": 61002, "epoch": 34, "sha256": "50565ca1b20749f2a5963adbcb729eeecc51dbdd439f4d0a126860fa32ec58d5"},
+    "candidate_3": {"retains_search_metadata": false, "current_seed": 62005, "current_epoch": 43, "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"}
+  },
+  "other_scientific_artifacts": {
+    "overwritten_by_this_mechanism": ["checkpoints/candidate_3.pt"],
+    "other_candidate_checkpoints_overwritten": false,
+    "final_checkpoints_overwritten": false,
+    "non_checkpoint_artifacts_overwritten_by_this_mechanism": false,
+    "note": "The failed execution later wrote its available reporting artifacts, but the checkpoint overwrite mechanism itself targets only the selected candidate path."
+  },
+  "conclusion": "candidate_3.pt was first the selected search checkpoint, its expected SHA was recorded after candidate search, and it was subsequently overwritten five times by final-seed invocations; the surviving file is the final seed 62005 serialization."
+}

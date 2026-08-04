@@ -1,0 +1,31 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.original_checkpoint_search_report.v1",
+  "assessment_mode": "bounded read-only search; no unrestricted machine-wide search",
+  "expected_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+  "metadata_search_binding": {"candidate_index": 3, "seed": 61003, "best_epoch": 38, "hidden_dim": 64, "learning_rate": 0.003},
+  "searched_locations": [
+    {"location": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1", "scope": "complete TGNN classification output root including checkpoint files and reporting metadata", "exact_sha_matches": ["selected_checkpoint_identity.json declaration only"], "checkpoint_files_found": 9},
+    {"location": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation", "scope": "activation worktree, including relevant temporary/output filename patterns", "exact_sha_matches": [], "checkpoint_files_found": 0},
+    {"location": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts", "scope": "relevant committed assessment/authorization and execution evidence; no checkpoint binaries", "exact_sha_matches": ["prior authorization declarations only"], "checkpoint_files_found": 0},
+    {"location": "system temporary locations explicitly referenced by runner", "scope": "none", "result": "The committed runner defines no system temporary path, transcript path, backup path, or staging path."},
+    {"location": "backup or staging paths explicitly created by runner", "scope": "none", "result": "The committed runner creates no backup or staging copy; its only checkpoint destinations are candidate_<index>.pt and final_seed_<seed>.pt under output_root/checkpoints."}
+  ],
+  "checkpoint_inventory_examined": [
+    {"file": "candidate_0.pt", "candidate_index": 0, "seed": 61000, "epoch": 51, "matches_original_metadata": false, "sha256": "e27d3dcb54249fa7ba3096fe9954035e4b7929df1331af4f52e488a20dc8a1c5"},
+    {"file": "candidate_1.pt", "candidate_index": 1, "seed": 61001, "epoch": 46, "matches_original_metadata": false, "sha256": "0271fb76cd4b6031c2af71812531f0cf554a859cc460b530dabdb6fa0880a0a4"},
+    {"file": "candidate_2.pt", "candidate_index": 2, "seed": 61002, "epoch": 34, "matches_original_metadata": false, "sha256": "50565ca1b20749f2a5963adbcb729eeecc51dbdd439f4d0a126860fa32ec58d5"},
+    {"file": "candidate_3.pt", "candidate_index": 3, "seed": 62005, "epoch": 43, "matches_original_metadata": false, "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"},
+    {"file": "final_seed_62001.pt", "candidate_index": 3, "seed": 62001, "epoch": 38, "matches_original_metadata": false, "sha256": "b5b4323f2bb34c8740fb73bcf50c5603c46feb10ae323fa86dfad4baeb141367"},
+    {"file": "final_seed_62002.pt", "candidate_index": 3, "seed": 62002, "epoch": 13, "matches_original_metadata": false, "sha256": "fa74a12749a2da0d66faa6620b7b244f38db11b674feefcd9781fdb80fd1ae86"},
+    {"file": "final_seed_62003.pt", "candidate_index": 3, "seed": 62003, "epoch": 56, "matches_original_metadata": false, "sha256": "e6803fe705c0ad0ff28e9c4d1ee52264d2bf5ddd76a7e23421c670b8836d61b2"},
+    {"file": "final_seed_62004.pt", "candidate_index": 3, "seed": 62004, "epoch": 50, "matches_original_metadata": false, "sha256": "95f127cf534327c293b4215dc7d330a9a40bb5be026c33d764519254b1adf106"},
+    {"file": "final_seed_62005.pt", "candidate_index": 3, "seed": 62005, "epoch": 43, "matches_original_metadata": false, "sha256": "235b907a504bb29c114f1e97dc275b81f7fff5ac2cafe8470afcc9b80493c2ae"}
+  ],
+  "results": {
+    "exact_byte_copy_exists": false,
+    "semantic_state_copy_of_original_exists": false,
+    "current_candidate_3_is_semantic_copy_of_final_seed_62005": true,
+    "recoverable_original_copy_exists": false,
+    "basis": "All nine checkpoint files in the complete output root were loaded read-only for metadata; no checkpoint files were found in the bounded activation/artifact scopes, and no explicit runner-created temporary, backup, staging, or transcript path exists. The only exact SHA occurrence in the output root is the declaration in selected_checkpoint_identity.json, not a checkpoint file."
+  }
+}
