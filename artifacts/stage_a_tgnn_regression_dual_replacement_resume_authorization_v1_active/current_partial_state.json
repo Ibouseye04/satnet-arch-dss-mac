@@ -1,0 +1,18 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.dual_replacement_current_partial_state.v1",
+  "status": "verified_partial_not_published",
+  "public_output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+  "public_identity": {"file_count": 17, "bytes": 2058047, "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"},
+  "reconstruction_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1",
+  "reconstruction_identity": {"file_count": 2, "bytes": 166184, "tree_sha256": "29a3f93735fc9b4d51a21f9e25257cbfd96068bae252b4b8675e4282541c441a"},
+  "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2",
+  "recovery_identity": {"file_count": 8, "bytes": 310165, "tree_sha256": "31991cea4521d761671955cce5a73bd4ee41cdf59921b90875b5f767c6ecec5c"},
+  "stale_lock": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2.lock", "bytes": 11, "sha256": "9e84dfc48bf4b92c032a07bdfa760ff22f2e63be15e5ca58ef6c5fc69b906889", "contents": "pid=23620\r\n", "owner_running": false},
+  "completion_marker": {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2.completed.json", "exists": false},
+  "bound_replacements": {
+    "checkpoints/candidate_1.pt": {"historical_sha256": "3e28e10ddc024b21b57cbc986367d0393742ddc387f523eb1ddb45cfba213ef2", "replacement_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"},
+    "selected_checkpoint_identity.json": {"historical_sha256": "87d6b2eab05129485ca167314407758c6f850d502a0fc80e1e97fce0d9eb136a", "replacement_sha256": "bed3df81e0be80e5f33de9a5b29fcca260522912ae6322ab4d2cce0c4c720282"}
+  },
+  "other_paths_policy": "create-or-idempotent only; conflicting bytes block",
+  "recovery_executed_during_authorization": false
+}

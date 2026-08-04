@@ -1,0 +1,15 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.dual_replacement_resume_authorization_inventory.v1",
+  "self_excluding": true,
+  "deterministic_order": "relative filename ascending",
+  "artifact_count": 7,
+  "artifacts": [
+    {"path": "README.md", "bytes": 6033, "sha256": "c09abe7f6c88be78415fc6ab00224c94cb121e68e9fd8d570a1b17a339ce8ea3"},
+    {"path": "current_partial_state.json", "bytes": 1840, "sha256": "02eb85ebac3401f7210f62c4750fd755fee928e62c33356efac116f5e817f170"},
+    {"path": "dual_replacement_authorization.json", "bytes": 2825, "sha256": "8fcd176541809c953675f340ccbe700b5959986e6a40c3cdfe0236538b177585"},
+    {"path": "dual_replacement_preflight_certificate.json", "bytes": 2782, "sha256": "897773041782e30f15631d5ceec9cd4f8fefd0718c7e9e70c9f79df921a0c7e2"},
+    {"path": "dual_replacement_runtime_plan.json", "bytes": 4181, "sha256": "35ac8124101b0348d976439f4d96ed6e35f65710bcebef22064a49e5d1fb162c"},
+    {"path": "selected_identity_replacement_defect.json", "bytes": 1341, "sha256": "4ab44f61d323706bf401ec42c6f45e9d2a5cf34dd47984ac75bca7d5ea5bc1e1"},
+    {"path": "tgnn_regression_dual_replacement_resume_command.ps1", "bytes": 11617, "sha256": "a924e328ba770a9d3aa0ee364cf832ee16e91863f443ea56c87de190187852b9"}
+  ]
+}

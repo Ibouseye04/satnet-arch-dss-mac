@@ -1,0 +1,13 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.selected_identity_replacement_defect.v1",
+  "status": "confirmed",
+  "failed_operation": "generic create-or-idempotent publication of selected_checkpoint_identity.json",
+  "root_cause": "The selected identity is an explicitly bound historical artifact and must use the same exact replacement policy as the candidate checkpoint.",
+  "authorized_paths": ["checkpoints/candidate_1.pt", "selected_checkpoint_identity.json"],
+  "selected_identity": {
+    "public_historical": {"bytes": 193, "sha256": "87d6b2eab05129485ca167314407758c6f850d502a0fc80e1e97fce0d9eb136a"},
+    "staged_replacement": {"bytes": 1442, "sha256": "bed3df81e0be80e5f33de9a5b29fcca260522912ae6322ab4d2cce0c4c720282"},
+    "required_semantics": {"historical_declared_checkpoint_sha256": "89455aeca56ff169f9dbe4d7d8a22ae08339ab60a7e7ef392262ebe11bcabda1", "recovered_exact_checkpoint_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2", "mismatch_classification": "SERIALIZATION_ONLY", "scientific_result_changed": false, "selected_checkpoint_recovery_applied": true, "training_rerun": false, "prediction_regenerated": false}
+  },
+  "policy": "Require staged replacement SHA; accept exact replacement idempotently; otherwise require exact historical SHA and atomically replace; refuse every other SHA."
+}

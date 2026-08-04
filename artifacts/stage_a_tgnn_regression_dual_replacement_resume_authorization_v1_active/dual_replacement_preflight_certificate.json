@@ -1,0 +1,16 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.dual_replacement_preflight_certificate.v1",
+  "preflight_mode": "read-only",
+  "executed_recovery": false,
+  "verdict": "STAGE A TGNN REGRESSION DUAL-REPLACEMENT RESUME AUTHORIZED — READY TO FINALIZE ONCE",
+  "activation": {"branch": "activate/stage-a-tgnn-regression-dual-replacement-resume-v1", "head": "a1df92bb2f4ba5f51f358a296321d2846cd6d0eb", "worktree_clean_required": true},
+  "identity_checks": {"public_prepublication_identity": true, "public_candidate_historical_identity": true, "public_selected_identity_historical_identity": true, "reconstruction_identity": true, "partial_recovery_identity": true, "staged_candidate_replacement_identity": true, "staged_selected_identity_replacement_identity": true, "staged_report_hashes": true, "preserved_superseded_checkpoint": true, "all_final_seed_checkpoints_unchanged": true, "stale_lock_exact_identity": true, "stale_lock_owner_not_running": true, "completion_marker_absent": true, "temporary_files_absent": true},
+  "replacement_helper_tests": {"passed": true, "runner": "dedicated Python unittest", "cases": 9, "result": "Ran 9 tests; OK", "covered": ["both expected historical files can be replaced", "either replacement already completed is idempotently accepted", "unexpected public candidate checkpoint blocks", "unexpected public selected identity blocks", "conflicting reporting artifact blocks", "only the two explicit paths receive replacement semantics"]},
+  "publication_policy": {"replacement_paths": ["checkpoints/candidate_1.pt", "selected_checkpoint_identity.json"], "other_paths": "create-or-idempotent only", "planned_final_tree_check": "always enforced", "unexpected_existing_sha": "block"},
+  "planned_final_identity": {"file_count": 22, "bytes": 2070248, "tree_sha256": "95134dab5669ee4bc9515777d19f48449186324977d17981be856fde533e6111", "deterministic_recalculation": {"all_equal": true, "recalculations": 4}},
+  "scientific_computation_guards": {"no_training_function_reachable": true, "optimizer_instantiated": false, "backward_called": false, "preprocessing_fitted": false, "inference_or_prediction_generation": false, "checkpoint_serialized_or_resaved": false, "bootstrap_or_scientific_metrics_recomputed": false, "test_indexes_or_targets_read": false},
+  "public_identity": {"file_count": 17, "bytes": 2058047, "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"},
+  "staged_identity": {"file_count": 8, "bytes": 310165, "tree_sha256": "31991cea4521d761671955cce5a73bd4ee41cdf59921b90875b5f767c6ecec5c"},
+  "stale_lock": {"bytes": 11, "sha256": "9e84dfc48bf4b92c032a07bdfa760ff22f2e63be15e5ca58ef6c5fc69b906889", "contents": "pid=23620\r\n", "owner_running": false},
+  "recovery_execution_during_authorization": false
+}

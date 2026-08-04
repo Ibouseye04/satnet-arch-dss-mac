@@ -1,0 +1,19 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.dual_replacement_resume_authorization.v1",
+  "authorization_id": "stage_a_tgnn_regression_dual_replacement_resume_authorization_v1_active",
+  "status": "active_prepared_not_executed",
+  "scope": "Stage A TGNN Regression reporting recovery dual bound replacement resume",
+  "verdict": "STAGE A TGNN REGRESSION DUAL-REPLACEMENT RESUME AUTHORIZED — READY TO FINALIZE ONCE",
+  "activation": {"branch": "activate/stage-a-tgnn-regression-dual-replacement-resume-v1", "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-dual-replacement-resume-v1-activation", "head": "a1df92bb2f4ba5f51f358a296321d2846cd6d0eb", "recovery_tooling_commit": "a1df92bb2f4ba5f51f358a296321d2846cd6d0eb", "recovery_script_sha256": "90722b91d85fafe0fda1de284b63a5f20b86174dd017dea5f78d64be94973d9d", "source_tooling_commit": "3c388d353939178b2c4cf7843f2b50a39fffe61d", "source_script_sha256": "6c30d1c4111d0565dad63d14544925d7da06f6ddfa3ebaf45741adfb1c7900ff"},
+  "bound_replacements": {
+    "checkpoints/candidate_1.pt": {"public_historical_sha256": "3e28e10ddc024b21b57cbc986367d0393742ddc387f523eb1ddb45cfba213ef2", "staged_replacement_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"},
+    "selected_checkpoint_identity.json": {"public_historical_sha256": "87d6b2eab05129485ca167314407758c6f850d502a0fc80e1e97fce0d9eb136a", "staged_replacement_sha256": "bed3df81e0be80e5f33de9a5b29fcca260522912ae6322ab4d2cce0c4c720282"}
+  },
+  "other_staged_reports": {"validation_bootstrap_intervals.json": "cc3dc99f0cfa0c95f3c4a366a9b88d99e74d9deebc48078985180154b12dd0b7", "final_seed_training_results.json": "7e1cb790785e3123261bddef5c0a47525b9ee9cd9b59142969d5b0ff8247bb10", "training_report.json": "d6307cabfdae4f540365958e4d38f65f105688ae27c0e101d2134f71bdeb3b26", "reporting_recovery_manifest.json": "5c9638088133b2aeb2bc396085d0bd26601f5e87793086b699dfba080c3de707"},
+  "public_identity_before": {"file_count": 17, "bytes": 2058047, "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"},
+  "recovery_identity": {"file_count": 8, "bytes": 310165, "tree_sha256": "31991cea4521d761671955cce5a73bd4ee41cdf59921b90875b5f767c6ecec5c"},
+  "corrected_final_identity": {"file_count": 22, "bytes": 2070248, "tree_sha256": "95134dab5669ee4bc9515777d19f48449186324977d17981be856fde533e6111"},
+  "execution_guards": {"recovery_executed_during_authorization": false, "training_rerun": false, "prediction_regenerated": false, "checkpoint_serialized_or_resaved": false, "test_indexes_or_targets_read": false, "reconstruction_rerun": false, "scientific_metrics_recomputed": false, "recovery_root_deleted_or_recreated": false},
+  "completion_marker_absent": true,
+  "final_seed_62005_sha256": "2570f45ccd441c60b1f2bed6abf9959317c5b29be976c296eac87e110bc3df83"
+}
