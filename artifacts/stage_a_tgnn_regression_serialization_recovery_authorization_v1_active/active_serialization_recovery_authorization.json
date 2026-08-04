@@ -29,6 +29,33 @@
     "exact_history_match": true,
     "exact_best_metric_match": true
   },
+  "final_seed_checkpoint_identities": [
+    {
+      "path": "checkpoints/final_seed_62001.pt",
+      "bytes": 150633,
+      "sha256": "d2c4feab32af6aa873ed2c4ee5955643c5de8fc97babf093ae0a5b8d50f4f29d"
+    },
+    {
+      "path": "checkpoints/final_seed_62002.pt",
+      "bytes": 150633,
+      "sha256": "7eb3ae92b756d5738da026a002a10e6b2bbbe429bf52c2a63aa74b41f4bed019"
+    },
+    {
+      "path": "checkpoints/final_seed_62003.pt",
+      "bytes": 150633,
+      "sha256": "b30bf14ae5311bda10afa090ee10c65352c2d1b2023d58de426f11603c5a30ea"
+    },
+    {
+      "path": "checkpoints/final_seed_62004.pt",
+      "bytes": 150633,
+      "sha256": "f74ec30e19dba7d38c84363b1f9532f6246bcbaba901bae07f421e5660a0c982"
+    },
+    {
+      "path": "checkpoints/final_seed_62005.pt",
+      "bytes": 150633,
+      "sha256": "2570f45ccd441c60b1f2bed6abf9959317c5b29be976c296eac87e110bc3df83"
+    }
+  ],
   "decision": {
     "training_completed": true,
     "candidate_count": 4,

@@ -6,8 +6,8 @@
   "artifacts": [
     {
       "path": "active_serialization_recovery_authorization.json",
-      "bytes": 3058,
-      "sha256": "1173c8da42c34bdfbf49edfcb77108615360c0c713f7cc0a32d488cc90a4c4d3"
+      "bytes": 3942,
+      "sha256": "9608dcacfc593d4d16db82b2c245caa1a2c077147e40a305b83ff4953b11ea60"
     },
     {
       "path": "bootstrap_occurrence_verification.json",
