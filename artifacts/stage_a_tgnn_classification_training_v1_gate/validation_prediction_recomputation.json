@@ -1,0 +1,23 @@
+{
+  "accepted_tolerance": 1e-06,
+  "deterministic_order": true,
+  "ensemble": "arithmetic mean of five seed class-1 probabilities",
+  "five_seed_probabilities_per_record": true,
+  "max_abs_probability_error": 0.0,
+  "mode": "inference-only; CPU; evaluation mode; torch.inference_mode",
+  "no_test_records": true,
+  "per_seed_reporting_losses_match": true,
+  "predicted_labels_match": true,
+  "records": 75,
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.validation_prediction_recomputation.v1",
+  "seed_order": [
+    62001,
+    62002,
+    62003,
+    62004,
+    62005
+  ],
+  "status": "pass",
+  "threshold": 0.5,
+  "unique_run_keys": 75
+}

@@ -1,0 +1,97 @@
+{
+  "artifact_inventory_self_excluding": true,
+  "declared_public_artifacts": {
+    "candidate_epoch_histories.jsonl": {
+      "bytes": 122644,
+      "matches": true,
+      "sha256": "37c356d10dd115a9114a3fb4a418c04a2ab8106c4b7c971bcfb94736c5b24f43"
+    },
+    "candidate_search_results.json": {
+      "bytes": 2891,
+      "matches": true,
+      "sha256": "e13a6167f0594459c0f9d10bb49452eef3b33283a0c5a90118bc37ff7b5ff04e"
+    },
+    "checkpoints/candidate_0.pt": {
+      "bytes": 150547,
+      "matches": true,
+      "sha256": "e27d3dcb54249fa7ba3096fe9954035e4b7929df1331af4f52e488a20dc8a1c5"
+    },
+    "checkpoints/candidate_1.pt": {
+      "bytes": 150547,
+      "matches": true,
+      "sha256": "0271fb76cd4b6031c2af71812531f0cf554a859cc460b530dabdb6fa0880a0a4"
+    },
+    "checkpoints/candidate_2.pt": {
+      "bytes": 470803,
+      "matches": true,
+      "sha256": "50565ca1b20749f2a5963adbcb729eeecc51dbdd439f4d0a126860fa32ec58d5"
+    },
+    "checkpoints/candidate_3.pt": {
+      "bytes": 470803,
+      "matches": true,
+      "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a"
+    },
+    "final_seed_training_results.json": {
+      "bytes": 2628,
+      "matches": true,
+      "sha256": "89a7fcebda852c43a312849a696fdcc0270e080182c6c7021b79a5b805290bfc"
+    },
+    "preprocessing_statistics.json": {
+      "bytes": 2663,
+      "matches": true,
+      "sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"
+    },
+    "reporting_recovery_manifest.json": {
+      "bytes": 1652,
+      "matches": true,
+      "sha256": "5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5"
+    },
+    "selected_checkpoint_identity.json": {
+      "bytes": 197,
+      "matches": true,
+      "sha256": "e3282f11f5a2df45d09691feaf9a40836e3bb453f0f5268a3df2e692319307d9"
+    },
+    "selected_configuration.json": {
+      "bytes": 675,
+      "matches": true,
+      "sha256": "78a505635bd2a7578ec8aaf73d3d81046e625452d1f7505ae5ee2e7993d45441"
+    },
+    "training_report.json": {
+      "bytes": 1178,
+      "matches": true,
+      "sha256": "6e1cba52549f6ad356f57866cfa3d1ef47319336dcd05d7e5c32454330519454"
+    },
+    "validation_bootstrap_intervals.json": {
+      "bytes": 1291,
+      "matches": true,
+      "sha256": "578d599c6dd094543d9a1607738c00dcad3c8368eae2a8f9af10fccecdf5eb5c"
+    },
+    "validation_design_metrics.json": {
+      "bytes": 2387,
+      "matches": true,
+      "sha256": "f8db8f564188f350f650220a56f89608056cb58fb11906d854fc0f827dc540a6"
+    },
+    "validation_metrics.json": {
+      "bytes": 464,
+      "matches": true,
+      "sha256": "baaaf3b56c3c829569413ef9bbde3e4eea837a2b3ebfb382c31c906eb9120bca"
+    },
+    "validation_predictions.jsonl": {
+      "bytes": 13539,
+      "matches": true,
+      "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210"
+    }
+  },
+  "final_tree": {
+    "bytes": 3755617,
+    "expected": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0",
+    "file_count": 22,
+    "matches": true,
+    "sha256": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0"
+  },
+  "locks": [],
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.artifact_identity.v1",
+  "status": "pass",
+  "temporary_publication_files": []
+}

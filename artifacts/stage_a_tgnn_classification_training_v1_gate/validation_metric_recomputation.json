@@ -1,0 +1,36 @@
+{
+  "final_seed_reporting_match": true,
+  "labels": [
+    0,
+    1
+  ],
+  "metrics": {
+    "accuracy": 0.9733333333333334,
+    "balanced_accuracy": 0.9863013698630136,
+    "brier_score": 0.014385121325028036,
+    "class_0_precision": 0.5,
+    "class_0_recall_specificity": 1.0,
+    "class_1_precision": 1.0,
+    "class_1_recall": 0.9726027397260274,
+    "confusion_matrix": [
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        71
+      ]
+    ],
+    "macro_f1": 0.8263888888888888,
+    "pr_auc": 1.0000000000000002,
+    "roc_auc": 1.0,
+    "weighted_f1": 0.9775925925925926,
+    "weighted_validation_log_loss": 0.08636575304016632
+  },
+  "published_validation_metrics_match": true,
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.validation_metric_recomputation.v1",
+  "status": "pass",
+  "undefined_values_are_null": true,
+  "valid_numeric_zero_preserved": true
+}
