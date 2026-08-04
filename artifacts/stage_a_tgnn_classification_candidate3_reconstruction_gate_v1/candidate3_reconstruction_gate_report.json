@@ -1,0 +1,99 @@
+{
+  "schema": "satnet.stage_a_tgnn_classification.candidate3_reconstruction_gate.report.v1",
+  "gate_type": "narrow independent read-only identity gate",
+  "verdict": "STAGE A TGNN CLASSIFICATION CANDIDATE-3 RECONSTRUCTION ACCEPTED — READY FOR REPORTING FINALIZATION",
+  "authorization_anchors": {
+    "recovery_assessment_commit": "f9522904987a4ee1587c817e11716806c77c4fb3",
+    "reconstruction_authorization_head": "53c624d6ac172b811aa0bae5a650b1b5da7cd0e7"
+  },
+  "reconstruction_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1",
+  "checkpoint_identity": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\checkpoints\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "exact_expected_identity": true
+  },
+  "checkpoint_metadata": {
+    "candidate_index": 3,
+    "seed": 61003,
+    "hidden_dim": 64,
+    "learning_rate": 0.003,
+    "best_epoch": 38,
+    "weighted_validation_log_loss": 0.06203101027124465,
+    "gclstm_input_dimension": 14,
+    "gclstm_hidden_dimension": 64,
+    "chebyshev_K": 2,
+    "classification_head_logits": 2,
+    "model_state_complete": true,
+    "optimizer_state_expected": true,
+    "optimizer_state_complete": true,
+    "preprocessing_binding_matches": true
+  },
+  "reconstructed_result_verification": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\candidate_3_reconstruction_result.json",
+    "sha256": "739651d7140d0a207247e1b5a2887a4ea45755921504248dd1460ee71c07f1f8",
+    "candidate_index": 3,
+    "seed": 61003,
+    "hidden_dim": 64,
+    "learning_rate": 0.003,
+    "best_epoch": 38,
+    "checkpoint_sha256_exact": true,
+    "history_sha256_exact": true,
+    "preprocessing_sha256_exact": true,
+    "predictions_written": false,
+    "reporting_finalization_run": false,
+    "test_access": false,
+    "all_required_result_fields_match": true
+  },
+  "epoch_history": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\candidate_3_epoch_history.jsonl",
+    "bytes": 28746,
+    "sha256": "730e39eb125f4d1d8f62fafb7889f7731b5b462d85016c45dbfb0ca5d5d396b0",
+    "row_count": 51,
+    "deterministic_order": true,
+    "best_epoch": 38,
+    "preserved_candidate3_metric_sequence_match": true
+  },
+  "preprocessing_binding": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\preprocessing_statistics.json",
+    "bytes": 2663,
+    "sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "checkpoint_manifest_identity": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "binding_match": true
+  },
+  "source_output_preservation": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "expected_tree_sha256": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "observed_tree_sha256": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "all_five_final_seed_checkpoints_unchanged": true,
+    "validation_predictions_unchanged": true,
+    "no_source_output_file_modified": true
+  },
+  "non_execution": {
+    "fit_calls": 0,
+    "optimizer_steps": 0,
+    "backward_calls": 0,
+    "checkpoint_writes": 0,
+    "prediction_generation": 0,
+    "reporting_finalization_run": false,
+    "test_sources_opened": 0,
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "training_run": false,
+    "optimizer_instantiated": false,
+    "model_instantiated": false,
+    "preprocessing_fitted": false,
+    "gate_scope": "hashing, JSON/JSONL parsing, and torch.load(map_location='cpu', weights_only=False) only; no training or reporting imports/calls"
+  },
+  "component_status": {
+    "checkpoint_identity": "pass",
+    "checkpoint_metadata": "pass",
+    "epoch_history": "pass",
+    "preprocessing_binding": "pass",
+    "result_json": "pass",
+    "selected_checkpoint_declaration": "pass",
+    "source_output_preservation": "pass",
+    "non_execution": "pass"
+  },
+  "status": "accepted"
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.candidate3_reconstruction_gate.preprocessing_binding.v1",
+  "verification_mode": "read-only frozen preprocessing identity and checkpoint binding verification",
+  "frozen_preprocessing": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\preprocessing_statistics.json",
+    "expected_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "observed_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "byte_count": 2663,
+    "sha256_match": true,
+    "schema_version": "stage_a_tgnn_preprocessing_statistics_v1",
+    "training_index_sha256": "f590fd975950bd6ab1b9cac26cd01e8d8826751774cf48ddb02f301a7dbe6271",
+    "tgnn_manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "accepted_node_feature_count": 14
+  },
+  "checkpoint_binding": {
+    "checkpoint_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\checkpoints\\candidate_3.pt",
+    "checkpoint_preprocessing_identity": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "checkpoint_identity_matches_frozen_preprocessing_manifest": true
+  },
+  "result_binding": {
+    "result_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\candidate_3_reconstruction_result.json",
+    "result_preprocessing_file_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "result_preprocessing_semantic_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "result_file_binding_match": true,
+    "result_semantic_binding_match": true
+  },
+  "status": "pass"
+}

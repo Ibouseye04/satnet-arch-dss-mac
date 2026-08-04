@@ -1,0 +1,59 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.candidate3_reconstruction_gate.checkpoint_identity.v1",
+  "verification_mode": "read-only CPU checkpoint load and byte identity verification",
+  "checkpoint": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\checkpoints\\candidate_3.pt",
+    "expected_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "observed_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "expected_byte_count": 470803,
+    "observed_byte_count": 470803,
+    "sha256_match": true,
+    "byte_count_match": true
+  },
+  "selected_checkpoint_declaration": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\selected_checkpoint_identity.json",
+    "observed_sha256": "e3282f11f5a2df45d09691feaf9a40836e3bb453f0f5268a3df2e692319307d9",
+    "declared_checkpoint_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_3.pt",
+    "declared_checkpoint_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "restored_expected_sha256": true
+  },
+  "metadata": {
+    "candidate_index": 3,
+    "seed": 61003,
+    "hidden_dim": 64,
+    "learning_rate": 0.003,
+    "best_epoch": 38,
+    "weighted_validation_log_loss": 0.06203101027124465,
+    "configuration_match": true,
+    "metric_match": true,
+    "cpu_load": true,
+    "model_instantiated": false
+  },
+  "architecture_contract": {
+    "class": "torch_geometric_temporal.nn.recurrent.GCLSTM",
+    "input_dimension": 14,
+    "hidden_dimension": 64,
+    "chebyshev_K": 2,
+    "classification_head": "two-logit linear head",
+    "model_state_keys_sha256": "d8085202c69219767d4b02300f7d9cf33eeef73d4419ca76f147a394544e5109",
+    "model_state_key_count": 22,
+    "model_state_complete": true,
+    "linear_weight_shape": [2, 64],
+    "linear_bias_shape": [2],
+    "all_model_tensors_cpu": true,
+    "all_model_tensors_float32": true
+  },
+  "optimizer_state": {
+    "expected": true,
+    "present": true,
+    "optimizer_type_contract": "Adam state layout",
+    "param_group_count": 1,
+    "parameter_count": 22,
+    "state_entry_count": 22,
+    "state_keys_complete_for_each_parameter": true,
+    "state_tensor_shapes_match_model_parameters": true,
+    "all_optimizer_state_tensors_cpu": true,
+    "optimizer_state_complete": true
+  },
+  "status": "pass"
+}
