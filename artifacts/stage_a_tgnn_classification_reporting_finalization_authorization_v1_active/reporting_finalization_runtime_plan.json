@@ -1,0 +1,83 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_finalization_runtime_plan.v1",
+  "mode": "finalize-reporting-only",
+  "activation_branch": "activate/stage-a-tgnn-classification-training-v1",
+  "activation_worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+  "activation_head": "32a0244bbb8c8a3955988b3c7be4f0128807377a",
+  "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "reconstructed_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1",
+  "reconstruction_gate_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_classification_candidate3_reconstruction_gate_v1",
+  "recovery_evidence_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+  "recovery_lock": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery.lock",
+  "expected_campaign_hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+  "expected_pre_finalization_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "accepted_checkpoint_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+  "accepted_reconstruction_gate_commit": "1bb496e",
+  "exact_preflight_command": "& 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation\\scripts\\tgnn_classification_finalize_reporting_command.ps1' -RepoRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation' -OutputRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1' -ReconstructedRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1' -ReconstructionGateRoot 'C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_classification_candidate3_reconstruction_gate_v1' -RecoveryRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery' -ExpectedCampaignHash 'fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f' -ExpectedPreFinalizationTreeHash '0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a' -ExpectedActivationHead '32a0244bbb8c8a3955988b3c7be4f0128807377a' -AcceptedCheckpointSha256 'e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a' -AcceptedReconstructionGateCommit '1bb496e' -PythonExecutable 'C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe' -PreflightOnly",
+  "never_read": [
+    "dataset root",
+    "train index",
+    "validation index",
+    "sealed test index",
+    "test targets",
+    "sequence arrays"
+  ],
+  "never_execute": [
+    "training epoch",
+    "optimizer construction",
+    "optimizer.step()",
+    "backward()",
+    "preprocessing fit",
+    "candidate search",
+    "final-seed training",
+    "validation prediction generation",
+    "TGNN regression training",
+    "RF output modification",
+    "test artifact access"
+  ],
+  "read_only_preflight": [
+    "verify activation commit, branch, and clean status",
+    "verify expected output tree hash, file count, and byte count",
+    "verify frozen artifact paths, byte counts, and SHA-256 values",
+    "verify reconstruction gate identities and accepted checkpoint identity",
+    "verify all five final-seed checkpoint identities",
+    "parse exactly 75 frozen validation prediction records",
+    "verify duplicate-free run keys and 15-design aggregation",
+    "probe corrected single-class metrics and canonical JSON",
+    "verify recovery root absent and recovery lock count zero",
+    "verify normal training wrapper refuses existing output root"
+  ],
+  "selected_checkpoint_sequence": [
+    "hash current checkpoints/candidate_3.pt",
+    "copy it to superseded_checkpoints/candidate_3_overwritten_by_final_seed_62005.pt in the external recovery root",
+    "verify preserved superseded SHA-256",
+    "stage reconstructed candidate_3.pt outside the output root",
+    "verify staged accepted SHA-256",
+    "atomically replace only checkpoints/candidate_3.pt",
+    "verify selected_checkpoint_identity.json resolves to accepted SHA-256",
+    "verify all final_seed_62001.pt through final_seed_62005.pt remain unchanged"
+  ],
+  "reporting_policy": {
+    "confusion_matrix_labels": [0, 1],
+    "undefined_roc_auc": null,
+    "undefined_class_0_recall_specificity": null,
+    "valid_numeric_zero": 0,
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 63001,
+    "bootstrap_resampling_unit": "design",
+    "bootstrap_percentile_bounds": [2.5, 97.5],
+    "canonical_json_allow_nan": false,
+    "recursive_non_finite_rejection": true
+  },
+  "publication_allowlist": [
+    "validation_design_metrics.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "reporting_recovery_manifest.json",
+    "artifact_inventory.json"
+  ],
+  "publication_order": "all reports staged and parsed externally; selected checkpoint restored; five reports published; artifact_inventory.json generated and published last",
+  "execution_constraint": "This task runs preflight only. Finalization requires the exact one-time command returned with the authorization."
+}

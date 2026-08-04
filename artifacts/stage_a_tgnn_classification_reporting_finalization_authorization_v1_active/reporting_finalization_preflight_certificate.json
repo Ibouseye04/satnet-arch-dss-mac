@@ -1,0 +1,111 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_finalization_preflight_certificate.v1",
+  "preflight_mode": "read-only",
+  "executed_finalization": false,
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING FINALIZATION AUTHORIZED — READY TO EXECUTE ONCE",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "32a0244bbb8c8a3955988b3c7be4f0128807377a",
+    "clean_worktree": true,
+    "failed_execution_tooling_sha": "fa314c07cdb3c60186365888e9c726a0e4a567e3"
+  },
+  "runtime": {
+    "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+    "python_identity_verified": true,
+    "cpu_only": true
+  },
+  "campaign": {
+    "hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+    "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "pre_finalization_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "pre_finalization_file_count": 16,
+    "pre_finalization_bytes": 3742138
+  },
+  "reconstruction_gate": {
+    "commit": "1bb496e",
+    "gate_report_sha256": "f83e2ce4e4d5a7fd57f9f0d0b32d81a3b65fced67ef460469c326c6d021d740a",
+    "checkpoint_identity_verification_sha256": "b399873b4c1f8d05252a22b908a7607b3ba493992a7f575132d338e3c8a4cd69",
+    "epoch_history_verification_sha256": "55bb98c2efb6d0106a368fdb7ba3f8043a4046eaa846ca7e5361f6fcf5453e45",
+    "preprocessing_binding_verification_sha256": "c5b9c00b490290187686001bacffa3ac7eae1c318c38ed18a9b30b364f4ffcf6",
+    "source_output_preservation_sha256": "c5fde1500addd94160dfa32be7e22f8dcda6b0f1816d37845bb751c460dea2c3",
+    "accepted_checkpoint": {
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\checkpoints\\candidate_3.pt",
+      "bytes": 470803,
+      "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a"
+    },
+    "accepted_history": {
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\candidate_3_epoch_history.jsonl",
+      "bytes": 28746,
+      "sha256": "730e39eb125f4d1d8f62fafb7889f7731b5b462d85016c45dbfb0ca5d5d396b0"
+    },
+    "reconstruction_result_sha256": "739651d7140d0a207247e1b5a2887a4ea45755921504248dd1460ee71c07f1f8",
+    "preprocessing_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"
+  },
+  "superseded_checkpoint": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"
+  },
+  "frozen_validation": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\validation_predictions.jsonl",
+    "bytes": 13539,
+    "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210",
+    "records": 75,
+    "unique_run_keys": 75,
+    "run_label_distribution": {"class_0": 2, "class_1": 73},
+    "design_count": 15,
+    "realizations_per_design": 5,
+    "design_label_distribution": {"class_0": 0, "class_1": 15},
+    "test_records": false
+  },
+  "final_seed_checkpoint_identities": [
+    {"path": "checkpoints/final_seed_62001.pt", "bytes": 471273, "sha256": "b5b4323f2bb34c8740fb73bcf50c5603c46feb10ae323fa86dfad4baeb141367"},
+    {"path": "checkpoints/final_seed_62002.pt", "bytes": 471273, "sha256": "fa74a12749a2da0d66faa6620b7b244f38db11b674feefcd9781fdb80fd1ae86"},
+    {"path": "checkpoints/final_seed_62003.pt", "bytes": 471273, "sha256": "e6803fe705c0ad0ff28e9c4d1ee52264d2bf5ddd76a7e23421c670b8836d61b2"},
+    {"path": "checkpoints/final_seed_62004.pt", "bytes": 471273, "sha256": "95f127cf534327c293b4215dc7d330a9a40bb5be026c33d764519254b1adf106"},
+    {"path": "checkpoints/final_seed_62005.pt", "bytes": 471273, "sha256": "235b907a504bb29c114f1e97dc275b81f7fff5ac2cafe8470afcc9b80493c2ae"}
+  ],
+  "metric_probe": {
+    "synthetic_single_class": true,
+    "confusion_matrix": [[0, 0], [0, 1]],
+    "roc_auc": null,
+    "class_0_recall_specificity": null,
+    "valid_numeric_zero_preserved": true,
+    "canonical_json_allow_nan_false": true,
+    "non_finite_values_serialized": false
+  },
+  "reporting_safety": {
+    "reporting_source_has_no_training_calls": true,
+    "optimizer_instantiated": false,
+    "optimizer_step": false,
+    "backward_pass": false,
+    "training_epoch": false,
+    "preprocessing_fitted": false,
+    "candidate_search_executed": false,
+    "final_seed_training_executed": false,
+    "validation_predictions_generated": false,
+    "checkpoint_written": false,
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "normal_training_wrapper_refuses_existing_output_root": true,
+    "normal_training_wrapper_refuses_existing_lock": true
+  },
+  "recovery_guards": {
+    "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "recovery_root_absent": true,
+    "recovery_lock": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery.lock",
+    "recovery_lock_count": 0,
+    "output_root_unchanged": true
+  },
+  "reporting_policy": {
+    "confusion_matrix_labels": [0, 1],
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 63001,
+    "resampling_unit": "design",
+    "percentile_bounds": [2.5, 97.5],
+    "undefined_metric_bounds_when_no_valid_replicates": null,
+    "recursive_non_finite_rejection": true,
+    "canonical_json_allow_nan": false
+  }
+}
