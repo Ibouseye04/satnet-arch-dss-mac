@@ -1,0 +1,35 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_atomic_copy_preflight.v1",
+  "preflight_mode": "isolated-scratch-only",
+  "executed_publication": false,
+  "scratch_directory": {
+    "isolated": true,
+    "public_output_touched": false,
+    "recovery_root_touched": false,
+    "temporary_residue_remaining": false
+  },
+  "source": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery\\staging\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a"
+  },
+  "destination": {
+    "scratch_basename": "probe.bin",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a"
+  },
+  "checks": {
+    "source_and_destination_hashes_match": true,
+    "fsync_succeeds_on_open_writable_destination_handle": true,
+    "destination_handle_closed_before_replace": true,
+    "replace_succeeds": true,
+    "temporary_residue_absent": true
+  },
+  "event_order": [
+    "destination_handle_opened",
+    "fsync_succeeded",
+    "destination_handle_closed",
+    "replace_succeeded"
+  ],
+  "verdict": "WINDOWS ATOMIC-COPY PREFLIGHT PASSED"
+}

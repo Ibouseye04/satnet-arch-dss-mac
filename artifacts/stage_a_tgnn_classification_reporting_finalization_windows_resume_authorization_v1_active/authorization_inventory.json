@@ -1,0 +1,18 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_resume_authorization_inventory.v1",
+  "self_excluding": true,
+  "authorization_directory": "artifacts/stage_a_tgnn_classification_reporting_finalization_windows_resume_authorization_v1_active",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_windows_resume_authorization_v1_active",
+  "activation_head": "ead97ac4582b8517dff818a4ce4368ff9b18667a",
+  "verdict": "STAGE A TGNN CLASSIFICATION WINDOWS RESUME PUBLICATION AUTHORIZED — TEMPORARY CHECKPOINT VERIFIED — READY TO PUBLISH ONCE",
+  "artifacts": [
+    {"path":"active_windows_resume_authorization.json","bytes":3658,"sha256":"a9ea238c3e70acd884209fc0a73b55b5db0dc069df35d384404eed4a59da71c3"},
+    {"path":"README.md","bytes":5185,"sha256":"e2b321d844de0c393262bfba39399544fbb254bdcb782340a49e42ba62ae9d1b"},
+    {"path":"residue_state_verification.json","bytes":1563,"sha256":"c990017e4b05ce070046c9dca91311753e79955c982fe78f7996433e79fac5d9"},
+    {"path":"tgnn_classification_windows_resume_publication_command.ps1","bytes":2032,"sha256":"63a95004af376ee2f7b042e988770df9910138b09b51f18f89acca1a26c459ef"},
+    {"path":"windows_atomic_copy_preflight.json","bytes":1184,"sha256":"c69f4b03861bea1b3deb98d99a2bfdc332fdebc52d3b482a411b33f351aa215b"},
+    {"path":"windows_atomic_copy_root_cause.json","bytes":1611,"sha256":"1f907f733696902d168178b4e779100bf7e25b6c3ffe1c423078bc7ac9ab8805"},
+    {"path":"windows_resume_preflight_certificate.json","bytes":4013,"sha256":"d43f1940bb05c396882a2edb01e31011ebedcd5b8cc3060efa1afd921ade9e7f"},
+    {"path":"windows_resume_runtime_plan.json","bytes":4893,"sha256":"c9f85441ea2c3f48f9f41f6b290af7ba2da50f121c3bd7571544bf83081dad7d"}
+  ]
+}

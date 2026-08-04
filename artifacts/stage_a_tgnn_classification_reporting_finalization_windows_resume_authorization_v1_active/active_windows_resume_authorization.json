@@ -1,0 +1,71 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_resume_publication_authorization.v1",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_windows_resume_authorization_v1_active",
+  "status": "active",
+  "verdict": "STAGE A TGNN CLASSIFICATION WINDOWS RESUME PUBLICATION AUTHORIZED — TEMPORARY CHECKPOINT VERIFIED — READY TO PUBLISH ONCE",
+  "scope": "one-time resume-only publication of six preserved staged reports and direct atomic replacement from the verified public checkpoint residue",
+  "publication_executed_during_authorization": false,
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "ead97ac4582b8517dff818a4ce4368ff9b18667a",
+    "resume_script": "scripts/resume_stage_a_tgnn_classification_reporting.py",
+    "resume_script_sha256": "7a04a12ea7e9311fc7f16354409115917ff47ad94b30f2708b3fd1c40b16b458",
+    "powershell_command": "artifacts/stage_a_tgnn_classification_reporting_finalization_windows_resume_authorization_v1_active/tgnn_classification_windows_resume_publication_command.ps1",
+    "powershell_command_sha256": "63a95004af376ee2f7b042e988770df9910138b09b51f18f89acca1a26c459ef",
+    "clean_worktree": true
+  },
+  "runtime": {
+    "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+    "cpu_only": true
+  },
+  "campaign": {
+    "hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+    "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "pre_finalization_tree_hash_excluding_residue": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "recovery_tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5",
+    "planned_post_publication_tree_hash": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0"
+  },
+  "accepted_checkpoint": {
+    "residue_bytes": 470803,
+    "residue_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "destination": "checkpoints\\candidate_3.pt",
+    "operation": "os.replace(existing_temporary_checkpoint, public_checkpoint)",
+    "copy_again": false,
+    "superseded_public_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"
+  },
+  "publication_allowlist": [
+    "validation_design_metrics.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "reporting_recovery_manifest.json",
+    "artifact_inventory.json"
+  ],
+  "required_guards": {
+    "exactly_one_authorized_checkpoint_residue": true,
+    "residue_identity_verified": true,
+    "governed_16_file_tree_verified_excluding_residue": true,
+    "all_six_public_reports_absent": true,
+    "resume_lock_absent": true,
+    "completion_marker_absent": true,
+    "recovery_root_unchanged": true,
+    "staged_reports_unchanged": true,
+    "atomic_copy_preflight_passed": true,
+    "activation_head_exact": true,
+    "activation_worktree_clean": true
+  },
+  "prohibited_operations": [
+    "training",
+    "prediction generation",
+    "bootstrap rerun",
+    "report regeneration",
+    "preprocessing refit",
+    "test index access",
+    "test target access",
+    "test source access",
+    "non-allowlisted public file modification"
+  ],
+  "completion_marker": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery.resume_publication_completed.json"
+}

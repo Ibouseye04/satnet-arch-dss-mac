@@ -1,0 +1,78 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_resume_preflight_certificate.v1",
+  "preflight_mode": "read-only",
+  "executed_publication": false,
+  "verdict": "STAGE A TGNN CLASSIFICATION WINDOWS RESUME PREFLIGHT PASSED",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "ead97ac4582b8517dff818a4ce4368ff9b18667a",
+    "clean_worktree": true,
+    "resume_script_sha256": "7a04a12ea7e9311fc7f16354409115917ff47ad94b30f2708b3fd1c40b16b458",
+    "powershell_command_sha256": "63a95004af376ee2f7b042e988770df9910138b09b51f18f89acca1a26c459ef"
+  },
+  "public_output": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "governed_file_count_excluding_residue": 16,
+    "governed_bytes_excluding_residue": 3742138,
+    "tree_hash_excluding_residue": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "candidate_3_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "all_six_reports_absent": true
+  },
+  "temporary_checkpoint_residue": {
+    "only_matching_file": true,
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\.candidate_3.pt.atp6bm7w.resume.tmp",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "accepted_reconstructed_selected_checkpoint": true
+  },
+  "recovery_root": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "file_count": 8,
+    "bytes": 955085,
+    "tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5",
+    "staged_checkpoint_unchanged": true,
+    "staged_reports_unchanged": true,
+    "resume_lock_absent": true,
+    "completion_marker_absent": true
+  },
+  "staged_checkpoint": {
+    "path": "staging\\candidate_3.pt",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a"
+  },
+  "staged_reports": {
+    "validation_design_metrics.json": {"bytes":2387,"sha256":"f8db8f564188f350f650220a56f89608056cb58fb11906d854fc0f827dc540a6","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "validation_bootstrap_intervals.json": {"bytes":1291,"sha256":"578d599c6dd094543d9a1607738c00dcad3c8368eae2a8f9af10fccecdf5eb5c","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "final_seed_training_results.json": {"bytes":2628,"sha256":"89a7fcebda852c43a312849a696fdcc0270e080182c6c7021b79a5b805290bfc","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "training_report.json": {"bytes":1178,"sha256":"6e1cba52549f6ad356f57866cfa3d1ef47319336dcd05d7e5c32454330519454","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "reporting_recovery_manifest.json": {"bytes":1652,"sha256":"5fa720bbb723a62a6e909012495d886bee9a15e63f528f574e213704857b88b5","parse_valid":true,"finite":true,"allow_nan_false":true},
+    "artifact_inventory.json": {"bytes":4343,"sha256":"e1a543d630114ca1ce83ecdc662db4a11d2be672b274dc0ede123dc767cad8d5","parse_valid":true,"finite":true,"allow_nan_false":true}
+  },
+  "atomic_copy_preflight": {
+    "isolated_scratch_only": true,
+    "source_and_destination_hashes_match": true,
+    "fsync_succeeded": true,
+    "handle_closed_before_replace": true,
+    "replace_succeeded": true,
+    "temporary_residue_absent": true
+  },
+  "planned_post_publication": {
+    "tree_hash": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0",
+    "file_count": 22,
+    "bytes": 3755617
+  },
+  "safety": {
+    "training_function_reachable": false,
+    "optimizer_instantiated": false,
+    "optimizer_step": false,
+    "backward_pass": false,
+    "prediction_generated": false,
+    "bootstrap_rerun": false,
+    "report_generation": false,
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "test_source_opened": false,
+    "public_file_written": false
+  }
+}
