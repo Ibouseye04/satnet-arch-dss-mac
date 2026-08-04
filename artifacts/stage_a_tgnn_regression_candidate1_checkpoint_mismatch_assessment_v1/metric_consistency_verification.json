@@ -1,0 +1,36 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_metric_consistency_verification.v1",
+  "method": "Read-only comparison using the reconstructed checkpoint metadata and already-written epoch history; no inference and no new validation-prediction artifact.",
+  "checkpoint_restored_best_epoch": 36,
+  "history_best_epoch": 36,
+  "checkpoint_validation_primary_metric": 0.1019323321363057,
+  "expected_best_metrics": {
+    "count": 75,
+    "mae": 0.0768268077338814,
+    "r2": 0.9157724309629774,
+    "residual_mean": -0.00971955793212961,
+    "residual_population_std": 0.101467879293647,
+    "rmse": 0.1019323321363057
+  },
+  "reconstructed_epoch_36_metrics_from_existing_history": {
+    "count": 75,
+    "mae": 0.0768268077338814,
+    "r2": 0.9157724309629774,
+    "residual_mean": -0.00971955793212961,
+    "residual_population_std": 0.101467879293647,
+    "rmse": 0.1019323321363057
+  },
+  "maximum_absolute_difference": {
+    "count": 0.0,
+    "mae": 0.0,
+    "r2": 0.0,
+    "residual_mean": 0.0,
+    "residual_population_std": 0.0,
+    "rmse": 0.0
+  },
+  "result": "EXACT_STORED_METRIC_MATCH",
+  "inference": {
+    "performed": false,
+    "reason": "Stored epoch-36 metrics and checkpoint validation_primary_metric were sufficient; no prediction regeneration was necessary."
+  }
+}

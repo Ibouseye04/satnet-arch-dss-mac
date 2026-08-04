@@ -1,0 +1,29 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_reconstruction_state_inventory.v1",
+  "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1",
+  "file_count": 2,
+  "bytes": 166184,
+  "tree_sha256": "29a3f93735fc9b4d51a21f9e25257cbfd96068bae252b4b8675e4282541c441a",
+  "tree_definition": "SHA-256 of newline-joined absolute-path|byte-count|file-SHA256 rows sorted by absolute path",
+  "lock": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1.lock",
+    "exists": false
+  },
+  "artifacts_written_before_failure": [
+    {
+      "path": "candidate_1_epoch_history.jsonl",
+      "bytes": 16021,
+      "sha256": "c6e37e8cb7bd1d31b0056093bc16a10506ee22c0c3361d15bb4ff1d5dccd0dcd"
+    },
+    {
+      "path": "checkpoints/candidate_1.pt",
+      "bytes": 150163,
+      "sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"
+    }
+  ],
+  "temporary_checkpoint": {
+    "exists": false,
+    "evidence": "No temporary or alternate checkpoint file exists under the reconstruction root; the source save implementation writes directly to candidate_1.pt."
+  },
+  "failure_boundary": "The reconstruction stopped at the exact checkpoint SHA-256 guard after writing candidate_1.pt; semantic identity and subsequent reconstruction artifacts were not written."
+}
