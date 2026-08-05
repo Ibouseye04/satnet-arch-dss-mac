@@ -1,0 +1,66 @@
+{
+  "bootstrap": {
+    "published_match": true,
+    "replicates": 10000,
+    "seed": 63002
+  },
+  "campaign_hash": "faa947e5a2dc603121615945beb5bcbd93a4ce5afeabc9a6fcc72f5b4eb406bd",
+  "candidate_selection": {
+    "best_epoch": 36,
+    "epochs_recorded": 49,
+    "hidden_dimension": 32,
+    "learning_rate": 0.003,
+    "search_seed": 61001,
+    "selected_candidate": 1
+  },
+  "checks": {
+    "artifact_identity_verification.json": "pass",
+    "bootstrap_verification.json": "pass",
+    "candidate_selection_verification.json": "pass",
+    "checkpoint_identity_verification.json": "pass",
+    "design_metric_verification.json": "pass",
+    "recovery_integrity_verification.json": "pass",
+    "test_seal_verification.json": "pass",
+    "validation_metric_recomputation.json": "pass",
+    "validation_prediction_recomputation.json": "pass"
+  },
+  "design_metrics": {
+    "count": 15,
+    "mae": 0.07904731344944115,
+    "r2": 0.9095777475134105,
+    "residual_mean": -0.0011120608633867323,
+    "residual_population_std": 0.1039906609816801,
+    "rmse": 0.10399660691950773
+  },
+  "final_tree": {
+    "bytes": 2070248,
+    "file_count": 22,
+    "sha256": "95134dab5669ee4bc9515777d19f48449186324977d17981be856fde533e6111"
+  },
+  "loss": "torch.nn.SmoothL1Loss(beta=1.0)",
+  "recovery_integrity": {
+    "classification": "SERIALIZATION_ONLY",
+    "scientific_result_changed": false
+  },
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.report.v1",
+  "status": "accepted",
+  "target": {
+    "alias": "gcc_frac_min",
+    "source_field": "space_gcc_fraction_original_min",
+    "transformation": "none"
+  },
+  "test_seal": {
+    "governed_artifacts_modified": false,
+    "test_access": false,
+    "training_occurred": false
+  },
+  "validation_metrics": {
+    "count": 75,
+    "mae": 0.0910536278881172,
+    "r2": 0.8887963809117314,
+    "residual_mean": -0.0011120608633867057,
+    "residual_population_std": 0.11711828692618899,
+    "rmse": 0.11712356642405067
+  },
+  "verdict": "STAGE A TGNN REGRESSION TRAINING V1 ACCEPTED — ALL FOUR STAGE A MODELS FROZEN — READY FOR SEALED TEST AUTHORIZATION"
+}

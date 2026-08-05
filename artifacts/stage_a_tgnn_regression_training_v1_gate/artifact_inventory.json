@@ -1,0 +1,62 @@
+{
+  "artifacts": [
+    {
+      "bytes": 4190,
+      "path": "artifact_identity_verification.json",
+      "sha256": "0c321a531603c5606fd05ca7c5e1048bfaf5f77341668e7cfbe071fb58651be8"
+    },
+    {
+      "bytes": 1700,
+      "path": "bootstrap_verification.json",
+      "sha256": "16a8068f3422d1241b4b42a46a67de7d429629f040a646d1b9d2666e6bfe2a82"
+    },
+    {
+      "bytes": 1722,
+      "path": "candidate_selection_verification.json",
+      "sha256": "937f8c869530c4ea7154830dfbecf9cdf783c9e839a1c0dad84a20cd504b9f81"
+    },
+    {
+      "bytes": 5871,
+      "path": "checkpoint_identity_verification.json",
+      "sha256": "a61fa7723182174e5be7808058730356254c3db029dfe31ad057e6c3b6b54401"
+    },
+    {
+      "bytes": 510,
+      "path": "design_metric_verification.json",
+      "sha256": "20806dbd3ff41dc29b14945f289eeee292ed0fad1e32a78f459ef1dab6eccdbe"
+    },
+    {
+      "bytes": 1500,
+      "path": "README.md",
+      "sha256": "e5b4cf26ef6501e26bb69d8f827871bb6d5b5b34ae4662dc7e42a03c1720be97"
+    },
+    {
+      "bytes": 869,
+      "path": "recovery_integrity_verification.json",
+      "sha256": "5999113abb2b7e76a9b8ce05478e1dbd7392e63c857658083787752f35a8f7a7"
+    },
+    {
+      "bytes": 646,
+      "path": "test_seal_verification.json",
+      "sha256": "26853f4eb5375d791a38daec8cd41b8d922b344812bf41ac63ab45ee915a6f00"
+    },
+    {
+      "bytes": 2105,
+      "path": "tgnn_regression_training_gate_report.json",
+      "sha256": "7931ac58def24a6d382d4918e4de78a9a647d9a9f2729ef092e72e206dbbe7ac"
+    },
+    {
+      "bytes": 801,
+      "path": "validation_metric_recomputation.json",
+      "sha256": "0445b707e753e644009b225340a1f0d4fc8cf69f8c5bc98793991b5a266b8c2d"
+    },
+    {
+      "bytes": 634,
+      "path": "validation_prediction_recomputation.json",
+      "sha256": "c2023ac890a519b4957273272903a18b02888072e1d805f6b24cbf551d444efa"
+    }
+  ],
+  "deterministic_order": "relative POSIX path ascending",
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.artifact_inventory.v1",
+  "self_excluding": true
+}

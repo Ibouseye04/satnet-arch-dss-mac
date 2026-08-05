@@ -1,0 +1,17 @@
+{
+  "design_count": 15,
+  "deterministic_design_order": true,
+  "metrics": {
+    "count": 15,
+    "mae": 0.07904731344944115,
+    "r2": 0.9095777475134105,
+    "residual_mean": -0.0011120608633867323,
+    "residual_population_std": 0.1039906609816801,
+    "rmse": 0.10399660691950773
+  },
+  "published_design_report_match": true,
+  "realizations_per_design": 5,
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.design_metric_verification.v1",
+  "status": "pass",
+  "undefined_values_are_null": true
+}

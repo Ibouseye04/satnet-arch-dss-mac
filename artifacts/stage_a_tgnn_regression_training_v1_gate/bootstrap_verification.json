@@ -1,0 +1,58 @@
+{
+  "designs_per_replicate": 15,
+  "duplicate_original_design_ids_remain_separate": true,
+  "intervals": {
+    "design_level": {
+      "mae": {
+        "lower_2_5_percent": 0.047294239838898355,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.11516817420166596,
+        "valid_replicates": 10000
+      },
+      "r2": {
+        "lower_2_5_percent": 0.7612116239736056,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.9672999036553279,
+        "valid_replicates": 10000
+      },
+      "rmse": {
+        "lower_2_5_percent": 0.06147113558484304,
+        "undefined_replicates": 0,
+        "upper_97_5_percent": 0.13979720635083007,
+        "valid_replicates": 10000
+      }
+    },
+    "mae": {
+      "lower_2_5_percent": 0.06200715181827467,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 0.12390767551604182,
+      "valid_replicates": 10000
+    },
+    "r2": {
+      "lower_2_5_percent": 0.7224768102786918,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 0.9502468520802123,
+      "valid_replicates": 10000
+    },
+    "rmse": {
+      "lower_2_5_percent": 0.07954058948830352,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 0.14988550915228502,
+      "valid_replicates": 10000
+    }
+  },
+  "no_nan_or_infinity": true,
+  "occurrence_identity": "<draw_index>:<design_id>",
+  "percentiles": [
+    2.5,
+    97.5
+  ],
+  "published_report_match": true,
+  "realizations_retained_per_occurrence": 5,
+  "replicates": 10000,
+  "run_multiplicity_preserved": true,
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.bootstrap_verification.v1",
+  "seed": 63002,
+  "status": "pass",
+  "valid_and_undefined_counts_explicit": true
+}

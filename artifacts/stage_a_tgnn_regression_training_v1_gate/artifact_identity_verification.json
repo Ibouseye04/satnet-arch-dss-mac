@@ -1,0 +1,115 @@
+{
+  "all_declared_public_hashes_and_sizes_match": true,
+  "artifact_inventory": {
+    "artifact_inventory.json": {
+      "bytes": 2912,
+      "sha256": "8a8207a789f552d677919638dd84a16ae0c2e602e73c84349d7fc20f61b1cdad"
+    },
+    "candidate_epoch_histories.jsonl": {
+      "bytes": 45198,
+      "sha256": "c2ae607f874721e24fbdd240e22f90220e7b24dab06d99cf4649b1db362e11b4"
+    },
+    "candidate_search_results.json": {
+      "bytes": 1925,
+      "sha256": "b9ffc1876f33dd1bb27750e3baee4005681326b6bd1a95557228eb018b7ff4a1"
+    },
+    "checkpoints/candidate_0.pt": {
+      "bytes": 150163,
+      "sha256": "7bc15a087e63b0091d5e5c8f9e4000beaa5dc6bdbc8ddc7e511ea2721d35bc9f"
+    },
+    "checkpoints/candidate_1.pt": {
+      "bytes": 150163,
+      "sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"
+    },
+    "checkpoints/candidate_2.pt": {
+      "bytes": 470035,
+      "sha256": "dbf7dff7281fbc05880c1a99194c7ca87a0d1e63b5ee433a48847d4585751c10"
+    },
+    "checkpoints/candidate_3.pt": {
+      "bytes": 470035,
+      "sha256": "b3cd6f18ac1a681f5da024624277fd9739124aebff4e0536a4ae29f19de945b4"
+    },
+    "checkpoints/final_seed_62001.pt": {
+      "bytes": 150633,
+      "sha256": "d2c4feab32af6aa873ed2c4ee5955643c5de8fc97babf093ae0a5b8d50f4f29d"
+    },
+    "checkpoints/final_seed_62002.pt": {
+      "bytes": 150633,
+      "sha256": "7eb3ae92b756d5738da026a002a10e6b2bbbe429bf52c2a63aa74b41f4bed019"
+    },
+    "checkpoints/final_seed_62003.pt": {
+      "bytes": 150633,
+      "sha256": "b30bf14ae5311bda10afa090ee10c65352c2d1b2023d58de426f11603c5a30ea"
+    },
+    "checkpoints/final_seed_62004.pt": {
+      "bytes": 150633,
+      "sha256": "f74ec30e19dba7d38c84363b1f9532f6246bcbaba901bae07f421e5660a0c982"
+    },
+    "checkpoints/final_seed_62005.pt": {
+      "bytes": 150633,
+      "sha256": "2570f45ccd441c60b1f2bed6abf9959317c5b29be976c296eac87e110bc3df83"
+    },
+    "final_seed_training_results.json": {
+      "bytes": 2220,
+      "sha256": "7e1cb790785e3123261bddef5c0a47525b9ee9cd9b59142969d5b0ff8247bb10"
+    },
+    "preprocessing_statistics.json": {
+      "bytes": 2663,
+      "sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"
+    },
+    "reporting_recovery_manifest.json": {
+      "bytes": 3942,
+      "sha256": "5c9638088133b2aeb2bc396085d0bd26601f5e87793086b699dfba080c3de707"
+    },
+    "selected_checkpoint_identity.json": {
+      "bytes": 1442,
+      "sha256": "bed3df81e0be80e5f33de9a5b29fcca260522912ae6322ab4d2cce0c4c720282"
+    },
+    "selected_configuration.json": {
+      "bytes": 429,
+      "sha256": "f50319ad667b038153a46bf8934ad92509b4df4a2a320e38fee383b64903a04b"
+    },
+    "training_report.json": {
+      "bytes": 628,
+      "sha256": "d6307cabfdae4f540365958e4d38f65f105688ae27c0e101d2134f71bdeb3b26"
+    },
+    "validation_bootstrap_intervals.json": {
+      "bytes": 1250,
+      "sha256": "cc3dc99f0cfa0c95f3c4a366a9b88d99e74d9deebc48078985180154b12dd0b7"
+    },
+    "validation_design_metrics.json": {
+      "bytes": 2238,
+      "sha256": "61be61606c8df1a5b0215285d30e4965ba025926a0bd0e5ba87450c9fddcfe2b"
+    },
+    "validation_metrics.json": {
+      "bytes": 267,
+      "sha256": "7610a0f47dd819b77f19c14d475dcae50356d942fae685d761481bcc0d129923"
+    },
+    "validation_predictions.jsonl": {
+      "bytes": 11573,
+      "sha256": "8b7eccb87da4d0d5e2f7dcde3a1b07a478994484a4ce554c908c7fbba36f677f"
+    }
+  },
+  "complete_inventory_matches": true,
+  "completion_marker": {
+    "bytes": 680,
+    "completed": true,
+    "final_tree_matches": true,
+    "published_path_count": 7,
+    "sha256": "df64ea76d15ddee5fb337dddf4a9edb77560ceb5fbee56936ee1363016cba21a"
+  },
+  "final_tree": {
+    "bytes": 2070248,
+    "file_count": 22,
+    "sha256": "95134dab5669ee4bc9515777d19f48449186324977d17981be856fde533e6111"
+  },
+  "inventory_self_excluding": true,
+  "non_recovered_artifacts_unchanged": true,
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+  "public_artifact_count": 22,
+  "recovery_lock_absent": true,
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.artifact_identity.v1",
+  "stale_lock_absent": true,
+  "status": "pass",
+  "temporary_publication_files": []
+}

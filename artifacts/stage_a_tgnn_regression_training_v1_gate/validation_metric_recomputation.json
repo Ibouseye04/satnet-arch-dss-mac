@@ -1,0 +1,25 @@
+{
+  "candidate_1_best_validation_metrics": {
+    "count": 75,
+    "mae": 0.0768268077338814,
+    "r2": 0.9157724309629774,
+    "residual_mean": -0.00971955793212961,
+    "residual_population_std": 0.101467879293647,
+    "rmse": 0.1019323321363057
+  },
+  "metrics": {
+    "count": 75,
+    "mae": 0.0910536278881172,
+    "r2": 0.8887963809117314,
+    "residual_mean": -0.0011120608633867057,
+    "residual_population_std": 0.11711828692618899,
+    "rmse": 0.11712356642405067
+  },
+  "no_nan_or_infinity": true,
+  "population_standard_deviation_denominator": "N",
+  "published_validation_metrics_match": true,
+  "residual": "prediction minus actual",
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.validation_metric_recomputation.v1",
+  "status": "pass",
+  "undefined_values_are_null": true
+}

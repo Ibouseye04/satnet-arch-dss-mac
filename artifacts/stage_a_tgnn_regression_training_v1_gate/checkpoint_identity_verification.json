@@ -1,0 +1,164 @@
+{
+  "architecture": {
+    "chebyshev_K": 2,
+    "class": "satnet.models.gnn_model.SatelliteGNN",
+    "dropout": 0.0,
+    "gclstm_layers": 1,
+    "global_mean_pooling": true,
+    "gradient_clipping": null,
+    "input_dimension": 14,
+    "loss": "torch.nn.SmoothL1Loss(beta=1.0)",
+    "scalar_regression_head": true,
+    "scheduler": null,
+    "weight_decay": 1e-05
+  },
+  "checkpoints": {
+    "candidate_0": {
+      "bytes": 150163,
+      "configuration": {
+        "candidate_index": 0,
+        "hidden_dim": 32,
+        "learning_rate": 0.001,
+        "seed": 61000
+      },
+      "epoch": 11,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\candidate_0.pt",
+      "seed": 61000,
+      "sha256": "7bc15a087e63b0091d5e5c8f9e4000beaa5dc6bdbc8ddc7e511ea2721d35bc9f"
+    },
+    "candidate_1": {
+      "bytes": 150163,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 61001
+      },
+      "epoch": 36,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\candidate_1.pt",
+      "seed": 61001,
+      "sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"
+    },
+    "candidate_2": {
+      "bytes": 470035,
+      "configuration": {
+        "candidate_index": 2,
+        "hidden_dim": 64,
+        "learning_rate": 0.001,
+        "seed": 61002
+      },
+      "epoch": 17,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\candidate_2.pt",
+      "seed": 61002,
+      "sha256": "dbf7dff7281fbc05880c1a99194c7ca87a0d1e63b5ee433a48847d4585751c10"
+    },
+    "candidate_3": {
+      "bytes": 470035,
+      "configuration": {
+        "candidate_index": 3,
+        "hidden_dim": 64,
+        "learning_rate": 0.003,
+        "seed": 61003
+      },
+      "epoch": 22,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\candidate_3.pt",
+      "seed": 61003,
+      "sha256": "b3cd6f18ac1a681f5da024624277fd9739124aebff4e0536a4ae29f19de945b4"
+    },
+    "final_seed_62001": {
+      "bytes": 150633,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 62001
+      },
+      "epoch": 15,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\final_seed_62001.pt",
+      "seed": 62001,
+      "sha256": "d2c4feab32af6aa873ed2c4ee5955643c5de8fc97babf093ae0a5b8d50f4f29d"
+    },
+    "final_seed_62002": {
+      "bytes": 150633,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 62002
+      },
+      "epoch": 10,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\final_seed_62002.pt",
+      "seed": 62002,
+      "sha256": "7eb3ae92b756d5738da026a002a10e6b2bbbe429bf52c2a63aa74b41f4bed019"
+    },
+    "final_seed_62003": {
+      "bytes": 150633,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 62003
+      },
+      "epoch": 20,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\final_seed_62003.pt",
+      "seed": 62003,
+      "sha256": "b30bf14ae5311bda10afa090ee10c65352c2d1b2023d58de426f11603c5a30ea"
+    },
+    "final_seed_62004": {
+      "bytes": 150633,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 62004
+      },
+      "epoch": 46,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\final_seed_62004.pt",
+      "seed": 62004,
+      "sha256": "f74ec30e19dba7d38c84363b1f9532f6246bcbaba901bae07f421e5660a0c982"
+    },
+    "final_seed_62005": {
+      "bytes": 150633,
+      "configuration": {
+        "candidate_index": 1,
+        "hidden_dim": 32,
+        "learning_rate": 0.003,
+        "seed": 62005
+      },
+      "epoch": 11,
+      "model_state_keys": 22,
+      "optimizer_state_entries": 22,
+      "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\final_seed_62005.pt",
+      "seed": 62005,
+      "sha256": "2570f45ccd441c60b1f2bed6abf9959317c5b29be976c296eac87e110bc3df83"
+    },
+    "selected_candidate_semantic_identity": {
+      "assessment_source": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_regression_candidate1_checkpoint_mismatch_assessment_v1\\checkpoint_semantic_identity.json",
+      "byte_for_byte_reconstruction_match": true,
+      "metadata": "c52d90c413704aa69b961c0245cf35c746be1ad26799c65002e9074e35a860ae",
+      "model_state": "4265d32cb33473c9b3f47a53cd8abafa13454f72bb0763e9ad6fd9be7b8113ef",
+      "optimizer_state": "4d69fc43793fbdbaeee141eed43a4666366285a3148b463e46a2eeb9ca5b97c6",
+      "preprocessing_binding": "1e4bee37b7ca35fee93418c1a7d63c356235f7ab07b0b9ad81a5d9b4a4bf5644"
+    }
+  },
+  "preprocessing_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.checkpoint_identity.v1",
+  "status": "pass",
+  "verification_mode": "read-only torch.load(map_location='cpu', weights_only=False); no checkpoint writes and no optimizer instantiated"
+}

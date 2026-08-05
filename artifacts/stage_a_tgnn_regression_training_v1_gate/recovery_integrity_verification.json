@@ -1,0 +1,18 @@
+{
+  "bootstrap_occurrence_defect_corrected": true,
+  "candidate_best_metrics_reproduced_exactly": true,
+  "candidate_history_reproduced_exactly": true,
+  "classification": "SERIALIZATION_ONLY",
+  "final_seed_hashes_unchanged": true,
+  "frozen_predictions_unchanged": true,
+  "governed_artifacts_modified": false,
+  "historical_declared_exact_sha256": "89455aeca56ff169f9dbe4d7d8a22ae08339ab60a7e7ef392262ebe11bcabda1",
+  "prediction_regenerated": false,
+  "reconstructed_candidate_byte_for_byte": true,
+  "recovered_exact_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2",
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.recovery_integrity.v1",
+  "scientific_result_changed": false,
+  "status": "pass",
+  "superseded_checkpoint_sha256": "3e28e10ddc024b21b57cbc986367d0393742ddc387f523eb1ddb45cfba213ef2",
+  "training_rerun": false
+}

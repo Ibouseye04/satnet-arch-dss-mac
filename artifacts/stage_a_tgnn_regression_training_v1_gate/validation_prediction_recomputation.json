@@ -1,0 +1,21 @@
+{
+  "accepted_tolerance": 1e-06,
+  "deterministic_order": true,
+  "ensemble": "arithmetic mean of five seed predictions",
+  "five_seed_predictions_per_record": true,
+  "frozen_prediction_sha256": "8b7eccb87da4d0d5e2f7dcde3a1b07a478994484a4ce554c908c7fbba36f677f",
+  "max_abs_prediction_difference": 0.0,
+  "mode": "inference-only; CPU; model.eval(); torch.no_grad()",
+  "no_test_records": true,
+  "records": 75,
+  "schema": "satnet.stage_a_tgnn_regression.training_gate.validation_prediction_recomputation.v1",
+  "seed_order": [
+    62001,
+    62002,
+    62003,
+    62004,
+    62005
+  ],
+  "status": "pass",
+  "unique_run_keys": 75
+}
