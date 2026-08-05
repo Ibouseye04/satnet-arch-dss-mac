@@ -1,0 +1,32 @@
+{
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "checks": {
+    "candidate_search_rerun": 0,
+    "ensemble_changes": 0,
+    "fit_calls": 0,
+    "model_writes": 0,
+    "preprocessing_fitting": 0,
+    "rf_regression_output_modified": 0,
+    "test_index_opened": 0,
+    "test_metrics_created": 0,
+    "test_predictions_created": 0,
+    "test_targets_opened": 0,
+    "tgnn_output_modified": 0,
+    "threshold_changes": 0,
+    "validation_prediction_generation": 0
+  },
+  "evidence": {
+    "execution_manifest_test_access": false,
+    "read_only_inputs": [
+      "frozen validation_predictions.jsonl",
+      "frozen JSON reports",
+      "raw SHA-256 identities"
+    ],
+    "test_named_paths_opened": [],
+    "training_report_test_access": false,
+    "training_report_test_metrics": false,
+    "training_report_test_predictions": false
+  },
+  "result": "PASS",
+  "schema": "satnet.stage_a.rf_classification.test_seal_verification.v1"
+}

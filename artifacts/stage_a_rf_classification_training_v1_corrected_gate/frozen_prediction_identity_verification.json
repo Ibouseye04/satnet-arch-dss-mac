@@ -1,0 +1,59 @@
+{
+  "blocked_gate_expected": {
+    "bytes": 59690,
+    "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+  },
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "design_count_per_seed": {
+    "51001": 15,
+    "51002": 15,
+    "51003": 15,
+    "51004": 15,
+    "51005": 15
+  },
+  "prediction_generation": false,
+  "realizations_per_design": 5,
+  "result": "PASS",
+  "row_count": 375,
+  "rows_per_seed": {
+    "51001": 75,
+    "51002": 75,
+    "51003": 75,
+    "51004": 75,
+    "51005": 75
+  },
+  "run_level_label_counts_per_seed": {
+    "51001": {
+      "0": 2,
+      "1": 73
+    },
+    "51002": {
+      "0": 2,
+      "1": 73
+    },
+    "51003": {
+      "0": 2,
+      "1": 73
+    },
+    "51004": {
+      "0": 2,
+      "1": 73
+    },
+    "51005": {
+      "0": 2,
+      "1": 73
+    }
+  },
+  "run_level_label_counts_total": {
+    "0": 10,
+    "1": 365
+  },
+  "schema": "satnet.stage_a.rf_classification.frozen_prediction_identity_verification.v1",
+  "source": {
+    "bytes": 59690,
+    "path": "validation_predictions.jsonl",
+    "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+  },
+  "source_hash_matches_blocked_gate": true,
+  "stored_predicted_label_matches_threshold": true
+}

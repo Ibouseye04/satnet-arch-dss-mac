@@ -1,0 +1,70 @@
+{
+  "all_model_hashes_match_blocked_gate": true,
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "classification_policy": {
+    "calibration_fitting": false,
+    "confusion_matrix_labels": [
+      0,
+      1
+    ],
+    "decision_threshold": 0.5,
+    "deterministic_ordering": true,
+    "ensemble_probability": "arithmetic mean of five frozen class-1 probabilities",
+    "threshold_optimization": false
+  },
+  "final_seeds": [
+    51001,
+    51002,
+    51003,
+    51004,
+    51005
+  ],
+  "model_count": 5,
+  "model_deserialization": false,
+  "model_writes": 0,
+  "models": {
+    "51001": {
+      "blocked_gate_sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14",
+      "bytes": 225100,
+      "hash_match": true,
+      "path": "rf_classification_seed_51001.joblib",
+      "random_state": 51001,
+      "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+    },
+    "51002": {
+      "blocked_gate_sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4",
+      "bytes": 223357,
+      "hash_match": true,
+      "path": "rf_classification_seed_51002.joblib",
+      "random_state": 51002,
+      "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+    },
+    "51003": {
+      "blocked_gate_sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea",
+      "bytes": 220460,
+      "hash_match": true,
+      "path": "rf_classification_seed_51003.joblib",
+      "random_state": 51003,
+      "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+    },
+    "51004": {
+      "blocked_gate_sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9",
+      "bytes": 219158,
+      "hash_match": true,
+      "path": "rf_classification_seed_51004.joblib",
+      "random_state": 51004,
+      "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+    },
+    "51005": {
+      "blocked_gate_sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da",
+      "bytes": 219609,
+      "hash_match": true,
+      "path": "rf_classification_seed_51005.joblib",
+      "random_state": 51005,
+      "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+    }
+  },
+  "result": "PASS",
+  "schema": "satnet.stage_a.rf_classification.frozen_model_identity_verification.v1",
+  "selected_candidate": 20
+}

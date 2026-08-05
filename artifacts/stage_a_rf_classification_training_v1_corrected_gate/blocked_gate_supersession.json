@@ -1,0 +1,29 @@
+{
+  "blocked_gate": {
+    "bootstrap_verification_identity": {
+      "bytes": 26247,
+      "path": "artifacts/stage_a_rf_classification_training_v1_gate/bootstrap_verification.json",
+      "sha256": "09670d9d5a9eb4c60c6a71718f87da6112a61514eb4e72c6790f67534dab0c84"
+    },
+    "commit": "4efc799dc6263f71c55cd9395a0047abdbabf48a",
+    "historical_status": "BLOCKED",
+    "report": "artifacts/stage_a_rf_classification_training_v1_gate/rf_classification_training_gate_report.json",
+    "report_identity": {
+      "bytes": 61188,
+      "path": "artifacts/stage_a_rf_classification_training_v1_gate/rf_classification_training_gate_report.json",
+      "sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08"
+    }
+  },
+  "result": "PASS",
+  "schema": "satnet.stage_a.rf_classification.blocked_gate_supersession.v1",
+  "supersession": {
+    "defect_scope": "reporting-only bootstrap undefined-metric serialization and counts",
+    "historical_commit_rewritten": false,
+    "historical_gate_files_modified": false,
+    "models_and_validation_predictions_unaffected": true,
+    "replacement_gate": "stage_a_rf_classification_training_v1_corrected_gate",
+    "scientific_model_selection_unaffected": true,
+    "superseded_for_gate_acceptance": true,
+    "test_seal_unaffected": true
+  }
+}

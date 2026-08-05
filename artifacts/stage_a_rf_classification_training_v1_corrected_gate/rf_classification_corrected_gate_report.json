@@ -1,0 +1,66 @@
+{
+  "acceptance_checks": {
+    "candidate_20_independently_selected": true,
+    "completed_output_identity_unchanged": true,
+    "corrected_bootstrap_reproduces": true,
+    "design_level_metrics_reproduce": true,
+    "final_model_hashes_match_blocked_gate": true,
+    "final_models_exactly_five_frozen_seeds": true,
+    "frozen_validation_predictions_unchanged": true,
+    "no_test_data_opened": true,
+    "no_training_or_inference": true,
+    "rf_regression_and_tgnn_outputs_unchanged": true,
+    "run_level_metrics_reproduce": true,
+    "undefined_values_null_with_counts": true
+  },
+  "artifact_references": {
+    "README.md": "README.md",
+    "blocked_gate_supersession.json": "blocked_gate_supersession.json",
+    "completed_output_identity_verification.json": "completed_output_identity_verification.json",
+    "corrected_bootstrap_verification.json": "corrected_bootstrap_verification.json",
+    "design_metric_recomputation.json": "design_metric_recomputation.json",
+    "frozen_model_identity_verification.json": "frozen_model_identity_verification.json",
+    "frozen_prediction_identity_verification.json": "frozen_prediction_identity_verification.json",
+    "test_seal_verification.json": "test_seal_verification.json",
+    "training_output_preservation.json": "training_output_preservation.json",
+    "validation_metric_recomputation.json": "validation_metric_recomputation.json"
+  },
+  "blocked_gate": {
+    "commit": "4efc799dc6263f71c55cd9395a0047abdbabf48a",
+    "report_identity": {
+      "bytes": 61188,
+      "path": "artifacts/stage_a_rf_classification_training_v1_gate/rf_classification_training_gate_report.json",
+      "sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08"
+    },
+    "status": "BLOCKED_AND_SUPERSEDED"
+  },
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "decision_threshold": 0.5,
+  "ensemble_policy": "Arithmetic mean of five frozen class-1 probabilities; threshold exactly 0.5; no threshold optimization; no calibration fitting.",
+  "evaluated_at": "2026-08-05",
+  "final_seeds": [
+    51001,
+    51002,
+    51003,
+    51004,
+    51005
+  ],
+  "gate_id": "stage_a_rf_classification_training_v1_corrected_gate",
+  "gate_scope": "Reporting-and-acceptance-gate correction only; no training, inference, candidate search, model, preprocessing, threshold, ensemble, test, RF regression, or TGNN changes.",
+  "required_gate_artifacts": [
+    "blocked_gate_supersession.json",
+    "completed_output_identity_verification.json",
+    "corrected_bootstrap_verification.json",
+    "design_metric_recomputation.json",
+    "frozen_model_identity_verification.json",
+    "frozen_prediction_identity_verification.json",
+    "test_seal_verification.json",
+    "training_output_preservation.json",
+    "validation_metric_recomputation.json",
+    "README.md"
+  ],
+  "schema": "satnet.stage_a.rf_classification.corrected_gate_report.v1",
+  "selected_candidate": 20,
+  "training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1",
+  "verdict": "STAGE A RF CLASSIFICATION TRAINING V1 ACCEPTED \u2014 BOOTSTRAP REPORTING DEFECT CORRECTED \u2014 READY FOR FOUR-MODEL SEALED TEST AUTHORIZATION"
+}

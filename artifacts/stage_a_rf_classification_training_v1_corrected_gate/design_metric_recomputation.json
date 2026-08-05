@@ -1,0 +1,847 @@
+{
+  "aggregation_policy": {
+    "designs_dropped": 0,
+    "deterministic_design_order": "lexicographic design_id",
+    "observed_design_label": "maximum observed run label",
+    "predicted_design_label": "probability >= 0.5",
+    "predicted_design_probability": "maximum frozen ensemble run probability",
+    "realizations_per_design": 5
+  },
+  "all_design_metrics_match_frozen_artifact": true,
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "per_seed": [
+    {
+      "computed_design_records": [
+        {
+          "design_id": "D003",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D007",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9222624271153683,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D017",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8777614815739816,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D031",
+          "observed_label": 1,
+          "predicted_label": 0,
+          "probability_class_1": 0.15993937373900619,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D033",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8651315520672138,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D042",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9931874999999999,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D052",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9892142857142856,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D064",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9639604007104008,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D066",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.970643648018648,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D067",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9932142857142857,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D072",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.984105339105339,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D074",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9970486111111111,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D082",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D087",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D099",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9543324592074593,
+          "realization_count": 5
+        }
+      ],
+      "computed_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.049972870047735964,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.15639007727196436
+      },
+      "design_count": 15,
+      "mismatches": [],
+      "realizations_per_design": [
+        5
+      ],
+      "result": "PASS",
+      "seed": 51001,
+      "stored_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.049972870047735964,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.15639007727196436
+      }
+    },
+    {
+      "computed_design_records": [
+        {
+          "design_id": "D003",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D007",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9208157120657121,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D017",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8653382043760333,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D031",
+          "observed_label": 1,
+          "predicted_label": 0,
+          "probability_class_1": 0.20043160412858554,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D033",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.864272990897991,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D042",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9977272727272727,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D052",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9955555555555555,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D064",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9483097943722945,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D066",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9790786435786434,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D067",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9835863095238095,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D072",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9927083333333334,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D074",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9983333333333333,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D082",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D087",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D099",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.952342888471178,
+          "realization_count": 5
+        }
+      ],
+      "computed_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.04585776306102596,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.1423728338631937
+      },
+      "design_count": 15,
+      "mismatches": [],
+      "realizations_per_design": [
+        5
+      ],
+      "result": "PASS",
+      "seed": 51002,
+      "stored_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.04585776306102596,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.14237283386319372
+      }
+    },
+    {
+      "computed_design_records": [
+        {
+          "design_id": "D003",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D007",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9376321733821733,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D017",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.860044322453862,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D031",
+          "observed_label": 1,
+          "predicted_label": 0,
+          "probability_class_1": 0.1950238031876964,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D033",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8721144729453552,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D042",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9982142857142857,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D052",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9887341269841269,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D064",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9461463744588745,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D066",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.984579365079365,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D067",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D072",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9912499999999999,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D074",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9959126984126985,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D082",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D087",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D099",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9673988095238095,
+          "realization_count": 5
+        }
+      ],
+      "computed_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.04614952978194695,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.14111211103509588
+      },
+      "design_count": 15,
+      "mismatches": [],
+      "realizations_per_design": [
+        5
+      ],
+      "result": "PASS",
+      "seed": 51003,
+      "stored_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.04614952978194695,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.1411121110350959
+      }
+    },
+    {
+      "computed_design_records": [
+        {
+          "design_id": "D003",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D007",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9467427637721755,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D017",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8713162380382775,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D031",
+          "observed_label": 1,
+          "predicted_label": 0,
+          "probability_class_1": 0.1844560297158983,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D033",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8549246186819716,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D042",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9978571428571428,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D052",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9891390692640692,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D064",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9459864718614718,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D066",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.977495879120879,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D067",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.996,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D072",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9857891414141413,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D074",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9868495670995672,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D082",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D087",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D099",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.946685515873016,
+          "realization_count": 5
+        }
+      ],
+      "computed_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.0474889628314144,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.14781765441615163
+      },
+      "design_count": 15,
+      "mismatches": [],
+      "realizations_per_design": [
+        5
+      ],
+      "result": "PASS",
+      "seed": 51004,
+      "stored_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.0474889628314144,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.14781765441615163
+      }
+    },
+    {
+      "computed_design_records": [
+        {
+          "design_id": "D003",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D007",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9252069433834138,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D017",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.8747106161275088,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D031",
+          "observed_label": 1,
+          "predicted_label": 0,
+          "probability_class_1": 0.15873492438933623,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D033",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.862370115995116,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D042",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.996547619047619,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D052",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9899516594516594,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D064",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9417976467976468,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D066",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9712342171717171,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D067",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9925,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D072",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9902083333333332,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D074",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9963961038961038,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D082",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D087",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 1.0,
+          "realization_count": 5
+        },
+        {
+          "design_id": "D099",
+          "observed_label": 1,
+          "predicted_label": 1,
+          "probability_class_1": 0.9436572985837691,
+          "realization_count": 5
+        }
+      ],
+      "computed_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.05037518870071751,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.15879140980828166
+      },
+      "design_count": 15,
+      "mismatches": [],
+      "realizations_per_design": [
+        5
+      ],
+      "result": "PASS",
+      "seed": 51005,
+      "stored_metrics": {
+        "accuracy": 0.9333333333333333,
+        "balanced_accuracy": 0.9333333333333333,
+        "brier_score": 0.05037518870071751,
+        "class_0_precision": 0.0,
+        "class_0_recall_specificity": 0.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.9333333333333333,
+        "confusion_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            14
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.4827586206896552,
+        "pr_auc_average_precision": 1.0,
+        "roc_auc": null,
+        "weighted_f1": 0.9655172413793104,
+        "weighted_validation_log_loss": 0.15879140980828163
+      }
+    }
+  ],
+  "result": "PASS",
+  "schema": "satnet.stage_a.rf_classification.design_metric_recomputation.v1",
+  "source_frozen_prediction_sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+}

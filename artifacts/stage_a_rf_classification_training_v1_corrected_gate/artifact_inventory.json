@@ -1,0 +1,61 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 1746,
+      "path": "README.md",
+      "sha256": "7efded95886aba898ffebb15be9804bc104dcbcccb06abdaf134067db2ed55a4"
+    },
+    {
+      "bytes": 1302,
+      "path": "blocked_gate_supersession.json",
+      "sha256": "4117480aa71ffbc2a1db4a173a35cf12ea41efe83eed5289a199cc0bc65875a7"
+    },
+    {
+      "bytes": 6259,
+      "path": "completed_output_identity_verification.json",
+      "sha256": "72e08a34c6449bc69585c122f38edafc4b2ab0e46f5bf48e136a356e0163676d"
+    },
+    {
+      "bytes": 23489,
+      "path": "corrected_bootstrap_verification.json",
+      "sha256": "9c1befda2d5c55e85661846cf543bbfcb9953d8dcd6765e4221d1c56e4ec2268"
+    },
+    {
+      "bytes": 23718,
+      "path": "design_metric_recomputation.json",
+      "sha256": "ad4bc025ef2ff678246ce879443d277f306b81efe762003605272296dc44896f"
+    },
+    {
+      "bytes": 2419,
+      "path": "frozen_model_identity_verification.json",
+      "sha256": "c10cf09cf25406e48ddd39cffd68e45eb0c7e4f4eab00e48a76b8d00f1ae503c"
+    },
+    {
+      "bytes": 1270,
+      "path": "frozen_prediction_identity_verification.json",
+      "sha256": "084f0d1404f18a591f8bd5d9268a7e9765251a784599079985796d69faf61e97"
+    },
+    {
+      "bytes": 3206,
+      "path": "rf_classification_corrected_gate_report.json",
+      "sha256": "67265da31d008104de1b37bcc466e81122271ec3ff0f3e7eb9ee9a0deedc0bc4"
+    },
+    {
+      "bytes": 973,
+      "path": "test_seal_verification.json",
+      "sha256": "10fa8fa2bbae5adf834c454d9510a9c212450482458011f13ce5e9cae5c2712f"
+    },
+    {
+      "bytes": 6556,
+      "path": "training_output_preservation.json",
+      "sha256": "8f094b3646d08cda997e8b101b043e03c8cf41ccf97dde2d2963895af7061de8"
+    },
+    {
+      "bytes": 8589,
+      "path": "validation_metric_recomputation.json",
+      "sha256": "9ead9b892040debd41ec12fdea78c56839c28a99eaff072e5e65288d4a8ef648"
+    }
+  ],
+  "self_excluding": true
+}

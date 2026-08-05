@@ -1,0 +1,180 @@
+{
+  "after_tree": {
+    "algorithm": "sha256(sorted relative filename UTF-8 + NUL + raw file bytes)",
+    "bytes": 1253620,
+    "entries": [
+      {
+        "bytes": 36760,
+        "path": "candidate_search_results.json",
+        "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86"
+      },
+      {
+        "bytes": 495,
+        "path": "environment_manifest.json",
+        "sha256": "6c459e7f08f12b6221a79349544d4c5a4d98769dbc3411e2dc6a3d9f3da75b54"
+      },
+      {
+        "bytes": 520,
+        "path": "execution_manifest.json",
+        "sha256": "e75abe1cd7cb5f2f3da14de675651f862541c5f39c61e5dd8a8d13e5ae505853"
+      },
+      {
+        "bytes": 7057,
+        "path": "final_seed_training_results.json",
+        "sha256": "1e7abb7fa2c7b025ed54224bdefd037c2e70949636bb3a690aa7765a11986e6b"
+      },
+      {
+        "bytes": 225100,
+        "path": "rf_classification_seed_51001.joblib",
+        "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+      },
+      {
+        "bytes": 223357,
+        "path": "rf_classification_seed_51002.joblib",
+        "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+      },
+      {
+        "bytes": 220460,
+        "path": "rf_classification_seed_51003.joblib",
+        "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+      },
+      {
+        "bytes": 219158,
+        "path": "rf_classification_seed_51004.joblib",
+        "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+      },
+      {
+        "bytes": 219609,
+        "path": "rf_classification_seed_51005.joblib",
+        "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+      },
+      {
+        "bytes": 708,
+        "path": "selected_configuration.json",
+        "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c"
+      },
+      {
+        "bytes": 248,
+        "path": "training_report.json",
+        "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00"
+      },
+      {
+        "bytes": 14629,
+        "path": "validation_bootstrap_intervals.json",
+        "sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54"
+      },
+      {
+        "bytes": 18713,
+        "path": "validation_design_metrics.json",
+        "sha256": "5c3dfddfb29f0dd7275914accc65fe40adc62c9916edecf82afd367275da49cd"
+      },
+      {
+        "bytes": 7116,
+        "path": "validation_metrics.json",
+        "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db"
+      },
+      {
+        "bytes": 59690,
+        "path": "validation_predictions.jsonl",
+        "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+      }
+    ],
+    "file_count": 15,
+    "tree_sha256": "5917b5155b1860a54a7c03305d67ddc5d0d9cf37a25d63aa967e1a7ca09f0fab"
+  },
+  "before_tree": {
+    "algorithm": "sha256(sorted relative filename UTF-8 + NUL + raw file bytes)",
+    "bytes": 1253620,
+    "entries": [
+      {
+        "bytes": 36760,
+        "path": "candidate_search_results.json",
+        "sha256": "c23def7bbc680c73e41df95546dc32cc3dc26e905f4384ff2daefdc8ad9c4b86"
+      },
+      {
+        "bytes": 495,
+        "path": "environment_manifest.json",
+        "sha256": "6c459e7f08f12b6221a79349544d4c5a4d98769dbc3411e2dc6a3d9f3da75b54"
+      },
+      {
+        "bytes": 520,
+        "path": "execution_manifest.json",
+        "sha256": "e75abe1cd7cb5f2f3da14de675651f862541c5f39c61e5dd8a8d13e5ae505853"
+      },
+      {
+        "bytes": 7057,
+        "path": "final_seed_training_results.json",
+        "sha256": "1e7abb7fa2c7b025ed54224bdefd037c2e70949636bb3a690aa7765a11986e6b"
+      },
+      {
+        "bytes": 225100,
+        "path": "rf_classification_seed_51001.joblib",
+        "sha256": "1cb9e632bed03440483cc1582454ed0317b193c996ff9dbecef0c63cf238fa14"
+      },
+      {
+        "bytes": 223357,
+        "path": "rf_classification_seed_51002.joblib",
+        "sha256": "a8da34989415b32703ba508f92bd61c8028381198b70a3b0b0247af6f77e3ae4"
+      },
+      {
+        "bytes": 220460,
+        "path": "rf_classification_seed_51003.joblib",
+        "sha256": "2c99dd8debdccd494d53dba89f1ae532bc4130259e3c434e97096daca4bff6ea"
+      },
+      {
+        "bytes": 219158,
+        "path": "rf_classification_seed_51004.joblib",
+        "sha256": "30a1ac7ba0d3b8306ad840a66471d2bbb5c3c89d403f314f3fe0c084e7b644e9"
+      },
+      {
+        "bytes": 219609,
+        "path": "rf_classification_seed_51005.joblib",
+        "sha256": "bcd925a2914144798bdce9c145fe1beb6c94cd9833497065bea089697db5f0da"
+      },
+      {
+        "bytes": 708,
+        "path": "selected_configuration.json",
+        "sha256": "9e9ec553d3dee4aa85ee237d105ce17b1f7ae8216f8345ce5a9e02279253842c"
+      },
+      {
+        "bytes": 248,
+        "path": "training_report.json",
+        "sha256": "0371f584d2f17a1ff37b485c1b73cfc5e565011ac1fd343420689dd5bc559e00"
+      },
+      {
+        "bytes": 14629,
+        "path": "validation_bootstrap_intervals.json",
+        "sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54"
+      },
+      {
+        "bytes": 18713,
+        "path": "validation_design_metrics.json",
+        "sha256": "5c3dfddfb29f0dd7275914accc65fe40adc62c9916edecf82afd367275da49cd"
+      },
+      {
+        "bytes": 7116,
+        "path": "validation_metrics.json",
+        "sha256": "9fcc8900b702a2dc01aab646484b8444f5ac82a9c7f057aed9676dbcce17b4db"
+      },
+      {
+        "bytes": 59690,
+        "path": "validation_predictions.jsonl",
+        "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+      }
+    ],
+    "file_count": 15,
+    "tree_sha256": "5917b5155b1860a54a7c03305d67ddc5d0d9cf37a25d63aa967e1a7ca09f0fab"
+  },
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "historical_defect_preserved_in": [
+    "4efc799dc6263f71c55cd9395a0047abdbabf48a:artifacts/stage_a_rf_classification_training_v1_gate/bootstrap_verification.json",
+    "4efc799dc6263f71c55cd9395a0047abdbabf48a:artifacts/stage_a_rf_classification_training_v1_gate/rf_classification_training_gate_report.json"
+  ],
+  "historical_defective_bootstrap_overwritten": false,
+  "models_and_predictions_unchanged": true,
+  "protected_training_output_modified": false,
+  "result": "PASS",
+  "schema": "satnet.stage_a.rf_classification.training_output_preservation.v1",
+  "training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1",
+  "tree_byte_identical": true
+}
