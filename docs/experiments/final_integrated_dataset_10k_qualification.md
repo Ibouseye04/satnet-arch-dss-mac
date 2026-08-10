@@ -2,7 +2,7 @@
 
 ## Status
 
-`IN PREPRODUCTION QUALIFICATION`
+`BLOCKED: FULL SUITE ENVIRONMENT GATE`
 
 This document prepares and qualifies the frozen dissertation-scale 10,000-run
 contract. It does not authorize execution of the full production campaign.
@@ -34,6 +34,8 @@ unchanged.
 | Run manifest hash | `e965d5daea19a958fe6ce20d5c4a75240a42497b6fde33a508d4df0df64888ea` |
 | Split manifest hash | `07a84c324b255f21f2697b88150c2cc3171156405f0750e2db1312ff8204c4aa` |
 | Contract bundle hash | `059dff74930d1125a46947a06d213dd07c3a93dce226a894558a01805c3ed94c` |
+| Qualification tooling SHA | `83798a8561ec4aa2a6dac8cc0fb8bb7d295d79d6` |
+| Frozen tag target | `a4a576607dd0d17ac4b6f350daff76a352c04f57` |
 
 The historical `artifacts/final_integrated_dataset_contract/` contract remains
 unchanged and retains its 500-run provenance.
@@ -56,6 +58,10 @@ unchanged and retains its 500-run provenance.
   jitter, Euclidean score, and tie ordering. Pairwise distance evaluation is
   NumPy-vectorized; no candidate approximation or scientific simulation change
   was introduced.
+- On the qualification Windows environment, direct LHS scoring measured 6.888 s
+  for the 395-row transition search and 51.760 s for the 1,600-row global
+  search. The 4,096-candidate split search was retained and its score counting
+  was changed from repeated record scans to exact `Counter` aggregation.
 
 The frozen pre-outcome grouped split candidate is **3958** with score recorded
 in `split_manifest.json`:
@@ -89,16 +95,16 @@ specification and generation constants before any simulation outcome is read.
 
 | Gate | Result |
 |---|---|
-| Contract materialization | Pending final repeat after tag freeze |
+| Contract materialization | Passed; reconstruction hashes match the frozen bundle |
 | 10k no-simulation dry run | Passed: 2,000 designs, 10,000 mappings, IDs 0-9999, zero simulations |
-| Focused tests | Pending final tag-bound rerun |
-| Full pytest suite | Pending |
-| Qualification generation | Not yet executed |
-| Authoritative qualification replay | Not yet executed |
-| Deterministic repeat | Not yet executed |
-| Verified resume | Not yet executed |
-| Protected-science audit | Pending final diff audit |
-| `git diff --check` | Passed during preparation |
+| Focused tests | Passed: 103 passed |
+| Full pytest suite | Blocked: Windows `0xc0000139` while importing optional `torch_scatter`/`torch_sparse` in `tests/models/test_gnn_model.py` |
+| Qualification generation | Passed: 45/45 successful; generation ledger SHA-256 `cd2d493d61beb08d8d22e2c00c6bd6cc85ca71d06c5e5866c17c9a26222634d1` |
+| Authoritative qualification replay | Passed: 45/45, all required stages matched; replay ledger SHA-256 `daab59e401ad60f3efabdedc75717d5a43927b10f97fddf623257569a39a06dc` |
+| Deterministic repeat | Passed for run 4115; all scientific artifact bytes and result hash matched |
+| Verified resume | Passed for run 0 with unchanged input-tree certificate |
+| Protected-science audit | Passed: no protected science paths changed from the foundation SHA |
+| `git diff --check` | Passed |
 
 ## Production stop condition
 
@@ -106,7 +112,9 @@ The full 10,000-run production generation, full authoritative production replay,
 production acceptance, RF training, and TGNN training are explicitly outside
 this qualification and have not been executed.
 
-When—and only when—all preproduction gates pass, this document will be updated
-to `READY FOR 10,000-RUN PRODUCTION EXECUTION` and will contain the exact
-preflight, generation, replay, and acceptance commands for a human-authorized
-next step.
+The contract and qualification-only execution gates passed except for the
+complete-suite environment gate above. Therefore the pipeline is **not**
+currently declared `READY FOR 10,000-RUN PRODUCTION EXECUTION`. No production
+commands are authorized by this report. After the environment gate is resolved,
+the complete suite and protected-science audit must be rerun before any
+production command is considered.
