@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).parents[2]
-PILOT_REPORT_SHA = "e4475f9bc22a83b30cdc6862d3337a1e2b6dbc3f"
+PILOT_REPORT_SHA = "a8fbfed18b1673f5fc9c6a291ccc02905f1392d6"
 PROTECTED_PATHS = (
     "src/satnet/ground",
     "src/satnet/network",
@@ -22,8 +22,10 @@ ALLOWED_PREFIXES = (
     "docs/experiments/final_integrated_dataset_",
     "src/satnet/experiments/final_dataset/",
     "src/satnet/experiments/final_generation/",
+    "src/satnet/experiments/integrated_ground_analysis.py",
     "tests/experiments/test_final_dataset_",
     "tests/experiments/test_final_generation_",
+    "tests/experiments/test_integrated_ground_analysis.py",
 )
 
 
