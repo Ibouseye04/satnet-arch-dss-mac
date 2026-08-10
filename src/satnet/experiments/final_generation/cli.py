@@ -223,7 +223,13 @@ def command_validate_qualification(args: argparse.Namespace) -> None:
 
 
 def command_compare_repeat(args: argparse.Namespace) -> None:
-    _print(compare_repeat(primary_root=args.input_root, repeat_root=args.repeat_root, run_id=4000))
+    _print(
+        compare_repeat(
+            primary_root=args.input_root,
+            repeat_root=args.repeat_root,
+            run_id=args.run_id,
+        )
+    )
 
 
 def command_generate_production(args: argparse.Namespace) -> None:
@@ -359,6 +365,7 @@ def build_parser() -> argparse.ArgumentParser:
     repeat = subparsers.add_parser("compare-repeat")
     repeat.add_argument("--input-root", type=Path, required=True)
     repeat.add_argument("--repeat-root", type=Path, required=True)
+    repeat.add_argument("--run-id", type=int, choices=range(FINAL_RUN_COUNT), default=4115)
     repeat.set_defaults(handler=command_compare_repeat)
 
     def add_production_confirmations(command: argparse.ArgumentParser) -> None:
