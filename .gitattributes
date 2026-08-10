@@ -3,4 +3,5 @@
 .beads/issues.jsonl merge=beads
 
 artifacts/final_integrated_dataset_contract/** -text
+artifacts/final_integrated_dataset_10k_contract/** -text
 artifacts/integrated_ground_pilot_25/inputs/pilot_catalog.csv -text

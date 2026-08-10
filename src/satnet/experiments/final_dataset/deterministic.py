@@ -5,6 +5,8 @@ import hashlib
 import math
 from typing import Any, Sequence, TypeVar
 
+import numpy as np
+
 from satnet.experiments.final_dataset.specification import (
     CANONICAL_DIMENSION_ORDER,
     CONTRACT_MASTER_SEED,
@@ -210,19 +212,27 @@ def _lhs_candidate(row_count: int, stratum_id: str, candidate_id: int) -> tuple[
 
 
 def _lhs_score(rows: Sequence[dict[str, float]]) -> tuple[float, float]:
-    distances: list[float] = []
-    for first in range(len(rows)):
-        for second in range(first + 1, len(rows)):
-            squared_distance = math.fsum(
-                (rows[first][dimension] - rows[second][dimension]) ** 2
-                for dimension in CANONICAL_DIMENSION_ORDER
-            )
-            distance = math.sqrt(squared_distance)
-            if not math.isfinite(distance):
-                raise RuntimeError("LHS distance is not finite")
-            distances.append(distance)
-    minimum = min(distances)
-    mean = math.fsum(distances) / len(distances)
+    """Score one LHS candidate without Python-level O(N²) pair iteration.
+
+    The candidate rows, dimension ordering, Euclidean metric, upper-triangle pair
+    order, and min/mean score semantics are unchanged. NumPy performs the same
+    pairwise arithmetic in vectorized form so the 1,600-row contract remains
+    materializable without weakening the 256-candidate search.
+    """
+    values = np.asarray(
+        [[row[dimension] for dimension in CANONICAL_DIMENSION_ORDER] for row in rows],
+        dtype=np.float64,
+    )
+    if values.ndim != 2 or values.shape[1] != len(CANONICAL_DIMENSION_ORDER):
+        raise RuntimeError("LHS candidate has an invalid shape")
+    squared_norms = np.einsum("ij,ij->i", values, values)
+    squared_distances = squared_norms[:, None] + squared_norms[None, :] - 2.0 * (values @ values.T)
+    upper = np.triu_indices(len(rows), k=1)
+    distances = np.sqrt(np.maximum(squared_distances[upper], 0.0))
+    if not np.all(np.isfinite(distances)):
+        raise RuntimeError("LHS distance is not finite")
+    minimum = float(np.min(distances))
+    mean = float(math.fsum(float(value) for value in distances) / len(distances))
     if not math.isfinite(minimum) or not math.isfinite(mean):
         raise RuntimeError("LHS score is not finite")
     return minimum, mean

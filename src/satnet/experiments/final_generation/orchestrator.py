@@ -47,7 +47,7 @@ from .artifacts import (
     validate_target_artifact,
     write_satellite_artifact,
 )
-from .constants import CONTRACT_SPEC_HASH, RUN_FILES
+from .constants import CONTRACT_SPEC_HASH, FINAL_RUN_COUNT, RUN_FILES, RUN_ID_WIDTH
 from .contract import ensure_mode_root
 from .io import atomic_write_json, file_identity, read_canonical_json
 from .mapping import FinalRunMapping
@@ -55,9 +55,9 @@ from .run_validation import validate_run_authoritatively
 
 
 def run_directory(output_root: str | Path, run_id: int) -> Path:
-    if type(run_id) is not int or not 0 <= run_id <= 499:
-        raise ValueError("run_id must be an integer in [0, 499]")
-    return Path(output_root) / f"run_{run_id:03d}"
+    if type(run_id) is not int or not 0 <= run_id < FINAL_RUN_COUNT:
+        raise ValueError(f"run_id must be an integer in [0, {FINAL_RUN_COUNT - 1}]")
+    return Path(output_root) / f"run_{run_id:0{RUN_ID_WIDTH}d}"
 
 
 def artifact_paths(run_root: str | Path) -> dict[str, Path]:
@@ -70,7 +70,7 @@ def _timestamp() -> str:
 
 
 def _attempt_number(output_root: Path, run_id: int) -> int:
-    root = output_root / "operational" / "attempts" / f"run_{run_id:03d}"
+    root = output_root / "operational" / "attempts" / f"run_{run_id:0{RUN_ID_WIDTH}d}"
     return len(tuple(root.glob("attempt_*.json"))) + 1 if root.exists() else 1
 
 
@@ -95,7 +95,7 @@ def attempt_input_identity(mapping: FinalRunMapping) -> dict[str, Any]:
 
 
 def _attempt_records(output_root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
-    root = output_root / "operational" / "attempts" / f"run_{run_id:03d}"
+    root = output_root / "operational" / "attempts" / f"run_{run_id:0{RUN_ID_WIDTH}d}"
     if not root.exists():
         return ()
     return tuple(read_canonical_json(path) for path in sorted(root.glob("attempt_*.json")))
@@ -120,13 +120,13 @@ def _attempt_path(output_root: Path, run_id: int, number: int) -> Path:
         output_root
         / "operational"
         / "attempts"
-        / f"run_{run_id:03d}"
+        / f"run_{run_id:0{RUN_ID_WIDTH}d}"
         / f"attempt_{number:03d}.json"
     )
 
 
 def _current_state_path(output_root: Path, run_id: int) -> Path:
-    return output_root / "operational" / "current_state" / f"run_{run_id:03d}.json"
+    return output_root / "operational" / "current_state" / f"run_{run_id:0{RUN_ID_WIDTH}d}.json"
 
 
 def _completed_stage_inventory(run_root: Path) -> list[dict[str, object]]:
@@ -225,7 +225,7 @@ def generate_run(
     final_root = run_directory(root, mapping.run_id)
     if final_root.exists():
         if not verified_resume:
-            raise FileExistsError(f"Completed run already exists: run_{mapping.run_id:03d}")
+            raise FileExistsError(f"Completed run already exists: run_{mapping.run_id:0{RUN_ID_WIDTH}d}")
         result = validate_completed_run(
             mapping=mapping, catalog=catalog, run_root=final_root
         )
@@ -244,10 +244,10 @@ def generate_run(
         if not retry:
             raise ValueError("A retry requires explicit retry=True")
         _validate_retry_identities(root, mapping)
-    temporary = Path(tempfile.mkdtemp(dir=root, prefix=f".run_{mapping.run_id:03d}.in_progress."))
+    temporary = Path(tempfile.mkdtemp(dir=root, prefix=f".run_{mapping.run_id:0{RUN_ID_WIDTH}d}.in_progress."))
     completed: list[str] = []
     stage = "input"
-    attempt_id = f"run_{mapping.run_id:03d}-attempt_{attempt_number:03d}"
+    attempt_id = f"run_{mapping.run_id:0{RUN_ID_WIDTH}d}-attempt_{attempt_number:03d}"
     input_identity = attempt_input_identity(mapping)
     input_identity_hash = canonical_hash(input_identity)
     try:

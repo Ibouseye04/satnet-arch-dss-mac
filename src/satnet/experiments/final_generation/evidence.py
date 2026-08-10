@@ -6,7 +6,7 @@ from typing import Any, Mapping, Sequence
 from satnet.ground.canonical import canonical_hash
 from satnet.ground.catalog import GroundStationCatalog
 
-from .constants import CONTRACT_SPEC_HASH
+from .constants import RUN_ID_WIDTH, CONTRACT_SPEC_HASH
 from .io import read_canonical_json
 from .mapping import FinalRunMapping
 from .orchestrator import (
@@ -99,7 +99,7 @@ def _indexed_records(
 def _validate_generation_attempts(
     *, root: Path, mapping: FinalRunMapping, result_hash: str
 ) -> int:
-    attempt_root = root / "operational" / "attempts" / f"run_{mapping.run_id:03d}"
+    attempt_root = root / "operational" / "attempts" / f"run_{mapping.run_id:0{RUN_ID_WIDTH}d}"
     paths = sorted(attempt_root.glob("attempt_*.json")) if attempt_root.is_dir() else []
     if not paths:
         raise ValueError(f"Missing generation attempt evidence for run {mapping.run_id}")
@@ -164,7 +164,7 @@ def validate_generation_evidence(
             Path(generation_root)
             / "operational"
             / "current_state"
-            / f"run_{mapping.run_id:03d}.json"
+            / f"run_{mapping.run_id:0{RUN_ID_WIDTH}d}.json"
         )
         if (
             state.get("state") != "succeeded"

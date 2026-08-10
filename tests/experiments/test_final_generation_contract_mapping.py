@@ -31,7 +31,7 @@ from satnet.experiments.final_generation.mapping import map_all_runs, map_frozen
 from satnet.simulation.tier1_rollout import Tier1RolloutConfig
 
 
-def test_frozen_contract_catalog_science_and_all_500_mappings_validate() -> None:
+def test_frozen_10k_contract_catalog_science_and_all_mappings_validate() -> None:
     contract = validate_frozen_contract(compare_tag_blobs=False)
     catalog = validate_catalog()
     validate_science_dependencies(contract["specification"])
@@ -40,10 +40,10 @@ def test_frozen_contract_catalog_science_and_all_500_mappings_validate() -> None
     assert contract["contract_bundle_hash"] == CONTRACT_BUNDLE_HASH
     assert catalog.catalog_hash == CATALOG_HASH
     assert len(FROZEN_ARTIFACTS) == 11
-    assert len(mappings) == 500
-    assert [mapping.run_id for mapping in mappings] == list(range(500))
-    assert [mappings[index].run_key for index in (0, 4, 5, 35, 200, 499)] == [
-        "D000-R00", "D000-R04", "D001-R00", "D007-R00", "D040-R00", "D099-R04"
+    assert len(mappings) == 10000
+    assert [mapping.run_id for mapping in mappings] == list(range(10000))
+    assert [mappings[index].run_key for index in (0, 4, 5, 1999, 2000, 9999)] == [
+        "D0000-R00", "D0000-R04", "D0001-R00", "D0399-R04", "D0400-R00", "D1999-R04"
     ]
     assert not any(field.name == "run_index" for field in fields(Tier1RolloutConfig))
 
@@ -56,15 +56,16 @@ def test_mapping_rejects_seed_and_identity_substitution() -> None:
     with pytest.raises(ValueError, match="ground-selection seed"):
         map_frozen_run(design, run)
     run = dict(contract["runs"][0])
-    run["run_key"] = "D000-R99"
+    run["run_key"] = "D0000-R99"
     with pytest.raises(ValueError, match="run_key"):
         map_frozen_run(design, run)
 
 
 def test_qualification_set_is_exact() -> None:
-    assert QUALIFICATION_RUN_IDS == (
-        0, 1, 2, 3, 4, 35, 36, 37, 38, 39, 200, 201, 202, 203, 204
-    )
+    assert len(QUALIFICATION_RUN_IDS) == 45
+    assert QUALIFICATION_RUN_IDS[0:5] == (0, 1, 2, 3, 4)
+    assert QUALIFICATION_RUN_IDS[-1] == 9999
+    assert tuple(sorted(set(QUALIFICATION_RUN_IDS))) == QUALIFICATION_RUN_IDS
 
 
 def test_canonical_float_reader_rejects_noncanonical_value() -> None:

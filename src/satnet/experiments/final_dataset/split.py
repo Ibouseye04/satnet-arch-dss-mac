@@ -14,9 +14,11 @@ from satnet.ground.canonical import canonical_hash
 SPLIT_MANIFEST_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_split_manifest"
 SPLIT_MANIFEST_IDENTITY_VERSION = "2"
 SPLIT_NAMES = ("train", "validation", "test")
-SPLIT_SIZES = {"train": 70, "validation": 15, "test": 15}
+SPLIT_SIZES = {"train": 1400, "validation": 300, "test": 300}
+SPLIT_RUN_SIZES = {"train": 7000, "validation": 1500, "test": 1500}
 SPLIT_CANDIDATE_COUNT = 4096
-FROZEN_SPLIT_CANDIDATE_ID = 164
+FROZEN_SPLIT_CANDIDATE_ID: int | None = 3958
+SELECTED_SPLIT_CANDIDATE_ID: int | None = None
 MARGINAL_FIELDS = (
     "num_planes",
     "sats_per_plane",
@@ -93,9 +95,11 @@ def _candidate_assignments(
         ),
     )
     return {
-        "train": tuple(ordered[:70]),
-        "validation": tuple(ordered[70:85]),
-        "test": tuple(ordered[85:]),
+        "train": tuple(ordered[:SPLIT_SIZES["train"]]),
+        "validation": tuple(
+            ordered[SPLIT_SIZES["train"] : SPLIT_SIZES["train"] + SPLIT_SIZES["validation"]]
+        ),
+        "test": tuple(ordered[SPLIT_SIZES["train"] + SPLIT_SIZES["validation"] :]),
     }
 
 
@@ -125,9 +129,18 @@ def _score(
     designs: tuple[dict[str, Any], ...],
     assignments: dict[str, tuple[dict[str, Any], ...]],
 ) -> tuple[Fraction, Fraction, Fraction]:
+    """Score marginals with exact fractions and O(N) counting per candidate."""
     values_by_design = {
         record["design_id"]: marginal_values(record) for record in designs
     }
+    counts_by_split = {
+        split: {
+            field: Counter(values_by_design[record["design_id"]][field] for record in assignments[split])
+            for field in MARGINAL_FIELDS
+        }
+        for split in SPLIT_NAMES
+    }
+    total_design_count = sum(SPLIT_SIZES.values())
     normalized: list[Fraction] = []
     absolute: list[Fraction] = []
     for field in MARGINAL_FIELDS:
@@ -136,11 +149,8 @@ def _score(
             if full_count <= 0:
                 raise RuntimeError("Split marginal category has no designs")
             for split in SPLIT_NAMES:
-                expected = Fraction(SPLIT_SIZES[split] * full_count, 100)
-                actual = sum(
-                    values_by_design[record["design_id"]][field] == category
-                    for record in assignments[split]
-                )
+                expected = Fraction(SPLIT_SIZES[split] * full_count, total_design_count)
+                actual = counts_by_split[split][field][category]
                 difference = abs(Fraction(actual, 1) - expected)
                 absolute.append(difference)
                 normalized.append(difference / expected)
@@ -158,8 +168,8 @@ def select_frozen_split(
     dict[str, tuple[dict[str, Any], ...]],
 ]:
     normalized = tuple(designs)
-    if len(normalized) != 100:
-        raise ValueError("Grouped split requires exactly 100 designs")
+    if len(normalized) != sum(SPLIT_SIZES.values()):
+        raise ValueError("Grouped split requires exactly 2,000 designs")
     valid_candidates: list[
         tuple[
             tuple[Fraction, Fraction, Fraction],
@@ -176,8 +186,10 @@ def select_frozen_split(
     score, candidate_id, assignments = min(
         valid_candidates, key=lambda item: (*item[0], item[1])
     )
-    if candidate_id != FROZEN_SPLIT_CANDIDATE_ID:
-        raise RuntimeError("Deterministic split selection differs from frozen candidate 164")
+    if FROZEN_SPLIT_CANDIDATE_ID is not None and candidate_id != FROZEN_SPLIT_CANDIDATE_ID:
+        raise RuntimeError("Deterministic split selection differs from the frozen 10k candidate")
+    global SELECTED_SPLIT_CANDIDATE_ID
+    SELECTED_SPLIT_CANDIDATE_ID = candidate_id
     return score, assignments
 
 
@@ -201,7 +213,9 @@ def build_split_manifest(
     normalized_designs = tuple(designs)
     normalized_runs = tuple(runs)
     score, assignments = select_frozen_split(normalized_designs)
-    candidate_id = FROZEN_SPLIT_CANDIDATE_ID
+    candidate_id = SELECTED_SPLIT_CANDIDATE_ID
+    if candidate_id is None:
+        raise RuntimeError("Split candidate selection did not produce an identity")
     design_assignments = {
         split: sorted(record["design_id"] for record in assignments[split])
         for split in SPLIT_NAMES
@@ -259,24 +273,40 @@ def validate_split_manifest(
         raise ValueError("Split-manifest hash mismatch")
     if manifest.get("outcome_fields_used") is not False:
         raise ValueError("Split manifest must be pre-outcome")
+    if manifest.get("selected_candidate_id") != FROZEN_SPLIT_CANDIDATE_ID:
+        raise ValueError("Split manifest candidate differs from the frozen 10k candidate")
+    normalized_designs = tuple(designs)
     design_assignments = manifest["design_assignments"]
     if {split: len(design_assignments[split]) for split in SPLIT_NAMES} != SPLIT_SIZES:
         raise ValueError("Split design counts are invalid")
     all_design_ids = [design_id for split in SPLIT_NAMES for design_id in design_assignments[split]]
-    expected_design_ids = [record["design_id"] for record in designs]
+    expected_design_ids = [record["design_id"] for record in normalized_designs]
     if len(all_design_ids) != len(set(all_design_ids)) or set(all_design_ids) != set(expected_design_ids):
         raise ValueError("Split designs are not a disjoint complete partition")
+    expected_assignments = _candidate_assignments(
+        normalized_designs, manifest["selected_candidate_id"]
+    )
+    expected_design_assignments = {
+        split: sorted(record["design_id"] for record in expected_assignments[split])
+        for split in SPLIT_NAMES
+    }
+    if design_assignments != expected_design_assignments:
+        raise ValueError("Split design assignments differ from deterministic reconstruction")
+    expected_score = _score(normalized_designs, expected_assignments)
+    persisted_score = manifest["selected_candidate_score"]
+    if {
+        "maximum_normalized_deviation": _fraction_object(expected_score[0]),
+        "sum_squared_normalized_deviation": _fraction_object(expected_score[1]),
+        "total_absolute_deviation": _fraction_object(expected_score[2]),
+    } != persisted_score:
+        raise ValueError("Split candidate score differs from deterministic reconstruction")
     design_split = {
         design_id: split
         for split in SPLIT_NAMES
         for design_id in design_assignments[split]
     }
     run_assignments = manifest["run_assignments"]
-    if {split: len(run_assignments[split]) for split in SPLIT_NAMES} != {
-        "train": 350,
-        "validation": 75,
-        "test": 75,
-    }:
+    if {split: len(run_assignments[split]) for split in SPLIT_NAMES} != SPLIT_RUN_SIZES:
         raise ValueError("Split run counts are invalid")
     normalized_runs = tuple(runs)
     if any(type(record.get("run_id")) is not int for record in normalized_runs):

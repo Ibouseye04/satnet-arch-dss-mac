@@ -9,7 +9,7 @@ from satnet.ground.service_policy import GroundServicePolicy
 from satnet.ground.visibility import GroundVisibilityPolicy
 from satnet.simulation.tier1_rollout import Tier1RolloutConfig
 
-from .constants import CONTRACT_SPEC_HASH
+from .constants import CONTRACT_SPEC_HASH, FINAL_RUN_COUNT, REALIZATIONS_PER_DESIGN
 from .io import parse_canonical_float
 
 
@@ -46,7 +46,7 @@ def map_frozen_run(design: dict[str, Any], run: dict[str, Any]) -> FinalRunMappi
     run_id = run.get("run_id")
     if type(design_index) is not int or type(realization_index) is not int or type(run_id) is not int:
         raise TypeError("Frozen run indices and run_id must be integers")
-    if run_id != design_index * 5 + realization_index:
+    if run_id != design_index * REALIZATIONS_PER_DESIGN + realization_index:
         raise ValueError("Frozen run_id formula mismatch")
     if run.get("run_key") != f"{design['design_id']}-{run['realization_id']}":
         raise ValueError("Frozen run_key mismatch")
@@ -119,6 +119,6 @@ def map_frozen_run(design: dict[str, Any], run: dict[str, Any]) -> FinalRunMappi
 def map_all_runs(contract: dict[str, Any]) -> tuple[FinalRunMapping, ...]:
     designs = {record["design_id"]: record for record in contract["designs"]}
     mapped = tuple(map_frozen_run(designs[run["design_id"]], run) for run in contract["runs"])
-    if tuple(value.run_id for value in mapped) != tuple(range(500)):
-        raise ValueError("Mapped run order is not exactly 0 through 499")
+    if tuple(value.run_id for value in mapped) != tuple(range(FINAL_RUN_COUNT)):
+        raise ValueError("Mapped run order is not exactly 0 through 9999")
     return mapped

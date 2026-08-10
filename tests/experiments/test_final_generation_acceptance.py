@@ -70,15 +70,15 @@ def test_qualification_subset_passes_without_claiming_production(
         generation_root=tmp_path / "generation",
         replay_root=tmp_path / "replay",
     )
-    assert result["generation_count"] == 15
-    assert result["replay_count"] == 15
+    assert result["generation_count"] == 45
+    assert result["replay_count"] == 45
     assert result["production_acceptance_claimed"] is False
 
 
 def test_qualification_rejects_wrong_subset(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="15-run set"):
+    with pytest.raises(ValueError, match="45-run set"):
         validate_qualification(
-            mappings=_mappings()[:15],
+            mappings=_mappings()[:45],
             generation_root=tmp_path / "generation",
             replay_root=tmp_path / "replay",
         )
@@ -102,10 +102,10 @@ def test_production_acceptance_rejects_forged_counts_without_records(
         generation_root / "operational" / "generation_ledger.json",
         {
             "contract_spec_hash": original_contract["contract_spec_hash"],
-            "distinct_frozen_run_submission_count": 500,
-            "operational_attempt_event_count": 500,
+            "distinct_frozen_run_submission_count": 10000,
+            "operational_attempt_event_count": 10000,
             "records": [],
-            "successful_generation_count": 500,
+            "successful_generation_count": 10000,
         },
     )
     atomic_write_json(
@@ -113,8 +113,8 @@ def test_production_acceptance_rejects_forged_counts_without_records(
         {
             "contract_spec_hash": original_contract["contract_spec_hash"],
             "records": [],
-            "replay_submission_count": 500,
-            "successful_replay_count": 500,
+            "replay_submission_count": 10000,
+            "successful_replay_count": 10000,
         },
     )
     with pytest.raises(ValueError, match="generation run set mismatch"):
@@ -146,14 +146,14 @@ def test_production_acceptance_passes_valid_record_derived_fixture(
     mappings = _mappings()
     contract = validate_frozen_contract(compare_tag_blobs=False)
     generation_ledger = {
-        "distinct_frozen_run_submission_count": 500,
+        "distinct_frozen_run_submission_count": 10000,
         "records": [{} for _ in mappings],
-        "successful_generation_count": 500,
+        "successful_generation_count": 10000,
     }
     replay_ledger = {
         "records": [{} for _ in mappings],
-        "replay_submission_count": 500,
-        "successful_replay_count": 500,
+        "replay_submission_count": 10000,
+        "successful_replay_count": 10000,
     }
     targets = {}
     for mapping in mappings:
@@ -193,5 +193,5 @@ def test_production_acceptance_passes_valid_record_derived_fixture(
         protected_science_diff_empty=True,
     )
     assert report["production_acceptance"] == "passed"
-    assert report["derived_generation_submission_count"] == 500
-    assert report["derived_replay_submission_count"] == 500
+    assert report["derived_generation_submission_count"] == 10000
+    assert report["derived_replay_submission_count"] == 10000

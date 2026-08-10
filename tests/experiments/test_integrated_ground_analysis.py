@@ -107,7 +107,7 @@ def test_runtime_structure_reports_ordered_means_and_projection() -> None:
     assert result["generation_runtime_seconds"]["mean"] == 5.0
     assert result["generation_runtime_seconds"]["median"] == 5.0
     assert result["generation_runtime_seconds"]["total"] == 25.0
-    assert result["projected_500_run_generation_seconds"] == 2500.0
+    assert result["projected_10000_run_generation_seconds"] == 50000.0
 
 
 def test_artifact_accounting_reports_stage_run_design_and_projection(tmp_path) -> None:
@@ -132,4 +132,4 @@ def test_artifact_accounting_reports_stage_run_design_and_projection(tmp_path) -
     assert result["total_pilot_bytes"] == 90
     assert result["by_stage_bytes"] == {"g1": 30, "g2": 60}
     assert result["by_design_bytes"] == {"P01": 60, "P02": 30}
-    assert result["estimated_500_run_bytes"] == 1800
+    assert result["estimated_10000_run_bytes"] == 36000

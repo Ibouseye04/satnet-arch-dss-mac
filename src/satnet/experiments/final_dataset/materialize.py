@@ -130,18 +130,18 @@ def _golden_vector(name: str, payload: dict[str, Any], *, include_seed: bool) ->
 def build_golden_vectors() -> dict[str, Any]:
     vectors = [
         _golden_vector(
-            "ground_selection_seed_D000",
-            ground_selection_seed_payload("D000"),
+            "ground_selection_seed_D0000",
+            ground_selection_seed_payload("D0000"),
             include_seed=True,
         ),
         _golden_vector(
-            "satellite_seed_D000_R00",
-            satellite_seed_payload("D000", "R00"),
+            "satellite_seed_D0000_R00",
+            satellite_seed_payload("D0000", "R00"),
             include_seed=True,
         ),
         _golden_vector(
-            "ground_failure_seed_D000_R00",
-            ground_failure_seed_payload("D000", "R00"),
+            "ground_failure_seed_D0000_R00",
+            ground_failure_seed_payload("D0000", "R00"),
             include_seed=True,
         ),
         _golden_vector(
@@ -174,8 +174,8 @@ def build_golden_vectors() -> dict[str, Any]:
             include_seed=False,
         ),
         _golden_vector(
-            "split_candidate_0_D000",
-            split_candidate_payload(candidate_id=0, design_id="D000"),
+            "split_candidate_0_D0000",
+            split_candidate_payload(candidate_id=0, design_id="D0000"),
             include_seed=False,
         ),
     ]
@@ -191,16 +191,16 @@ def build_golden_vectors() -> dict[str, Any]:
 
 def build_doe_evidence(designs: Iterable[dict[str, Any]]) -> dict[str, Any]:
     normalized = tuple(designs)
-    transition = normalized[5:40]
-    global_records = normalized[40:]
+    transition = normalized[5:400]
+    global_records = normalized[400:]
     payload: dict[str, Any] = {
         "identity_domain": DOE_EVIDENCE_IDENTITY_DOMAIN,
         "identity_version": DOE_EVIDENCE_IDENTITY_VERSION,
         "design_counts": {
             "pilot_anchor": 5,
-            "transition": 35,
-            "global": 60,
-            "total": 100,
+            "transition": 395,
+            "global": 1600,
+            "total": 2000,
         },
         "lhs_selected_candidate_ids": {
             "transition": transition[0]["lhs_candidate_id"],

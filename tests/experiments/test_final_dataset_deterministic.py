@@ -49,19 +49,19 @@ def test_canonical_float_examples_and_strict_reader() -> None:
 def test_seed_and_digest_golden_vectors() -> None:
     cases = (
         (
-            ground_selection_seed_payload("D000"),
-            "15d84731821505f8fa48c8bce17f5637549d51908dd8508afda931e107a94bf3",
-            9054823368371031027,
+            ground_selection_seed_payload("D0000"),
+            "1b84fe4224c7cde0c34765d9528d5c8192f49431b3741c85869d747556bf60c8",
+            476665182886518984,
         ),
         (
-            satellite_seed_payload("D000", "R00"),
-            "a4a0ad1553309875b2e5fa5b64c7d67aaccdbc4ab3b6a136d5c09a149a7a6501",
-            6179108102034056449,
+            satellite_seed_payload("D0000", "R00"),
+            "5ee237d23dbaa4313202868b7a7cddbea760580a73368a01e5dbe77525bd920b",
+            7339714508060725771,
         ),
         (
-            ground_failure_seed_payload("D000", "R00"),
-            "3491ab32f540baa102cc0a05e9ac9fca5db7923401123985793cfc7cafd0550c",
-            8736134989647729932,
+            ground_failure_seed_payload("D0000", "R00"),
+            "65c93e3ac553afdcdaef9730c5ec61c4d0be4d866a0005b0ad216a7ac65ce61d",
+            3251997481484740125,
         ),
     )
     for payload, digest, seed in cases:
@@ -96,8 +96,8 @@ def test_seed_and_digest_golden_vectors() -> None:
             "0a7ea6344701d1a8e7511ccb56fe5346b562283c49cb18f3ff3a90a3f1629f44",
         ),
         (
-            split_candidate_payload(candidate_id=0, design_id="D000"),
-            "0307fd48dd37131924474b10740882f8029f2b6bb4b53ee84fdc949aeaa14746",
+            split_candidate_payload(candidate_id=0, design_id="D0000"),
+            "e7ddda59767df72b3e378b6b4ba5d88d55977299046506bcc16e1824ab4dd41f",
         ),
     )
     for payload, digest in digest_cases:

@@ -33,7 +33,7 @@ from satnet.experiments.integrated_ground_manifest import read_pilot_design_mani
 from satnet.ground.catalog import load_ground_station_catalog
 
 ROOT = Path(__file__).parents[2]
-OUTPUT = ROOT / "artifacts" / "final_integrated_dataset_contract"
+OUTPUT = ROOT / "artifacts" / "final_integrated_dataset_10k_contract"
 PILOT_DESIGNS = ROOT / "artifacts" / "integrated_ground_pilot_25" / "inputs" / "pilot_designs.json"
 PILOT_CATALOG = ROOT / "artifacts" / "integrated_ground_pilot_25" / "inputs" / "pilot_catalog.csv"
 
@@ -49,18 +49,18 @@ def runs() -> tuple[dict, ...]:
 
 
 def test_manifest_counts_ordering_and_hash_inventory(designs, runs) -> None:
-    assert len(designs) == 100
-    assert len(runs) == 500
-    assert [record["design_id"] for record in designs] == [f"D{index:03d}" for index in range(100)]
-    assert [record["run_id"] for record in runs] == list(range(500))
+    assert len(designs) == 2000
+    assert len(runs) == 10000
+    assert [record["design_id"] for record in designs] == [f"D{index:04d}" for index in range(2000)]
+    assert [record["run_id"] for record in runs] == list(range(10000))
     assert all(type(record["run_id"]) is int for record in runs)
     assert all("run_index" not in record for record in runs)
-    assert len({record["run_key"] for record in runs}) == 500
+    assert len({record["run_key"] for record in runs}) == 10000
     inventory = read_json(OUTPUT / "manifest_inventory.json")
     assert inventory["catalog_hash"] == CATALOG_HASH
     assert inventory["design_manifest_hash"] == design_manifest_hash(designs)
     assert inventory["run_manifest_hash"] == run_manifest_hash(runs)
-    assert inventory["split_design_counts"] == {"train": 70, "validation": 15, "test": 15}
+    assert inventory["split_design_counts"] == {"train": 1400, "validation": 300, "test": 300}
 
 
 def test_pilot_anchor_scientific_equality_and_new_identity(designs) -> None:
@@ -109,10 +109,10 @@ def test_design_level_ground_selection_is_materialized_and_fixed(designs, runs) 
 def test_exact_doe_coverage(designs) -> None:
     assert Counter(record["doe_stratum"] for record in designs) == {
         "pilot_anchor": 5,
-        "transition": 35,
-        "global": 60,
+        "transition": 395,
+        "global": 1600,
     }
-    transition = designs[5:40]
+    transition = designs[5:400]
     assert len(
         {
             (record["total_ground_station_count"], tuple(record["composition_weights"]))
@@ -120,21 +120,25 @@ def test_exact_doe_coverage(designs) -> None:
         }
     ) == 35
     assert Counter((record["num_planes"], record["sats_per_plane"]) for record in transition) == {
-        (5, 6): 6,
-        (5, 7): 6,
-        (5, 8): 6,
-        (6, 6): 6,
-        (6, 7): 6,
-        (6, 8): 5,
+        (5, 6): 66,
+        (5, 7): 66,
+        (5, 8): 66,
+        (6, 6): 66,
+        (6, 7): 66,
+        (6, 8): 65,
     }
-    global_records = designs[40:]
-    assert set(Counter((record["num_planes"], record["sats_per_plane"]) for record in global_records).values()) == {5}
+    global_records = designs[400:]
+    assert Counter((record["num_planes"], record["sats_per_plane"]) for record in global_records) == {
+        (4, 5): 134, (4, 6): 134, (4, 7): 134, (4, 8): 134,
+        (5, 5): 133, (5, 6): 133, (5, 7): 133, (5, 8): 133,
+        (6, 5): 133, (6, 6): 133, (6, 7): 133, (6, 8): 133,
+    }
     assert Counter(record["total_ground_station_count"] for record in global_records) == {
-        total: 6 for total in (6, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+        total: 160 for total in (6, 10, 15, 20, 25, 30, 35, 40, 45, 50)
     }
-    assert set(Counter(tuple(record["composition_weights"]) for record in global_records).values()) == {6}
-    assert {record["lhs_candidate_id"] for record in transition} == {72}
-    assert {record["lhs_candidate_id"] for record in global_records} == {158}
+    assert set(Counter(tuple(record["composition_weights"]) for record in global_records).values()) == {160}
+    assert {record["lhs_candidate_id"] for record in transition} == {51}
+    assert {record["lhs_candidate_id"] for record in global_records} == {49}
 
 
 def test_reduced_compositions_unify_anchor_and_non_anchor(designs) -> None:
@@ -150,19 +154,19 @@ def test_reduced_compositions_unify_anchor_and_non_anchor(designs) -> None:
 
 def test_grouped_split_is_pre_outcome_and_exact(designs, runs) -> None:
     split = read_json(OUTPUT / "split_manifest.json")
-    assert split["selected_candidate_id"] == 164
+    assert split["selected_candidate_id"] == 3958
     assert split["outcome_fields_used"] is False
     assert {name: len(split["design_assignments"][name]) for name in ("train", "validation", "test")} == {
-        "train": 70,
-        "validation": 15,
-        "test": 15,
+        "train": 1400,
+        "validation": 300,
+        "test": 300,
     }
     assert {name: len(split["run_assignments"][name]) for name in ("train", "validation", "test")} == {
-        "train": 350,
-        "validation": 75,
-        "test": 75,
+        "train": 7000,
+        "validation": 1500,
+        "test": 1500,
     }
-    assignments = _candidate_assignments(designs, 164)
+    assignments = _candidate_assignments(designs, 3958)
     score = _score(designs, assignments)
     persisted = split["selected_candidate_score"]
     assert (score[0].numerator, score[0].denominator) == (
@@ -178,7 +182,7 @@ def test_grouped_split_is_pre_outcome_and_exact(designs, runs) -> None:
         persisted["total_absolute_deviation"]["denominator"],
     )
     anchor_counts = {
-        name: sum(design_id in {"D000", "D001", "D002", "D003", "D004"} for design_id in split["design_assignments"][name])
+        name: sum(design_id in {"D0000", "D0001", "D0002", "D0003", "D0004"} for design_id in split["design_assignments"][name])
         for name in ("train", "validation", "test")
     }
     assert anchor_counts == {"train": 3, "validation": 1, "test": 1}
@@ -206,7 +210,7 @@ def test_split_digest_tie_uses_design_id(monkeypatch, designs) -> None:
     )
     assignments = _candidate_assignments(tuple(reversed(designs)), 0)
     ordered = [record["design_id"] for name in ("train", "validation", "test") for record in assignments[name]]
-    assert ordered == [f"D{index:03d}" for index in range(100)]
+    assert ordered == [f"D{index:04d}" for index in range(2000)]
 
 
 def test_catalog_semantic_identity_and_separate_file_identity() -> None:

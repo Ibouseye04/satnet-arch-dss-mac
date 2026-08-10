@@ -32,7 +32,7 @@ def replay_run_read_only(
     output_root = ensure_mode_root(output_root, output_mode, create=True)
     source_run = run_directory(source_root, mapping.run_id)
     if not source_run.is_dir():
-        raise FileNotFoundError(f"Source run does not exist: run_{mapping.run_id:03d}")
+        raise FileNotFoundError(f"Source run does not exist: run_{mapping.run_id:04d}")
     report_path = run_directory(output_root, mapping.run_id) / "replay_report.json"
     if report_path.exists():
         raise FileExistsError(f"Replay report already exists for run {mapping.run_id}")

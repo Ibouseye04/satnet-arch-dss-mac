@@ -17,6 +17,7 @@ PROTECTED_PATHS = (
 ALLOWED_EXACT_PATHS = frozenset({".gitattributes"})
 ALLOWED_PREFIXES = (
     "artifacts/final_integrated_dataset_contract/",
+    "artifacts/final_integrated_dataset_10k_contract/",
     "artifacts/final_integrated_dataset_generation_qualification/",
     "docs/experiments/final_integrated_dataset_",
     "src/satnet/experiments/final_dataset/",
@@ -60,7 +61,7 @@ def test_contract_change_allowlist_rejects_unauthorized_path() -> None:
 
 
 def test_contract_artifact_root_contains_no_scientific_run_evidence() -> None:
-    root = ROOT / "artifacts" / "final_integrated_dataset_contract"
+    root = ROOT / "artifacts" / "final_integrated_dataset_10k_contract"
     expected = {
         "contract_bundle.json",
         "contract_specification.json",

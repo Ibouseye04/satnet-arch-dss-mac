@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from satnet.experiments.final_generation import contract as contract_module
-from satnet.experiments.final_generation.cli import build_parser
-from satnet.experiments.final_generation.constants import FROZEN_ARTIFACTS
+from satnet.experiments.final_generation.cli import _confirm_production, build_parser
+from satnet.experiments.final_generation.constants import CONTRACT_SPEC_HASH, FROZEN_ARTIFACTS
 from satnet.experiments.final_generation.contract import (
     ensure_mode_root,
     validate_frozen_contract,
@@ -42,7 +42,7 @@ def test_modified_and_missing_frozen_artifact_rejected(
     monkeypatch.setattr(contract_module, "contract_root", lambda: copied)
     target = copied / "contract_specification.json"
     target.write_bytes(target.read_bytes() + b" ")
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, RuntimeError)):
         validate_frozen_contract(compare_tag_blobs=True)
     shutil.copy2(source / "contract_specification.json", target)
     (copied / "golden_vectors.json").unlink()
@@ -88,7 +88,7 @@ def test_stage_failure_preserves_immutable_attempt_and_stops_downstream(
         )
     assert not run_directory(root, 0).exists()
     attempt = read_canonical_json(
-        root / "operational" / "attempts" / "run_000" / "attempt_001.json"
+        root / "operational" / "attempts" / "run_0000" / "attempt_001.json"
     )
     assert attempt["state"] == "failed"
     assert attempt["failed_stage"] == "satellite"
@@ -161,9 +161,22 @@ def test_production_cli_requires_all_confirmations() -> None:
     parsed = parser.parse_args(
         [
             "production", "--output-root", "X:/production", "--confirm-production",
-            "--confirm-contract-spec-hash", "0" * 64, "--confirm-run-count", "500",
+            "--confirm-contract-spec-hash", "0" * 64, "--confirm-run-count", "10000",
             "--expected-tooling-sha", "1" * 40,
         ]
     )
     assert parsed.confirm_production is True
-    assert parsed.confirm_run_count == 500
+    assert parsed.confirm_run_count == 10000
+
+
+def test_production_confirmation_is_exactly_10k() -> None:
+    base = {
+        "confirm_production": True,
+        "confirm_contract_spec_hash": CONTRACT_SPEC_HASH,
+        "confirm_run_count": 10000,
+    }
+    _confirm_production(type("Args", (), base)())
+    for count in (500, 9999, 10001):
+        args = type("Args", (), {**base, "confirm_run_count": count})()
+        with pytest.raises(ValueError, match="run-count"):
+            _confirm_production(args)

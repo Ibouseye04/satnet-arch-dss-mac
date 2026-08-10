@@ -16,7 +16,7 @@ from satnet.experiments.final_dataset.specification import (
 from satnet.ground.canonical import canonical_hash
 
 ROOT = Path(__file__).parents[2]
-OUTPUT = ROOT / "artifacts" / "final_integrated_dataset_contract"
+OUTPUT = ROOT / "artifacts" / "final_integrated_dataset_10k_contract"
 
 
 @pytest.fixture(scope="module")
@@ -42,30 +42,30 @@ def _changed_runs(
 
 
 def test_authoritative_numeric_run_identity_and_run_key(designs, runs) -> None:
-    assert len({design["design_id"] for design in designs}) == 100
-    assert len(runs) == 500
-    assert [record["run_id"] for record in runs] == list(range(500))
-    assert {record["run_id"] for record in runs} == set(range(500))
+    assert len({design["design_id"] for design in designs}) == 2000
+    assert len(runs) == 10000
+    assert [record["run_id"] for record in runs] == list(range(10000))
+    assert {record["run_id"] for record in runs} == set(range(10000))
     assert all(type(record["run_id"]) is int for record in runs)
     assert all(type(record["run_key"]) is str for record in runs)
     assert all("run_index" not in record for record in runs)
-    assert len({record["run_key"] for record in runs}) == 500
-    assert len({(record["design_id"], record["realization_id"]) for record in runs}) == 500
+    assert len({record["run_key"] for record in runs}) == 10000
+    assert len({(record["design_id"], record["realization_id"]) for record in runs}) == 10000
     for record in runs:
         assert record["run_id"] == record["design_index"] * 5 + record["realization_index"]
         assert record["realization_id"] == f"R{record['realization_index']:02d}"
         assert record["run_key"] == f"{record['design_id']}-{record['realization_id']}"
-    assert runs[0]["run_key"] == "D000-R00"
-    assert runs[4]["run_key"] == "D000-R04"
-    assert runs[5]["run_key"] == "D001-R00"
-    assert runs[-1]["run_key"] == "D099-R04"
+    assert runs[0]["run_key"] == "D0000-R00"
+    assert runs[4]["run_key"] == "D0000-R04"
+    assert runs[5]["run_key"] == "D0001-R00"
+    assert runs[-1]["run_key"] == "D1999-R04"
 
 
 def test_split_manifest_uses_integer_run_ids_and_preserves_frozen_designs(runs) -> None:
     split = read_json(OUTPUT / "split_manifest.json")
-    assert split["selected_candidate_id"] == 164
+    assert split["selected_candidate_id"] == 3958
     assert canonical_hash({"design_assignments": split["design_assignments"]}) == (
-        "84aadaa6d28a9991725bfc3182badbe4a367d2ee7fe6cc3b81b8d09da5583c86"
+        "7a775735bd85981694c0fbbc5460c7ede7a0a9b236fffd5b65605367bf0e2b7b"
     )
     assigned = [
         run_id
@@ -73,7 +73,7 @@ def test_split_manifest_uses_integer_run_ids_and_preserves_frozen_designs(runs) 
         for run_id in split["run_assignments"][split_name]
     ]
     assert all(type(run_id) is int for run_id in assigned)
-    assert set(assigned) == set(range(500))
+    assert set(assigned) == set(range(10000))
     run_by_id = {record["run_id"]: record for record in runs}
     for split_name in ("train", "validation", "test"):
         assert all(
@@ -89,7 +89,7 @@ def test_non_integer_run_id_fails(value, designs, runs) -> None:
         validate_run_records(changed, designs=designs)
 
 
-@pytest.mark.parametrize("value", [-1, 500])
+@pytest.mark.parametrize("value", [-1, 10000])
 def test_out_of_range_run_id_fails(value, designs, runs) -> None:
     changed = _changed_runs(runs, record_index=0, field="run_id", value=value)
     with pytest.raises(ValueError, match="run_id must be within"):
@@ -126,11 +126,11 @@ def test_non_string_run_key_fails(designs, runs) -> None:
 def test_later_generation_acceptance_gates_are_complete() -> None:
     gates = build_later_generation_acceptance_gates()
     required_values = {
-        "expected_run_count": 500,
-        "required_generation_attempt_count": 500,
-        "required_successful_generation_count": 500,
-        "required_authoritative_replay_count": 500,
-        "required_successful_replay_count": 500,
+        "expected_run_count": 10000,
+        "required_generation_attempt_count": 10000,
+        "required_successful_generation_count": 10000,
+        "required_authoritative_replay_count": 10000,
+        "required_successful_replay_count": 10000,
         "allow_seed_substitution": False,
         "allow_run_omission": False,
         "allow_replacement_runs": False,
@@ -187,7 +187,7 @@ def test_later_generation_acceptance_gates_are_complete() -> None:
         "minimum_unique_values_per_split": 5,
     }
     assert gates["split_immutability"] == {
-        "selected_candidate_id": 164,
+        "selected_candidate_id": 3958,
         "outcomes_or_labels_may_modify_assignments": False,
         "all_realizations_grouped_by_design": True,
     }

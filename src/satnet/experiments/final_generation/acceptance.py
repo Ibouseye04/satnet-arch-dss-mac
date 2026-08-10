@@ -59,7 +59,7 @@ def validate_qualification(
 ) -> dict[str, Any]:
     ordered = tuple(sorted(mappings, key=lambda value: value.run_id))
     if tuple(value.run_id for value in ordered) != QUALIFICATION_RUN_IDS:
-        raise ValueError("Qualification mappings do not match the frozen 15-run set")
+        raise ValueError("Qualification mappings do not match the frozen deterministic 45-run set")
     generated = ensure_mode_root(generation_root, "qualification", create=False)
     replayed = ensure_mode_root(replay_root, "qualification_replay", create=False)
     generation_ledger = read_canonical_json(
@@ -83,7 +83,7 @@ def validate_qualification(
     result_hashes = [results[mapping.run_id]["run_result_hash"] for mapping in ordered]
     _validate_ground_consistency(ordered, generated)
     return {
-        "design_ids": ["D000", "D007", "D040"],
+        "design_ids": sorted({mapping.design["design_id"] for mapping in ordered}),
         "generation_count": len(result_hashes),
         "production_acceptance_claimed": False,
         "qualification_run_ids": list(QUALIFICATION_RUN_IDS),

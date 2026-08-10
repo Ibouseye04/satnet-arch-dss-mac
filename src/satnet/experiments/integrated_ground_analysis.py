@@ -24,6 +24,7 @@ from satnet.experiments.integrated_ground_runner import (
     run_directory,
 )
 from satnet.ground.catalog import load_ground_station_catalog
+from satnet.experiments.final_generation.constants import FINAL_RUN_COUNT
 
 CLASSIFICATION_FIELDS = (
     "space_threshold_breach_any",
@@ -284,11 +285,11 @@ def runtime_diagnostics(rows: Sequence[Mapping[str, object]]) -> dict[str, objec
             "minimum": min(values),
             "total": math.fsum(values),
         }
-    result["projected_500_run_generation_seconds"] = (
-        result["generation_runtime_seconds"]["mean"] * 500
+    result["projected_10000_run_generation_seconds"] = (
+        result["generation_runtime_seconds"]["mean"] * FINAL_RUN_COUNT
     )
-    result["projected_500_run_replay_seconds"] = (
-        result["replay_runtime_seconds"]["mean"] * 500
+    result["projected_10000_run_replay_seconds"] = (
+        result["replay_runtime_seconds"]["mean"] * FINAL_RUN_COUNT
     )
     result["projection_note"] = (
         "Linear extrapolation from this 25-run pilot; available compute and parallelism are "
@@ -329,7 +330,7 @@ def artifact_size_diagnostics(
     return {
         "by_design_bytes": design_totals,
         "by_stage_bytes": stage_totals,
-        "estimated_500_run_bytes": total_pilot_bytes * 20,
+        "estimated_10000_run_bytes": total_pilot_bytes * (FINAL_RUN_COUNT // 25),
         "estimate_note": (
             "Linear extrapolation from canonical pilot artifacts only; future ML datasets are excluded."
         ),

@@ -43,7 +43,7 @@ def _mapping() -> FinalRunMapping:
 
 def _generation_fixture(tmp_path: Path, mapping: FinalRunMapping) -> tuple[Path, dict[str, object]]:
     root = tmp_path / "generation"
-    run_root = root / "run_000"
+    run_root = root / "run_0000"
     (run_root / "targets").mkdir(parents=True)
     target_hash = "1" * 64
     inventory_hash = "2" * 64
@@ -59,9 +59,9 @@ def _generation_fixture(tmp_path: Path, mapping: FinalRunMapping) -> tuple[Path,
         "published_result_hash": result_hash,
         "state": "succeeded",
     }
-    atomic_write_json(root / "operational" / "attempts" / "run_000" / "attempt_001.json", attempt)
+    atomic_write_json(root / "operational" / "attempts" / "run_0000" / "attempt_001.json", attempt)
     atomic_write_json(
-        root / "operational" / "current_state" / "run_000.json",
+        root / "operational" / "current_state" / "run_0000.json",
         {
             "published_result_hash": result_hash,
             "run_record_hash": mapping.run["run_record_hash"],
@@ -92,7 +92,7 @@ def _production_namespace(**overrides: object) -> Namespace:
         "acceptance_report": Path("C:/audit/acceptance.json"),
         "confirm_contract_spec_hash": CONTRACT_SPEC_HASH,
         "confirm_production": True,
-        "confirm_run_count": 500,
+        "confirm_run_count": 10000,
         "expected_tooling_sha": "a" * 40,
         "input_root": Path("C:/audit/generation"),
         "output_root": Path("C:/audit/generation"),
@@ -108,10 +108,10 @@ def _production_namespace(**overrides: object) -> Namespace:
 
 def test_frozen_paths_are_binary_checkout_inputs() -> None:
     text = (ROOT / ".gitattributes").read_text(encoding="utf-8")
-    assert "artifacts/final_integrated_dataset_contract/** -text" in text
+    assert "artifacts/final_integrated_dataset_contract/** -text\nartifacts/final_integrated_dataset_10k_contract/** -text" in text
     assert "artifacts/integrated_ground_pilot_25/inputs/pilot_catalog.csv -text" in text
     paths = [
-        f"artifacts/final_integrated_dataset_contract/{name}" for name in FROZEN_ARTIFACTS
+        f"artifacts/final_integrated_dataset_10k_contract/{name}" for name in FROZEN_ARTIFACTS
     ]
     paths.append("artifacts/integrated_ground_pilot_25/inputs/pilot_catalog.csv")
     output = subprocess.run(
@@ -158,6 +158,7 @@ def test_repository_family_paths_and_git_common_dir_are_rejected(
     prohibited = (
         first,
         first / "artifacts" / "final_integrated_dataset_contract",
+        first / "artifacts" / "final_integrated_dataset_10k_contract",
         first / "data",
         first / "docs" / "refactor_plans" / "2026-07-15_tier1_validity_remediation_atomic_gameplan.md",
         first / "docs" / "validation" / "tier1_defect_verification.md",
@@ -190,7 +191,7 @@ def test_retry_rejects_changed_frozen_identity(
     from satnet.ground.canonical import canonical_hash
 
     atomic_write_json(
-        tmp_path / "operational" / "attempts" / "run_000" / "attempt_001.json",
+        tmp_path / "operational" / "attempts" / "run_0000" / "attempt_001.json",
         {
             "attempt_input_identity": identity,
             "attempt_input_identity_hash": canonical_hash(identity),
@@ -215,7 +216,7 @@ def test_retry_accepts_exact_frozen_identity(tmp_path: Path) -> None:
     from satnet.ground.canonical import canonical_hash
 
     atomic_write_json(
-        tmp_path / "operational" / "attempts" / "run_000" / "attempt_001.json",
+        tmp_path / "operational" / "attempts" / "run_0000" / "attempt_001.json",
         {
             "attempt_input_identity": identity,
             "attempt_input_identity_hash": canonical_hash(identity),
@@ -358,7 +359,7 @@ def _replay_fixture(tmp_path: Path, mapping: FinalRunMapping) -> tuple[Path, dic
         "target_artifact_hash": "1" * 64,
     }
     root = tmp_path / "replay"
-    atomic_write_json(root / "run_000" / "replay_report.json", record)
+    atomic_write_json(root / "run_0000" / "replay_report.json", record)
     return root, {
         "contract_spec_hash": CONTRACT_SPEC_HASH,
         "records": [record],
@@ -408,7 +409,7 @@ def test_replay_evidence_rejects_mismatch_and_aggregate_disagreement(
     else:
         record = {**ledger["records"][0], **mutation}
         ledger["records"] = [record]
-        atomic_write_json(root / "run_000" / "replay_report.json", record, overwrite=True)
+        atomic_write_json(root / "run_0000" / "replay_report.json", record, overwrite=True)
     with pytest.raises(ValueError, match=match):
         validate_replay_evidence(
             mappings=(mapping,),
@@ -476,7 +477,7 @@ def test_validate_production_command_writes_atomic_operational_report(
     monkeypatch.setattr(
         cli,
         "validate_production_acceptance",
-        lambda **kwargs: {"production_acceptance": "passed", "validated_run_count": 500},
+        lambda **kwargs: {"production_acceptance": "passed", "validated_run_count": 10000},
     )
     monkeypatch.setattr(cli, "_print", lambda value: None)
     cli.command_validate_production(args)
@@ -484,7 +485,7 @@ def test_validate_production_command_writes_atomic_operational_report(
 
     assert read_canonical_json(report_path) == {
         "production_acceptance": "passed",
-        "validated_run_count": 500,
+        "validated_run_count": 10000,
     }
 
 
@@ -508,7 +509,7 @@ def test_verified_resume_requires_matching_replay_certificate(
     from satnet.experiments.final_generation.contract import ensure_mode_root
 
     ensure_mode_root(root, "qualification", create=True)
-    (root / "run_000").mkdir()
+    (root / "run_0000").mkdir()
     monkeypatch.setattr(
         "satnet.experiments.final_generation.orchestrator.validate_completed_run",
         lambda **kwargs: {"run_result_hash": "3" * 64},
@@ -533,7 +534,7 @@ def test_resume_certificate_rejects_missing_stage(tmp_path: Path) -> None:
     report = ledger["records"][0]
     report["per_stage_comparison"] = report["per_stage_comparison"][:-1]
     atomic_write_json(root / "execution_mode.json", mode_marker("qualification_replay"))
-    atomic_write_json(root / "run_000" / "replay_report.json", report, overwrite=True)
+    atomic_write_json(root / "run_0000" / "replay_report.json", report, overwrite=True)
     with pytest.raises(ValueError, match="certificate mismatch"):
         _validate_resume_certificate(
             mapping=mapping,

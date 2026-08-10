@@ -7,7 +7,7 @@ from typing import Any, Sequence
 from satnet.ground.canonical import canonical_json
 
 from .acceptance import validate_production_acceptance, validate_qualification
-from .constants import CONTRACT_SPEC_HASH, QUALIFICATION_RUN_IDS
+from .constants import CONTRACT_SPEC_HASH, FINAL_DESIGN_COUNT, FINAL_RUN_COUNT, QUALIFICATION_RUN_IDS, RUN_ID_WIDTH
 from .contract import (
     ensure_mode_root,
     protected_science_isolation_passes,
@@ -53,8 +53,8 @@ def _confirm_production(args: argparse.Namespace) -> None:
         raise ValueError("Production requires --confirm-production")
     if args.confirm_contract_spec_hash != CONTRACT_SPEC_HASH:
         raise ValueError("Production contract confirmation mismatch")
-    if args.confirm_run_count != 500:
-        raise ValueError("Production run-count confirmation must equal 500")
+    if args.confirm_run_count != FINAL_RUN_COUNT:
+        raise ValueError(f"Production run-count confirmation must equal {FINAL_RUN_COUNT}")
 
 
 def command_preflight(args: argparse.Namespace) -> None:
@@ -67,7 +67,7 @@ def command_inspect(args: argparse.Namespace) -> None:
     _print(
         {
             "design": mapping.design,
-            "intended_output_directory": f"run_{mapping.run_id:03d}",
+            "intended_output_directory": f"run_{mapping.run_id:0{RUN_ID_WIDTH}d}",
             "run": mapping.run,
             "satellite_config_hash": mapping.satellite_config.config_hash(),
         }
@@ -76,16 +76,24 @@ def command_inspect(args: argparse.Namespace) -> None:
 
 def command_dry_run(args: argparse.Namespace) -> None:
     contract, mappings = _load(runtime_sha=args.expected_tooling_sha)
-    directories = [f"run_{mapping.run_id:03d}" for mapping in mappings]
+    directories = [f"run_{mapping.run_id:0{RUN_ID_WIDTH}d}" for mapping in mappings]
     run_keys = [mapping.run_key for mapping in mappings]
     design_ids = {mapping.design["design_id"] for mapping in mappings}
     split_counts = {
         split: sum(mapping.run["split_assignment"] == split for mapping in mappings)
         for split in ("train", "validation", "test")
     }
-    if len(set(directories)) != 500 or len(set(run_keys)) != 500 or len(design_ids) != 100:
+    split_design_counts = {
+        split: len({mapping.design["design_id"] for mapping in mappings if mapping.run["split_assignment"] == split})
+        for split in ("train", "validation", "test")
+    }
+    if (
+        len(set(directories)) != FINAL_RUN_COUNT
+        or len(set(run_keys)) != FINAL_RUN_COUNT
+        or len(design_ids) != FINAL_DESIGN_COUNT
+    ):
         raise ValueError("Dry-run identity uniqueness failed")
-    if split_counts != {"train": 350, "validation": 75, "test": 75}:
+    if split_counts != {"train": 7000, "validation": 1500, "test": 1500} or split_design_counts != {"train": 1400, "validation": 300, "test": 300}:
         raise ValueError("Dry-run split cardinality failed")
     _print(
         {
@@ -95,6 +103,7 @@ def command_dry_run(args: argparse.Namespace) -> None:
             "run_count": len(mappings),
             "run_id_max": mappings[-1].run_id,
             "run_id_min": mappings[0].run_id,
+            "split_design_counts": split_design_counts,
             "split_run_counts": split_counts,
             "state": "passed",
             "unique_output_directory_count": len(set(directories)),
@@ -189,7 +198,7 @@ def command_replay_set(args: argparse.Namespace) -> None:
 
 def command_materialize_ledgers(args: argparse.Namespace) -> None:
     _, mappings = _load(runtime_sha=None)
-    selected = _selection(mappings, QUALIFICATION_RUN_IDS if args.qualification else range(500))
+    selected = _selection(mappings, QUALIFICATION_RUN_IDS if args.qualification else range(FINAL_RUN_COUNT))
     generation = materialize_generation_ledger(
         output_root=args.input_root, mappings=selected, catalog=validate_catalog()
     )
@@ -214,7 +223,7 @@ def command_validate_qualification(args: argparse.Namespace) -> None:
 
 
 def command_compare_repeat(args: argparse.Namespace) -> None:
-    _print(compare_repeat(primary_root=args.input_root, repeat_root=args.repeat_root, run_id=200))
+    _print(compare_repeat(primary_root=args.input_root, repeat_root=args.repeat_root, run_id=4000))
 
 
 def command_generate_production(args: argparse.Namespace) -> None:
@@ -295,7 +304,7 @@ def build_parser() -> argparse.ArgumentParser:
     preflight.set_defaults(handler=command_preflight)
 
     inspect = subparsers.add_parser("inspect-run")
-    inspect.add_argument("--run-id", type=int, required=True, choices=range(500))
+    inspect.add_argument("--run-id", type=int, required=True, choices=range(FINAL_RUN_COUNT))
     inspect.set_defaults(handler=command_inspect)
 
     dry = subparsers.add_parser("dry-run")
@@ -303,7 +312,7 @@ def build_parser() -> argparse.ArgumentParser:
     dry.set_defaults(handler=command_dry_run)
 
     qualify = subparsers.add_parser("qualify")
-    qualify.add_argument("--run-id", type=int, required=True, choices=range(500))
+    qualify.add_argument("--run-id", type=int, required=True, choices=range(FINAL_RUN_COUNT))
     qualify.add_argument("--output-root", type=Path, required=True)
     qualify.add_argument("--expected-tooling-sha", required=True)
     qualify.add_argument("--retry", action="store_true")
@@ -324,7 +333,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualify_set.set_defaults(handler=command_qualify_set)
 
     replay = subparsers.add_parser("replay")
-    replay.add_argument("--run-id", type=int, required=True, choices=range(500))
+    replay.add_argument("--run-id", type=int, required=True, choices=range(FINAL_RUN_COUNT))
     replay.add_argument("--input-root", type=Path, required=True)
     replay.add_argument("--replay-output-root", type=Path, required=True)
     replay.add_argument("--expected-tooling-sha", required=True)

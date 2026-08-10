@@ -53,7 +53,7 @@ from satnet.simulation.tier1_rollout import (
 
 CONTRACT_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_contract_specification"
 CONTRACT_IDENTITY_VERSION = "1"
-CONTRACT_VERSION = "2"
+CONTRACT_VERSION = "3"
 CONTRACT_MASTER_SEED = 20260719
 SPLIT_MASTER_SEED = 20260720
 SEED_MODULUS = 2**63
@@ -67,6 +67,13 @@ CANONICAL_DIMENSION_ORDER = (
     "satellite_node_failure_probability",
     "satellite_edge_failure_probability",
     "ground_station_failure_probability",
+)
+QUALIFICATION_RUN_IDS = (
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 35, 60,
+    3039, 3539, 3735, 4115, 5564, 6099, 6225, 6874, 7195, 7365,
+    7369, 8624, 8645, 8980, 9174, 9514, 9999,
 )
 
 
@@ -90,11 +97,11 @@ def _schema_hash(schema: dict[str, Any], field_name: str) -> str:
 
 def build_later_generation_acceptance_gates() -> dict[str, Any]:
     return {
-        "expected_run_count": 500,
-        "required_generation_attempt_count": 500,
-        "required_successful_generation_count": 500,
-        "required_authoritative_replay_count": 500,
-        "required_successful_replay_count": 500,
+        "expected_run_count": 10000,
+        "required_generation_attempt_count": 10000,
+        "required_successful_generation_count": 10000,
+        "required_authoritative_replay_count": 10000,
+        "required_successful_replay_count": 10000,
         "allow_seed_substitution": False,
         "allow_run_omission": False,
         "allow_replacement_runs": False,
@@ -148,7 +155,7 @@ def build_later_generation_acceptance_gates() -> dict[str, Any]:
             "minimum_unique_values_per_split": 5,
         },
         "split_immutability": {
-            "selected_candidate_id": 164,
+            "selected_candidate_id": 3958,
             "outcomes_or_labels_may_modify_assignments": False,
             "all_realizations_grouped_by_design": True,
         },
@@ -208,18 +215,19 @@ def build_contract_specification() -> dict[str, Any]:
             "identity_version": "1",
         },
         "dataset_cardinality": {
-            "design_count": 100,
+            "design_count": 2000,
             "realizations_per_design": 5,
-            "run_count": 500,
-            "design_ids": "D000_through_D099",
+            "run_count": 10000,
+            "design_ids": "D0000_through_D1999",
             "realization_ids": "R00_through_R04",
+            "qualification_run_ids": list(QUALIFICATION_RUN_IDS),
         },
         "run_identity": {
             "schema_version": "2",
             "authoritative_field": "run_id",
             "run_id_value_type": "exact_integer_not_boolean",
             "run_id_first": 0,
-            "run_id_last": 499,
+            "run_id_last": 9999,
             "run_id_formula": "design_index * realizations_per_design + realization_index",
             "run_key_value_type": "string",
             "run_key_formula": "design_id + '-' + realization_id",
@@ -257,14 +265,14 @@ def build_contract_specification() -> dict[str, Any]:
                 {
                     "stratum_id": "transition",
                     "design_index_first": 5,
-                    "design_index_last": 39,
-                    "design_count": 35,
+                    "design_index_last": 399,
+                    "design_count": 395,
                 },
                 {
                     "stratum_id": "global",
-                    "design_index_first": 40,
-                    "design_index_last": 99,
-                    "design_count": 60,
+                    "design_index_first": 400,
+                    "design_index_last": 1999,
+                    "design_count": 1600,
                 },
             ],
             "transition": {
@@ -276,12 +284,12 @@ def build_contract_specification() -> dict[str, Any]:
                     "ground_station_failure_probability": [_c(0.05), _c(0.15)],
                 },
                 "satellite_pair_frequencies": [
-                    {"num_planes": 5, "sats_per_plane": 6, "count": 6},
-                    {"num_planes": 5, "sats_per_plane": 7, "count": 6},
-                    {"num_planes": 5, "sats_per_plane": 8, "count": 6},
-                    {"num_planes": 6, "sats_per_plane": 6, "count": 6},
-                    {"num_planes": 6, "sats_per_plane": 7, "count": 6},
-                    {"num_planes": 6, "sats_per_plane": 8, "count": 5},
+                    {"num_planes": 5, "sats_per_plane": 6, "count": 66},
+                    {"num_planes": 5, "sats_per_plane": 7, "count": 66},
+                    {"num_planes": 5, "sats_per_plane": 8, "count": 66},
+                    {"num_planes": 6, "sats_per_plane": 6, "count": 66},
+                    {"num_planes": 6, "sats_per_plane": 7, "count": 66},
+                    {"num_planes": 6, "sats_per_plane": 8, "count": 65},
                 ],
                 "station_totals": [10, 12, 15, 18, 20],
                 "composition_weights": [
@@ -293,7 +301,11 @@ def build_contract_specification() -> dict[str, Any]:
                     [2, 1, 2],
                     [1, 2, 2],
                 ],
-                "ground_schedule": "exact_cartesian_product",
+                "ground_schedule": "balanced_repetition_of_exact_cartesian_product",
+                "ground_cell_count": 35,
+                "ground_cell_repetition_counts": {"base_cells": 11, "remainder_cells": 10},
+                "satellite_pair_schedule": "balanced_largest_remainder",
+                "satellite_pair_remainder_order": "listed_order",
             },
             "global": {
                 "continuous_ranges": {
@@ -304,13 +316,15 @@ def build_contract_specification() -> dict[str, Any]:
                     "ground_station_failure_probability": [_c(0.0), _c(0.40)],
                 },
                 "satellite_values": {"num_planes": [4, 5, 6], "sats_per_plane": [5, 6, 7, 8]},
-                "satellite_pair_frequency": 5,
+                "satellite_pair_frequency": 133,
+                "satellite_pair_remainder": 4,
+                "satellite_pair_remainder_order": "product_order",
                 "station_total_frequencies": [
-                    {"total": total, "count": 6}
+                    {"total": total, "count": 160}
                     for total in [6, 10, 15, 20, 25, 30, 35, 40, 45, 50]
                 ],
                 "composition_weight_frequencies": [
-                    {"weights": weights, "count": 6}
+                    {"weights": weights, "count": 160}
                     for weights in [
                         [1, 1, 1],
                         [3, 1, 1],
@@ -335,6 +349,7 @@ def build_contract_specification() -> dict[str, Any]:
         "lhs": {
             "implementation": "repository_local",
             "candidate_count": 256,
+            "scoring_implementation": "numpy_vectorized_pairwise_distances_exact_selection_order",
             "dimension_order": list(CANONICAL_DIMENSION_ORDER),
             "permutation_order": ["digest_bytes_ascending", "row_index_ascending"],
             "rank_semantics": "k[d,r] is the zero-based rank of row r in dimension d",
@@ -417,7 +432,8 @@ def build_contract_specification() -> dict[str, Any]:
         "split": {
             "strategy": "pre_outcome_grouped_marginal_balance",
             "candidate_count": 4096,
-            "design_counts": {"train": 70, "validation": 15, "test": 15},
+            "design_counts": {"train": 1400, "validation": 300, "test": 300},
+            "run_counts": {"train": 7000, "validation": 1500, "test": 1500},
             "candidate_order": ["digest_bytes_ascending", "design_id_ascending"],
             "marginals": [
                 "num_planes",
@@ -479,8 +495,9 @@ def build_contract_specification() -> dict[str, Any]:
             "generated_records_reference_contract_bundle_hash": False,
         },
         "contract_phase_validation_gates": {
-            "manifest_counts": {"designs": 100, "runs": 500},
-            "split_design_counts": {"train": 70, "validation": 15, "test": 15},
+            "manifest_counts": {"designs": 2000, "runs": 10000},
+            "split_design_counts": {"train": 1400, "validation": 300, "test": 300},
+            "split_run_counts": {"train": 7000, "validation": 1500, "test": 1500},
             "all_realizations_colocated": True,
             "canonical_float_strings": True,
             "outcome_free_design_and_run_manifests": True,

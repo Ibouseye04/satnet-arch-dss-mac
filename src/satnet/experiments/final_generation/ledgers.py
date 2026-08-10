@@ -5,14 +5,14 @@ from typing import Any, Sequence
 
 from satnet.ground.catalog import GroundStationCatalog
 
-from .constants import CONTRACT_SPEC_HASH
+from .constants import CONTRACT_SPEC_HASH, RUN_ID_WIDTH
 from .io import atomic_write_json, read_canonical_json
 from .mapping import FinalRunMapping
 from .orchestrator import artifact_paths, attempt_input_identity, run_directory, validate_completed_run
 
 
 def _attempt_records(root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
-    attempt_root = root / "operational" / "attempts" / f"run_{run_id:03d}"
+    attempt_root = root / "operational" / "attempts" / f"run_{run_id:0{RUN_ID_WIDTH}d}"
     if not attempt_root.exists():
         return ()
     return tuple(read_canonical_json(path) for path in sorted(attempt_root.glob("attempt_*.json")))

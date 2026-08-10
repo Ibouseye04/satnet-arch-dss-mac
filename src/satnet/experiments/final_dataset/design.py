@@ -41,8 +41,12 @@ DESIGN_MANIFEST_IDENTITY_VERSION = "1"
 RUN_MANIFEST_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_run_manifest"
 RUN_MANIFEST_IDENTITY_VERSION = "2"
 REALIZATIONS_PER_DESIGN = 5
-FINAL_DESIGN_COUNT = 100
+FINAL_DESIGN_COUNT = 2000
 FINAL_RUN_COUNT = FINAL_DESIGN_COUNT * REALIZATIONS_PER_DESIGN
+PILOT_ANCHOR_COUNT = 5
+TRANSITION_DESIGN_COUNT = 395
+GLOBAL_DESIGN_COUNT = 1600
+DESIGN_ID_WIDTH = 4
 RUN_RECORD_FIELDS = frozenset(
     {
         "contract_spec_hash",
@@ -136,7 +140,7 @@ def _base_design_record(
 ) -> dict[str, Any]:
     specification = build_contract_specification()
     fixed = specification["fixed_profile"]
-    design_id = f"D{design_index:03d}"
+    design_id = f"D{design_index:0{DESIGN_ID_WIDTH}d}"
     if pilot is None:
         design_name = f"Final integrated {doe_stratum} design {design_id}"
         description = f"Pre-outcome deterministic {doe_stratum} design"
@@ -243,7 +247,9 @@ def _transition_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]
         "satellite_edge_failure_probability": (0.05, 0.10),
         "ground_station_failure_probability": (0.05, 0.15),
     }
-    rows, evidence = select_lhs(row_count=35, stratum_id="transition", ranges=ranges)
+    rows, evidence = select_lhs(
+        row_count=TRANSITION_DESIGN_COUNT, stratum_id="transition", ranges=ranges
+    )
     ground_cells = [
         (total, weights, allocate_ground_classes(total, weights))
         for total, weights in product(
@@ -261,16 +267,14 @@ def _transition_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]
     ]
     satellite_pairs = [
         pair
-        for pair, count in (
-            ((5, 6), 6),
-            ((5, 7), 6),
-            ((5, 8), 6),
-            ((6, 6), 6),
-            ((6, 7), 6),
-            ((6, 8), 5),
+        for pair, count in zip(
+            ((5, 6), (5, 7), (5, 8), (6, 6), (6, 7), (6, 8)),
+            (66, 66, 66, 66, 66, 65),
+            strict=True,
         )
         for _ in range(count)
     ]
+    ground_cells = ground_cells * 11 + ground_cells[:10]
     paired_rows = deterministic_order(
         rows, stratum_id="transition", schedule_purpose="continuous_rows"
     )
@@ -289,7 +293,7 @@ def _transition_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]
         _, weights, counts = ground
         result.append(
             _base_design_record(
-                design_index=5 + offset,
+                design_index=PILOT_ANCHOR_COUNT + offset,
                 doe_stratum="transition",
                 num_planes=satellites[0],
                 sats_per_plane=satellites[1],
@@ -325,7 +329,7 @@ def _global_ground_schedule() -> list[tuple[int, tuple[int, int, int], tuple[int
     )
     result: list[tuple[int, tuple[int, int, int], tuple[int, int, int]]] = []
     for total_index, total in enumerate(totals):
-        for repetition in range(6):
+        for repetition in range(160):
             composition = weights[(total_index + repetition) % len(weights)]
             result.append((total, composition, allocate_ground_classes(total, composition)))
     return result
@@ -339,9 +343,17 @@ def _global_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]]:
         "satellite_edge_failure_probability": (0.0, 0.25),
         "ground_station_failure_probability": (0.0, 0.40),
     }
-    rows, evidence = select_lhs(row_count=60, stratum_id="global", ranges=ranges)
+    rows, evidence = select_lhs(
+        row_count=GLOBAL_DESIGN_COUNT, stratum_id="global", ranges=ranges
+    )
     satellite_pairs = [
-        pair for pair in product((4, 5, 6), (5, 6, 7, 8)) for _ in range(5)
+        pair
+        for pair, count in zip(
+            product((4, 5, 6), (5, 6, 7, 8)),
+            (134, 134, 134, 134, 133, 133, 133, 133, 133, 133, 133, 133),
+            strict=True,
+        )
+        for _ in range(count)
     ]
     paired_rows = deterministic_order(
         rows, stratum_id="global", schedule_purpose="continuous_rows"
@@ -361,7 +373,7 @@ def _global_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]]:
         _, weights, counts = ground
         result.append(
             _base_design_record(
-                design_index=40 + offset,
+                design_index=PILOT_ANCHOR_COUNT + TRANSITION_DESIGN_COUNT + offset,
                 doe_stratum="global",
                 num_planes=satellites[0],
                 sats_per_plane=satellites[1],
@@ -404,18 +416,43 @@ def _assert_equal(actual: object, expected: object, field_name: str) -> None:
         raise ValueError(f"Anchor field mismatch for {field_name}: {actual!r} != {expected!r}")
 
 
+DESIGN_SCIENTIFIC_FIELDS = (
+    "doe_stratum",
+    "num_planes",
+    "sats_per_plane",
+    "altitude_km",
+    "inclination_deg",
+    "satellite_node_failure_probability",
+    "satellite_edge_failure_probability",
+    "civilian_count",
+    "government_count",
+    "military_count",
+    "ground_station_failure_probability",
+)
+
+
+def design_scientific_signature(record: Mapping[str, Any]) -> tuple[Any, ...]:
+    return tuple(record[field] for field in DESIGN_SCIENTIFIC_FIELDS)
+
+
 def validate_design_records(
     records: Iterable[dict[str, Any]], *, pilot_designs: tuple[IntegratedPilotDesign, ...]
 ) -> None:
     normalized = tuple(records)
-    if len(normalized) != 100:
-        raise ValueError("Final contract requires exactly 100 designs")
-    if [record["design_id"] for record in normalized] != [f"D{index:03d}" for index in range(100)]:
+    if len(normalized) != FINAL_DESIGN_COUNT:
+        raise ValueError("Final 10k contract requires exactly 2,000 designs")
+    if [record["design_id"] for record in normalized] != [f"D{index:0{DESIGN_ID_WIDTH}d}" for index in range(FINAL_DESIGN_COUNT)]:
         raise ValueError("Design IDs or ordering are invalid")
-    if [record["design_index"] for record in normalized] != list(range(100)):
+    if [record["design_index"] for record in normalized] != list(range(FINAL_DESIGN_COUNT)):
         raise ValueError("Design indices are invalid")
-    if len({record["design_record_hash"] for record in normalized}) != 100:
+    if len({record["design_record_hash"] for record in normalized}) != FINAL_DESIGN_COUNT:
         raise ValueError("Design-record hashes must be unique")
+    records_by_signature: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for record in normalized:
+        records_by_signature.setdefault(design_scientific_signature(record), []).append(record)
+    for signature, matching in records_by_signature.items():
+        if len(matching) > 1 and not all(record["pilot_design_id"] for record in matching):
+            raise ValueError(f"Non-anchor scientific design signature is duplicated: {signature!r}")
     for record in normalized:
         expected_hash = _record_hash(
             record,
@@ -435,7 +472,7 @@ def validate_design_records(
         if len(selected) != record["total_ground_station_count"]:
             raise ValueError("Ground count does not match selected IDs")
     counts = {stratum: sum(record["doe_stratum"] == stratum for record in normalized) for stratum in ("pilot_anchor", "transition", "global")}
-    if counts != {"pilot_anchor": 5, "transition": 35, "global": 60}:
+    if counts != {"pilot_anchor": PILOT_ANCHOR_COUNT, "transition": TRANSITION_DESIGN_COUNT, "global": GLOBAL_DESIGN_COUNT}:
         raise ValueError("DOE stratum counts are invalid")
     anchor_fields = {
         "num_planes": "num_planes",
@@ -476,7 +513,7 @@ def validate_design_records(
         _assert_equal(record["minimum_elevation_deg"], _c(pilot.minimum_elevation_deg), "minimum_elevation_deg")
         _assert_equal(record["space_gcc_threshold"], _c(pilot.space_gcc_threshold), "space_gcc_threshold")
         _assert_equal(record["ground_service_threshold"], _c(pilot.ground_service_threshold), "ground_service_threshold")
-    transition = normalized[5:40]
+    transition = normalized[PILOT_ANCHOR_COUNT : PILOT_ANCHOR_COUNT + TRANSITION_DESIGN_COUNT]
     transition_cells = {
         (
             record["total_ground_station_count"],
@@ -490,18 +527,19 @@ def validate_design_records(
         pair: sum((record["num_planes"], record["sats_per_plane"]) == pair for record in transition)
         for pair in ((5, 6), (5, 7), (5, 8), (6, 6), (6, 7), (6, 8))
     }
-    if transition_pair_counts != {(5, 6): 6, (5, 7): 6, (5, 8): 6, (6, 6): 6, (6, 7): 6, (6, 8): 5}:
+    if transition_pair_counts != {(5, 6): 66, (5, 7): 66, (5, 8): 66, (6, 6): 66, (6, 7): 66, (6, 8): 65}:
         raise ValueError("Transition satellite-pair frequencies are invalid")
-    global_records = normalized[40:]
+    global_records = normalized[PILOT_ANCHOR_COUNT + TRANSITION_DESIGN_COUNT :]
     for total in (6, 10, 15, 20, 25, 30, 35, 40, 45, 50):
-        if sum(record["total_ground_station_count"] == total for record in global_records) != 6:
+        if sum(record["total_ground_station_count"] == total for record in global_records) != 160:
             raise ValueError("Global station-total frequencies are invalid")
     global_weights = ((1, 1, 1), (3, 1, 1), (1, 3, 1), (1, 1, 3), (9, 9, 2), (9, 2, 9), (2, 9, 9), (8, 1, 1), (1, 8, 1), (1, 1, 8))
     for weights in global_weights:
-        if sum(tuple(record["composition_weights"]) == weights for record in global_records) != 6:
+        if sum(tuple(record["composition_weights"]) == weights for record in global_records) != 160:
             raise ValueError("Global composition frequencies are invalid")
     for pair in product((4, 5, 6), (5, 6, 7, 8)):
-        if sum((record["num_planes"], record["sats_per_plane"]) == pair for record in global_records) != 5:
+        expected_count = 134 if pair in tuple(product((4,), (5, 6, 7, 8))) else 133
+        if sum((record["num_planes"], record["sats_per_plane"]) == pair for record in global_records) != expected_count:
             raise ValueError("Global satellite-pair frequencies are invalid")
 
 
@@ -597,9 +635,9 @@ def validate_run_records(
     normalized_designs = tuple(designs)
     design_by_id = {design["design_id"]: design for design in normalized_designs}
     if len(design_by_id) != FINAL_DESIGN_COUNT:
-        raise ValueError("Final run manifest requires exactly 100 unique designs")
+        raise ValueError("Final run manifest requires exactly 2,000 unique designs")
     if len(normalized) != FINAL_RUN_COUNT:
-        raise ValueError("Final run manifest requires exactly 500 runs")
+        raise ValueError("Final run manifest requires exactly 10,000 runs")
     for record in normalized:
         if set(record) != RUN_RECORD_FIELDS:
             raise ValueError("Run record fields do not match the authoritative schema")

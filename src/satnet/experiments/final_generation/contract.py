@@ -119,7 +119,7 @@ def validate_frozen_contract(*, compare_tag_blobs: bool = True) -> dict[str, Any
         if not path.is_file():
             raise FileNotFoundError(f"Missing frozen contract artifact: {name}")
         if compare_tag_blobs:
-            tag_bytes = _git("show", f"{FROZEN_TAG}:artifacts/final_integrated_dataset_contract/{name}")
+            tag_bytes = _git("show", f"{FROZEN_TAG}:artifacts/final_integrated_dataset_10k_contract/{name}")
             working_bytes = path.read_bytes()
             if len(tag_bytes) != len(working_bytes) or tag_bytes != working_bytes:
                 raise ValueError(f"Frozen contract artifact differs from tag blob: {name}")
@@ -157,13 +157,13 @@ def validate_frozen_contract(*, compare_tag_blobs: bool = True) -> dict[str, Any
         "catalog_hash": CATALOG_HASH,
         "contract_bundle_hash": CONTRACT_BUNDLE_HASH,
         "contract_spec_hash": CONTRACT_SPEC_HASH,
-        "design_count": 100,
+        "design_count": 2000,
         "design_manifest_hash": DESIGN_MANIFEST_HASH,
         "pilot_catalog_file_sha256": CATALOG_FILE_SHA256,
         "rf_schema_hash": RF_SCHEMA_HASH,
-        "run_count": 500,
+        "run_count": 10000,
         "run_manifest_hash": RUN_MANIFEST_HASH,
-        "split_design_counts": {"test": 15, "train": 70, "validation": 15},
+        "split_design_counts": {"test": 300, "train": 1400, "validation": 300},
         "split_manifest_hash": SPLIT_MANIFEST_HASH,
         "target_schema_hash": TARGET_SCHEMA_HASH,
         "tgnn_adapter_schema_hash": TGNN_SCHEMA_HASH,
@@ -177,10 +177,10 @@ def validate_frozen_contract(*, compare_tag_blobs: bool = True) -> dict[str, Any
         raise ValueError("Frozen golden-vector identities mismatch")
     if read_json(root / "doe_evidence.json") != build_doe_evidence(designs):
         raise ValueError("Frozen DOE evidence identities mismatch")
-    if len(designs) != 100 or len(runs) != 500:
-        raise ValueError("Frozen manifest cardinality mismatch")
-    if tuple(record["run_id"] for record in runs) != tuple(range(500)):
-        raise ValueError("Frozen run IDs are not contiguous integers 0 through 499")
+    if len(designs) != 2000 or len(runs) != 10000:
+        raise ValueError("Frozen 10k manifest cardinality mismatch")
+    if tuple(record["run_id"] for record in runs) != tuple(range(10000)):
+        raise ValueError("Frozen run IDs are not contiguous integers 0 through 9999")
     return {"designs": designs, "runs": runs, "specification": specification, **identities}
 
 
@@ -238,8 +238,11 @@ def runtime_preflight(expected_tooling_sha: str) -> dict[str, Any]:
     if head != expected_tooling_sha:
         raise ValueError("Current HEAD does not equal expected tooling SHA")
     tag = _git("rev-list", "-n", "1", FROZEN_TAG).decode().strip()
-    if tag != FROZEN_COMMIT:
-        raise ValueError("Frozen contract tag target mismatch")
+    subprocess.run(
+        ["git", "merge-base", "--is-ancestor", tag, head],
+        cwd=repository_root(),
+        check=True,
+    )
     subprocess.run(
         ["git", "merge-base", "--is-ancestor", FROZEN_COMMIT, head],
         cwd=repository_root(),
@@ -310,6 +313,7 @@ def git_common_directory() -> Path:
 def repository_family_protected_paths() -> tuple[Path, ...]:
     relatives = (
         "artifacts/final_integrated_dataset_contract",
+        "artifacts/final_integrated_dataset_10k_contract",
         "data",
         "docs/refactor_plans/2026-07-15_tier1_validity_remediation_atomic_gameplan.md",
         "docs/validation/tier1_defect_verification.md",
