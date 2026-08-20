@@ -1,0 +1,80 @@
+{
+  "code_sha": "e55dba59e83864d2dd11fa47482bd4ec2bdd797a",
+  "completed_at": "2026-08-19T12:06:58.162829+00:00",
+  "configuration": {
+    "bootstrap": true,
+    "class_weight": "balanced",
+    "max_depth": 10,
+    "max_features": "sqrt",
+    "min_samples_leaf": 5,
+    "n_estimators": 300,
+    "n_jobs": -1,
+    "random_state": 42
+  },
+  "dataset_bundle_hash": "38dacd66432bfa660410ff9cab7f181a53151120e8102dc40df57016f78bbfc3",
+  "environment_versions": {
+    "device": "cpu",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "python": "3.11.9",
+    "scikit_learn": "1.9.0",
+    "torch": "2.5.1+cpu",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal_distribution": "0.56.2",
+    "torch_geometric_temporal_imported": "0.54.0"
+  },
+  "fit_runtime_seconds": 0.5243848000100115,
+  "model_family": "RF",
+  "model_path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_2026\\final_model.joblib",
+  "model_selection_metric": {
+    "name": "balanced_accuracy",
+    "value": 0.9519305155074196
+  },
+  "model_sha256": "7d2994fd3209cd3aa36c3f173b743ada3ccb31b5f4f4c9ba4d247258fc6b7f59",
+  "production_sha": "d0515088cf3fca06a6aa2d47059269089dcb10a7",
+  "schema_version": "satnet.final_robustness_manifest.v1",
+  "seed": 2026,
+  "selection_sha256": "a1b7076197f123ecf62b0b79ddd092bdb66f0d7d8b94d6c113dc201744163911",
+  "status": "completed",
+  "task": "rf_space_classification",
+  "test_accessed": false,
+  "train_count": 7000,
+  "training_plan_hash": "e14ec5e5b2221aa2c9aa187a2baacc517e676f9dc748612c206eb1dc43788a0a",
+  "validation_count": 1500,
+  "validation_metrics": {
+    "accuracy": 0.9433333333333334,
+    "balanced_accuracy": 0.9519305155074196,
+    "confusion_matrix": [
+      [
+        285,
+        10
+      ],
+      [
+        75,
+        1130
+      ]
+    ],
+    "f1_by_class": {
+      "0": 0.8702290076335878,
+      "1": 0.9637526652452025
+    },
+    "macro_f1": 0.9169908364393952,
+    "majority_class_baseline_accuracy": 0.8033333333333333,
+    "negative_class_count": 295,
+    "positive_class_count": 1205,
+    "pr_auc": 0.9947053670158975,
+    "precision_by_class": {
+      "0": 0.7916666666666666,
+      "1": 0.9912280701754386
+    },
+    "recall_by_class": {
+      "0": 0.9661016949152542,
+      "1": 0.9377593360995851
+    },
+    "roc_auc": 0.976552500175821,
+    "sensitivity": 0.9377593360995851,
+    "specificity": 0.9661016949152542,
+    "weighted_f1": 0.9453596792482516
+  },
+  "winning_config_id": "rf_022"
+}

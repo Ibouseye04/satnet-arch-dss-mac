@@ -1,0 +1,286 @@
+{
+  "RF": {
+    "123": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "RF",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 0.99875,
+      "positive_class_score_probability_mean": 0.9858776216398991,
+      "positive_class_score_probability_median": 0.9914608585858588,
+      "positive_class_score_probability_min": 0.9457544633808669,
+      "positive_class_score_probability_standard_deviation": 0.014471520302168767,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 123,
+      "specificity": null,
+      "task": "rf_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "2026": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "RF",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9850777763004567,
+      "positive_class_score_probability_median": 0.9939343281321011,
+      "positive_class_score_probability_min": 0.9301128152837697,
+      "positive_class_score_probability_standard_deviation": 0.017391234570538264,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 2026,
+      "specificity": null,
+      "task": "rf_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "42": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "RF",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9837957458484726,
+      "positive_class_score_probability_median": 0.9913717288717288,
+      "positive_class_score_probability_min": 0.9220437664731783,
+      "positive_class_score_probability_standard_deviation": 0.01792276599850989,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 42,
+      "specificity": null,
+      "task": "rf_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "456": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "RF",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9873668183771512,
+      "positive_class_score_probability_median": 0.9912988363927475,
+      "positive_class_score_probability_min": 0.9395732535424743,
+      "positive_class_score_probability_standard_deviation": 0.01317824773135014,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 456,
+      "specificity": null,
+      "task": "rf_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "789": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "RF",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 0.9985714285714286,
+      "positive_class_score_probability_mean": 0.9836233602844053,
+      "positive_class_score_probability_median": 0.989263151973378,
+      "positive_class_score_probability_min": 0.9403843138543514,
+      "positive_class_score_probability_standard_deviation": 0.015112666500106165,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 789,
+      "specificity": null,
+      "task": "rf_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    }
+  },
+  "TGNN": {
+    "123": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "TGNN",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.999961217045784,
+      "positive_class_score_probability_median": 0.9999997615814209,
+      "positive_class_score_probability_min": 0.996392548084259,
+      "positive_class_score_probability_standard_deviation": 0.00023469656743504486,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 123,
+      "specificity": null,
+      "task": "tgnn_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "2026": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "TGNN",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9999089409907659,
+      "positive_class_score_probability_median": 0.9999998807907104,
+      "positive_class_score_probability_min": 0.9752097725868225,
+      "positive_class_score_probability_standard_deviation": 0.0014287906920034876,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 2026,
+      "specificity": null,
+      "task": "tgnn_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "42": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "TGNN",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9992475694417954,
+      "positive_class_score_probability_median": 0.9999983906745911,
+      "positive_class_score_probability_min": 0.840756356716156,
+      "positive_class_score_probability_standard_deviation": 0.009220463629614182,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 42,
+      "specificity": null,
+      "task": "tgnn_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "456": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "TGNN",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9999936054150264,
+      "positive_class_score_probability_median": 1.0,
+      "positive_class_score_probability_min": 0.9992892742156982,
+      "positive_class_score_probability_standard_deviation": 4.909200735187928e-05,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 456,
+      "specificity": null,
+      "task": "tgnn_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    },
+    "789": {
+      "accuracy": 1.0,
+      "balanced_accuracy_two_class": null,
+      "descriptive_only": true,
+      "false_negative_count": 0,
+      "false_negative_rate": 0.0,
+      "model_family": "TGNN",
+      "negative_class_precision_recall_f1": null,
+      "observed_class_confusion_accounting": [
+        [
+          300
+        ]
+      ],
+      "positive_class_recall_sensitivity": 1.0,
+      "positive_class_score_probability_max": 1.0,
+      "positive_class_score_probability_mean": 0.9999812752008438,
+      "positive_class_score_probability_median": 1.0,
+      "positive_class_score_probability_min": 0.9975989460945129,
+      "positive_class_score_probability_standard_deviation": 0.00014860695325955025,
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300,
+      "roc_auc": null,
+      "seed": 789,
+      "specificity": null,
+      "task": "tgnn_space_classification",
+      "true_positive_count": 300,
+      "two_class_confusion_matrix_interpretation": "NOT MEANINGFUL: frozen external classification data contain one observed class only"
+    }
+  }
+}

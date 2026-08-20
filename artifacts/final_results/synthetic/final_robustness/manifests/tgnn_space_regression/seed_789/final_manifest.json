@@ -1,0 +1,73 @@
+{
+  "checkpoint_path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_789\\best_validation_checkpoint.pt",
+  "checkpoint_sha256": "e231b66d8f4f4ef120a64e5a326a83611b02c5c8a1c2c91547186a57d0250fb3",
+  "code_sha": "e55dba59e83864d2dd11fa47482bd4ec2bdd797a",
+  "completed_at": "2026-08-20T06:32:12.475893+00:00",
+  "configuration": {
+    "batch_size": 1,
+    "cheb_k": 2,
+    "classification_loss": "CrossEntropyLoss",
+    "dropout": null,
+    "hidden_dim": 64,
+    "learning_rate": 0.001,
+    "max_epochs": 100,
+    "num_layers": 1,
+    "optimizer": "Adam",
+    "regression_loss": "SmoothL1Loss",
+    "weight_decay": 0.0
+  },
+  "dataset_bundle_hash": "38dacd66432bfa660410ff9cab7f181a53151120e8102dc40df57016f78bbfc3",
+  "early_stopping": {
+    "direction": "minimize",
+    "min_delta": 0.0,
+    "monitor": "mae",
+    "patience": 10,
+    "restore_best": true,
+    "stopped_early": true
+  },
+  "environment_versions": {
+    "device": "cpu",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "python": "3.11.9",
+    "scikit_learn": "1.9.0",
+    "torch": "2.5.1+cpu",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal_distribution": "0.56.2",
+    "torch_geometric_temporal_imported": "0.54.0"
+  },
+  "epochs_run": 30,
+  "fit_runtime_seconds": 7538.071560600016,
+  "max_epochs": 100,
+  "model_family": "TGNN",
+  "model_selection_metric": {
+    "name": "mae",
+    "value": 0.031054709150914163
+  },
+  "production_sha": "d0515088cf3fca06a6aa2d47059269089dcb10a7",
+  "schema_version": "satnet.final_robustness_manifest.v1",
+  "seed": 789,
+  "selected_epoch": 30,
+  "selection_sha256": "c85dfdcd3b6a62d741675ac522fda76bd3de7dd4c311a82bc1b12e079dab2bfb",
+  "status": "completed",
+  "task": "tgnn_space_regression",
+  "test_accessed": false,
+  "train_count": 7000,
+  "training_plan_hash": "e14ec5e5b2221aa2c9aa187a2baacc517e676f9dc748612c206eb1dc43788a0a",
+  "validation_count": 1500,
+  "validation_metrics": {
+    "mae": 0.031054709150914163,
+    "maximum_absolute_error": 0.4607091496388117,
+    "median_absolute_error": 0.01745224585135776,
+    "prediction_mean": 0.31865460945665836,
+    "prediction_standard_deviation": 0.32500593867417277,
+    "predictions_above_one": 0,
+    "predictions_below_zero": 0,
+    "r2": 0.9752885770732981,
+    "rmse": 0.05180247525139699,
+    "target_mean": 0.32063026455026455,
+    "target_median": 0.1388888888888889,
+    "target_standard_deviation": 0.32953506618479295
+  },
+  "winning_config_id": "tgnn_010"
+}

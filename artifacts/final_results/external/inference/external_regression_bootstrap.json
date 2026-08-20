@@ -1,0 +1,15 @@
+{
+  "bootstrap_mean_delta": 0.06462429794351755,
+  "bootstrap_sd": 0.004447060475846749,
+  "bootstrap_seed": 20260820,
+  "confidence_interval": "95% percentile",
+  "observed_delta_mae_rf_minus_tgnn": 0.06449563017740914,
+  "observed_rf_mae": 0.1273978715832696,
+  "observed_tgnn_mae": 0.06290224140586045,
+  "paired": true,
+  "percentile_2_5": 0.05592972863883819,
+  "percentile_97_5": 0.0734203385275529,
+  "replicates": 2000,
+  "sampling_unit": "episode_id",
+  "valid_replicates": 2000
+}

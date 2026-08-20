@@ -1,0 +1,74 @@
+{
+  "classification_descriptive": {
+    "RF": {
+      "false_negative_rate_per_seed": {
+        "42": 0.0,
+        "123": 0.0,
+        "456": 0.0,
+        "789": 0.0,
+        "2026": 0.0
+      },
+      "max_sensitivity": 1.0,
+      "mean_sensitivity": 1.0,
+      "min_sensitivity": 1.0,
+      "sensitivity_per_seed": {
+        "42": 1.0,
+        "123": 1.0,
+        "456": 1.0,
+        "789": 1.0,
+        "2026": 1.0
+      },
+      "standard_deviation_sensitivity": 0.0
+    },
+    "TGNN": {
+      "false_negative_rate_per_seed": {
+        "42": 0.0,
+        "123": 0.0,
+        "456": 0.0,
+        "789": 0.0,
+        "2026": 0.0
+      },
+      "max_sensitivity": 1.0,
+      "mean_sensitivity": 1.0,
+      "min_sensitivity": 1.0,
+      "sensitivity_per_seed": {
+        "42": 1.0,
+        "123": 1.0,
+        "456": 1.0,
+        "789": 1.0,
+        "2026": 1.0
+      },
+      "standard_deviation_sensitivity": 0.0
+    }
+  },
+  "regression": {
+    "RF": {
+      "mae_per_seed": {
+        "42": 0.1273978715832696,
+        "123": 0.12765187652567322,
+        "456": 0.12744006491892657,
+        "789": 0.1273781063462055,
+        "2026": 0.12745201391140437
+      },
+      "max_mae": 0.12765187652567322,
+      "mean_mae": 0.12746398665709585,
+      "min_mae": 0.1273781063462055,
+      "population_standard_deviation_mae": 9.773927531563766e-05,
+      "seed_42_mae": 0.1273978715832696
+    },
+    "TGNN": {
+      "mae_per_seed": {
+        "42": 0.06290224140586045,
+        "123": 0.0627940192249717,
+        "456": 0.06345601852596121,
+        "789": 0.05722958686430618,
+        "2026": 0.06799850607345659
+      },
+      "max_mae": 0.06799850607345659,
+      "mean_mae": 0.06287607441891123,
+      "min_mae": 0.05722958686430618,
+      "population_standard_deviation_mae": 0.0034195286427564386,
+      "seed_42_mae": 0.06290224140586045
+    }
+  }
+}
