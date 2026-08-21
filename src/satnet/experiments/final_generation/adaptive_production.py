@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 from typing import Any, Iterable, Sequence
 
-from satnet.ground.canonical import canonical_hash, canonical_json
+from satnet.ground.canonical import canonical_float_string, canonical_hash, canonical_json
 from satnet.network.hypatia_adapter import HypatiaAdapter
 
 from .adaptive_contract import load_adaptive_contract, map_adaptive_contract_runs
@@ -232,6 +232,16 @@ def _collect_fixed_occurrences(value: Any, path: str, output: list[dict[str, str
             _collect_fixed_occurrences(item, path, output)
 
 
+def _canonicalize_trace(value: Any) -> Any:
+    if isinstance(value, float):
+        return canonical_float_string(value)
+    if isinstance(value, list):
+        return [_canonicalize_trace(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _canonicalize_trace(item) for key, item in value.items()}
+    return value
+
+
 def _behavioral_traces(mappings: Sequence[Any], root: Path) -> dict[str, Any]:
     by_design: dict[str, list[Any]] = {}
     for mapping in mappings:
@@ -283,6 +293,7 @@ def _behavioral_traces(mappings: Sequence[Any], root: Path) -> dict[str, Any]:
                 }
         if selected_trace is None:
             raise ValueError(f"No selected non-zero adaptive offset trace for {design_id}")
+        selected_trace = _canonicalize_trace(selected_trace)
         atomic_write_json(
             root / "behavioral_traces" / f"{design_id}.json",
             selected_trace,
