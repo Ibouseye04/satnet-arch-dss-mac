@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -70,7 +72,9 @@ jobs:
           --ignore=tests/test_tier1_guardrails.py
           --ignore=tests/tools/test_validate_proxy_rankings.py
           --ignore=tests/utils/test_graph_cache.py
+          --ignore=tests/utils/test_split_manifest.py
           --ignore=tests/validation/test_v04_tgnn_reconstruction.py
+          --ignore=tests/validation/test_v05_graph_cache_identity.py
           --ignore=tests/validation/test_v06_stale_experiment_reuse.py
 
   dss-tests:
@@ -128,7 +132,9 @@ jobs:
           tests/test_tier1_guardrails.py
           tests/tools/test_validate_proxy_rankings.py
           tests/utils/test_graph_cache.py
+          tests/utils/test_split_manifest.py
           tests/validation/test_v04_tgnn_reconstruction.py
+          tests/validation/test_v05_graph_cache_identity.py
           tests/validation/test_v06_stale_experiment_reuse.py
 
   frontend:
