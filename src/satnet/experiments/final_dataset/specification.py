@@ -41,6 +41,11 @@ from satnet.ground.service_policy import (
     GROUND_SERVICE_POLICY_VERSION,
     GroundServicePolicy,
 )
+from satnet.experiments.production_profile import (
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+    HISTORICAL_FIXED_PROFILE,
+    ProductionTopologyProfile,
+)
 from satnet.ground.visibility import GroundVisibilityPolicy
 from satnet.ground.visibility_persistence import GROUND_VISIBILITY_SCHEMA_VERSION
 from satnet.network.hypatia_adapter import LinkBudgetEngine, PHYSICS_MODEL_VERSION
@@ -170,7 +175,21 @@ def build_later_generation_acceptance_gates() -> dict[str, Any]:
     }
 
 
-def build_contract_specification() -> dict[str, Any]:
+def build_contract_specification(
+    *,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
+    pilot_design_manifest_hash_value: str = PILOT_DESIGN_MANIFEST_HASH,
+) -> dict[str, Any]:
+    profile.validate()
+    if profile is not HISTORICAL_FIXED_PROFILE and pilot_design_manifest_hash_value == PILOT_DESIGN_MANIFEST_HASH:
+        from satnet.experiments.integrated_ground_manifest import (
+            build_adaptive_pilot_designs,
+            pilot_design_manifest_hash,
+        )
+
+        pilot_design_manifest_hash_value = pilot_design_manifest_hash(
+            build_adaptive_pilot_designs()
+        )
     target_schema = build_target_schema()
     rf_schema = build_rf_schema()
     tgnn_schema = build_tgnn_schema()
@@ -190,7 +209,7 @@ def build_contract_specification() -> dict[str, Any]:
         "validated_foundation": {
             "pilot_report_sha": PILOT_REPORT_SHA,
             "protected_science_base_sha": PROTECTED_SCIENCE_BASE_SHA,
-            "pilot_design_manifest_hash": PILOT_DESIGN_MANIFEST_HASH,
+            "pilot_design_manifest_hash": pilot_design_manifest_hash_value,
             "catalog_hash": CATALOG_HASH,
         },
         "seeds": {
@@ -370,17 +389,17 @@ def build_contract_specification() -> dict[str, Any]:
             "pairing": "independently_permuted_records_paired_by_position",
         },
         "fixed_profile": {
-            "duration_minutes": 10,
-            "step_seconds": 60,
-            "inclusive_timestep_count": 11,
-            "phasing_factor": 1,
-            "max_isl_distance_km": _c(10000.0),
-            "isl_policy": "grid_fixed",
-            "adjacent_search_k": 1,
-            "max_inter_plane_links_per_sat": 1,
-            "orbital_engine": "sgp4",
-            "epoch_iso": DEFAULT_EPOCH_ISO,
-            "failure_model": DEFAULT_FAILURE_MODEL,
+            "duration_minutes": profile.duration_minutes,
+            "step_seconds": profile.step_seconds,
+            "inclusive_timestep_count": profile.inclusive_timestep_count,
+            "phasing_factor": profile.phasing_factor,
+            "max_isl_distance_km": _c(profile.max_isl_distance_km),
+            "isl_policy": profile.isl_policy,
+            "adjacent_search_k": profile.adjacent_search_k,
+            "max_inter_plane_links_per_sat": profile.max_inter_plane_links_per_sat,
+            "orbital_engine": profile.orbital_engine,
+            "epoch_iso": profile.epoch_iso,
+            "failure_model": profile.failure_model,
             "minimum_elevation_deg": _c(10.0),
             "space_gcc_threshold": _c(0.8),
             "ground_service_threshold": _c(0.8),
@@ -508,9 +527,37 @@ def build_contract_specification() -> dict[str, Any]:
         },
         "later_generation_acceptance_gates": build_later_generation_acceptance_gates(),
     }
+    if profile is not HISTORICAL_FIXED_PROFILE:
+        payload["production_profile"] = profile.profile_id
     result = deepcopy(payload)
     result["contract_spec_hash"] = canonical_hash(payload)
     return result
+
+
+def build_adaptive_contract_specification() -> dict[str, Any]:
+    """Build the corrected, non-historical adaptive contract identity."""
+
+    from satnet.experiments.integrated_ground_manifest import (
+        build_adaptive_pilot_designs,
+        pilot_design_manifest_hash,
+    )
+
+    adaptive_pilot_hash = pilot_design_manifest_hash(build_adaptive_pilot_designs())
+    specification = build_contract_specification(
+        profile=FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+        pilot_design_manifest_hash_value=adaptive_pilot_hash,
+    )
+    validate_adaptive_contract_specification(specification)
+    return specification
+
+
+def validate_adaptive_contract_specification(specification: dict[str, Any]) -> None:
+    validate_contract_specification(specification)
+    if specification.get("production_profile") != FINAL_ADAPTIVE_PRODUCTION_PROFILE.profile_id:
+        raise ValueError("Specification is not the final adaptive production lineage")
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE.assert_matches(specification["fixed_profile"])
+    if specification["contract_spec_hash"] == build_contract_specification()["contract_spec_hash"]:
+        raise ValueError("Adaptive specification reuses the historical fixed-policy hash")
 
 
 def validate_contract_specification(specification: dict[str, Any]) -> None:
@@ -526,6 +573,33 @@ def validate_contract_specification(specification: dict[str, Any]) -> None:
         "later_generation_acceptance_gates"
     ) != build_later_generation_acceptance_gates():
         raise ValueError("Later-generation acceptance gates differ from the frozen contract")
+
+
+def materialize_adaptive_machine_specification(
+    output_root: str | Path, *, overwrite: bool = False
+) -> dict[str, str]:
+    """Materialize only the corrected adaptive machine contract preflight."""
+
+    root = Path(output_root)
+    schemas = {
+        "target_schema.json": build_target_schema(),
+        "integrated_rf_export_schema.json": build_rf_schema(),
+        "integrated_tgnn_adapter_schema.json": build_tgnn_schema(),
+    }
+    specification = build_adaptive_contract_specification()
+    values = {**schemas, "contract_specification.json": specification}
+    root.mkdir(parents=True, exist_ok=True)
+    for filename, value in values.items():
+        path = root / filename
+        if path.exists() and not overwrite:
+            raise FileExistsError(f"Contract artifact already exists: {path}")
+        path.write_text(canonical_json(value) + "\n", encoding="utf-8", newline="\n")
+    return {
+        "contract_spec_hash": specification["contract_spec_hash"],
+        "target_schema_hash": schemas["target_schema.json"]["target_schema_hash"],
+        "rf_schema_hash": schemas["integrated_rf_export_schema.json"]["rf_schema_hash"],
+        "tgnn_adapter_schema_hash": schemas["integrated_tgnn_adapter_schema.json"]["tgnn_adapter_schema_hash"],
+    }
 
 
 def materialize_machine_specification(output_root: str | Path, *, overwrite: bool = False) -> dict[str, str]:

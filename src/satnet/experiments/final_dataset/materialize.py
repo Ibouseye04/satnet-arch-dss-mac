@@ -28,9 +28,12 @@ from satnet.experiments.final_dataset.deterministic import (
 )
 from satnet.experiments.final_dataset.specification import (
     CATALOG_HASH,
-    PILOT_DESIGN_MANIFEST_HASH,
     build_contract_specification,
     validate_contract_specification,
+)
+from satnet.experiments.production_profile import (
+    HISTORICAL_FIXED_PROFILE,
+    ProductionTopologyProfile,
 )
 from satnet.experiments.final_dataset.split import (
     build_split_manifest,
@@ -38,7 +41,10 @@ from satnet.experiments.final_dataset.split import (
     select_frozen_split,
     validate_split_manifest,
 )
-from satnet.experiments.integrated_ground_manifest import read_pilot_design_manifest
+from satnet.experiments.integrated_ground_manifest import (
+    pilot_design_manifest_hash,
+    read_pilot_design_manifest,
+)
 from satnet.ground.canonical import canonical_hash, canonical_json
 
 BUNDLE_IDENTITY_DOMAIN = "satnet_final_integrated_dataset_contract_bundle"
@@ -263,9 +269,14 @@ def materialize_final_contract_manifests(
     pilot_design_manifest: str | Path,
     catalog_path: str | Path,
     overwrite: bool = False,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
 ) -> dict[str, str]:
     root = Path(output_root)
-    specification = build_contract_specification()
+    pilot_designs = read_pilot_design_manifest(pilot_design_manifest)
+    specification = build_contract_specification(
+        profile=profile,
+        pilot_design_manifest_hash_value=pilot_design_manifest_hash(pilot_designs),
+    )
     validate_contract_specification(specification)
     persisted_specification = read_json(root / "contract_specification.json")
     if persisted_specification != specification:
@@ -273,6 +284,7 @@ def materialize_final_contract_manifests(
     designs = build_design_records(
         pilot_design_manifest=pilot_design_manifest,
         catalog_path=catalog_path,
+        profile=profile,
     )
     pilot_designs = read_pilot_design_manifest(pilot_design_manifest)
     validate_design_records(designs, pilot_designs=pilot_designs)
@@ -315,7 +327,7 @@ def materialize_final_contract_manifests(
         "tgnn_adapter_schema_hash": schema_hashes["tgnn_adapter_schema_hash"],
         "catalog_hash": CATALOG_HASH,
         "pilot_catalog_file_sha256": _file_sha256(Path(catalog_path)),
-        "pilot_design_manifest_hash": PILOT_DESIGN_MANIFEST_HASH,
+        "pilot_design_manifest_hash": pilot_design_manifest_hash(pilot_designs),
         "design_manifest_hash": design_hash,
         "run_manifest_hash": run_hash,
         "split_manifest_hash": split["split_manifest_hash"],
@@ -348,19 +360,31 @@ def materialize_final_contract_manifests(
     }
 
 
-def validate_materialized_contract(output_root: str | Path) -> dict[str, str]:
+def validate_materialized_contract(
+    output_root: str | Path,
+    *,
+    pilot_design_manifest: str | Path | None = None,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
+) -> dict[str, str]:
     root = Path(output_root)
     specification = read_json(root / "contract_specification.json")
     validate_contract_specification(specification)
+    if profile is not HISTORICAL_FIXED_PROFILE:
+        profile.assert_matches(specification["fixed_profile"])
+        if specification.get("production_profile") != profile.profile_id:
+            raise ValueError("Materialized contract production profile mismatch")
     designs = read_jsonl(root / "designs.jsonl")
     runs = read_jsonl(root / "runs.jsonl")
-    pilot_designs = read_pilot_design_manifest(
-        Path(__file__).parents[4]
+    manifest_path = (
+        Path(pilot_design_manifest)
+        if pilot_design_manifest is not None
+        else Path(__file__).parents[4]
         / "artifacts"
         / "integrated_ground_pilot_25"
         / "inputs"
         / "pilot_designs.json"
     )
+    pilot_designs = read_pilot_design_manifest(manifest_path)
     validate_design_records(designs, pilot_designs=pilot_designs)
     validate_run_records(runs, designs=designs)
     design_hash = design_manifest_hash(designs)

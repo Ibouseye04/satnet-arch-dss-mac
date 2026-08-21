@@ -20,6 +20,10 @@ from satnet.experiments.final_dataset.specification import (
     PILOT_DESIGN_MANIFEST_HASH,
     build_contract_specification,
 )
+from satnet.experiments.production_profile import (
+    HISTORICAL_FIXED_PROFILE,
+    ProductionTopologyProfile,
+)
 from satnet.experiments.integrated_ground_manifest import (
     IntegratedPilotDesign,
     pilot_design_manifest_hash,
@@ -137,8 +141,13 @@ def _base_design_record(
     composition_weights: tuple[int, int, int] | None,
     lhs_candidate_id: int | None,
     pilot: IntegratedPilotDesign | None = None,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
+    pilot_design_manifest_hash_value: str = PILOT_DESIGN_MANIFEST_HASH,
 ) -> dict[str, Any]:
-    specification = build_contract_specification()
+    specification = build_contract_specification(
+        profile=profile,
+        pilot_design_manifest_hash_value=pilot_design_manifest_hash_value,
+    )
     fixed = specification["fixed_profile"]
     design_id = f"D{design_index:0{DESIGN_ID_WIDTH}d}"
     if pilot is None:
@@ -212,7 +221,11 @@ def _base_design_record(
 
 
 def _anchor_records(
-    *, pilot_designs: tuple[IntegratedPilotDesign, ...], catalog: GroundStationCatalog
+    *,
+    pilot_designs: tuple[IntegratedPilotDesign, ...],
+    catalog: GroundStationCatalog,
+    profile: ProductionTopologyProfile,
+    pilot_design_manifest_hash_value: str,
 ) -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     for design_index, pilot in enumerate(pilot_designs):
@@ -234,12 +247,19 @@ def _anchor_records(
                 composition_weights=None,
                 lhs_candidate_id=None,
                 pilot=pilot,
+                profile=profile,
+                pilot_design_manifest_hash_value=pilot_design_manifest_hash_value,
             )
         )
     return result
 
 
-def _transition_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]]:
+def _transition_records(
+    *,
+    catalog: GroundStationCatalog,
+    profile: ProductionTopologyProfile,
+    pilot_design_manifest_hash_value: str,
+) -> list[dict[str, Any]]:
     ranges = {
         "altitude_km": (600.0, 800.0),
         "inclination_deg": (55.0, 60.0),
@@ -308,6 +328,8 @@ def _transition_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]
                 catalog=catalog,
                 composition_weights=weights,
                 lhs_candidate_id=evidence["candidate_id"],
+                profile=profile,
+                pilot_design_manifest_hash_value=pilot_design_manifest_hash_value,
             )
         )
     return result
@@ -335,7 +357,12 @@ def _global_ground_schedule() -> list[tuple[int, tuple[int, int, int], tuple[int
     return result
 
 
-def _global_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]]:
+def _global_records(
+    *,
+    catalog: GroundStationCatalog,
+    profile: ProductionTopologyProfile,
+    pilot_design_manifest_hash_value: str,
+) -> list[dict[str, Any]]:
     ranges = {
         "altitude_km": (300.0, 1200.0),
         "inclination_deg": (30.0, 98.0),
@@ -388,24 +415,49 @@ def _global_records(*, catalog: GroundStationCatalog) -> list[dict[str, Any]]:
                 catalog=catalog,
                 composition_weights=weights,
                 lhs_candidate_id=evidence["candidate_id"],
+                profile=profile,
+                pilot_design_manifest_hash_value=pilot_design_manifest_hash_value,
             )
         )
     return result
 
 
 def build_design_records(
-    *, pilot_design_manifest: str | Path, catalog_path: str | Path
+    *,
+    pilot_design_manifest: str | Path,
+    catalog_path: str | Path,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
 ) -> tuple[dict[str, Any], ...]:
+    profile.validate()
     pilot_designs = read_pilot_design_manifest(pilot_design_manifest)
-    if pilot_design_manifest_hash(pilot_designs) != PILOT_DESIGN_MANIFEST_HASH:
+    actual_pilot_hash = pilot_design_manifest_hash(pilot_designs)
+    if profile is HISTORICAL_FIXED_PROFILE and actual_pilot_hash != PILOT_DESIGN_MANIFEST_HASH:
         raise ValueError("Pilot design manifest identity does not match the contract")
+    if profile is not HISTORICAL_FIXED_PROFILE:
+        for pilot in pilot_designs:
+            profile.assert_matches(pilot.identity_payload())
+            if pilot.satellite_failure_model != profile.failure_model:
+                raise ValueError("Adaptive pilot manifest uses the wrong failure model")
     catalog = load_ground_station_catalog(catalog_path)
     if catalog.catalog_hash != CATALOG_HASH:
         raise ValueError("Pilot catalog semantic identity does not match the contract")
     records = (
-        _anchor_records(pilot_designs=pilot_designs, catalog=catalog)
-        + _transition_records(catalog=catalog)
-        + _global_records(catalog=catalog)
+        _anchor_records(
+            pilot_designs=pilot_designs,
+            catalog=catalog,
+            profile=profile,
+            pilot_design_manifest_hash_value=actual_pilot_hash,
+        )
+        + _transition_records(
+            catalog=catalog,
+            profile=profile,
+            pilot_design_manifest_hash_value=actual_pilot_hash,
+        )
+        + _global_records(
+            catalog=catalog,
+            profile=profile,
+            pilot_design_manifest_hash_value=actual_pilot_hash,
+        )
     )
     validate_design_records(records, pilot_designs=pilot_designs)
     return tuple(records)

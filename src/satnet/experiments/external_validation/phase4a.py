@@ -40,6 +40,7 @@ except ImportError as exc:
 
 from sgp4.api import Satrec, WGS72
 
+from satnet.experiments.production_profile import FINAL_ADAPTIVE_PRODUCTION_PROFILE
 from satnet.metrics.labels import compute_gcc_size, compute_num_components
 from satnet.network.hypatia_adapter import (
     ATMOSPHERE_BUFFER_KM,
@@ -128,6 +129,12 @@ class Phase4AConfig:
             raise ValueError("Phase 4A requires exactly 300 episodes")
         if self.start.tzinfo is None or self.end.tzinfo is None:
             raise ValueError("Phase 4A boundaries must be timezone-aware")
+        if self.duration_minutes != FINAL_ADAPTIVE_PRODUCTION_PROFILE.duration_minutes:
+            raise ValueError("Phase 4A must use the adaptive production duration")
+        if self.step_seconds != FINAL_ADAPTIVE_PRODUCTION_PROFILE.step_seconds:
+            raise ValueError("Phase 4A must use the adaptive production timestep")
+        if self.max_isl_distance_km != FINAL_ADAPTIVE_PRODUCTION_PROFILE.max_isl_distance_km:
+            raise ValueError("Phase 4A must use the adaptive production ISL range")
         if self.duration_minutes * 60 // self.step_seconds + 1 != NUM_TIMESTEPS:
             raise ValueError("Phase 4A requires 11 inclusive timesteps")
         if self.lookback_days <= 0 or self.max_tle_age_hours <= 0:
@@ -423,9 +430,9 @@ def _build_graph(
             [position for position in accepted_positions if position is not None],
             LinkBudgetEngine(),
             max_isl_distance_km=config.max_isl_distance_km,
-            isl_policy="grid_fixed",
-            adjacent_search_k=1,
-            max_inter_plane_links_per_sat=1,
+            isl_policy=FINAL_ADAPTIVE_PRODUCTION_PROFILE.isl_policy,
+            adjacent_search_k=FINAL_ADAPTIVE_PRODUCTION_PROFILE.adjacent_search_k,
+            max_inter_plane_links_per_sat=FINAL_ADAPTIVE_PRODUCTION_PROFILE.max_inter_plane_links_per_sat,
         )
         for link in links:
             graph.add_edge(
@@ -677,7 +684,7 @@ def _contract(config: Phase4AConfig, source_manifest: Mapping[str, Any]) -> dict
         "status_categories_observed": ["anomalous", "decayed", "deorbiting", "operational", "raising", "unknown"],
         "isl_capability_rule": "is_isl_capable=true is required for candidate selection; this is a public heuristic, while status operational remains the service-available mapping",
         "missing_data": {"tle_max_age_hours": config.max_tle_age_hours, "future_tle": "prohibited", "missing_or_stale_state": "node unavailable; no future substitution", "rejected_episode": "if fewer than requested structurally valid operational/ISL-capable planes are available"},
-        "physics": {"orbital_engine": "SGP4/WGS72 from source2 elements", "teme_to_ecef": "existing SATNET GMST transform", "earth_radius_km": EARTH_RADIUS_KM, "atmosphere_buffer_km": ATMOSPHERE_BUFFER_KM, "max_isl_distance_km": config.max_isl_distance_km, "isl_policy": "grid_fixed", "adjacent_search_k": 1, "max_inter_plane_links_per_sat": 1, "link_budget": "existing LinkBudgetEngine defaults; optical preferred, RF fallback"},
+        "physics": {"orbital_engine": "SGP4/WGS72 from source2 elements", "teme_to_ecef": "existing SATNET GMST transform", "earth_radius_km": EARTH_RADIUS_KM, "atmosphere_buffer_km": ATMOSPHERE_BUFFER_KM, "max_isl_distance_km": config.max_isl_distance_km, "isl_policy": FINAL_ADAPTIVE_PRODUCTION_PROFILE.isl_policy, "adjacent_search_k": FINAL_ADAPTIVE_PRODUCTION_PROFILE.adjacent_search_k, "max_inter_plane_links_per_sat": FINAL_ADAPTIVE_PRODUCTION_PROFILE.max_inter_plane_links_per_sat, "link_budget": "existing LinkBudgetEngine defaults; optical preferred, RF fallback"},
         "rf_features": {"order": EXTERNAL_RF_FEATURE_ORDER, "altitude_rule": "mean SGP4-derived ECEF radius minus Earth radius for nominal selected nodes at episode start", "inclination_rule": "arithmetic mean of latest valid source2 inclination values for nominal selected nodes", "node_failure_probability": "30-day strict-pre-start source1 shell-2 ISL-capable snapshot unavailable fraction; numerator non-operational status rows, denominator all qualifying status rows", "edge_failure_probability": "30-day strict-pre-start daily states; numerator frozen candidate link rejected by distance/LOS/budget, denominator candidate evaluations with both endpoint TLEs <=24h old"},
         "tgnn_features": {"node_order": EXTERNAL_TGNN_NODE_FEATURE_ORDER, "edge_order": EXTERNAL_TGNN_EDGE_FEATURE_ORDER, "node_scaling": "plane/(num_planes-1), sat/(sats_per_plane-1), exists in {0,1}", "edge_scaling": "distance/10000, margin/100, type_code/2 with intra=0 inter=1 seam=2, optical=1 otherwise=0"},
         "targets": {"regression": "space_gcc_fraction_original_min = min_t |GCC_t| / nominal_subgraph_size", "classification": "space_threshold_breach_any = any_t(space GCC original fraction < 0.8)", "threshold": config.gcc_threshold, "denominator": "nominal selected satellite count; unavailable nodes remain in denominator"},
@@ -694,7 +701,7 @@ def _provenance() -> list[dict[str, str]]:
         ("plane_idx", "real RAAN structure", "DERIVED_FROM_REAL", "circular RAAN clustering", "index", "1-degree gap; deterministic sort"),
         ("status_available", "starlink-fleet-data status", "DERIVED_FROM_REAL", "status mapping", "boolean", "operational true; all other observed categories false"),
         ("is_isl_capable", "starlink-fleet-data", "PUBLIC_HEURISTIC", "candidate eligibility filter", "boolean", "true required for selected shell candidates"),
-        ("link_viability", "real SGP4 positions", "FROZEN_SATNET_DERIVATION", "grid_fixed candidate, distance, LOS, link budget", "boolean", "existing SATNET max-range/LOS/budget rules"),
+        ("link_viability", "real SGP4 positions", "FROZEN_SATNET_DERIVATION", "grid_adaptive candidate search, distance, LOS, link budget", "boolean", "existing SATNET max-range/LOS/budget rules"),
         ("distance_km", "real SGP4 positions", "DERIVED_FROM_REAL", "ECEF Euclidean distance", "km", "existing SATNET distance function"),
         ("margin_db", "real SGP4 positions", "FROZEN_SATNET_DERIVATION", "existing LinkBudgetEngine", "dB", "optical preferred; RF fallback"),
         ("num_planes", "frozen episode schedule", "FROZEN_SATNET_DERIVATION", "deterministic 12-cell cycle", "count", "4, 5, 6 only"),

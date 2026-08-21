@@ -21,6 +21,11 @@ from satnet.ground.catalog import (
 )
 from satnet.ground.failure_policy import GroundFailurePolicy
 from satnet.ground.service_policy import GroundServicePolicy
+from satnet.experiments.production_profile import (
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+    HISTORICAL_FIXED_PROFILE,
+    ProductionTopologyProfile,
+)
 from satnet.ground.visibility import GroundVisibilityPolicy
 from satnet.simulation.tier1_rollout import (
     DEFAULT_EPOCH_ISO,
@@ -80,9 +85,9 @@ class IntegratedPilotDesign:
     step_seconds: int = PILOT_STEP_SECONDS
     phasing_factor: int = 1
     max_isl_distance_km: float = 10000.0
-    isl_policy: str = "grid_fixed"
-    adjacent_search_k: int = 1
-    max_inter_plane_links_per_sat: int = 1
+    isl_policy: str = HISTORICAL_FIXED_PROFILE.isl_policy
+    adjacent_search_k: int = HISTORICAL_FIXED_PROFILE.adjacent_search_k
+    max_inter_plane_links_per_sat: int = HISTORICAL_FIXED_PROFILE.max_inter_plane_links_per_sat
     epoch_iso: str = DEFAULT_EPOCH_ISO
     orbital_engine: str = "sgp4"
     satellite_failure_model: str = DEFAULT_FAILURE_MODEL
@@ -368,7 +373,10 @@ def derive_pilot_seed(
     return int.from_bytes(digest, byteorder="big", signed=False) % PILOT_SEED_MODULUS
 
 
-def build_pilot_designs() -> tuple[IntegratedPilotDesign, ...]:
+def build_pilot_designs(
+    *, profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE
+) -> tuple[IntegratedPilotDesign, ...]:
+    profile.validate()
     values = (
         (
             "P01",
@@ -461,9 +469,25 @@ def build_pilot_designs() -> tuple[IntegratedPilotDesign, ...]:
             government_count=value[10],
             military_count=value[11],
             ground_failure_probability=value[12],
+            duration_minutes=profile.duration_minutes,
+            step_seconds=profile.step_seconds,
+            phasing_factor=profile.phasing_factor,
+            max_isl_distance_km=profile.max_isl_distance_km,
+            isl_policy=profile.isl_policy,
+            adjacent_search_k=profile.adjacent_search_k,
+            max_inter_plane_links_per_sat=profile.max_inter_plane_links_per_sat,
+            epoch_iso=profile.epoch_iso,
+            orbital_engine=profile.orbital_engine,
+            satellite_failure_model=profile.failure_model,
         )
         for value in values
     )
+
+
+def build_adaptive_pilot_designs() -> tuple[IntegratedPilotDesign, ...]:
+    """Build the five known architecture anchors under the adaptive lineage."""
+
+    return build_pilot_designs(profile=FINAL_ADAPTIVE_PRODUCTION_PROFILE)
 
 
 def build_pilot_runs(
@@ -867,11 +891,12 @@ def materialize_pilot_inputs(
     output_root: str | Path,
     *,
     overwrite: bool = False,
+    profile: ProductionTopologyProfile = HISTORICAL_FIXED_PROFILE,
 ) -> dict[str, object]:
     root = Path(output_root)
     input_root = root / "inputs"
     catalog = build_synthetic_pilot_catalog()
-    designs = build_pilot_designs()
+    designs = build_pilot_designs(profile=profile)
     runs = build_pilot_runs(designs)
     catalog_path = input_root / "pilot_catalog.csv"
     provenance_path = input_root / "pilot_catalog_provenance.json"

@@ -10,6 +10,7 @@ from satnet.ground.integrated_graph import OperationalSatelliteGraphSnapshot
 from satnet.ground.position_adapter import reconstruct_operational_satellite_position_sequence
 from satnet.ground.satellite_graph_adapter import reconstruct_operational_satellite_graph_sequence
 from satnet.ground.coordinates import OperationalSatellitePositionSnapshot
+from satnet.experiments.production_profile import FINAL_ADAPTIVE_PRODUCTION_PROFILE
 from satnet.network.hypatia_adapter import PHYSICS_MODEL_VERSION
 from satnet.simulation.tier1_rollout import (
     DEFAULT_EPOCH_ISO,
@@ -21,14 +22,14 @@ from satnet.simulation.tier1_rollout import (
     run_tier1_rollout,
 )
 
-DSS_DURATION_MINUTES = 10
-DSS_STEP_SECONDS = 60
-DSS_PHASING_FACTOR = 1
-DSS_MAX_ISL_DISTANCE_KM = 10_000.0
-DSS_ISL_POLICY = "grid_fixed"
-DSS_ADJACENT_SEARCH_K = 1
-DSS_MAX_INTER_PLANE_LINKS_PER_SAT = 1
-DSS_ORBITAL_ENGINE = "sgp4"
+DSS_DURATION_MINUTES = FINAL_ADAPTIVE_PRODUCTION_PROFILE.duration_minutes
+DSS_STEP_SECONDS = FINAL_ADAPTIVE_PRODUCTION_PROFILE.step_seconds
+DSS_PHASING_FACTOR = FINAL_ADAPTIVE_PRODUCTION_PROFILE.phasing_factor
+DSS_MAX_ISL_DISTANCE_KM = FINAL_ADAPTIVE_PRODUCTION_PROFILE.max_isl_distance_km
+DSS_ISL_POLICY = FINAL_ADAPTIVE_PRODUCTION_PROFILE.isl_policy
+DSS_ADJACENT_SEARCH_K = FINAL_ADAPTIVE_PRODUCTION_PROFILE.adjacent_search_k
+DSS_MAX_INTER_PLANE_LINKS_PER_SAT = FINAL_ADAPTIVE_PRODUCTION_PROFILE.max_inter_plane_links_per_sat
+DSS_ORBITAL_ENGINE = FINAL_ADAPTIVE_PRODUCTION_PROFILE.orbital_engine
 DSS_FIXED_ROLLOUT_THRESHOLD = 0.80
 
 

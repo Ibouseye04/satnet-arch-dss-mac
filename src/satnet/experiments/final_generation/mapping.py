@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from satnet.experiments.production_profile import (
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+    ProductionTopologyProfile,
+)
 from satnet.ground.failure_policy import GroundFailurePolicy
 from satnet.ground.selection import GroundSegmentEnabledConfig
 from satnet.ground.service_policy import GroundServicePolicy
@@ -32,11 +36,21 @@ class FinalRunMapping:
         return self.run["run_key"]
 
 
-def map_frozen_run(design: dict[str, Any], run: dict[str, Any]) -> FinalRunMapping:
-    if design.get("contract_spec_hash") != CONTRACT_SPEC_HASH:
+def map_frozen_run(
+    design: dict[str, Any],
+    run: dict[str, Any],
+    *,
+    contract_spec_hash: str = CONTRACT_SPEC_HASH,
+    production_profile: ProductionTopologyProfile | None = None,
+) -> FinalRunMapping:
+    if design.get("contract_spec_hash") != contract_spec_hash:
         raise ValueError("Design contract specification hash mismatch")
-    if run.get("contract_spec_hash") != CONTRACT_SPEC_HASH:
+    if run.get("contract_spec_hash") != contract_spec_hash:
         raise ValueError("Run contract specification hash mismatch")
+    if production_profile is not None:
+        production_profile.assert_matches(design)
+        if design.get("satellite_failure_model") != production_profile.failure_model:
+            raise ValueError("Design failure model does not match production profile")
     if run.get("design_id") != design.get("design_id"):
         raise ValueError("Run does not reference supplied design")
     if run.get("design_record_hash") != design.get("design_record_hash"):
@@ -113,6 +127,22 @@ def map_frozen_run(design: dict[str, Any], run: dict[str, Any]) -> FinalRunMappi
         visibility_policy=visibility,
         service_policy=service,
         failure_policy=failure,
+    )
+
+
+def map_adaptive_run(
+    design: dict[str, Any],
+    run: dict[str, Any],
+    *,
+    contract_spec_hash: str,
+) -> FinalRunMapping:
+    """Map a corrected adaptive run with explicit scientific identity checks."""
+
+    return map_frozen_run(
+        design,
+        run,
+        contract_spec_hash=contract_spec_hash,
+        production_profile=FINAL_ADAPTIVE_PRODUCTION_PROFILE,
     )
 
 
