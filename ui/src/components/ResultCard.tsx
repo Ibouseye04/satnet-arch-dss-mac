@@ -134,7 +134,7 @@ export default function ResultCard({ result, architecture, comparisonLabel, onLa
             </Box>
             <Chip color={meets ? 'success' : 'error'} label={meets ? 'MEETS EXPECTED REQUIREMENT' : 'BELOW EXPECTED REQUIREMENT'} />
           </Stack>
-          <Box className="hero-metric"><Typography data-testid="expected-minimum-gcc" variant="h1">{formatPercent(space.expected_minimum_gcc)}</Typography><Typography variant="body2" color="text.secondary">arithmetic mean of modeled minimum GCC values</Typography></Box>
+          <Box className="hero-metric"><Typography data-testid="expected-minimum-gcc" variant="h1">{formatPercent(space.expected_minimum_gcc)}</Typography><Typography variant="body2" color="text.secondary">Mean of five TGNN-predicted minimum GCC values</Typography></Box>
           <ResilienceBar prediction={space.expected_minimum_gcc} threshold={space.required_minimum_connectivity} />
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid size={{ xs: 12, sm: 4 }}><Metric label="Required Connectivity" value={formatPercent(space.required_minimum_connectivity)} /></Grid>
