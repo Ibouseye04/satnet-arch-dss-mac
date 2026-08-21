@@ -24,9 +24,14 @@ ml = [
     "torch-geometric>=2.4,<3.0",
     "torch-geometric-temporal>=0.56,<1.0",
 ]
+dss = [
+    "fastapi>=0.115,<1.0",
+    "uvicorn[standard]>=0.30,<1.0",
+]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=4.0",
+    "httpx>=0.28,<1.0",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,0 +1,17 @@
+{
+  "schema": "satnet.stage_a_tgnn_classification.reporting_finalization_resume_authorization_inventory.v1",
+  "self_excluding": true,
+  "authorization_directory": "artifacts/stage_a_tgnn_classification_reporting_finalization_resume_authorization_v1_active",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_resume_authorization_v1_active",
+  "activation_head": "7e28c1118ef1a7404a11d9f8b0d7c3b94187e7ae",
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING FINALIZATION RESUME AUTHORIZED — STAGED OUTPUTS PRESERVED — READY TO PUBLISH ONCE",
+  "artifacts": [
+    {"path":"active_reporting_finalization_resume_authorization.json","bytes":4046,"sha256":"67c33b152cf507d00447d82b2f75b048e6aaeeea9570f9faed5e1a7dcb42d65a"},
+    {"path":"publication_plan_mismatch_root_cause.json","bytes":6839,"sha256":"722a132f48927bd043f9e1b5f605297691cd3c6a135b35fc2a7cdc0fd0b8b3b5"},
+    {"path":"README.md","bytes":5646,"sha256":"51deee10dad589a641f8cdead54ba3ac6f16fd05b0b421ad947b246dade8393a"},
+    {"path":"reporting_finalization_resume_preflight_certificate.json","bytes":4950,"sha256":"25e553d2429011c3cf471a5300cf8880782c9910046f0c3143656bb716aeee1f"},
+    {"path":"reporting_finalization_resume_runtime_plan.json","bytes":5681,"sha256":"5a65e0b72b3344c92767e999a4365512c58d76e6caa9089b487d465f42d0c823"},
+    {"path":"staged_artifact_identity_verification.json","bytes":3671,"sha256":"00efd6e175e6b19f7609900e99b4cd327a300b374be080e601593f80ece05842"},
+    {"path":"tgnn_classification_resume_reporting_publication_command.ps1","bytes":2034,"sha256":"b75ea8f4ec9a329d93740fc7875099cdca154577d9998369ae712dc6c875575e"}
+  ]
+}

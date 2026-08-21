@@ -1,0 +1,14 @@
+{
+  "forbidden_test_named_artifacts": [],
+  "test_metrics_present": false,
+  "test_predictions_present": false,
+  "test_rows_loaded": 0,
+  "test_source_reads": 0,
+  "test_target_paths_opened": [],
+  "train_and_validation_records_only": true,
+  "training_report_flags": {
+    "test_access": false,
+    "test_metrics": false,
+    "test_predictions": false
+  }
+}

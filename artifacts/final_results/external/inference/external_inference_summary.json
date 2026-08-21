@@ -1,0 +1,183 @@
+{
+  "authorization_sha256": "13e8f0bd7960fcbdae0e283d6f7e1c61545f90bb01b38a864767ed547d30ad3a",
+  "final_external_inference_bundle_sha256": "9c56a8ecc1ef499ab99d87afe075a6bfe3133b26ddd5ab5b8fc4d876cbae384f",
+  "preflight": {
+    "adapter_modified": false,
+    "adapter_sha256": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23",
+    "dataset": {
+      "classification_negative": 0,
+      "classification_positive": 300,
+      "episode_count": 300,
+      "rf_feature_order": [
+        "num_planes",
+        "sats_per_plane",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability"
+      ],
+      "tgnn_edge_feature_order": [
+        "distance_km_scaled_10000",
+        "margin_db_scaled_100",
+        "link_type_code_scaled_2",
+        "link_mode_binary"
+      ],
+      "tgnn_node_feature_order": [
+        "plane_idx_normalized",
+        "sat_in_plane_normalized",
+        "node_exists_constant"
+      ],
+      "timesteps_per_episode": 11
+    },
+    "external_bundle_sha256": "9abede2f83adbfc96e8267805e3253d6dbcd6f5240d675729d5677aa053b7e28",
+    "external_data_modified": false,
+    "model_artifacts": [
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_42\\final_model.joblib",
+        "seed": 42,
+        "sha256": "cefea7b3ce8a0f3dc59f436f83ed08933a26ecdb4a091802c1a81302823ca7e6",
+        "task": "rf_space_classification"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_123\\final_model.joblib",
+        "seed": 123,
+        "sha256": "973b7ea709cac3b8ea3948af98f16703cd2e8361fd8e437a9862010a47ce1701",
+        "task": "rf_space_classification"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_456\\final_model.joblib",
+        "seed": 456,
+        "sha256": "6b667f6ecd30cc33331430350b4d5f2fcce3960129b02ed3279f8da0b505ef03",
+        "task": "rf_space_classification"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_789\\final_model.joblib",
+        "seed": 789,
+        "sha256": "0ff4d68b1475af3069f40fcc421c3f475733a72b401040b582943b14df006e22",
+        "task": "rf_space_classification"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_classification\\seed_2026\\final_model.joblib",
+        "seed": 2026,
+        "sha256": "7d2994fd3209cd3aa36c3f173b743ada3ccb31b5f4f4c9ba4d247258fc6b7f59",
+        "task": "rf_space_classification"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_42\\best_validation_checkpoint.pt",
+        "seed": 42,
+        "sha256": "7d5262bf58c05848d6230e044a1ed46ee3d184d04aa1a1fa2c42eb93f787f3e0",
+        "task": "tgnn_space_classification"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_123\\best_validation_checkpoint.pt",
+        "seed": 123,
+        "sha256": "d07d57579676d97ae6092d234e1e9b3290f50fe56befe984b429571dc364206c",
+        "task": "tgnn_space_classification"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_456\\best_validation_checkpoint.pt",
+        "seed": 456,
+        "sha256": "6e8e19c7bdb1109ea4e1435a79cdb5695a662c8662878eb1802719581a4bdcac",
+        "task": "tgnn_space_classification"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_789\\best_validation_checkpoint.pt",
+        "seed": 789,
+        "sha256": "bade1c470a9cb164d070d777886809457a3f516b100e4823169c46e42cc5c734",
+        "task": "tgnn_space_classification"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_2026\\best_validation_checkpoint.pt",
+        "seed": 2026,
+        "sha256": "a3ebff6d93d1c638aa353f139d382fbf68a7d6427214073dba2d4e524fcf79d0",
+        "task": "tgnn_space_classification"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_regression\\seed_42\\final_model.joblib",
+        "seed": 42,
+        "sha256": "bfacf778e6d9623d508571b50621868d0130e60b78ebecf31088d284269c40d8",
+        "task": "rf_space_regression"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_regression\\seed_123\\final_model.joblib",
+        "seed": 123,
+        "sha256": "22cb470105ca8f51b413ea58cf95c592fccb205357cd00a62da7897b703de217",
+        "task": "rf_space_regression"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_regression\\seed_456\\final_model.joblib",
+        "seed": 456,
+        "sha256": "14d4100886131303a33aae3d6e77443d7a94ffbc723c5f44ef8b53d7d6dd0ef2",
+        "task": "rf_space_regression"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_regression\\seed_789\\final_model.joblib",
+        "seed": 789,
+        "sha256": "00c5f250ccd4fa86746002211dd391ea5c6df0117fe42ccbc3c4c07ef2fe4f73",
+        "task": "rf_space_regression"
+      },
+      {
+        "kind": "final_model.joblib",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\rf_space_regression\\seed_2026\\final_model.joblib",
+        "seed": 2026,
+        "sha256": "aaec456c006d330c10d296a3f6a6631b28ad8da356306ea5bff1b5f447459991",
+        "task": "rf_space_regression"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_42\\best_validation_checkpoint.pt",
+        "seed": 42,
+        "sha256": "22cabef076428ba5c118b10fa230c5930af1b1c2da53bdd5c51b118dc0c9960a",
+        "task": "tgnn_space_regression"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_123\\best_validation_checkpoint.pt",
+        "seed": 123,
+        "sha256": "308f4bf179212df640162c8ba45e5b53a2221a6cf3dd8e2fafef5425f41bf8b0",
+        "task": "tgnn_space_regression"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_456\\best_validation_checkpoint.pt",
+        "seed": 456,
+        "sha256": "e42b224adc78f35c9b1fad69aa89139fb72d84044445d2b391d9ca2a257ab199",
+        "task": "tgnn_space_regression"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_789\\best_validation_checkpoint.pt",
+        "seed": 789,
+        "sha256": "e231b66d8f4f4ef120a64e5a326a83611b02c5c8a1c2c91547186a57d0250fb3",
+        "task": "tgnn_space_regression"
+      },
+      {
+        "kind": "best_validation_checkpoint.pt",
+        "path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_regression\\seed_2026\\best_validation_checkpoint.pt",
+        "seed": 2026,
+        "sha256": "11834cae573a65a9b8e22838cae3d0b8118d0f27da1fcdd3e804d3a057690a9e",
+        "task": "tgnn_space_regression"
+      }
+    ],
+    "source_manifest_sha256": "02153a1fcb8cac32d0d6b5999ea7c2953d00024c874d23e392664011bb1bbf29",
+    "status": "PASS",
+    "synthetic_heldout_bundle_sha256": "4359650814b960283b711e49e29301edd98b4966933bad0fb2aff532e2384551",
+    "tle_2025_sha256": "9e9339cdbfc536cb91a1b5a26c898f193fdb683202f1cb1ceb7cee8bda81f64e",
+    "training_performed": false
+  },
+  "runtime_seconds": 4.625
+}

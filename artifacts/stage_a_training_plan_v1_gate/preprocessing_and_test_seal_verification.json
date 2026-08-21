@@ -1,0 +1,43 @@
+{
+  "report_id": "stage_a_training_plan_v1_preprocessing_and_test_seal_verification",
+  "read_only": true,
+  "preprocessing": {
+    "rf_scaling": "none",
+    "tgnn_statistics_training_only": true,
+    "scaled_node_features": ["latitude_deg", "longitude_deg", "altitude_m", "ecef_x_km", "ecef_y_km", "ecef_z_km"],
+    "scaled_node_feature_count": 6,
+    "binary_one_hot_node_index_operational_features_unscaled": true,
+    "edge_attributes_unscaled": true,
+    "non_applicable_sentinel_zeros_excluded_by_applicability_masks": true,
+    "applicable_physical_zeros_retained": true,
+    "validation_and_test_use_frozen_training_statistics": true,
+    "target_normalization": false,
+    "target_transformation": false,
+    "zero_variance_rule": "scale=1.0 and degenerate-feature rule recorded",
+    "statistics_pooling": "training snapshots only across training designs, realizations, snapshots, and applicable nodes",
+    "serialization_and_hash_procedure_frozen": false,
+    "serialization_gap": "The plan requires preprocessing hashes but does not define exact serialization, canonical bytes, field order, or hash input.",
+    "result": "blocked by missing executable artifact serialization/hash rule"
+  },
+  "final_test_seal": {
+    "requires_four_completed_independent_training_gates": true,
+    "requires_four_frozen_selected_configurations": true,
+    "requires_all_final_repeated_seed_artifacts_present_and_hashed": true,
+    "requires_preprocessing_artifacts_frozen_and_hashed": true,
+    "threshold_fixed_at": 0.5,
+    "pending_refit_or_train_validation_merge_forbidden": true,
+    "authorization_artifact_before_test_target_access": true,
+    "one_time_evaluation": true,
+    "post_opening_retuning_recalibration_threshold_change_model_replacement_forbidden": true,
+    "test_target_files_opened_during_this_gate": false,
+    "test_target_paths_or_values_read_during_this_gate": false,
+    "test_seal_protocol_result": "passed as written"
+  },
+  "non_execution": {
+    "normalization_statistics_calculated": false,
+    "preprocessing_artifact_created": false,
+    "test_target_materialized": false,
+    "accepted_dataset_or_evidence_modified": false
+  },
+  "overall_result": "Final-test seal passes. Preprocessing serialization/hash rule is a plan blocker."
+}

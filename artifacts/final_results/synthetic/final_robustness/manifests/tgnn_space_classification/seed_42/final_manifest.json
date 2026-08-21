@@ -1,0 +1,94 @@
+{
+  "checkpoint_path": "C:\\Users\\johns\\external\\satnet-10k-model-training-v1\\final_robustness\\tgnn_space_classification\\seed_42\\best_validation_checkpoint.pt",
+  "checkpoint_sha256": "7d5262bf58c05848d6230e044a1ed46ee3d184d04aa1a1fa2c42eb93f787f3e0",
+  "code_sha": "e55dba59e83864d2dd11fa47482bd4ec2bdd797a",
+  "completed_at": "2026-08-19T13:21:40.550569+00:00",
+  "configuration": {
+    "batch_size": 1,
+    "cheb_k": 2,
+    "classification_loss": "CrossEntropyLoss",
+    "dropout": null,
+    "hidden_dim": 32,
+    "learning_rate": 0.001,
+    "max_epochs": 100,
+    "num_layers": 1,
+    "optimizer": "Adam",
+    "regression_loss": "SmoothL1Loss",
+    "weight_decay": 0.0
+  },
+  "dataset_bundle_hash": "38dacd66432bfa660410ff9cab7f181a53151120e8102dc40df57016f78bbfc3",
+  "early_stopping": {
+    "direction": "maximize",
+    "min_delta": 0.0,
+    "monitor": "balanced_accuracy",
+    "patience": 10,
+    "restore_best": true,
+    "stopped_early": true
+  },
+  "environment_versions": {
+    "device": "cpu",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "python": "3.11.9",
+    "scikit_learn": "1.9.0",
+    "torch": "2.5.1+cpu",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal_distribution": "0.56.2",
+    "torch_geometric_temporal_imported": "0.54.0"
+  },
+  "epochs_run": 14,
+  "fit_runtime_seconds": 4469.338503600011,
+  "max_epochs": 100,
+  "model_family": "TGNN",
+  "model_selection_metric": {
+    "name": "balanced_accuracy",
+    "value": 0.9538293832196357
+  },
+  "production_sha": "d0515088cf3fca06a6aa2d47059269089dcb10a7",
+  "schema_version": "satnet.final_robustness_manifest.v1",
+  "seed": 42,
+  "selected_epoch": 14,
+  "selection_sha256": "c85dfdcd3b6a62d741675ac522fda76bd3de7dd4c311a82bc1b12e079dab2bfb",
+  "status": "completed",
+  "task": "tgnn_space_classification",
+  "test_accessed": false,
+  "train_count": 7000,
+  "training_plan_hash": "e14ec5e5b2221aa2c9aa187a2baacc517e676f9dc748612c206eb1dc43788a0a",
+  "validation_count": 1500,
+  "validation_metrics": {
+    "accuracy": 0.9566666666666667,
+    "balanced_accuracy": 0.9538293832196357,
+    "confusion_matrix": [
+      [
+        280,
+        15
+      ],
+      [
+        50,
+        1155
+      ]
+    ],
+    "f1_by_class": {
+      "0": 0.896,
+      "1": 0.9726315789473684
+    },
+    "macro_f1": 0.9343157894736842,
+    "majority_class_baseline_accuracy": 0.8033333333333333,
+    "negative_class_count": 295,
+    "positive_class_count": 1205,
+    "pr_auc": 0.9977667705619766,
+    "precision_by_class": {
+      "0": 0.8484848484848485,
+      "1": 0.9871794871794872
+    },
+    "recall_by_class": {
+      "0": 0.9491525423728814,
+      "1": 0.9585062240663901
+    },
+    "roc_auc": 0.9904043884942683,
+    "sensitivity": 0.9585062240663901,
+    "specificity": 0.9491525423728814,
+    "weighted_f1": 0.9575607017543859
+  },
+  "winning_config_id": "tgnn_002"
+}

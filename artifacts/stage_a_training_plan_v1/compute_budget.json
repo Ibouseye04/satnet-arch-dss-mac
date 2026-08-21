@@ -1,0 +1,42 @@
+{
+  "budget_id": "stage_a_compute_budget_v1",
+  "status": "frozen",
+  "machine_assumption": "Available Windows AMD64 CPU machine; no CUDA device is required or used.",
+  "rf": {
+    "candidate_configurations_per_task": 24,
+    "tasks": 2,
+    "final_repeated_seed_runs_per_task": 5,
+    "maximum_estimator_fits": 58,
+    "maximum_trees_across_all_fits": 23200,
+    "maximum_trees_per_fit": 400,
+    "candidate_model_persistence": "metrics/configuration only; candidate model files are not retained",
+    "wall_clock_timeout_minutes": {"per_task": 90, "all_rf_tasks": 180},
+    "parallel_workers": 1
+  },
+  "tgnn": {
+    "candidate_configurations_per_task": 4,
+    "tasks": 2,
+    "maximum_epochs_per_configuration": 60,
+    "final_repeated_seed_runs_per_task": 5,
+    "maximum_training_runs": 18,
+    "maximum_run_epochs": 60,
+    "maximum_total_run_epochs": 1080,
+    "wall_clock_timeout_minutes": {"per_task": 360, "all_tgnn_tasks": 720},
+    "parallel_workers": 1,
+    "batch_size": 1,
+    "dataloader_workers": 0,
+    "search_policy": "four predeclared candidates; no exhaustive search beyond the frozen finite space"
+  },
+  "combined": {
+    "maximum_training_runs": 76,
+    "maximum_wall_clock_minutes": 900,
+    "timeout_action": "stop the affected run, retain its transcript, mark the experiment incomplete, and do not inspect test targets or silently alter the plan",
+    "checkpoint_storage_limit": {
+      "maximum_files": 18,
+      "maximum_bytes_total": 2147483648,
+      "maximum_bytes_per_checkpoint": 134217728,
+      "retention": "best checkpoint per TGNN candidate/final seed only; no RF candidate checkpoints"
+    },
+    "practicality_constraint": "Run the ordered experiments serially on one CPU worker; the four-by-two TGNN candidate space is intentionally finite and avoids an unnecessary exhaustive architecture search."
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "specification_id": "stage_a_rf_training_v1",
+  "status": "frozen",
+  "dataset": {
+    "manifest_sha256": "3fae8566a2194f6a2410e8173bd4619955631226a6a213fffe22769bf74dfb16",
+    "row_granularity": "one complete simulation run",
+    "predictor_count": 12,
+    "predictor_order": [
+      "num_planes",
+      "sats_per_plane",
+      "configured_satellite_count",
+      "altitude_km",
+      "inclination_deg",
+      "satellite_node_failure_probability",
+      "satellite_edge_failure_probability",
+      "civilian_count",
+      "government_count",
+      "military_count",
+      "total_ground_station_count",
+      "ground_station_failure_probability"
+    ],
+    "classification_target": "partition_any",
+    "regression_target": "gcc_frac_min",
+    "predictor_policy": "The exact accepted 12-column order is mandatory; no additional or replacement predictor is allowed."
+  },
+  "implementation": {
+    "classification_estimator": "sklearn.ensemble.RandomForestClassifier",
+    "regression_estimator": "sklearn.ensemble.RandomForestRegressor",
+    "scikit_learn_version": "1.9.0",
+    "python_version": "3.11.9",
+    "feature_scaling": "disabled; tree estimators operate on the accepted raw predictor values",
+    "random_state_parameter": "set explicitly in every candidate estimator-parameter dictionary",
+    "parallel_workers": 1,
+    "reason_for_single_worker": "deterministic tree construction and stable candidate ordering on the Windows CPU machine"
+  },
+  "constructor_introspection": {
+    "method": "read-only get_params(deep=False) on the installed scikit-learn 1.9.0 environment",
+    "classifier_parameter_order": [
+      "bootstrap",
+      "ccp_alpha",
+      "class_weight",
+      "criterion",
+      "max_depth",
+      "max_features",
+      "max_leaf_nodes",
+      "max_samples",
+      "min_impurity_decrease",
+      "min_samples_leaf",
+      "min_samples_split",
+      "min_weight_fraction_leaf",
+      "monotonic_cst",
+      "n_estimators",
+      "n_jobs",
+      "oob_score",
+      "random_state",
+      "verbose",
+      "warm_start"
+    ],
+    "regressor_parameter_order": [
+      "bootstrap",
+      "ccp_alpha",
+      "criterion",
+      "max_depth",
+      "max_features",
+      "max_leaf_nodes",
+      "max_samples",
+      "min_impurity_decrease",
+      "min_samples_leaf",
+      "min_samples_split",
+      "min_weight_fraction_leaf",
+      "monotonic_cst",
+      "n_estimators",
+      "n_jobs",
+      "oob_score",
+      "random_state",
+      "verbose",
+      "warm_start"
+    ],
+    "introspection_is_read_only": true,
+    "default_dependency_policy": "Every parameter returned by get_params(deep=False) is present with an explicit value in every executable candidate dictionary; no constructor default is relied upon."
+  },
+  "parameter_completeness": {
+    "candidate_dictionary_count": 48,
+    "candidates_per_task": 24,
+    "all_dictionaries_are_executable_constructor_kwargs": true,
+    "constructor_only_verification": "Instantiate every dictionary with its declared estimator class and do not call fit.",
+    "n_jobs": 1,
+    "calibration_enabled": false,
+    "scaling_enabled": false
+  },
+  "candidate_search": {
+    "strategy": "exhaustive evaluation of a finite, predeclared Cartesian candidate list; no adaptive search",
+    "candidate_count_per_task": 24,
+    "candidate_order": "candidate_index ascending; n_estimators, max_depth, min_samples_leaf, then max_features vary in the listed order",
+    "search_space": {
+      "n_estimators": [200, 400],
+      "max_depth": [null, 16, 32],
+      "min_samples_leaf": [1, 2],
+      "max_features": ["sqrt", 0.75]
+    },
+    "candidate_configurations": {
+      "classification": [
+        {"candidate_index": 0, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41000, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 1, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41001, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 2, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41002, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 3, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41003, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 4, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41004, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 5, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41005, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 6, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41006, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 7, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41007, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 8, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41008, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 9, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41009, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 10, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41010, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 11, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41011, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 12, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41012, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 13, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41013, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 14, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41014, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 15, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41015, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 16, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41016, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 17, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41017, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 18, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41018, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 19, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41019, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 20, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41020, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 21, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41021, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 22, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41022, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 23, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "class_weight": "balanced", "criterion": "gini", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41023, "verbose": 0, "warm_start": false}}
+      ],
+      "regression": [
+        {"candidate_index": 0, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41000, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 1, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41001, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 2, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41002, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 3, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41003, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 4, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41004, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 5, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41005, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 6, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41006, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 7, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41007, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 8, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41008, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 9, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41009, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 10, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41010, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 11, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 200, "n_jobs": 1, "oob_score": false, "random_state": 41011, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 12, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41012, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 13, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41013, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 14, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41014, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 15, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": null, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41015, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 16, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41016, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 17, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41017, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 18, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41018, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 19, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 16, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41019, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 20, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41020, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 21, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 1, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41021, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 22, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": "sqrt", "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41022, "verbose": 0, "warm_start": false}},
+        {"candidate_index": 23, "estimator_parameters": {"bootstrap": true, "ccp_alpha": 0.0, "criterion": "squared_error", "max_depth": 32, "max_features": 0.75, "max_leaf_nodes": null, "max_samples": null, "min_impurity_decrease": 0.0, "min_samples_leaf": 2, "min_samples_split": 2, "min_weight_fraction_leaf": 0.0, "monotonic_cst": null, "n_estimators": 400, "n_jobs": 1, "oob_score": false, "random_state": 41023, "verbose": 0, "warm_start": false}}
+      ]
+    },
+    "search_seed_schedule": {
+      "formula": "random_state = 41000 + candidate_index",
+      "candidate_index_base": 0,
+      "classification_seed_range": [41000, 41023],
+      "regression_seed_range": [41000, 41023]
+    },
+    "candidate_artifacts": "Record metrics and configuration only; do not retain candidate model files."
+  },
+  "validation_evaluation": {
+    "fit_split": "train only",
+    "selection_split": "validation only",
+    "classification_primary": "training-weighted validation log loss",
+    "regression_primary": "validation RMSE",
+    "metrics_and_ties": "Use classification_metric_and_imbalance_policy.json and regression_metric_policy.json exactly.",
+    "threshold": 0.5,
+    "test_access": false
+  },
+  "final_models": {
+    "repeated_seed_runs_per_task": 5,
+    "seed_schedule": [51001, 51002, 51003, 51004, 51005],
+    "fit_data": "training split only; no train/validation merge",
+    "identity": "selected candidate configuration plus target alias, accepted predictor order, preprocessing identity, library versions, and the five final seeds",
+    "aggregation": "For final reporting, classification probabilities and regression predictions are averaged across the five fixed seed runs before thresholding or metric calculation.",
+    "test_evaluation": "one evaluation of the frozen five-seed ensemble after authorization"
+  },
+  "serialization": {
+    "format": "joblib serialized estimator",
+    "library": "joblib 1.5.3",
+    "protocol": 5,
+    "compression": 0,
+    "metadata_required": ["target", "task_type", "predictor_order", "selected_configuration", "seed", "package_versions", "source_manifest_sha256", "config_hash"]
+  },
+  "feature_importance": {
+    "method": "mean decrease in impurity from estimator.feature_importances_",
+    "scope": "reported for frozen training-fitted final forests; no test-derived importance",
+    "permutation_importance": "disabled for v1"
+  },
+  "probability_calibration": {
+    "enabled": false,
+    "reason": "No calibration split or post-selection calibration is introduced; raw forest probabilities are used with the threshold frozen at 0.5."
+  }
+}

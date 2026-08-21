@@ -24,6 +24,19 @@ artifacts/graph_cache/
 
 # Experiment logs
 experiments/
+!docs/experiments/
+!docs/experiments/**
+!scripts/experiments/
+!scripts/experiments/**
+!src/satnet/experiments/
+!src/satnet/experiments/**
+!tests/experiments/
+!tests/experiments/**
+artifacts/integrated_ground_pilot_25/runs/
+artifacts/integrated_ground_pilot_25/repeats/
+src/satnet/experiments/__pycache__/
+scripts/experiments/__pycache__/
+tests/experiments/__pycache__/
 
 # Models (optional)
 models/*.joblib
@@ -52,3 +65,10 @@ data/processed/
 
 # Generated smoke-test artifacts
 artifacts/smoke/
+
+# Frontend local dependencies, environment, and build output
+ui/node_modules/
+ui/dist/
+ui/.env
+ui/.env.local
+ui/.env.*.local

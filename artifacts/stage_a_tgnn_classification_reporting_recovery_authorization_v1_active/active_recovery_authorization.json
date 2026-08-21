@@ -1,0 +1,55 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_recovery_authorization.v1",
+  "authorization_id": "stage_a_tgnn_classification_reporting_recovery_authorization_v1_active",
+  "status": "blocked",
+  "verdict": "STAGE A TGNN CLASSIFICATION RECOVERY BLOCKED — INSUFFICIENT COMPLETED TRAINING EVIDENCE",
+  "scope": "reporting finalization only; never training, prediction regeneration, preprocessing, candidate search, or checkpoint replacement",
+  "campaign_hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+  "failed_execution_activation_head": "fa314c07cdb3c60186365888e9c726a0e4a567e3",
+  "recovery_implementation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "expected_activation_head_for_command": "7b7a198de1884034318486e9f92ed208590ba505",
+  "expected_pre_recovery_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "dedicated_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "required_guards": {
+    "existing_output_root": true,
+    "expected_campaign_hash": true,
+    "expected_pre_recovery_tree_hash": true,
+    "exact_activation_head": true,
+    "clean_activation_worktree": true,
+    "dedicated_python_executable": true,
+    "explicit_finalize_reporting_only": true,
+    "refuse_if_training_function_would_execute": true
+  },
+  "authorization_decision": {
+    "training_completed": true,
+    "frozen_validation_predictions_present": true,
+    "preprocessing_preservation_verified": true,
+    "candidate_history_preservation_verified": true,
+    "final_checkpoint_files_present": true,
+    "selected_checkpoint_preservation_verified": false,
+    "reporting_recovery_authorized": false,
+    "blocking_reason": "candidate_3.pt no longer matches selected_checkpoint_identity.json and contains final-seed metadata. No recovery operation may replace or reconstruct it."
+  },
+  "permitted_artifacts_if_block_is_resolved": [
+    "validation_design_metrics.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "artifact_inventory.json",
+    "execution_manifest.json",
+    "environment_manifest.json"
+  ],
+  "prohibited_operations": [
+    "optimizer.step()",
+    "loss.backward()",
+    "model.train() for fitting",
+    "any training epoch function",
+    "checkpoint creation or replacement",
+    "preprocessing fitting",
+    "candidate search",
+    "final-seed training",
+    "new validation prediction generation",
+    "test artifact access"
+  ]
+}

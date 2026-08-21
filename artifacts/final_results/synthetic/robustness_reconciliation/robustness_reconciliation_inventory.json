@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "bytes": 41605,
+      "path": "robustness_provenance_reconciliation.json",
+      "sha256": "2caa7f52495ce5c9aad811c6534ac8cdc69948122312fba0d4caf2d59362c27a"
+    },
+    {
+      "bytes": 43245,
+      "path": "robustness_provenance_reconciliation_report.md",
+      "sha256": "08a96855b48132c3caab783eba3d99259010e6c1ffe8f1f4ffc0a779e773a9c6"
+    },
+    {
+      "bytes": 12460,
+      "path": "run_robustness_reconciliation.py",
+      "sha256": "a70bc46be01da0ff11fbd11efaeafbcb04c4f14b7a27888f635c095137ffbff3"
+    }
+  ],
+  "bundle_sha256": "cfecdbe07a5088f2f621b12a05ece9bef61bc4e24876eb0d85f01db9825ea75e",
+  "driver_sha256": "a70bc46be01da0ff11fbd11efaeafbcb04c4f14b7a27888f635c095137ffbff3",
+  "hash_algorithm": "sha256 over sorted relative UTF-8 path + NUL byte + raw file bytes",
+  "inventory_self_excluding": true,
+  "schema_version": "satnet.robustness_reconciliation_inventory.v1",
+  "test_accessed": false
+}

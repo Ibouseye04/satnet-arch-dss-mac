@@ -1,0 +1,43 @@
+{
+  "blocked_gate": {
+    "commit": "c61f6166cdf4053b89e05459ca1b87b84b0d50ad",
+    "report_sha256": "9c0458fcf083b854a9be8db00eeff251a5e0b2eb024a0e79bc33726df7f86b08"
+  },
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "correction": {
+    "bootstrap_artifact": {
+      "bytes": 14629,
+      "path": "validation_bootstrap_intervals.json",
+      "sha256": "15c38887f2585d7e80b77d33b8c701600aaf2d632cfe7e1b10f5a010833d2b54"
+    },
+    "corrected_metrics": [
+      "class_0_recall_specificity"
+    ],
+    "no_candidate_search": true,
+    "no_fit_called": true,
+    "no_new_predictions": true,
+    "undefined_metric_policy": "undefined values are null; valid numeric zero values are retained"
+  },
+  "decision_threshold": 0.5,
+  "independent_regate_performed": false,
+  "preservation": {
+    "candidate_selection_unchanged": true,
+    "model_files_byte_identical": true,
+    "ordinary_validation_metrics_unchanged": true,
+    "ordinary_validation_predictions_unchanged": true,
+    "protected_artifacts_unchanged": true,
+    "test_target_read": false
+  },
+  "schema": "satnet.stage_a.rf_classification.bootstrap_reporting_remediation.v1",
+  "selected_candidate": 20,
+  "source": {
+    "predictions_artifact": {
+      "bytes": 59690,
+      "path": "validation_predictions.jsonl",
+      "sha256": "f47664a163652a8701e3449a88c7eb64258728758d41bded92bbf61503c4c6f4"
+    },
+    "test_target_access": false,
+    "training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1"
+  },
+  "verdict": "STAGE A RF CLASSIFICATION BOOTSTRAP REPORTING REMEDIATED \u2014 READY FOR TARGETED RE-GATE"
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_history_comparison.v1",
+  "reconstructed_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1\\candidate_1_epoch_history.jsonl",
+  "preserved_source_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\candidate_epoch_histories.jsonl",
+  "selection": "Only rows with candidate_index == 1 were compared; no index or target artifact was opened.",
+  "row_counts": {
+    "reconstructed": 49,
+    "preserved_candidate_1": 49,
+    "exact": true
+  },
+  "epochs": {
+    "reconstructed": "0..48",
+    "preserved": "0..48",
+    "exact": true
+  },
+  "numeric_fields_max_absolute_difference": {
+    "train_loss": 0.0,
+    "validation_metrics.rmse": 0.0,
+    "validation_metrics.mae": 0.0,
+    "validation_metrics.r2": 0.0,
+    "validation_metrics.residual_mean": 0.0,
+    "validation_metrics.residual_population_std": 0.0
+  },
+  "numeric_fields_nonzero_difference_count": {
+    "train_loss": 0,
+    "validation_metrics.rmse": 0,
+    "validation_metrics.mae": 0,
+    "validation_metrics.r2": 0,
+    "validation_metrics.residual_mean": 0,
+    "validation_metrics.residual_population_std": 0
+  },
+  "training_loss_exact": true,
+  "validation_metrics_exact": true,
+  "improvement_flags_exact": true,
+  "best_epoch_tracking_exact": true,
+  "best_epoch": {
+    "reconstructed": 36,
+    "preserved": 36,
+    "expected": 36,
+    "qualifying_row": 36
+  },
+  "early_stopping": {
+    "metric": "validation RMSE",
+    "direction": "lower_is_better",
+    "minimum_delta": 0.0,
+    "equality_is_improvement": false,
+    "patience": 12,
+    "final_counter": 12,
+    "final_stopping_epoch": 48,
+    "stopping_condition_met": true
+  },
+  "history_sha256": {
+    "reconstructed": "c6e37e8cb7bd1d31b0056093bc16a10506ee22c0c3361d15bb4ff1d5dccd0dcd",
+    "preserved_candidate_1_canonical_rows": "c6e37e8cb7bd1d31b0056093bc16a10506ee22c0c3361d15bb4ff1d5dccd0dcd",
+    "expected": "c6e37e8cb7bd1d31b0056093bc16a10506ee22c0c3361d15bb4ff1d5dccd0dcd",
+    "exact": true
+  },
+  "result": "EXACT_HISTORY_MATCH"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.torch_save_byte_determinism_report.v1",
+  "assessment_mode": "isolated synthetic checkpoint only; no existing output-root checkpoint was resaved",
+  "runtime": {"python": "3.11.9", "torch": "2.12.1+cpu", "device": "cpu", "dedicated_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe"},
+  "synthetic_object": {"top_level_keys": ["epoch", "metadata", "model_state_dict"], "tensor_keys": ["weight", "bias"], "optimizer_instantiated": false, "backward_called": false, "training_epoch_run": false},
+  "same_destination_path": {"path": "torch_save_probe_same_path.pt", "bytes": 2301, "first_sha256": "80cfcf9c580a405df50cc6799118e247128593683a82353df80a44a3d63070f0", "second_sha256": "80cfcf9c580a405df50cc6799118e247128593683a82353df80a44a3d63070f0", "exact_bytes_equal": true},
+  "distinct_destination_paths": {"a": {"path": "torch_save_probe_a.pt", "bytes": 2109, "sha256": "20b213c2b479e577452ae46708c4d452480dc9328b0458c46d50e540d003ebf6"}, "b": {"path": "torch_save_probe_b.pt", "bytes": 2109, "sha256": "30c0af07207d37d008961cad5d33b9f2ae7d95a4464822525f6466e29a334f01"}, "exact_bytes_equal": false},
+  "observed_runtime_behavior": {"same_path_byte_deterministic": true, "same_object_distinct_filename_byte_deterministic": false, "checkpoint_archive_prefix_is_filename_sensitive": true},
+  "existing_checkpoint_confirmation": {"candidate_3_archive_prefix": "candidate_3/", "final_seed_62005_archive_prefix": "final_seed_62005/", "member_count_each": 94, "semantic_objects_identical": true, "file_bytes_identical": false},
+  "conclusion": "Exact SHA reproduction is technically realistic only when the runtime, serialized object, insertion/order semantics, Torch version, serialization format, and destination basename/container name are held constant. For an isolated recovery with a different mandated filename, exact expected e94c94... bytes should not be treated as the primary acceptance criterion; canonical semantic state_dict equality is required."
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_recovery_salvage_assessment.v1",
+  "assessment_mode": "read-only; test artifacts not opened",
+  "verdict": "STAGE A TGNN CLASSIFICATION RECOVERY BLOCKED — INSUFFICIENT COMPLETED TRAINING EVIDENCE",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "activation_worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+  "failed_execution_activation_head": "fa314c07cdb3c60186365888e9c726a0e4a567e3",
+  "recovery_implementation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "campaign_hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+  "dedicated_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "pre_recovery_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "exact_last_completed_stage": "validation_predictions.jsonl was written after validation_metrics.json; validation_design_metrics.json serialization then failed with ValueError: Out of range float values are not JSON compliant",
+  "training_completed": {
+    "training_itself_completed": true,
+    "candidate_training_runs_completed": 4,
+    "final_seed_training_runs_completed": 5,
+    "validation_predictions_completed": true,
+    "candidate_search_completed": true,
+    "final_model_count": 5,
+    "total_checkpoint_count": 9
+  },
+  "selected_candidate": {
+    "candidate_index": 3,
+    "hidden_dim": 64,
+    "learning_rate": 0.003,
+    "search_seed": 61003,
+    "best_epoch": 38,
+    "epochs_completed": 51,
+    "selection_primary_metric": 0.06203101027124465
+  },
+  "selected_checkpoint_assessment": {
+    "declared_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_3.pt",
+    "declared_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "actual_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "actual_checkpoint_metadata": {"seed": 62005, "epoch": 43, "candidate_index": 3},
+    "identity_consistent": false,
+    "preservation_gate": "failed; the selected search checkpoint identity is not preserved at its declared path"
+  },
+  "artifact_existence": {
+    "preprocessing_statistics": true,
+    "candidate_epoch_history": true,
+    "selected_checkpoint_path_exists": true,
+    "validation_predictions": true,
+    "execution_manifest": false,
+    "training_report": false,
+    "validation_design_metrics": false,
+    "validation_bootstrap_intervals": false,
+    "final_seed_training_results": false,
+    "artifact_inventory": false
+  },
+  "information_sufficiency": {
+    "all_training_and_prediction_artifacts_present": true,
+    "all_information_needed_to_finalize_reporting": false,
+    "blocking_reason": "A required frozen selected checkpoint cannot be verified or preserved byte-for-byte because selected_checkpoint_identity.json records e94c94... while candidate_3.pt currently hashes 08d831... and contains final seed 62005 metadata. Recovery must not replace or reconstruct that scientific artifact."
+  },
+  "concrete_reporting_defect": {
+    "scope": "design-level validation reporting",
+    "cause": "The five-realization max aggregation produced a single-class design-level y_true. The existing metrics implementation allowed sklearn ROC-AUC to produce a non-finite value under the observed warning path, then canonical JSON serialization used allow_nan=false.",
+    "required_correction": "Call confusion_matrix with labels [0, 1], return ROC-AUC null for fewer than two observed classes, return class-0 recall/specificity null when class-0 support is absent, retain valid numeric zero, and reject non-finite values before canonical serialization."
+  },
+  "lock_assessment": {"training_lock_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1.lock", "exists": false},
+  "test_access": {"test_artifacts_opened": false, "test_target_sources_opened": false, "sealed_test_index_opened": false},
+  "file_inventory": [
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\candidate_epoch_histories.jsonl", "bytes": 122644, "sha256": "37c356d10dd115a9114a3fb4a418c04a2ab8106c4b7c971bcfb94736c5b24f43"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\candidate_search_results.json", "bytes": 2891, "sha256": "e13a6167f0594459c0f9d10bb49452eef3b33283a0c5a90118bc37ff7b5ff04e"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_0.pt", "bytes": 150547, "sha256": "e27d3dcb54249fa7ba3096fe9954035e4b7929df1331af4f52e488a20dc8a1c5"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_1.pt", "bytes": 150547, "sha256": "0271fb76cd4b6031c2af71812531f0cf554a859cc460b530dabdb6fa0880a0a4"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_2.pt", "bytes": 470803, "sha256": "50565ca1b20749f2a5963adbcb729eeecc51dbdd439f4d0a126860fa32ec58d5"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\candidate_3.pt", "bytes": 470803, "sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\final_seed_62001.pt", "bytes": 471273, "sha256": "b5b4323f2bb34c8740fb73bcf50c5603c46feb10ae323fa86dfad4baeb141367"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\final_seed_62002.pt", "bytes": 471273, "sha256": "fa74a12749a2da0d66faa6620b7b244f38db11b674feefcd9781fdb80fd1ae86"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\final_seed_62003.pt", "bytes": 471273, "sha256": "e6803fe705c0ad0ff28e9c4d1ee52264d2bf5ddd76a7e23421c670b8836d61b2"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\final_seed_62004.pt", "bytes": 471273, "sha256": "95f127cf534327c293b4215dc7d330a9a40bb5be026c33d764519254b1adf106"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\final_seed_62005.pt", "bytes": 471273, "sha256": "235b907a504bb29c114f1e97dc275b81f7fff5ac2cafe8470afcc9b80493c2ae"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\preprocessing_statistics.json", "bytes": 2663, "sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\selected_checkpoint_identity.json", "bytes": 197, "sha256": "e3282f11f5a2df45d09691feaf9a40836e3bb453f0f5268a3df2e692319307d9"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\selected_configuration.json", "bytes": 675, "sha256": "78a505635bd2a7578ec8aaf73d3d81046e625452d1f7505ae5ee2e7993d45441"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\validation_metrics.json", "bytes": 464, "sha256": "baaaf3b56c3c829569413ef9bbde3e4eea837a2b3ebfb382c31c906eb9120bca"},
+    {"path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\validation_predictions.jsonl", "bytes": 13539, "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210"}
+  ]
+}

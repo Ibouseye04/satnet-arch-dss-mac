@@ -1,0 +1,38 @@
+{
+  "inventory_version": "1",
+  "inventory_scope": "artifacts/stage_a_training_plan_v1_gate",
+  "self_excluding": true,
+  "artifact_count_excluding_inventory": 6,
+  "artifacts": [
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/metric_and_selection_verification.json",
+      "bytes": 3237,
+      "sha256": "d305c9e61056f0ecb43b66bc3723323b3404587bf063d8926780c18dac23a3da"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/preprocessing_and_test_seal_verification.json",
+      "bytes": 2266,
+      "sha256": "d57779550a975dd8436a5e18e7f60a5cfeaf8ed9600a69c5fde3fec174202116"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/README.md",
+      "bytes": 2429,
+      "sha256": "a06b7e5dc5e0da5bf07e8f797d9aa6234397810da08b9e2c4b42848af2b081b1"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/runtime_compatibility_report.json",
+      "bytes": 2929,
+      "sha256": "3b68ee547348e80fec123c5d13d1866afe0363739715da0777b933c6aff8b14f"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/search_budget_verification.json",
+      "bytes": 3439,
+      "sha256": "f90effd3aa41c1a4bb02c5cee27c93066e67eafe0ba6d07e690cca98210d2f8a"
+    },
+    {
+      "path": "artifacts/stage_a_training_plan_v1_gate/training_plan_gate_report.json",
+      "bytes": 5712,
+      "sha256": "75560841527dae6c3526bafc1c41d8adbfcf9e00f491a9d05a819f39e3b409df"
+    }
+  ]
+}

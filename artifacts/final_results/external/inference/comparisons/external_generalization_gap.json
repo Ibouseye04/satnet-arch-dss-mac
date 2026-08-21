@@ -1,0 +1,76 @@
+{
+  "RF": [
+    {
+      "absolute_mae_change": 0.08016675909636975,
+      "external_real_data_driven_mae": 0.1273978715832696,
+      "relative_mae_change": 1.697329469395942,
+      "seed": 42,
+      "synthetic_heldout_test_mae": 0.04723111248689984
+    },
+    {
+      "absolute_mae_change": 0.08054076158457922,
+      "external_real_data_driven_mae": 0.12765187652567322,
+      "relative_mae_change": 1.7095914984241916,
+      "seed": 123,
+      "synthetic_heldout_test_mae": 0.047111114941094004
+    },
+    {
+      "absolute_mae_change": 0.08020874333796271,
+      "external_real_data_driven_mae": 0.12744006491892657,
+      "relative_mae_change": 1.6982108620540928,
+      "seed": 456,
+      "synthetic_heldout_test_mae": 0.04723132158096386
+    },
+    {
+      "absolute_mae_change": 0.08002216540388618,
+      "external_real_data_driven_mae": 0.1273781063462055,
+      "relative_mae_change": 1.6898020356380439,
+      "seed": 789,
+      "synthetic_heldout_test_mae": 0.047355940942319326
+    },
+    {
+      "absolute_mae_change": 0.08034291944079042,
+      "external_real_data_driven_mae": 0.12745201391140437,
+      "relative_mae_change": 1.7054651621653927,
+      "seed": 2026,
+      "synthetic_heldout_test_mae": 0.04710909447061395
+    }
+  ],
+  "TGNN": [
+    {
+      "absolute_mae_change": 0.031275557565575554,
+      "external_real_data_driven_mae": 0.06290224140586045,
+      "relative_mae_change": 0.9888977840205272,
+      "seed": 42,
+      "synthetic_heldout_test_mae": 0.0316266838402849
+    },
+    {
+      "absolute_mae_change": 0.031467535489311936,
+      "external_real_data_driven_mae": 0.0627940192249717,
+      "relative_mae_change": 1.0045026360073603,
+      "seed": 123,
+      "synthetic_heldout_test_mae": 0.031326483735659764
+    },
+    {
+      "absolute_mae_change": 0.03313114480458869,
+      "external_real_data_driven_mae": 0.06345601852596121,
+      "relative_mae_change": 1.0925402397055444,
+      "seed": 456,
+      "synthetic_heldout_test_mae": 0.030324873721372516
+    },
+    {
+      "absolute_mae_change": 0.02981478960365845,
+      "external_real_data_driven_mae": 0.05722958686430618,
+      "relative_mae_change": 1.0875436838066923,
+      "seed": 789,
+      "synthetic_heldout_test_mae": 0.02741479726064773
+    },
+    {
+      "absolute_mae_change": 0.0357178063267627,
+      "external_real_data_driven_mae": 0.06799850607345659,
+      "relative_mae_change": 1.1064755908960997,
+      "seed": 2026,
+      "synthetic_heldout_test_mae": 0.03228069974669389
+    }
+  ]
+}

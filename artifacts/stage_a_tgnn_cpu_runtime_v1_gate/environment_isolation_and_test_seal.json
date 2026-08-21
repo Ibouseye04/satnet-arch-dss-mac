@@ -1,0 +1,53 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_environment_isolation_and_test_seal",
+  "status": "pass",
+  "implementation_commit": "f102111",
+  "environment_isolation": {
+    "dedicated_environment_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1",
+    "dedicated_environment_outside_repository": true,
+    "dedicated_python_exists": true,
+    "project_venv": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\.venv",
+    "project_venv_file_count_initial_probe": 33473,
+    "project_venv_file_count_final_probe": 33473,
+    "dedicated_venv_file_count_initial_probe": 33572,
+    "dedicated_venv_file_count_final_probe": 33572,
+    "project_venv_file_count_unchanged": true,
+    "dedicated_venv_file_count_unchanged": true,
+    "package_installation_during_gate": false,
+    "package_download_during_gate": false,
+    "bytecode_writes_disabled_during_probe": true
+  },
+  "accepted_inputs_and_outputs": {
+    "declared_pre_gate_evidence_hashes_verified": true,
+    "accepted_runtime_evidence_modified": false,
+    "accepted_datasets_modified": false,
+    "accepted_gates_modified": false,
+    "training_plans_modified": false,
+    "rf_outputs_modified": false,
+    "unrelated_files_touched": false
+  },
+  "serialization_reader_seal": {
+    "reader_import": "scripts.build_stage_a_tgnn_dataset.load_sequence",
+    "reader_imported_without_calling_reader": true,
+    "sequence_artifacts_opened": 0,
+    "train_indexes_opened": 0,
+    "validation_indexes_opened": 0,
+    "test_indexes_or_targets_opened": 0,
+    "preprocessing_statistics_calculated": false
+  },
+  "training_seal": {
+    "training_performed": false,
+    "optimizer_instantiated": false,
+    "loss_calculated": false,
+    "backward_performed": false,
+    "checkpoint_created": false,
+    "production_data_loaded": false
+  },
+  "worktree_status_before_and_after": [
+    " M .gitattributes",
+    "?? data/",
+    "?? docs/refactor_plans/2026-07-15_tier1_validity_remediation_atomic_gameplan.md",
+    "?? docs/validation/tier1_defect_verification.md"
+  ],
+  "worktree_scope_result": "Pre-existing unrelated worktree changes were preserved; this gate writes only its own artifact directory."
+}

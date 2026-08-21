@@ -1,0 +1,41 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression_candidate1_checkpoint_mismatch_assessment.v1",
+  "assessment_only": true,
+  "verdict": "STAGE A TGNN REGRESSION CANDIDATE-1 MISMATCH ASSESSED — SERIALIZATION-ONLY REMEDIATION REQUIRED",
+  "classification": "SERIALIZATION_ONLY",
+  "scope": {
+    "candidate_index": 1,
+    "seed": 61001,
+    "hidden_dimension": 32,
+    "learning_rate": 0.003,
+    "expected_checkpoint_sha256": "89455aeca56ff169f9dbe4d7d8a22ae08339ab60a7e7ef392262ebe11bcabda1",
+    "observed_checkpoint_sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2",
+    "observed_checkpoint_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1\\checkpoints\\candidate_1.pt"
+  },
+  "evidence": {
+    "history_exact": true,
+    "best_epoch_and_metrics_exact": true,
+    "checkpoint_metadata_matches_candidate_contract": true,
+    "all_checkpoint_tensors_finite": true,
+    "serialization_contracts_code_identical": true,
+    "current_failed_candidate_checkpoint_is_original_reference": false,
+    "current_failed_candidate_checkpoint_overwrite_observed": true
+  },
+  "scientific_divergence_found": false,
+  "inference_performed": false,
+  "recommended_narrow_remediation": "Prevent the final-seed loop from overwriting checkpoints/candidate_1.pt; call the candidate training primitive for final seeds without its candidate output root, or direct each final-seed save to a distinct final-seed destination. Preserve the candidate checkpoint before final-seed execution. No remediation was applied in this assessment.",
+  "safety": {
+    "training_epoch_run_by_assessment": false,
+    "optimizer_instantiated_by_assessment": false,
+    "backward_called_by_assessment": false,
+    "optimizer_step_called_by_assessment": false,
+    "preprocessing_refit_by_assessment": false,
+    "new_predictions_generated_by_assessment": false,
+    "bootstrap_run_by_assessment": false,
+    "reporting_finalization_run_by_assessment": false,
+    "checkpoint_rewritten_by_assessment": false,
+    "failed_output_modified_by_assessment": false,
+    "reconstruction_output_modified_by_assessment": false,
+    "test_indexes_or_targets_opened_by_python_diagnostic": false
+  }
+}

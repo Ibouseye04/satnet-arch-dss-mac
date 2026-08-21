@@ -1,0 +1,143 @@
+{
+  "verification_id": "stage_a_training_plan_v1_targeted_rf_parameter_completeness_v1",
+  "scope": "Independent constructor-only validation of the remediated RF parameter closure",
+  "plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+  "environment": {
+    "python": "3.11.9",
+    "scikit_learn": "1.9.0",
+    "introspection": "get_params(deep=False)",
+    "fit_called": false
+  },
+  "expected_parameter_names": {
+    "classification": [
+      "bootstrap",
+      "ccp_alpha",
+      "class_weight",
+      "criterion",
+      "max_depth",
+      "max_features",
+      "max_leaf_nodes",
+      "max_samples",
+      "min_impurity_decrease",
+      "min_samples_leaf",
+      "min_samples_split",
+      "min_weight_fraction_leaf",
+      "monotonic_cst",
+      "n_estimators",
+      "n_jobs",
+      "oob_score",
+      "random_state",
+      "verbose",
+      "warm_start"
+    ],
+    "regression": [
+      "bootstrap",
+      "ccp_alpha",
+      "criterion",
+      "max_depth",
+      "max_features",
+      "max_leaf_nodes",
+      "max_samples",
+      "min_impurity_decrease",
+      "min_samples_leaf",
+      "min_samples_split",
+      "min_weight_fraction_leaf",
+      "monotonic_cst",
+      "n_estimators",
+      "n_jobs",
+      "oob_score",
+      "random_state",
+      "verbose",
+      "warm_start"
+    ]
+  },
+  "tasks": {
+    "classification": {
+      "estimator": "sklearn.ensemble.RandomForestClassifier",
+      "candidate_count": 24,
+      "candidate_parameter_name_sets": [
+        [
+          "bootstrap",
+          "ccp_alpha",
+          "class_weight",
+          "criterion",
+          "max_depth",
+          "max_features",
+          "max_leaf_nodes",
+          "max_samples",
+          "min_impurity_decrease",
+          "min_samples_leaf",
+          "min_samples_split",
+          "min_weight_fraction_leaf",
+          "monotonic_cst",
+          "n_estimators",
+          "n_jobs",
+          "oob_score",
+          "random_state",
+          "verbose",
+          "warm_start"
+        ]
+      ],
+      "missing_parameters": [],
+      "extra_parameters": [],
+      "constructor_failures": [],
+      "successful_constructor_validations": 24,
+      "n_jobs_violations": [],
+      "criterion": "gini",
+      "class_weight": "balanced",
+      "fixed_parameter_violations": [],
+      "candidate_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+      "random_state_schedule": [41000, 41001, 41002, 41003, 41004, 41005, 41006, 41007, 41008, 41009, 41010, 41011, 41012, 41013, 41014, 41015, 41016, 41017, 41018, 41019, 41020, 41021, 41022, 41023],
+      "candidate_order_is_deterministic": true,
+      "random_state_schedule_is_deterministic": true
+    },
+    "regression": {
+      "estimator": "sklearn.ensemble.RandomForestRegressor",
+      "candidate_count": 24,
+      "candidate_parameter_name_sets": [
+        [
+          "bootstrap",
+          "ccp_alpha",
+          "criterion",
+          "max_depth",
+          "max_features",
+          "max_leaf_nodes",
+          "max_samples",
+          "min_impurity_decrease",
+          "min_samples_leaf",
+          "min_samples_split",
+          "min_weight_fraction_leaf",
+          "monotonic_cst",
+          "n_estimators",
+          "n_jobs",
+          "oob_score",
+          "random_state",
+          "verbose",
+          "warm_start"
+        ]
+      ],
+      "missing_parameters": [],
+      "extra_parameters": [],
+      "constructor_failures": [],
+      "successful_constructor_validations": 24,
+      "n_jobs_violations": [],
+      "criterion": "squared_error",
+      "fixed_parameter_violations": [],
+      "candidate_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+      "random_state_schedule": [41000, 41001, 41002, 41003, 41004, 41005, 41006, 41007, 41008, 41009, 41010, 41011, 41012, 41013, 41014, 41015, 41016, 41017, 41018, 41019, 41020, 41021, 41022, 41023],
+      "candidate_order_is_deterministic": true,
+      "random_state_schedule_is_deterministic": true
+    }
+  },
+  "aggregate_result": {
+    "candidates_expected": 48,
+    "candidates_inspected": 48,
+    "successful_constructor_validations": 48,
+    "missing_parameter_count": 0,
+    "extra_parameter_count": 0,
+    "constructor_failure_count": 0,
+    "n_jobs_violation_count": 0,
+    "fixed_parameter_violation_count": 0,
+    "pass": true
+  }
+}

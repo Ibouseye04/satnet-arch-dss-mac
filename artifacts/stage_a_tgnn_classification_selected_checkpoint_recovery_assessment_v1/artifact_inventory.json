@@ -1,0 +1,19 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.selected_checkpoint_recovery_assessment_artifact_inventory.v1",
+  "self_excluding": true,
+  "assessment_directory": "artifacts/stage_a_tgnn_classification_selected_checkpoint_recovery_assessment_v1",
+  "verdict": "STAGE A TGNN CLASSIFICATION SELECTED CHECKPOINT RECOVERABLE — READY FOR TARGETED RECONSTRUCTION AUTHORIZATION",
+  "artifacts": [
+    {"path": "checkpoint_overwrite_root_cause.json", "bytes": 5364, "sha256": "a5fe7eefbc3b9657a92ac649ba0ec1cc07c09c74b4a28b4ad33b269877ee59b0"},
+    {"path": "checkpoint_semantic_comparison.json", "bytes": 6058, "sha256": "4233523510188786bfe7677b36208c9ee361058fa45e0f179781500618f14e30"},
+    {"path": "deterministic_reconstruction_feasibility.json", "bytes": 5448, "sha256": "f86e2ea653043767accacdcdf8747d260f2497b17340698f80fb4aed18fd6ba0"},
+    {"path": "original_checkpoint_search_report.json", "bytes": 4169, "sha256": "1214f4f98bcc6a51fa51ab4aed8e0630f94a908ce770ee366dc2d9b5e672f140"},
+    {"path": "preserved_output_identity.json", "bytes": 3700, "sha256": "14209080e29048bcec5f9a85f91e0e98ea8bf7e210855342dccc52e9a3bdd27d"},
+    {"path": "README.md", "bytes": 3809, "sha256": "a6a4895955ee978a9252e0be1bd14bd347a478f978bf5926ca740af896b9b0b4"},
+    {"path": "selected_checkpoint_recovery_assessment.json", "bytes": 3740, "sha256": "e102701c80061344df367c4f27e106469465c1bfef8291a70d65d82fdf16be41"},
+    {"path": "torch_save_byte_determinism_report.json", "bytes": 2045, "sha256": "a18c3cc370cb9e8521e81a9fa71032ba0ca757a4ec4e38c2541a031d747143e5"},
+    {"path": "torch_save_probe_a.pt", "bytes": 2109, "sha256": "20b213c2b479e577452ae46708c4d452480dc9328b0458c46d50e540d003ebf6"},
+    {"path": "torch_save_probe_b.pt", "bytes": 2109, "sha256": "30c0af07207d37d008961cad5d33b9f2ae7d95a4464822525f6466e29a334f01"},
+    {"path": "torch_save_probe_same_path.pt", "bytes": 2301, "sha256": "80cfcf9c580a405df50cc6799118e247128593683a82353df80a44a3d63070f0"}
+  ]
+}

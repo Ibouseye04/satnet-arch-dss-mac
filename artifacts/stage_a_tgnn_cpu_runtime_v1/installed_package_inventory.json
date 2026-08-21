@@ -1,0 +1,25 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_installed_package_inventory",
+  "status": "pass",
+  "environment_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "platform": "Windows AMD64 / CPython 3.11.9",
+  "wheelhouse": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\wheelhouse",
+  "identity_note": "wheel_sha256 values are SHA-256 hashes of the resolved wheel files retained in the dedicated environment wheelhouse; local CPU build suffixes are the installed distribution identities.",
+  "required_frozen_packages": {
+    "torch": {"requested_version": "2.12.1", "installed_version": "2.12.1+cpu", "source": "https://download.pytorch.org/whl/cpu", "wheel_filename": "torch-2.12.1+cpu-cp311-cp311-win_amd64.whl", "wheel_sha256": "cf9ef28ef8d1a7d56aba206780cbb09e8a643a942f26a2374ab21b9a02b9d9fd"},
+    "torch-geometric": {"requested_version": "2.8.0", "installed_version": "2.8.0", "source": "https://pypi.org/simple/torch-geometric/", "wheel_filename": "torch_geometric-2.8.0-py3-none-any.whl", "wheel_sha256": "1f62e415a2e9ee69d34617d1b0b230e9d9040f51809b96e801e742770fd4dada"},
+    "torch-geometric-temporal": {"requested_version": "0.56.2", "installed_version": "0.56.2", "source": "https://pypi.org/simple/torch-geometric-temporal/", "wheel_filename": "torch_geometric_temporal-0.56.2-py3-none-any.whl", "wheel_sha256": "6cb5d0d28ba2b9fac864a0737ded6c4ee53365ce5e43849a3f5da83695c2a624"},
+    "torch-sparse": {"requested_version": "0.6.18", "installed_version": "0.6.18+pt212cpu", "source": "https://data.pyg.org/whl/torch-2.12.1+cpu.html; resolved directory torch-2.12.0+cpu", "wheel_filename": "torch_sparse-0.6.18+pt212cpu-cp311-cp311-win_amd64.whl", "wheel_sha256": "be4a2c555bad61b8b1d5e76fc6a3cbb603d2f3e6ba8f6eb0ff3b9a1ac4c44a3a"},
+    "torch-scatter": {"requested_version": "2.1.2", "installed_version": "2.1.2+pt212cpu", "source": "https://data.pyg.org/whl/torch-2.12.1+cpu.html; resolved directory torch-2.12.0+cpu", "wheel_filename": "torch_scatter-2.1.2+pt212cpu-cp311-cp311-win_amd64.whl", "wheel_sha256": "281f39bc1384c0b808d6328a146261da8911f19fc74527f6dc17be1c1e5bbad8"},
+    "scikit-learn": {"requested_version": "1.9.0", "installed_version": "1.9.0", "source": "https://pypi.org/simple/scikit-learn/", "wheel_filename": "scikit_learn-1.9.0-cp311-cp311-win_amd64.whl", "wheel_sha256": "5dc1818c77575d149e25fce9ef82dd7b7263ae372f03494158668ad632a69759"},
+    "joblib": {"requested_version": "1.5.3", "installed_version": "1.5.3", "source": "https://pypi.org/simple/joblib/", "wheel_filename": "joblib-1.5.3-py3-none-any.whl", "wheel_sha256": "5fc3c5039fc5ca8c0276333a188bbd59d6b7ab37fe6632daa76bc7f9ec18e713"},
+    "numpy": {"requested_version": "1.26.4", "installed_version": "1.26.4", "source": "https://pypi.org/simple/numpy/", "wheel_filename": "numpy-1.26.4-cp311-cp311-win_amd64.whl", "wheel_sha256": "cd25bcecc4974d09257ffcd1f098ee778f7834c3ad767fe5db785be9a4aa9cb2"},
+    "pandas": {"requested_version": "2.3.3", "installed_version": "2.3.3", "source": "https://pypi.org/simple/pandas/", "wheel_filename": "pandas-2.3.3-cp311-cp311-win_amd64.whl", "wheel_sha256": "f086f6fe114e19d92014a1966f43a3e62285109afe874f067f5abbdcbb10e59c"},
+    "scipy": {"requested_version": "1.17.1", "installed_version": "1.17.1", "source": "https://pypi.org/simple/scipy/", "wheel_filename": "scipy-1.17.1-cp311-cp311-win_amd64.whl", "wheel_sha256": "d30e57c72013c2a4fe441c2fcb8e77b14e152ad48b5464858e07e2ad9fbfceff"}
+  },
+  "installed_distributions": [
+    ["aiohappyeyeballs", "2.7.1"], ["aiohttp", "3.14.3"], ["aiosignal", "1.4.0"], ["attrs", "26.1.0"], ["certifi", "2026.7.22"], ["charset-normalizer", "3.4.9"], ["colorama", "0.4.6"], ["Cython", "3.2.9"], ["decorator", "4.4.2"], ["filelock", "3.29.0"], ["frozenlist", "1.8.0"], ["fsspec", "2026.4.0"], ["idna", "3.18"], ["Jinja2", "3.1.6"], ["joblib", "1.5.3"], ["MarkupSafe", "3.0.3"], ["mpmath", "1.3.0"], ["multidict", "6.7.1"], ["narwhals", "2.24.0"], ["networkx", "3.6.1"], ["numpy", "1.26.4"], ["pandas", "2.3.3"], ["pip", "24.0"], ["propcache", "0.5.2"], ["psutil", "7.2.2"], ["pyparsing", "3.3.2"], ["python-dateutil", "2.9.0.post0"], ["pytz", "2026.3.post1"], ["requests", "2.34.2"], ["scikit-learn", "1.9.0"], ["scipy", "1.17.1"], ["setuptools", "65.5.0"], ["six", "1.17.0"], ["sympy", "1.14.0"], ["threadpoolctl", "3.6.0"], ["torch", "2.12.1+cpu"], ["torch-geometric", "2.8.0"], ["torch_geometric_temporal", "0.56.2"], ["torch_scatter", "2.1.2+pt212cpu"], ["torch_sparse", "0.6.18+pt212cpu"], ["tqdm", "4.70.0"], ["typing_extensions", "4.15.0"], ["tzdata", "2026.3"], ["urllib3", "2.7.0"], ["xxhash", "3.8.1"], ["yarl", "1.24.5"]
+  ],
+  "cuda_dependency_check": {"nvidia_distributions": [], "cuda_runtime_dlls": [], "torch_version_cuda": null, "torch_cuda_is_available": false},
+  "recorded_training_or_dataset_access": false
+}

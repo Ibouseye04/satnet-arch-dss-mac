@@ -1,0 +1,55 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_serialization_contract_comparison.v1",
+  "original_runner": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1-activation\\scripts\\run_stage_a_tgnn_regression_training.py",
+    "checkpoint_construction_line": 439,
+    "direct_save_line": 444,
+    "save_call": "torch.save(checkpoint, checkpoint_path)",
+    "candidate_destination": "output_root/checkpoints/candidate_{candidate_index}.pt",
+    "temporary_basename": false,
+    "temporary_rename": false
+  },
+  "reconstruction": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1-activation\\scripts\\reconstruct_stage_a_tgnn_candidate1.py",
+    "training_primitive_line": 504,
+    "checkpoint_path_guard_line": 514,
+    "save_implementation": "Delegates to the imported original runner train_configuration; no independent torch.save payload implementation",
+    "temporary_basename": false,
+    "temporary_rename": false
+  },
+  "payload_comparison": {
+    "top_level_dictionary_order": "IDENTICAL: model_state_dict, optimizer_state_dict, epoch, configuration, target, preprocessing_identity, seed, validation_primary_metric, environment_identity",
+    "nested_configuration_order": "IDENTICAL: candidate_index, hidden_dim, learning_rate, seed",
+    "nested_target_order": "IDENTICAL: alias, source_field, transformation",
+    "nested_environment_order": "IDENTICAL: python, torch",
+    "model_state_dict_generation": "IDENTICAL: model.state_dict() after loading cloned CPU best_state",
+    "optimizer_state_dict_generation": "IDENTICAL: optimizer.state_dict() after loading deep-copied best_optimizer_state",
+    "tensor_device_conversion": "IDENTICAL: best model tensors detach().cpu().clone(); optimizer state is loaded into the CPU optimizer/model",
+    "cloning_or_copying": "IDENTICAL: model best state clone and optimizer deepcopy",
+    "missing_or_additional_checkpoint_keys": "NONE",
+    "metadata_field_order": "IDENTICAL"
+  },
+  "serialization_options": {
+    "pickle_protocol": 2,
+    "use_new_zipfile_serialization": true,
+    "explicit_options_in_source": false,
+    "effective_torch_version": "2.12.1+cpu",
+    "archive_root": "candidate_1",
+    "archive_member_count": 94,
+    "archive_compression": "ZIP_STORED/uncompressed",
+    "archive_format_version": "1",
+    "archive_storage_alignment": "64",
+    "archive_byteorder": "little",
+    "archive_version": "3"
+  },
+  "observed_layout": {
+    "reconstruction_serialization_id_sha256": "e322dbaea0f9deac3de1d6e18991ccf0195ae2ff8b3d0e7c5b3282b44c903b2e",
+    "current_failed_candidate_serialization_id_sha256": "436884cf10d415e9396f608277e2ed3cdd92107de7f03f4076bed6369db1e096",
+    "serialization_id_differs": true,
+    "archive_root_differs": false,
+    "archive_member_count_differs": false,
+    "archive_format_differs": false
+  },
+  "interpretation": "No source-level serialization or payload-construction difference exists between the original candidate save and reconstruction save. The PyTorch archive layout is the same and the generated serialization identifier differs between observed saves. The failed output's current candidate_1.pt is a final-seed overwrite (seed 62005, epoch 11), not the expected original candidate-1 bytes; its payload differences are therefore not evidence of reconstruction divergence.",
+  "conclusion": "Exact-file mismatch is attributable to serialization identity/layout and the loss of the original pre-final-seed candidate file; no scientific payload divergence is established."
+}

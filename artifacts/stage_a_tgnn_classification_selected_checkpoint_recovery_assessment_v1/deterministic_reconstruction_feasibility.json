@@ -1,0 +1,37 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.deterministic_reconstruction_feasibility.v1",
+  "assessment_mode": "diagnosis only; reconstruction not authorized or executed",
+  "authorization_state": "not authorized; this assessment only determines feasibility",
+  "candidate_scope": "candidate 3 only",
+  "bindings": {
+    "dataset_manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "training_index_sha256": "f590fd975950bd6ab1b9cac26cd01e8d8826751774cf48ddb02f301a7dbe6271",
+    "validation_index_sha256": "cfc3d0c13898b0d24f2c273bfc9d15c11bbf20607900146e8fa5aa0d0815d361",
+    "preprocessing_statistics_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "preprocessing_identity": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "candidate_parameters": {"candidate_index": 3, "hidden_dim": 64, "learning_rate": 0.003, "chebyshev_K": 2, "layers": 1, "dropout": 0.0, "batch_size": 1, "weight_decay": 0.00001},
+    "seed": 61003,
+    "sample_ordering": "accepted training and validation JSONL index order; entries are consumed in file order and each temporal sequence is processed in its frozen 11-timestep order",
+    "deterministic_torch_settings": {"random_seed": 61003, "numpy_seed": 61003, "torch_seed": 61003, "torch_threads": 1, "torch_interop_threads": 1, "torch_deterministic_algorithms": true, "cuda_allowed": false, "device": "cpu"},
+    "early_stopping": {"maximum_epochs": 60, "patience": 12, "minimum_delta": 0.0, "metric": "training-weighted validation log loss", "restore_best_state": true, "best_epoch_zero_based": 38},
+    "stored_history": {"path": "candidate_epoch_histories.jsonl", "sha256": "37c356d10dd115a9114a3fb4a418c04a2ab8106c4b7c971bcfb94736c5b24f43", "candidate3_rows": 51, "epoch_range": [0, 50], "qualifying_epochs": [0, 1, 2, 3, 4, 5, 6, 16, 17, 19, 20, 23, 27, 28, 30, 32, 35, 38], "last_best_epoch_so_far": 38, "best_validation_metric": 0.06203101027124465, "final_non_improvement_streak": 12},
+    "loss_weighting": {"loss": "torch.nn.CrossEntropyLoss", "class_weights": [3.5714285714285716, 0.5813953488372093], "source": "frozen training runner constant; training labels only"},
+    "runtime_package_identity": {"python": "3.11.9", "torch": "2.12.1+cpu", "torch_geometric": "2.8.0", "torch_geometric_temporal": "0.56.2", "torch_sparse": "0.6.18+pt212cpu", "torch_scatter": "2.1.2+pt212cpu", "numpy": "1.26.4", "scikit_learn": "1.9.0", "package_inventory_sha256": "a57632c1cc89c5ab728c8c309fd43dc614d143a37a9354bf1f965ae65df7c660"},
+    "training_tooling_identity": {"failed_execution_runner_commit": "fa314c07cdb3c60186365888e9c726a0e4a567e3", "runner_path": "scripts/run_stage_a_tgnn_classification_training.py", "training_plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d", "tgnn_implementation_commit": "f9cd85bbf762dce673a5877e080e675bf8721290"}
+  },
+  "feasibility": {
+    "run_candidate_3_only": {"feasible": true, "condition": "Use frozen accepted dataset and exact bindings above; do not invoke the four-candidate or final-seed campaign."},
+    "stop_using_same_early_stopping_rule": {"feasible": true, "condition": "Implement the runner's zero-based epoch, strict value < best - minimum_delta test, patience count, and best-state restoration."},
+    "write_new_recovery_path_without_candidate_3_pt": {"feasible": true, "condition": "Use a new isolated recovery root and a recovery-specific filename; never open for write the existing output-root candidate_3.pt or any existing output artifact."},
+    "avoid_modifying_existing_checkpoints_and_outputs": {"feasible": true, "condition": "Preflight the existing output-tree hash, use a new output root, and assert the original tree and all identities are unchanged before and after."},
+    "reproduce_stored_epoch_history_and_validation_metrics": {"feasible": true, "condition": "The frozen index hashes, preprocessing artifact, candidate history, selection result, runtime package identity, and tooling identity provide deterministic comparison inputs. The reconstruction must compare all 51 candidate-3 history rows and the best validation metric before checkpoint acceptance."},
+    "compare_reconstructed_file_to_expected_sha256": {"feasible": true, "reliability": "conditional", "condition": "Exact bytes can be compared, but torch.save serialization is destination-basename sensitive; the original expected bytes used the candidate_3 archive prefix, while a mandated recovery filename may differ."},
+    "compare_canonical_semantic_state_dict_hash": {"feasible": true, "reliability": "primary comparison", "condition": "Use SATNET-TGNN-CANONICAL-V1 from checkpoint_semantic_comparison.json and require exact key, dtype, shape, and tensor-value equality."}
+  },
+  "limitations": [
+    "The assessment did not open train, validation, or sealed-test index contents; their frozen SHA-256 bindings were taken from committed runner and accepted evidence.",
+    "No reconstruction was run and no authorization is granted by this file.",
+    "The original expected candidate-3 bytes cannot be validated against an existing original file because no exact or semantic original copy was found."
+  ],
+  "conclusion": "An isolated candidate-3-only deterministic reconstruction is technically feasible and can be prepared for targeted authorization; it must write only to a new recovery path and use canonical semantic comparison as the robust acceptance test."
+}

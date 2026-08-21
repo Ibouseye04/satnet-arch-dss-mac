@@ -1,0 +1,62 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 1660,
+      "path": "README.md",
+      "sha256": "5f5e2cf587147a755b5ee69a596fd297f817e1e88f81c11f1e6210c8925aa88e"
+    },
+    {
+      "bytes": 3345,
+      "path": "artifact_identity_verification.json",
+      "sha256": "c4906544ce6dbb973193a97a03ac9b6405b52c6dac1e4b6cbefa788d42babd9e"
+    },
+    {
+      "bytes": 1765,
+      "path": "bootstrap_verification.json",
+      "sha256": "2d6480a5c4d414a5e87455d5a8253aa9e8c184fb9369936296a9c7f6d2746b67"
+    },
+    {
+      "bytes": 6103,
+      "path": "candidate_selection_verification.json",
+      "sha256": "fb9606ff8d4becec9f2b36c116069405cb03e245d5820b2e1a957482ee4afe94"
+    },
+    {
+      "bytes": 4009,
+      "path": "checkpoint_identity_verification.json",
+      "sha256": "bdf5304fd34d58354eb5900a58c778038c8ffc9dfa03f69a8959259a4bb96ccc"
+    },
+    {
+      "bytes": 3398,
+      "path": "design_metric_verification.json",
+      "sha256": "dd656ec5b97a27fa8ac2b3f47d1a4d86941e463354d4081f53f922d76805fe05"
+    },
+    {
+      "bytes": 871,
+      "path": "recovery_integrity_verification.json",
+      "sha256": "cd54fd11cb73a87972ce0189d7cdb2e8871c35e681aaf364fd47f51963cd8d80"
+    },
+    {
+      "bytes": 494,
+      "path": "test_seal_verification.json",
+      "sha256": "18810c308f71bbc76eb118fefe89fa03a8236aa2c459dd4600a56195368aeecd"
+    },
+    {
+      "bytes": 16222,
+      "path": "tgnn_classification_training_gate_report.json",
+      "sha256": "c9ff82bcf62f954cfaf11dd70b49afe9e27f7597420dee80119a7c2757b6c626"
+    },
+    {
+      "bytes": 892,
+      "path": "validation_metric_recomputation.json",
+      "sha256": "204e449d731535f3cd389d7e314e3f47f6d646a9e38c9d26ba6446589a8bcc4d"
+    },
+    {
+      "bytes": 653,
+      "path": "validation_prediction_recomputation.json",
+      "sha256": "d5a6d6051ce4adf0a1a518ffca8c1bb2a65caa3e8e0e24a3ee57ea8a4318c078"
+    }
+  ],
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.artifact_inventory.v1",
+  "self_excluding": true
+}

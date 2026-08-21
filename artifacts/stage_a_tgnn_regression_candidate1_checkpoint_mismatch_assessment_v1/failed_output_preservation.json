@@ -1,0 +1,37 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_failed_output_preservation.v1",
+  "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+  "expected_identity": {
+    "file_count": 17,
+    "bytes": 2058047,
+    "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"
+  },
+  "observed_identity_before_assessment": {
+    "file_count": 17,
+    "bytes": 2058047,
+    "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"
+  },
+  "observed_identity_after_assessment": {
+    "file_count": 17,
+    "bytes": 2058047,
+    "tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c"
+  },
+  "byte_identical": true,
+  "modified_by_assessment": false,
+  "current_failed_candidate_1_context": {
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1\\checkpoints\\candidate_1.pt",
+    "bytes": 150163,
+    "sha256": "3e28e10ddc024b21b57cbc986367d0393742ddc387f523eb1ddb45cfba213ef2",
+    "observed_seed": 62005,
+    "observed_epoch": 11,
+    "interpretation": "Existing final-seed overwrite; not modified by this assessment."
+  },
+  "safety_result": {
+    "failed_output_cleaned": false,
+    "failed_output_replaced": false,
+    "failed_output_checkpoint_rewritten": false,
+    "validation_predictions_modified": false,
+    "final_seed_checkpoints_modified": false,
+    "test_index_or_targets_opened_by_python_diagnostic": false
+  }
+}

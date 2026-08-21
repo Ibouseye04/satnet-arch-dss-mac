@@ -1,0 +1,15 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_checkpoint_mismatch_assessment.artifact_inventory.v1",
+  "root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_regression_candidate1_checkpoint_mismatch_assessment_v1",
+  "self_excluding": true,
+  "artifacts": [
+    {"path": "checkpoint_mismatch_assessment.json", "bytes": 2211, "sha256": "5dce1c65f117ea762ccf6dfccbdb62ff7579eb8178f42d0fa29bfad7e80d6f50"},
+    {"path": "checkpoint_semantic_identity.json", "bytes": 3829, "sha256": "7a96309b5ae8e7466ae10bc630e2797dcfeeda17622cda46a462879af112da23"},
+    {"path": "failed_output_preservation.json", "bytes": 1429, "sha256": "f37423e5b51bd9823d789903f9464d4085fc77a44bc0d36607d5c548746b30f5"},
+    {"path": "history_comparison.json", "bytes": 2080, "sha256": "8465af5ce4c97cf4a94ff090329c431c7382f9bf28ab57693f791b2d1b43f3fd"},
+    {"path": "metric_consistency_verification.json", "bytes": 1293, "sha256": "9eb1ef4ea86b7d304018d23a78ab73bd09b4ce3fa4efdcb8d3c5efe6fa5e27cc"},
+    {"path": "README.md", "bytes": 2740, "sha256": "5eebcf03197525f37604f0522565ebf53fba15a558c130f25fd575953da490d0"},
+    {"path": "reconstruction_state_inventory.json", "bytes": 1347, "sha256": "e927f8e8f61978cc03d0110f09f2275a7ec7bd8822634db09cbc1315b90bfaeb"},
+    {"path": "serialization_contract_comparison.json", "bytes": 3563, "sha256": "f64e9f3f826a7d3b3b85e76764f3d87b2ab6226a69ab005d58db568551004604"}
+  ]
+}

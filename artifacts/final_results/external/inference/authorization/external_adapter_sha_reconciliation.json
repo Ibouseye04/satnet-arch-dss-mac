@@ -1,0 +1,34 @@
+{
+  "schema_version": "satnet.phase4b.external_adapter_sha_reconciliation.v1",
+  "previously_reported_adapter_sha": "cc03fc9e1e0074901d5577b0d36698e4f0f0b55e18873c4fcd1d7aaf698f68ac",
+  "authoritative_frozen_adapter_sha": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23",
+  "evidence": [
+    {
+      "kind": "independently_recomputed_adapter_sha",
+      "path": "C:/Users/johns/Developer/satnet-arch-dss-mac/src/satnet/experiments/external_validation/phase4a.py + src/satnet/network/hypatia_adapter.py",
+      "sha256": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23"
+    },
+    {
+      "kind": "frozen_phase4a_inventory",
+      "path": "C:/Users/johns/external/satnet-real-external-validation-v1/external_validation_inventory.json",
+      "adapter_sha256": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23"
+    },
+    {
+      "kind": "frozen_adapter_specification",
+      "path": "C:/Users/johns/external/satnet-real-external-validation-v1/contracts/external_adapter_specification.json",
+      "adapter_sha256": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23"
+    },
+    {
+      "kind": "verified_external_bundle",
+      "path": "C:/Users/johns/external/satnet-real-external-validation-v1",
+      "bundle_sha256": "9abede2f83adbfc96e8267805e3253d6dbcd6f5240d675729d5677aa053b7e28"
+    }
+  ],
+  "classification": "reporting/transcription mismatch only",
+  "phase4a_dataset_invalidated": false,
+  "adapter_invalidated": false,
+  "rebuild_required": false,
+  "retraining_required": false,
+  "external_inference_previously_performed": false,
+  "created_for_phase4b_resume": true
+}

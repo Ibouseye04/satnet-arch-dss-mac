@@ -1,0 +1,35 @@
+{
+  "protocol_id": "stage_a_final_test_opening_v1",
+  "status": "frozen",
+  "purpose": "Authorize exactly one final test-target opening and one evaluation pass for the four frozen model identities.",
+  "preconditions": [
+    "RF and TGNN dataset gates are accepted and their exact full commit identities are recorded.",
+    "The immutable split counts and five-realizations-per-design invariant pass for both accepted datasets.",
+    "The four model-specific training outputs have passed their independent training gates.",
+    "The four selected configurations, preprocessing identity, environment identity, and fixed thresholds are recorded and hash-locked.",
+    "All five repeated-seed weights for each model identity are frozen and hashed; no candidate or final selection remains unresolved.",
+    "No test target file has been opened, parsed, loaded, or materialized before this authorization."
+  ],
+  "authorization_sequence": [
+    "Create an append-only authorization record containing the four final model identities, source dataset manifest hashes, plan artifact inventory hash, and current implementation HEAD.",
+    "Verify the target-free sealed test indexes and confirm that no target-bearing test source is in the process memory or preprocessing inputs.",
+    "Keep the four frozen model specifications and fitted weights immutable; do not merge train and validation and do not refit.",
+    "Open the sealed test target sources exactly once in a dedicated evaluation process after authorization; load no test target before this point.",
+    "Evaluate RF classification, RF regression, TGNN classification, and TGNN regression in the frozen execution order using the fixed five-seed ensembles.",
+    "Write run-level predictions, design-level aggregates, all required metrics, uncertainty records where applicable, and hashes in one final evaluation record.",
+    "Close the test-target process and mark the test split consumed; do not rerun, retune, recalibrate, or replace any model based on the results."
+  ],
+  "test_usage": {
+    "allowed": ["single final forward/predict pass", "final metrics", "final prediction-versus-actual and residual exports", "final design-level uncertainty reporting"],
+    "forbidden": ["preprocessing fitting", "class-weight calculation", "threshold selection", "calibration", "architecture selection", "hyperparameter selection", "checkpoint selection", "model replacement", "any post-result retuning"]
+  },
+  "evaluation_contract": {
+    "models": ["rf_classification", "rf_regression", "tgnn_classification", "tgnn_regression"],
+    "classification_threshold": 0.5,
+    "classification_probability": "average the five frozen seed probabilities, then apply 0.5",
+    "regression_prediction": "average the five frozen seed predictions",
+    "metrics": "use the complete classification and regression metric lists and design-level aggregation/uncertainty rules from the child policies",
+    "missing_or_failed_output": "mark the final evaluation incomplete and preserve the frozen models; never use test results to repair it"
+  },
+  "post_opening_lock": "Test results are read-only evidence. No model, configuration, preprocessing statistic, threshold, architecture, seed, or dataset may be changed after result opening."
+}

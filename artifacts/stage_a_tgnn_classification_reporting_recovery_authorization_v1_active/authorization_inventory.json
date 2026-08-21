@@ -1,0 +1,15 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_recovery_authorization_inventory.v1",
+  "self_excluding": true,
+  "authorization_directory": "artifacts/stage_a_tgnn_classification_reporting_recovery_authorization_v1_active",
+  "recovery_implementation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "verdict": "STAGE A TGNN CLASSIFICATION RECOVERY BLOCKED — INSUFFICIENT COMPLETED TRAINING EVIDENCE",
+  "artifacts": [
+    {"path": "active_recovery_authorization.json", "bytes": 2621, "sha256": "ba32baf5998fbda946b137072039dfa14e3d2b522fbdd25b7679101a99f32e3d"},
+    {"path": "README.md", "bytes": 3743, "sha256": "12261fd4753837ae23e69c1dd8043e8bc7f68614d009948bb1eb5ca1d88488ba"},
+    {"path": "recovery_preflight_certificate.json", "bytes": 2583, "sha256": "17aa6a1d627653d9455e30e7d50bfaad8126cd5026ccc9fea45cd4fbdf46295e"},
+    {"path": "recovery_runtime_plan.json", "bytes": 3021, "sha256": "54cd50e0ed63ea64536b25f00283b5839cbedf9797feae9ece57e9819890c487"},
+    {"path": "salvage_assessment.json", "bytes": 7380, "sha256": "553e2ab88a18b9d28fb5fa7cf91f85938faba0f2318bd6ec2654ad62ffeb7975"},
+    {"path": "tgnn_classification_finalize_reporting_command.ps1", "bytes": 1299, "sha256": "d15913c4a9fb216b4e88b123f753d4a0056ebc13816e852c8fa681579691bb8f"}
+  ]
+}

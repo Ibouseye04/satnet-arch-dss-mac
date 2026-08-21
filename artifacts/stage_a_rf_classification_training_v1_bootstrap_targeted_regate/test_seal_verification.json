@@ -1,0 +1,28 @@
+{
+  "schema": "satnet.stage_a.rf_classification.bootstrap_targeted_regate.test_seal.v1",
+  "campaign_hash": "6b7ff19d91a4a3d9c4bb02213cc11c41281ebaf02c15fb853a772291a40b3ec4",
+  "bound_training_output_root": "C:\\Users\\johns\\satnet-stage-a-rf-classification-training-v1",
+  "checks": {
+    "test_access_manifest_false": true,
+    "test_target_source_opened_by_targeted_regate": false,
+    "test_targets_read_or_materialized": false,
+    "test_predictions_created": false,
+    "test_metrics_created": false,
+    "fit_called": false,
+    "new_model_created": false,
+    "model_modified": false,
+    "candidate_search_performed": false,
+    "new_validation_predictions_generated": false,
+    "ordinary_validation_metrics_recalculated": false,
+    "rf_regression_training_performed": false,
+    "tgnn_training_performed": false
+  },
+  "evidence_basis": [
+    "execution_manifest.json test_access=false",
+    "training_report.json test_access=false, test_metrics=false, test_predictions=false",
+    "bootstrap_reporting_remediation_report.json no_candidate_search=true, no_fit_called=true, no_new_predictions=true, test_target_read=false",
+    "read-only SHA-256 and byte-count comparisons only for protected outputs and models",
+    "read-only validation prediction row grouping only: 375 existing records, no metric calculation or prediction generation"
+  ],
+  "result": "PASS"
+}

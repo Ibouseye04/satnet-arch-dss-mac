@@ -1,0 +1,71 @@
+{
+  "verification_id": "stage_a_training_plan_v1_targeted_regression_formulas_v1",
+  "scope": "Independent exact-string and aggregation-contract validation; no targets were read",
+  "plan_head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+  "run_level": {
+    "error_i": "y_hat_i - y_i",
+    "rmse": "sqrt((1 / N) * sum_{i=1..N}(error_i^2))",
+    "mae": "(1 / N) * sum_{i=1..N}(|error_i|)",
+    "r2": "1 - (sum_{i=1..N}((y_i - y_hat_i)^2) / sum_{i=1..N}((y_i - mean(y))^2))",
+    "zero_r2_denominator": "If sum_{i=1..N}((y_i - mean(y))^2) is zero, record r2 as null/undefined; do not substitute zero.",
+    "exact_formula_checks": {
+      "error": true,
+      "rmse": true,
+      "mae": true,
+      "r2": true,
+      "zero_denominator_null_without_zero_substitution": true
+    }
+  },
+  "design_level": {
+    "realizations_per_design": 5,
+    "actual_design_mean": "(1 / 5) * sum_{j=1..5}(y_dj)",
+    "predicted_design_mean": "(1 / 5) * sum_{j=1..5}(y_hat_dj)",
+    "rmse": "sqrt((1 / D) * sum_{d=1..D}((y_hat_design_d - y_design_d)^2))",
+    "mae": "(1 / D) * sum_{d=1..D}(|y_hat_design_d - y_design_d|)",
+    "r2": "1 - (sum_{d=1..D}((y_design_d - y_hat_design_d)^2) / sum_{d=1..D}((y_design_d - mean(y_design))^2))",
+    "zero_r2_denominator": "If the design-level R2 denominator is zero, record r2 as null/undefined; do not substitute zero.",
+    "exact_aggregation_checks": {
+      "exactly_five_realizations_averaged_per_design": true,
+      "actual_and_predicted_means_calculated_separately": true,
+      "rmse_over_design_means": true,
+      "mae_over_design_means": true,
+      "r2_over_design_means": true,
+      "zero_denominator_null_without_zero_substitution": true
+    }
+  },
+  "residuals": {
+    "residual": "residual_i = y_hat_i - y_i",
+    "residual_mean": "(1 / N) * sum_{i=1..N}(residual_i)",
+    "residual_population_std": "sqrt((1 / N) * sum_{i=1..N}((residual_i - residual_mean)^2))",
+    "denominator": "N; population standard deviation, not sample standard deviation",
+    "exact_checks": {
+      "residual_sign": true,
+      "population_denominator_N": true
+    }
+  },
+  "bootstrap": {
+    "method": "design-aware nonparametric bootstrap with replacement",
+    "unit": "design_id",
+    "resampling_unit": "design_id, never an individual realization",
+    "retention_rule": "For each selected design occurrence, retain all five realization rows belonging to that design; repeated selections retain repeated copies of all five rows.",
+    "replicates": 10000,
+    "seed": 63002,
+    "interval": "percentile 2.5th and 97.5th percentiles",
+    "undefined_r2_rule": "A replicate with a zero R2 denominator has r2=null/undefined. Exclude only undefined R2 replicates from R2 percentile calculation; do not exclude them from RMSE or MAE calculations.",
+    "r2_replicate_counts": "Report the number of defined R2 replicates and the number of undefined R2 replicates.",
+    "exact_checks": {
+      "design_unit": true,
+      "with_replacement": true,
+      "all_five_realizations_retained": true,
+      "replicate_count": true,
+      "seed": true,
+      "percentile_interval": true,
+      "undefined_r2_excluded_only_from_r2_percentiles": true,
+      "defined_and_undefined_r2_counts_reported": true
+    }
+  },
+  "record_ordering": "Emit run-level prediction-versus-actual and residual records in ascending design_id, then ascending realization_id, then ascending run_id. Emit design-level records in ascending design_id.",
+  "record_ordering_exact": true,
+  "interpretation_required": false,
+  "pass": true
+}

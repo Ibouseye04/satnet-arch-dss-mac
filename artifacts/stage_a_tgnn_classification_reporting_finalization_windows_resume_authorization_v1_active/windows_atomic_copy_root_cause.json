@@ -1,0 +1,39 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_atomic_copy_root_cause.v1",
+  "failure": {
+    "prior_operation": "copy_to_atomic_destination",
+    "invalid_sequence": [
+      "mkstemp descriptor remained open",
+      "bytes were copied without keeping a writable destination handle for fsync",
+      "temporary file was reopened read-only and fsync was attempted",
+      "cleanup ran while a Windows file handle remained open"
+    ],
+    "observed_errors": ["OSError: [Errno 9] Bad file descriptor", "PermissionError: [WinError 32]"]
+  },
+  "correction": {
+    "implementation": "scripts/resume_stage_a_tgnn_classification_reporting.py",
+    "sequence": [
+      "close the mkstemp descriptor before opening the temporary path",
+      "open source in rb mode",
+      "open temporary in xb mode",
+      "copy bytes while destination handle is open",
+      "flush destination handle",
+      "fsync destination_handle.fileno() while writable handle is open",
+      "exit both with-blocks",
+      "os.replace temporary with destination",
+      "unlink only after the with-block has exited and only on failure"
+    ],
+    "checkpoint_operation": "os.replace(existing_temporary_checkpoint, public checkpoints\\candidate_3.pt)",
+    "report_operation": "corrected Windows-safe atomic copy of existing staged bytes"
+  },
+  "publication_scope": {
+    "training": false,
+    "prediction_generation": false,
+    "bootstrap_rerun": false,
+    "report_regeneration": false,
+    "preprocessing_refit": false,
+    "test_indexes_opened": false,
+    "test_targets_opened": false,
+    "test_source_opened": false
+  }
+}

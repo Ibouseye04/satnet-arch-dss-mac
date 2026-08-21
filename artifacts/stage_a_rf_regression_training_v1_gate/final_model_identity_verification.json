@@ -1,0 +1,186 @@
+{
+  "candidate_index": 8,
+  "feature_order": [
+    "num_planes",
+    "sats_per_plane",
+    "configured_satellite_count",
+    "altitude_km",
+    "inclination_deg",
+    "satellite_node_failure_probability",
+    "satellite_edge_failure_probability",
+    "civilian_count",
+    "government_count",
+    "military_count",
+    "total_ground_station_count",
+    "ground_station_failure_probability"
+  ],
+  "fit_calls_observed": 0,
+  "identities": {
+    "51001": {
+      "all_tree_sample_indices_within_training_rows": true,
+      "bootstrap_sample_index_min_max": [
+        0,
+        349
+      ],
+      "bytes": 1946193,
+      "estimator_type": "sklearn.ensemble._forest.RandomForestRegressor",
+      "feature_names_in": [
+        "num_planes",
+        "sats_per_plane",
+        "configured_satellite_count",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability",
+        "civilian_count",
+        "government_count",
+        "military_count",
+        "total_ground_station_count",
+        "ground_station_failure_probability"
+      ],
+      "fitted_tree_count": 200,
+      "n_estimators": 200,
+      "n_features_in": 12,
+      "parameter_differences": {},
+      "path": "rf_regression_seed_51001.joblib",
+      "random_state": 51001,
+      "sha256": "ad0eac90078b21c0d7f18e163c2f4797e0fe498ecc574052d8fb234279c7d307",
+      "training_sample_count": 350
+    },
+    "51002": {
+      "all_tree_sample_indices_within_training_rows": true,
+      "bootstrap_sample_index_min_max": [
+        0,
+        349
+      ],
+      "bytes": 1944465,
+      "estimator_type": "sklearn.ensemble._forest.RandomForestRegressor",
+      "feature_names_in": [
+        "num_planes",
+        "sats_per_plane",
+        "configured_satellite_count",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability",
+        "civilian_count",
+        "government_count",
+        "military_count",
+        "total_ground_station_count",
+        "ground_station_failure_probability"
+      ],
+      "fitted_tree_count": 200,
+      "n_estimators": 200,
+      "n_features_in": 12,
+      "parameter_differences": {},
+      "path": "rf_regression_seed_51002.joblib",
+      "random_state": 51002,
+      "sha256": "256fb98ebb09d78a62db520c6f8edf6d11c70dfa743771809b50d981eafff00d",
+      "training_sample_count": 350
+    },
+    "51003": {
+      "all_tree_sample_indices_within_training_rows": true,
+      "bootstrap_sample_index_min_max": [
+        0,
+        349
+      ],
+      "bytes": 1941153,
+      "estimator_type": "sklearn.ensemble._forest.RandomForestRegressor",
+      "feature_names_in": [
+        "num_planes",
+        "sats_per_plane",
+        "configured_satellite_count",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability",
+        "civilian_count",
+        "government_count",
+        "military_count",
+        "total_ground_station_count",
+        "ground_station_failure_probability"
+      ],
+      "fitted_tree_count": 200,
+      "n_estimators": 200,
+      "n_features_in": 12,
+      "parameter_differences": {},
+      "path": "rf_regression_seed_51003.joblib",
+      "random_state": 51003,
+      "sha256": "ac8d9c80e018fa6edab650331c742fafc7039035e864e90a7741edf464e9fab5",
+      "training_sample_count": 350
+    },
+    "51004": {
+      "all_tree_sample_indices_within_training_rows": true,
+      "bootstrap_sample_index_min_max": [
+        0,
+        349
+      ],
+      "bytes": 1952529,
+      "estimator_type": "sklearn.ensemble._forest.RandomForestRegressor",
+      "feature_names_in": [
+        "num_planes",
+        "sats_per_plane",
+        "configured_satellite_count",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability",
+        "civilian_count",
+        "government_count",
+        "military_count",
+        "total_ground_station_count",
+        "ground_station_failure_probability"
+      ],
+      "fitted_tree_count": 200,
+      "n_estimators": 200,
+      "n_features_in": 12,
+      "parameter_differences": {},
+      "path": "rf_regression_seed_51004.joblib",
+      "random_state": 51004,
+      "sha256": "b091bafcf941289a109382f86d30a40b2dad069dbf2fa71d5df24bb5ea0d45b6",
+      "training_sample_count": 350
+    },
+    "51005": {
+      "all_tree_sample_indices_within_training_rows": true,
+      "bootstrap_sample_index_min_max": [
+        0,
+        349
+      ],
+      "bytes": 1948641,
+      "estimator_type": "sklearn.ensemble._forest.RandomForestRegressor",
+      "feature_names_in": [
+        "num_planes",
+        "sats_per_plane",
+        "configured_satellite_count",
+        "altitude_km",
+        "inclination_deg",
+        "satellite_node_failure_probability",
+        "satellite_edge_failure_probability",
+        "civilian_count",
+        "government_count",
+        "military_count",
+        "total_ground_station_count",
+        "ground_station_failure_probability"
+      ],
+      "fitted_tree_count": 200,
+      "n_estimators": 200,
+      "n_features_in": 12,
+      "parameter_differences": {},
+      "path": "rf_regression_seed_51005.joblib",
+      "random_state": 51005,
+      "sha256": "f87ce700077f908727c159ebf9c295b098733334dc54a1aa87c6e73ef1da10b6",
+      "training_sample_count": 350
+    }
+  },
+  "model_count": 5,
+  "model_failures": [],
+  "result": "PASS",
+  "seeds": [
+    51001,
+    51002,
+    51003,
+    51004,
+    51005
+  ],
+  "validation_or_test_rows_used_for_fitting": false
+}

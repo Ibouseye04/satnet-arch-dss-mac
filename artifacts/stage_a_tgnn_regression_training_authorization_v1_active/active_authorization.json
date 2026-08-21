@@ -1,0 +1,61 @@
+{
+  "authorization_id": "stage_a_tgnn_regression_training_v1",
+  "authorization_status": "AUTHORIZED",
+  "scope": "Contracted GCLSTM TGNN regression only; accepted train and validation splits only; preparation and one future execution",
+  "accepted_training_plan": {
+    "head": "a5e224f354f4ac2b3950da87d52f5cdc722f560d",
+    "regate": "4f9e5e3a2534fc9dbe1e8fb9613cbc041d03e489",
+    "artifacts": {
+      "tgnn_training_specification_sha256": "ee9c386b30babe356ddc680d34b9a1c38b965e4bbef146ce921bd57be956f654",
+      "regression_metric_policy_sha256": "883843df7d0dd43e4b404573b79bd4224e62ac85be22c245f4d4fcd3b96ea873",
+      "preprocessing_specification_sha256": "7597c7567a0970cc8eb600c7254c3cc15aa41b33af9f1d0448160430b9e016c7",
+      "model_selection_policy_sha256": "ced6fe7d13bc94dfcaf2b5780d993f3ca32a31305a20ffaa2472e6bec5b28ba4",
+      "reproducibility_specification_sha256": "9fbd4cde8089f4811d6b886c8105c947535282b12d83d7667d93bb60e57e27a3",
+      "compute_budget_sha256": "5981bd2e66dc3a3fbc5c0771094a1db16f0e000e3f58c2a240270a72a3c0b188"
+    }
+  },
+  "accepted_dataset": {
+    "root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_dataset_v1",
+    "implementation_head": "f9cd85bbf762dce673a5877e080e675bf8721290",
+    "gate_commit": "ea32faab3945f24e5ed234947b03cda56dbdd95f",
+    "manifest_sha256": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "train_index_sha256": "f590fd975950bd6ab1b9cac26cd01e8d8826751774cf48ddb02f301a7dbe6271",
+    "validation_index_sha256": "cfc3d0c13898b0d24f2c273bfc9d15c11bbf20607900146e8fa5aa0d0815d361",
+    "sealed_test_index_sha256": "9d09498c41b5fbf52409d2715b77289f2c141b96f3a4f87fe2cf469df4273779",
+    "graph_schema_sha256": "eb7dfcca04b20c4d955938caf7e88a34cf1c8849c3e7cc50cfed3b6240840304",
+    "node_feature_schema_sha256": "dea0c6c07c7295ebea6acaba0ec320236d8b40afc14a65922ed06c6d63d6b055",
+    "edge_schema_sha256": "ca552f9b21a95717cb9e149fd463b8dd665682d5ebf61d7ae2b5be17f274d0e6"
+  },
+  "accepted_runtime": {
+    "implementation_commit": "f102111",
+    "gate_commit": "dcabfba20fb6e9aaa71e9c174b6f9fdfe7b70c51",
+    "gate_report_sha256": "53697c95bdc5ae049b1317d3c988cf97d4a8bb7b3f369c09bbd5130bebbb91f1",
+    "python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe"
+  },
+  "accepted_prior_model_gates": {
+    "rf_classification": {"commit": "4efc799dc6263f71c55cd9395a0047abdbabf48a", "report_sha256": "71dbe8a7185456e752bf02631be574c19653b146727653bf1438bd6bc68bf3f8"},
+    "rf_regression": {"commit": "ef45ecf4b26e80420bddff50b46692b62daf8ad6", "report_sha256": "6d7dd042a3560c0f993b9773c408e35840f10980c2644a43bbfaf722e34a121f"},
+    "tgnn_classification": {"commit": "196c012c422f8ea95cb1f05bd0ed9012bc7e0dfb", "gate_report_sha256": "c9ff82bcf62f954cfaf11dd70b49afe9e27f7597420dee80119a7c2757b6c626", "completed_output_tree_sha256": "125829be00d8ea670c1a0ec8ae4602b9399c16d88c83802c83c628123b2691a0"}
+  },
+  "tgnn_classification_history_hash_clarification": {
+    "candidate_3_sha256": "730e39eb125f4d1d8f62fafb7889f7731b5b462d85016c45dbfb0ca5d5d396b0",
+    "full_candidate_history_sha256": "37c356d10dd115a9114a3fb4a418c04a2ab8106c4b7c971bcfb94736c5b24f43",
+    "status": "committed artifact verified; malformed response line treated as transcription error"
+  },
+  "authorized_model": "satnet.models.gnn_model.SatelliteGNN with one torch_geometric_temporal GCLSTM layer",
+  "target": {"alias": "gcc_frac_min", "source_field": "space_gcc_fraction_original_min", "transformation": "none", "representation": "untransformed scalar"},
+  "split_scope": {"train_designs": 70, "train_sequences": 350, "validation_designs": 15, "validation_sequences": 75, "test": "sealed and prohibited", "merge_train_validation": false, "realizations_per_design": 5, "timesteps_per_sequence": 11},
+  "graph_contract": {"scope": "combined satellite-ground heterogeneous temporal graph", "node_features": 14, "node_feature_order": ["node_type_satellite", "node_type_ground_station", "plane_index", "satellite_within_plane_index", "ground_station_class_civilian", "ground_station_class_government", "ground_station_class_military", "latitude_deg", "longitude_deg", "altitude_m", "ecef_x_km", "ecef_y_km", "ecef_z_km", "operational_indicator"], "edge_attributes": 10, "edge_attribute_order": ["distance_km", "margin_db", "elevation_deg", "slant_range_km", "link_type_intra_plane", "link_type_inter_plane", "link_type_seam_link", "link_mode_optical", "edge_type_inter_satellite", "edge_type_satellite_ground"], "variable_node_populations": true, "padding_or_masking": false, "zero_edge_shapes": {"edge_index": [2, 0], "edge_attr": [0, 10]}, "edge_attributes_to_gclstm": "preserved and validated; not injected as edge_weight"},
+  "architecture": {"input_dimension": 14, "gclstm_layers": 1, "chebyshev_K": 2, "dropout": 0.0, "batch_size": 1, "pooling": "global mean pooling over final-timestep node hidden states", "head": "Linear(hidden_dim, 1) scalar regression", "weight_decay": 0.00001, "scheduler": null, "gradient_clipping": false, "device": "cpu", "dataloader_workers": 0, "shuffle": false, "ordered_run_processing": "ascending run_id"},
+  "candidates": [{"candidate_index": 0, "hidden_dim": 32, "learning_rate": 0.001, "seed": 61000}, {"candidate_index": 1, "hidden_dim": 32, "learning_rate": 0.003, "seed": 61001}, {"candidate_index": 2, "hidden_dim": 64, "learning_rate": 0.001, "seed": 61002}, {"candidate_index": 3, "hidden_dim": 64, "learning_rate": 0.003, "seed": 61003}],
+  "final_seeds": [62001, 62002, 62003, 62004, 62005],
+  "optimization": {"optimizer": "torch.optim.Adam", "betas": [0.9, 0.999], "eps": 1e-08, "weight_decay": 0.00001, "maximum_epochs": 60, "scheduler": null, "gradient_clipping": false, "loss": "torch.nn.SmoothL1Loss(beta=1.0) with unnormalized target", "early_stopping": {"metric_name": "validation RMSE", "direction": "lower_is_better", "minimum_delta": 0.0, "equality_counts_as_improvement": false, "improvement_predicate": "metric < best_metric - minimum_delta", "first_eligible_epoch": 0, "patience": 12, "best_epoch_tie_handling": "earliest qualifying epoch", "best_checkpoint_restoration": "restore exact model and optimizer state captured at best validation RMSE epoch before final reporting"}},
+  "selection_hierarchy": ["validation RMSE lower is better", "validation MAE lower is better", "validation R2 higher is better", "simpler architecture: hidden_dim 32 before 64; learning rate does not define complexity", "candidate_index ascending"],
+  "preprocessing": {"fit_split": "train only", "scaled_features": ["latitude_deg", "longitude_deg", "altitude_m", "ecef_x_km", "ecef_y_km", "ecef_z_km"], "applicability": "ground-station nodes only; satellite sentinel zeros excluded and remain exactly 0.0", "population_standard_deviation": true, "zero_variance_transform": 0.0, "artifact_schema": "stage_a_tgnn_preprocessing_statistics_v1", "calculated_during_authorization": false},
+  "validation_reporting": {"metrics": ["RMSE", "MAE", "R2", "residual mean", "residual population standard deviation"], "residual": "prediction minus actual", "residual_std_denominator": "N", "run_level_predictions": true, "design_level_aggregation": true, "per_seed_metrics": true, "five_seed_ensemble": true, "bootstrap_replicates": 10000, "bootstrap_seed": 63002, "designs_per_replicate": 15, "realizations_retained_per_selected_design": 5, "percentile_bounds": [2.5, 97.5], "undefined_r2": "null; report valid and undefined replicate counts; never zero"},
+  "activation": {"branch": "activate/stage-a-tgnn-regression-training-v1", "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1-activation", "base_head": "196c012c422f8ea95cb1f05bd0ed9012bc7e0dfb", "activation_head": "d9cb035abff3668ccdba80039523110043ecf6ac", "committed_training_tooling_sha": "d9cb035abff3668ccdba80039523110043ecf6ac"},
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+  "prohibited_actions": ["training before future execution", "optimizer creation during preflight", "preprocessing statistic calculation during authorization", "checkpoint creation during authorization", "validation predictions or metrics during authorization", "test index or test target access", "test predictions or metrics", "TGNN classification rerun", "RF rerun", "accepted dataset/plan/gate/runtime/model-output modification", "project .venv modification"],
+  "campaign_hash": "faa947e5a2dc603121615945beb5bcbd93a4ce5afeabc9a6fcc72f5b4eb406bd",
+  "authorization_semantic_sha256": "688870e392d1c76a802cf545b32e5cbfb2ec21d02e717c792149e8a78ef6bea1"
+}

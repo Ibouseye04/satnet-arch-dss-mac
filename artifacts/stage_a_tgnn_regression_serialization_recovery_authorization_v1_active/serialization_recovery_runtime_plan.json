@@ -1,0 +1,43 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression.serialization_recovery_runtime_plan.v1",
+  "mode": "serialization-only-recovery-and-reporting-finalization",
+  "activation_branch": "activate/stage-a-tgnn-regression-serialization-recovery-v1",
+  "activation_worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-serialization-recovery-v1-activation",
+  "activation_head": "f783e61879140faf4b5c4b7c18a63728ddc67f57",
+  "source_overwrite_guard_sha": "3c388d353939178b2c4cf7843f2b50a39fffe61d",
+  "recovery_tooling_sha": "f783e61879140faf4b5c4b7c18a63728ddc67f57",
+  "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+  "reconstruction_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1",
+  "assessment_root": "C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_regression_candidate1_checkpoint_mismatch_assessment_v1",
+  "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2",
+  "recovery_lock": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2.lock",
+  "completion_marker": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2.completed.json",
+  "campaign_hash": "faa947e5a2dc603121615945beb5bcbd93a4ce5afeabc9a6fcc72f5b4eb406bd",
+  "expected_failed_output_tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c",
+  "expected_reconstruction_tree_sha256": "29a3f93735fc9b4d51a21f9e25257cbfd96068bae252b4b8675e4282541c441a",
+  "planned_final_identity": {
+    "file_count": 22,
+    "bytes": 2070248,
+    "tree_sha256": "a4ad12ff2045eab169da3469968a01f63b688b8d91fc5777e05a93d56338492b"
+  },
+  "recovery_timestamp": "2026-08-04T18:49:31.526Z",
+  "preflight_only_suffix": "-PreflightOnly",
+  "exact_one_time_command": "& 'C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_regression_serialization_recovery_authorization_v1_active\\tgnn_regression_serialization_recovery_command.ps1' -RepoRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-regression-serialization-recovery-v1-activation' -OutputRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1' -ReconstructionRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1' -RecoveryRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2' -AssessmentRoot 'C:\\Users\\johns\\Developer\\satnet-arch-dss-mac\\artifacts\\stage_a_tgnn_regression_candidate1_checkpoint_mismatch_assessment_v1' -ExpectedActivationHead 'f783e61879140faf4b5c4b7c18a63728ddc67f57' -ExpectedSourceToolingSha '3c388d353939178b2c4cf7843f2b50a39fffe61d' -ExpectedRecoveryToolingSha 'f783e61879140faf4b5c4b7c18a63728ddc67f57' -RecoveryTimestamp '2026-08-04T18:49:31.526Z' -PlannedFinalTreeSha256 'a4ad12ff2045eab169da3469968a01f63b688b8d91fc5777e05a93d56338492b' -PlannedFinalFileCount 22 -PlannedFinalBytes 2070248 -PythonExecutable 'C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe' -TranscriptDirectory 'C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2-transcripts'",
+  "execution_policy": "dedicated Python exactly once; preserve process exit code; write transcript outside both roots",
+  "atomic_file_policy": "flush and fsync while handles remain open; close handles before os.replace; no cleanup with open handles",
+  "interrupted_run_policy": "completion marker refuses rerun; initial execution refuses non-absent recovery root; exact already-published files are tolerated by byte comparison",
+  "never_execute": [
+    "training epoch",
+    "candidate search",
+    "final-seed training",
+    "checkpoint reconstruction",
+    "optimizer construction",
+    "backward()",
+    "optimizer.step()",
+    "model inference",
+    "prediction generation",
+    "preprocessing fit",
+    "test index or target access"
+  ]
+}

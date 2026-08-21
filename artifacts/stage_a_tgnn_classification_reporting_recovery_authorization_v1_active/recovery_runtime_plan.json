@@ -1,0 +1,54 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_recovery_runtime_plan.v1",
+  "mode": "finalize-reporting-only",
+  "implementation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "repo_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+  "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "expected_campaign_hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+  "expected_pre_recovery_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "expected_activation_head": "7b7a198de1884034318486e9f92ed208590ba505",
+  "exact_finalize_command": "& 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation\\scripts\\tgnn_classification_finalize_reporting_command.ps1' -RepoRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation' -OutputRoot 'C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1' -ExpectedCampaignHash 'fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f' -ExpectedPreRecoveryTreeHash '0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a' -ExpectedActivationHead '7b7a198de1884034318486e9f92ed208590ba505' -PythonExecutable 'C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe'",
+  "preflight_command_suffix": "-PreflightOnly",
+  "read_inputs": [
+    "existing output-root JSON/JSONL reporting artifacts",
+    "existing checkpoint files for identity and metadata only",
+    "normal training wrapper source for rerun refusal",
+    "activation git HEAD and clean status"
+  ],
+  "never_read": [
+    "dataset root",
+    "train index",
+    "validation index",
+    "sealed test index",
+    "test target sources",
+    "sequence arrays"
+  ],
+  "never_execute": [
+    "optimizer construction or step",
+    "backward pass",
+    "model fitting mode",
+    "training epoch",
+    "candidate search",
+    "final-seed training",
+    "preprocessing fit",
+    "prediction generation unless absent; absence is a blocking condition"
+  ],
+  "preservation_checks": [
+    "preprocessing_statistics.json SHA-256 unchanged",
+    "candidate_epoch_histories.jsonl SHA-256 unchanged",
+    "selected_configuration.json unchanged",
+    "all checkpoint SHA-256 values unchanged",
+    "validation_predictions.jsonl SHA-256 unchanged",
+    "pre-recovery tree hash matches before reporting writes"
+  ],
+  "reporting_outputs": {
+    "undefined_metric_policy": "None/null for undefined; valid numeric zero remains numeric zero",
+    "confusion_matrix_labels": [0, 1],
+    "bootstrap_undefined_interval_bounds": null,
+    "bootstrap_counts": ["valid_replicates", "undefined_replicates"],
+    "canonical_json_allow_nan": false,
+    "recursive_non_finite_rejection": true
+  },
+  "current_authorization_result": "blocked before recovery execution because selected checkpoint identity is inconsistent"
+}

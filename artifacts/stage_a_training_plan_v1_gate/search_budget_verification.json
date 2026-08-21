@@ -1,0 +1,86 @@
+{
+  "report_id": "stage_a_training_plan_v1_search_budget_verification",
+  "read_only": true,
+  "rf": {
+    "candidate_space": {
+      "n_estimators": [200, 400],
+      "max_depth": [null, 16, 32],
+      "min_samples_leaf": [1, 2],
+      "max_features": ["sqrt", 0.75]
+    },
+    "candidate_configurations_per_task": 24,
+    "independent_cartesian_calculation": "2 * 3 * 2 * 2 = 24",
+    "final_repeated_seed_fits_per_task": 5,
+    "fits_per_task": "24 + 5 = 29",
+    "tasks": 2,
+    "total_fits": "29 * 2 = 58",
+    "maximum_trees_per_fit": 400,
+    "maximum_trees_across_both_tasks": "29 * 2 * 400 = 23200",
+    "candidate_order_deterministic": true,
+    "candidate_seed_formula": "random_state = 41000 + candidate_index",
+    "candidate_seed_ranges": {"classification": [41000, 41023], "regression": [41000, 41023]},
+    "final_seed_list": [51001, 51002, 51003, 51004, 51005],
+    "every_candidate_has_exact_random_state": true,
+    "all_candidate_values_accepted_by_frozen_sklearn_api_without_fit": true,
+    "classifier_fixed_controls": {
+      "criterion_squared_or_gini": "gini",
+      "class_weight": "balanced",
+      "bootstrap": true,
+      "probability_calibration": false,
+      "feature_scaling": false,
+      "parallel_workers": 1
+    },
+    "regressor_fixed_controls": {
+      "criterion": "squared_error",
+      "bootstrap": true,
+      "probability_calibration": "not_applicable",
+      "feature_scaling": false,
+      "parallel_workers": 1
+    },
+    "serialization": {
+      "format": "joblib serialized estimator",
+      "protocol": 5,
+      "compression": 0,
+      "determinism_documented": true
+    },
+    "parameter_closure": {
+      "all_estimator_parameters_explicitly_frozen": false,
+      "omitted_parameters": ["min_weight_fraction_leaf", "min_impurity_decrease", "verbose", "warm_start", "ccp_alpha", "monotonic_cst", "n_jobs"],
+      "result": "blocked until exact values are frozen"
+    }
+  },
+  "tgnn": {
+    "candidate_configurations_per_task": 4,
+    "independent_cartesian_calculation": "2 hidden dimensions * 2 learning rates = 4",
+    "final_repeated_seed_runs_per_task": 5,
+    "runs_per_task": "4 + 5 = 9",
+    "tasks": 2,
+    "total_runs": "9 * 2 = 18",
+    "maximum_epochs_per_run": 60,
+    "maximum_total_run_epochs": "18 * 60 = 1080",
+    "candidate_order_deterministic": true,
+    "candidate_seed_formula": "seed = 61000 + candidate_index",
+    "candidate_seed_range": [61000, 61003],
+    "final_seed_list": [62001, 62002, 62003, 62004, 62005],
+    "contracted_one_layer_gclstm": true,
+    "chebyshev_K": 2,
+    "chebyshev_constraint_K_greater_than_1": true,
+    "hidden_dimensions": [32, 64],
+    "learning_rates": [0.001, 0.003],
+    "dropout": 0.0,
+    "batch_size": 1,
+    "weight_decay": 0.00001,
+    "early_stopping_patience": 12,
+    "scheduler_enabled": false,
+    "gradient_clipping_enabled": false,
+    "cpu_only": true,
+    "torch_threads": 1,
+    "dataloader_workers": 0,
+    "shuffle": false,
+    "zero_edge_snapshots_supported_without_placeholder_edges": true,
+    "variable_node_counts_without_padding_or_masking": true,
+    "edge_attributes_preserved_but_not_claimed_as_consumed_by_contracted_gclstm": true,
+    "result": "budget and frozen search contract passed; active GCLSTM import still requires environment preparation"
+  },
+  "overall_result": "RF budget arithmetic passes but RF parameter closure is incomplete; TGNN budget arithmetic and frozen search contract pass."
+}

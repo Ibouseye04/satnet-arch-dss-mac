@@ -1,0 +1,15 @@
+{
+  "schema": "satnet.stage_a_tgnn_classification.reporting_finalization_authorization_inventory.v1",
+  "self_excluding": true,
+  "authorization_directory": "artifacts/stage_a_tgnn_classification_reporting_finalization_authorization_v1_active",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_authorization_v1_active",
+  "activation_head": "32a0244bbb8c8a3955988b3c7be4f0128807377a",
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING FINALIZATION AUTHORIZED — READY TO EXECUTE ONCE",
+  "artifacts": [
+    {"path": "active_reporting_finalization_authorization.json", "bytes": 6829, "sha256": "4aede9b3a53916a0052bdbf546bc4b8c1ea157344899fb3892d2aa7aa1557eff"},
+    {"path": "README.md", "bytes": 4633, "sha256": "45c8ff0b5141fadfd51d4d0b69330474be65f9564ae00860b149f3a9fa127fe9"},
+    {"path": "reporting_finalization_preflight_certificate.json", "bytes": 5604, "sha256": "ddfc12e094174f973d3f53ad9a28d2f50a2ebea10a37f4ac1b30c81978a4e06a"},
+    {"path": "reporting_finalization_runtime_plan.json", "bytes": 5330, "sha256": "d8d699ac1e8d24fd563896d09ba8bc8e2e1cafc6387492e4f80789dddb048433"},
+    {"path": "tgnn_classification_finalize_reporting_command.ps1", "bytes": 1941, "sha256": "55a2974d1e97a18fcead49f7ef721bd7712f3c6aab636e21c6ec3ddce4cb736b"}
+  ]
+}

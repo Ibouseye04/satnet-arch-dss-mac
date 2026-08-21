@@ -1,0 +1,18 @@
+{
+  "backward_calls": 0,
+  "checkpoint_writes": 0,
+  "fit_calls": 0,
+  "model_modifications": 0,
+  "optimizer_instantiated": false,
+  "optimizer_steps": 0,
+  "reporting_artifacts_modified": 0,
+  "rf_outputs_unchanged": true,
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.test_seal.v1",
+  "status": "pass",
+  "test_indexes_opened": 0,
+  "test_metrics": false,
+  "test_predictions": false,
+  "test_targets_opened": 0,
+  "tgnn_regression_training": false,
+  "training_epochs": 0
+}

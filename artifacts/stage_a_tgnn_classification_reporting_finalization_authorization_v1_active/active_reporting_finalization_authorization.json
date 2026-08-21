@@ -1,0 +1,114 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_finalization_authorization.v1",
+  "authorization_id": "stage_a_tgnn_classification_reporting_finalization_authorization_v1_active",
+  "status": "active",
+  "verdict": "STAGE A TGNN CLASSIFICATION REPORTING FINALIZATION AUTHORIZED — READY TO EXECUTE ONCE",
+  "scope": "reporting finalization only with one explicitly authorized selected-checkpoint restoration; no training or prediction generation",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-classification-training-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1-activation",
+    "head": "32a0244bbb8c8a3955988b3c7be4f0128807377a",
+    "tooling_commit": "32a0244bbb8c8a3955988b3c7be4f0128807377a",
+    "failed_execution_tooling_sha": "fa314c07cdb3c60186365888e9c726a0e4a567e3"
+  },
+  "campaign": {
+    "hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+    "output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "pre_finalization_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "pre_finalization_file_count": 16,
+    "pre_finalization_bytes": 3742138,
+    "dedicated_python": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe"
+  },
+  "accepted_reconstruction": {
+    "gate_commit": "1bb496e",
+    "gate_report_sha256": "f83e2ce4e4d5a7fd57f9f0d0b32d81a3b65fced67ef460469c326c6d021d740a",
+    "reconstruction_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1",
+    "checkpoint_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\checkpoints\\candidate_3.pt",
+    "checkpoint_bytes": 470803,
+    "checkpoint_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "history_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-candidate3-reconstruction-v1\\candidate_3_epoch_history.jsonl",
+    "history_bytes": 28746,
+    "history_sha256": "730e39eb125f4d1d8f62fafb7889f7731b5b462d85016c45dbfb0ca5d5d396b0",
+    "reconstruction_result_sha256": "739651d7140d0a207247e1b5a2887a4ea45755921504248dd1460ee71c07f1f8",
+    "preprocessing_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"
+  },
+  "selected_checkpoint_restoration": {
+    "authorized_target": "checkpoints\\candidate_3.pt",
+    "current_superseded_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "current_superseded_bytes": 470803,
+    "external_recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "preserved_external_name": "superseded_checkpoints\\candidate_3_overwritten_by_final_seed_62005.pt",
+    "preserved_external_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "replacement_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "replacement_operation": "atomic os.replace from externally staged checkpoint",
+    "other_checkpoints_replacement_authorized": false
+  },
+  "frozen_inputs": {
+    "read_only": true,
+    "validation_predictions": {"path": "validation_predictions.jsonl", "bytes": 13539, "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210", "records": 75},
+    "preprocessing_statistics": {"path": "preprocessing_statistics.json", "bytes": 2663, "sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"},
+    "candidate_search_results": {"path": "candidate_search_results.json", "bytes": 2891, "sha256": "e13a6167f0594459c0f9d10bb49452eef3b33283a0c5a90118bc37ff7b5ff04e"},
+    "candidate_epoch_histories": {"path": "candidate_epoch_histories.jsonl", "bytes": 122644, "sha256": "37c356d10dd115a9114a3fb4a418c04a2ab8106c4b7c971bcfb94736c5b24f43"},
+    "selected_configuration": {"path": "selected_configuration.json", "bytes": 675, "sha256": "78a505635bd2a7578ec8aaf73d3d81046e625452d1f7505ae5ee2e7993d45441"},
+    "selected_checkpoint_identity": {"path": "selected_checkpoint_identity.json", "bytes": 197, "sha256": "e3282f11f5a2df45d09691feaf9a40836e3bb453f0f5268a3df2e692319307d9"},
+    "validation_metrics": {"path": "validation_metrics.json", "bytes": 464, "sha256": "baaaf3b56c3c829569413ef9bbde3e4eea837a2b3ebfb382c31c906eb9120bca"},
+    "final_seed_checkpoints": [
+      {"path": "checkpoints/final_seed_62001.pt", "bytes": 471273, "sha256": "b5b4323f2bb34c8740fb73bcf50c5603c46feb10ae323fa86dfad4baeb141367"},
+      {"path": "checkpoints/final_seed_62002.pt", "bytes": 471273, "sha256": "fa74a12749a2da0d66faa6620b7b244f38db11b674feefcd9781fdb80fd1ae86"},
+      {"path": "checkpoints/final_seed_62003.pt", "bytes": 471273, "sha256": "e6803fe705c0ad0ff28e9c4d1ee52264d2bf5ddd76a7e23421c670b8836d61b2"},
+      {"path": "checkpoints/final_seed_62004.pt", "bytes": 471273, "sha256": "95f127cf534327c293b4215dc7d330a9a40bb5be026c33d764519254b1adf106"},
+      {"path": "checkpoints/final_seed_62005.pt", "bytes": 471273, "sha256": "235b907a504bb29c114f1e97dc275b81f7fff5ac2cafe8470afcc9b80493c2ae"}
+    ]
+  },
+  "authorization_decision": {
+    "training_completed": true,
+    "candidate_count": 4,
+    "final_seed_count": 5,
+    "frozen_validation_prediction_count": 75,
+    "selected_candidate": 3,
+    "selected_checkpoint_recovery_applied": true,
+    "reporting_finalization_authorized": true,
+    "test_access": false,
+    "test_metrics": false,
+    "test_predictions": false,
+    "warnings_do_not_modify_candidate_selection": true
+  },
+  "required_guards": {
+    "existing_output_root": true,
+    "expected_campaign_hash": true,
+    "expected_pre_finalization_tree_hash": true,
+    "accepted_checkpoint_sha256": true,
+    "accepted_reconstruction_gate_identity": true,
+    "exact_activation_head": true,
+    "clean_activation_worktree": true,
+    "dedicated_python_executable": true,
+    "absent_recovery_evidence_root": true,
+    "absent_recovery_lock": true,
+    "explicit_finalize_reporting_only_mode": true,
+    "refuse_if_training_path_would_execute": true
+  },
+  "permitted_publication_allowlist": [
+    "validation_design_metrics.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "reporting_recovery_manifest.json",
+    "artifact_inventory.json"
+  ],
+  "prohibited_operations": [
+    "training epoch",
+    "optimizer construction",
+    "optimizer.step()",
+    "backward()",
+    "preprocessing refit",
+    "validation prediction generation",
+    "candidate search",
+    "final-seed rerun",
+    "TGNN regression training",
+    "test index access",
+    "test target access",
+    "modification of RF outputs",
+    "replacement of final_seed_62001.pt through final_seed_62005.pt"
+  ],
+  "activation_state": "preflight passed; finalization not executed"
+}

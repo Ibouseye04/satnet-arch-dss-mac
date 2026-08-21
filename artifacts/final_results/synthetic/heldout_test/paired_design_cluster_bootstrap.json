@@ -1,0 +1,38 @@
+{
+  "space_classification": {
+    "bootstrap_mean_delta": -0.0035944428605818087,
+    "bootstrap_seed": 20260812,
+    "bootstrap_standard_deviation": 0.018276561477150278,
+    "cluster_unit": "design_id",
+    "comparison": "rf_space_classification/seed_42 vs tgnn_space_classification/seed_42",
+    "designs": 300,
+    "observed_delta": -0.0034152342612794317,
+    "observed_rf_metric": 0.9397779315137533,
+    "observed_tgnn_metric": 0.9431931657750328,
+    "paired": true,
+    "percentile_2_5": -0.04079517635686995,
+    "percentile_97_5": 0.030551570656432322,
+    "realizations_per_design": 5,
+    "rejected_replicates": 0,
+    "statistic": "delta_balanced_accuracy = RF - TGNN",
+    "valid_replicates": 2000
+  },
+  "space_regression": {
+    "bootstrap_mean_delta": 0.015600269400416564,
+    "bootstrap_seed": 20260812,
+    "bootstrap_standard_deviation": 0.002788411111375053,
+    "cluster_unit": "design_id",
+    "comparison": "rf_space_regression/seed_42 vs tgnn_space_regression/seed_42",
+    "designs": 300,
+    "observed_delta": 0.015604428646614939,
+    "observed_rf_metric": 0.04723111248689984,
+    "observed_tgnn_metric": 0.0316266838402849,
+    "paired": true,
+    "percentile_2_5": 0.01042093875804641,
+    "percentile_97_5": 0.02109229034530408,
+    "realizations_per_design": 5,
+    "rejected_replicates": 0,
+    "statistic": "delta_MAE = RF - TGNN",
+    "valid_replicates": 2000
+  }
+}

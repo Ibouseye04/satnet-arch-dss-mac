@@ -1,0 +1,72 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_runtime_environment_manifest",
+  "status": "prepared",
+  "purpose": "Stage A TGNN CPU runtime environment preparation only",
+  "environment_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1",
+  "venv_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv",
+  "python_executable": "C:\\Users\\johns\\satnet-stage-a-tgnn-runtime-v1\\.venv\\Scripts\\python.exe",
+  "platform": {
+    "system": "Windows",
+    "machine": "AMD64",
+    "python_implementation": "CPython",
+    "python_version": "3.11.9"
+  },
+  "frozen_runtime": {
+    "python": "3.11.9",
+    "torch": "2.12.1",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal": "0.56.2",
+    "scikit_learn": "1.9.0",
+    "joblib": "1.5.3",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1"
+  },
+  "installed_distribution_versions": {
+    "torch": "2.12.1+cpu",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal": "0.56.2",
+    "torch_sparse": "0.6.18+pt212cpu",
+    "torch_scatter": "2.1.2+pt212cpu",
+    "scikit_learn": "1.9.0",
+    "joblib": "1.5.3",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1"
+  },
+  "version_match": {
+    "result": "pass",
+    "comparison_rule": "CPU/local build suffixes are retained in installed_distribution_versions; requested frozen base versions match exactly"
+  },
+  "cpu_only": {
+    "torch_cuda_is_available": false,
+    "torch_version_cuda": null,
+    "nvidia_distributions_present": false,
+    "cuda_runtime_dlls_present_in_site_packages": false,
+    "torch_sparse_and_torch_scatter_cuda_extensions_present": false,
+    "native_wheel_tags": ["pt212cpu"]
+  },
+  "deterministic_cpu_settings": {
+    "torch_use_deterministic_algorithms": true,
+    "warn_only": false,
+    "torch_num_threads": 1,
+    "torch_num_interop_threads": 1,
+    "cpu_device_usable": true,
+    "result": "pass"
+  },
+  "package_source_and_wheel_identities": "See installed_package_inventory.json",
+  "dataset_access": {
+    "dataset_sequences_opened": false,
+    "dataset_serialization_reader_imported_only": true,
+    "preprocessing_statistics_calculated": false
+  },
+  "training_execution": {
+    "training_performed": false,
+    "optimizer_created": false,
+    "loss_calculated": false,
+    "backward_performed": false,
+    "checkpoint_created": false
+  },
+  "accepted_inputs_modified": false,
+  "independent_runtime_gate_performed": false
+}

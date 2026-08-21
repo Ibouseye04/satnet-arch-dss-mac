@@ -1,0 +1,59 @@
+{
+  "schema_version": "satnet.environment_version_reconciliation.v1",
+  "status": "reconciled_proceed",
+  "classification": "A",
+  "classification_description": "stale package-internal __version__ constant",
+  "sys_executable": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Scripts\\python.exe",
+  "imported_module": {
+    "name": "torch_geometric_temporal",
+    "file": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages\\torch_geometric_temporal\\__init__.py",
+    "version_attribute": "0.54.0",
+    "version_source_file_contents": "from torch_geometric_temporal.nn import *\nfrom torch_geometric_temporal.dataset import *\nfrom torch_geometric_temporal.signal import *\n\n__version__ = \"0.54.0\"\n\n__all__ = [\n    \"torch_geometric\",\n    \"__version__\",\n]\n",
+    "package_source_path": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages\\torch_geometric_temporal"
+  },
+  "distribution": {
+    "requested_name": "torch-geometric-temporal",
+    "metadata_name": "torch_geometric_temporal",
+    "version": "0.56.2",
+    "dist_info_path": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages\\torch_geometric_temporal-0.56.2.dist-info",
+    "pip_show": {
+      "Name": "torch_geometric_temporal",
+      "Version": "0.56.2",
+      "Location": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages",
+      "Requires": ["cython", "decorator", "networkx", "numpy", "torch", "torch-geometric", "torch-scatter", "torch-sparse"],
+      "Required-By": []
+    },
+    "matching_distribution_count": 1,
+    "matching_distribution_paths": ["C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages\\torch_geometric_temporal-0.56.2.dist-info"]
+  },
+  "source_consistency": {
+    "record_entries_with_hash": 62,
+    "missing_recorded_files": [],
+    "record_hash_or_size_mismatches": [],
+    "all_recorded_files_match_0_56_2_distribution_record": true,
+    "package_init_record_sha256": "sha256=BrrzheTygzC2A4qMB1qaE_Y7zJ2ElzMKEwNUfK45S3A",
+    "package_init_actual_size_bytes": 216,
+    "package_init_record_size_bytes": 216
+  },
+  "import_path_assessment": {
+    "spec_origin": "C:\\Users\\johns\\venvs\\satnet-10k-qualification\\Lib\\site-packages\\torch_geometric_temporal\\__init__.py",
+    "incorrect_import_path": false,
+    "duplicate_installation": false,
+    "mixed_or_stale_package_files": false,
+    "installation_defect": false
+  },
+  "pip_check": {
+    "status": "pass",
+    "output": "No broken requirements found."
+  },
+  "determination": "The imported package files are the files recorded by the sole torch_geometric_temporal 0.56.2 distribution, including matching RECORD hashes and sizes. Only the package's internal __version__ literal remains 0.54.0. This is stale internal metadata (A), not mixed files, duplicate installation, or an incorrect import path. No reinstall was performed.",
+  "qualification_basis": [
+    "The distribution metadata is 0.56.2.",
+    "The sole distribution is installed in the qualified interpreter site-packages.",
+    "All 62 hashed RECORD entries match installed bytes and sizes.",
+    "The package imports from that same site-packages directory.",
+    "pip check passes.",
+    "The previously qualified import/test surface remains available."
+  ],
+  "test_access_policy": "TEST targets remain sealed; this artifact contains environment evidence only and no TEST metrics or predictions."
+}

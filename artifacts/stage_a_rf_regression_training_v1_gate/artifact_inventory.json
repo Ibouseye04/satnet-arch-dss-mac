@@ -1,0 +1,40 @@
+{
+  "artifacts": [
+    {
+      "bytes": 3475,
+      "path": "bootstrap_verification.json",
+      "sha256": "5ab30a80b60c08a9e5c35061d0e3bd9b01669662c0699d26269be9c68cb9d5a5"
+    },
+    {
+      "bytes": 2832,
+      "path": "candidate_selection_verification.json",
+      "sha256": "4b54914a59328503cbf274c62353f939c2c22c116f52adbe5e1f461e233812de"
+    },
+    {
+      "bytes": 5634,
+      "path": "final_model_identity_verification.json",
+      "sha256": "ac0b4367ae35854d416eb5833a2d37a887000c78b49f34e8fc26f87238182882"
+    },
+    {
+      "bytes": 1330,
+      "path": "README.md",
+      "sha256": "783d5644b9abf02b670bf0ed1303ba53d33c37ec549d09dda45c63c9d7fbb775"
+    },
+    {
+      "bytes": 48432,
+      "path": "rf_regression_training_gate_report.json",
+      "sha256": "6d7dd042a3560c0f993b9773c408e35840f10980c2644a43bbfaf722e34a121f"
+    },
+    {
+      "bytes": 459,
+      "path": "test_seal_verification.json",
+      "sha256": "cf753824903bbdc42fd3129e2cd37957c659ea10ff0ee8626e5225eeb8a03bb2"
+    },
+    {
+      "bytes": 21538,
+      "path": "validation_metric_recomputation.json",
+      "sha256": "7f94d02f43da0034f80a177b0b3fb79c09ba8d2f5c86c1746be0fb7f7ce3b455"
+    }
+  ],
+  "self_excluding": true
+}

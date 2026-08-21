@@ -1,0 +1,66 @@
+{
+  "specification_id": "stage_a_reproducibility_v1",
+  "status": "frozen",
+  "runtime": {
+    "python": "3.11.9",
+    "platform": "Windows AMD64 CPU",
+    "torch": "2.12.1",
+    "torch_geometric": "2.8.0",
+    "torch_geometric_temporal": "0.56.2",
+    "scikit_learn": "1.9.0",
+    "joblib": "1.5.3",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1"
+  },
+  "device_policy": {
+    "device": "cpu",
+    "cuda": "disabled_and_unavailable_on_freeze_machine",
+    "mps": "not applicable on Windows",
+    "torch_threads": 1,
+    "torch_interop_threads": 1,
+    "environment_variables": {"PYTHONHASHSEED": "0", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "CUBLAS_WORKSPACE_CONFIG": ":4096:8"}
+  },
+  "deterministic_settings": {
+    "torch_use_deterministic_algorithms": true,
+    "torch_deterministic_warn_only": false,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "failure_policy": "fail the run if a requested operation cannot satisfy deterministic algorithms; do not silently fall back",
+    "python_random_seed": "set from the run seed",
+    "numpy_seed": "set from the run seed",
+    "torch_cpu_seed": "set from the run seed"
+  },
+  "seed_schedule": {
+    "classification_bootstrap": 63001,
+    "regression_bootstrap": 63002,
+    "rf_search": {"formula": "41000 + candidate_index", "candidate_index_base": 0, "count_per_task": 24},
+    "rf_final": [51001, 51002, 51003, 51004, 51005],
+    "tgnn_search": {"formula": "61000 + candidate_index", "candidate_index_base": 0, "count_per_task": 4},
+    "tgnn_final": [62001, 62002, 62003, 62004, 62005],
+    "seed_reuse_policy": "A seed is used only for the declared purpose; do not add, omit, or reorder seeds."
+  },
+  "data_order": {
+    "split_assignment": "accepted immutable design-level assignment",
+    "within_split_order": "run_id ascending, then realization_id ascending where needed",
+    "tgnn_snapshot_order": "accepted timestep_index ascending",
+    "dataloader_workers": 0,
+    "shuffle": false,
+    "batch_order": "ascending run_id; batch size 1 for TGNN",
+    "rf_parallel_workers": 1
+  },
+  "initialization": {
+    "rule": "Set all declared seeds and deterministic settings immediately before each candidate or repeated-seed model initialization.",
+    "model_initialization": "Use framework default parameter initialization under the fixed torch seed; do not copy weights between candidates or repeated runs.",
+    "optimizer_initialization": "Instantiate the optimizer after model initialization under the same run seed; optimizer state starts empty.",
+    "preprocessing_initialization": "Fit training-only statistics once per experiment configuration and reuse the frozen transform for validation/test."
+  },
+  "capture_requirements": [
+    "record Python, OS, CPU, package versions, device, deterministic settings, environment variables, and git HEAD",
+    "record the exact command line and a complete stdout/stderr transcript",
+    "record split identities, source dataset manifest hashes, config hash, seed, candidate index, and selected checkpoint hash",
+    "SHA-256 hash every plan, configuration, model, prediction, metrics, transcript, and final report artifact",
+    "write an artifact inventory that is self-excluding and records relative paths, byte sizes, and hashes"
+  ],
+  "rerun_rule": "A rerun is a new declared run with the same frozen configuration and seed schedule; it cannot change a selection or test result after test opening."
+}

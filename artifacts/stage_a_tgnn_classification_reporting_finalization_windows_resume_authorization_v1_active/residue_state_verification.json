@@ -1,0 +1,34 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.windows_resume_residue_state_verification.v1",
+  "verification_mode": "read-only",
+  "publication_executed": false,
+  "public_output": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+    "governed_file_count_excluding_residue": 16,
+    "governed_bytes_excluding_residue": 3742138,
+    "governed_tree_hash_excluding_residue": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+    "candidate_3_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+    "final_reports_absent": true
+  },
+  "temporary_checkpoint_residue": {
+    "glob": ".candidate_3.pt.*.resume.tmp",
+    "matching_files": 1,
+    "path": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1\\checkpoints\\.candidate_3.pt.atp6bm7w.resume.tmp",
+    "bytes": 470803,
+    "sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "authorized_selected_checkpoint": true
+  },
+  "recovery_root": {
+    "root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+    "tree_hash": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5",
+    "accepted_staged_checkpoint_unchanged": true,
+    "staged_reports_unchanged": true
+  },
+  "guards": {
+    "resume_lock_absent": true,
+    "completion_marker_absent": true,
+    "superseded_checkpoint_preserved": true,
+    "no_publication_write": true
+  },
+  "verdict": "TEMPORARY CHECKPOINT VERIFIED — RESIDUE AUTHORIZED FOR DIRECT ATOMIC REPLACEMENT"
+}

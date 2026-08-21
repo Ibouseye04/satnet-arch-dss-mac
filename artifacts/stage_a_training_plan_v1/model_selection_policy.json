@@ -1,0 +1,69 @@
+{
+  "policy_id": "stage_a_model_selection_v1",
+  "status": "frozen",
+  "scope": ["rf_classification", "rf_regression", "tgnn_classification", "tgnn_regression"],
+  "candidate_evaluation": {
+    "fit_only": "train split",
+    "selection_only": "validation split",
+    "test_access": false,
+    "candidate_order": "the exact order declared in each family specification",
+    "failed_candidate": "record failure and stop the affected experiment; do not silently replace its configuration or inspect test data"
+  },
+  "classification": {
+    "hierarchy": [
+      "training-weighted validation log loss, lower is better",
+      "macro-F1, higher is better",
+      "balanced accuracy, higher is better",
+      "class-0 recall/specificity, higher is better",
+      "simpler model or architecture if still tied"
+    ],
+    "threshold": 0.5,
+    "threshold_selection": "no optimization; threshold is frozen before training and test authorization",
+    "class_weights": "computed from training labels only",
+    "tie_breaker_definition": "RF candidates use rf_simplicity_key ascending; TGNN candidates use lower hidden dimension, fewer layers, lower dropout, then earlier candidate index."
+  },
+  "regression": {
+    "hierarchy": [
+      "validation RMSE, lower is better",
+      "validation MAE, lower is better",
+      "validation R2, higher is better",
+      "simpler model or architecture if still tied"
+    ],
+    "tie_breaker_definition": "RF candidates use rf_simplicity_key ascending; TGNN candidates use the TGNN simplicity order; then earlier candidate index."
+  },
+  "rf_simplicity_order": {
+    "purpose": "Final tie-break only; validation and test performance never redefine simplicity.",
+    "max_features_ranks": {"sqrt": 0, "0.75": 1},
+    "max_features_rationale": "sqrt evaluates fewer candidate predictors at each split than 0.75 for the fixed 12-predictor RF schema.",
+    "key_name": "rf_simplicity_key",
+    "key": "(n_estimators, max_depth_is_none, max_depth_value_if_not_none_else_0, -min_samples_leaf, max_features_simplicity_rank, candidate_index)",
+    "ordering": "Compare the tuple lexicographically in ascending order; the first unequal element decides.",
+    "component_definitions": {
+      "n_estimators": "The candidate's explicit integer n_estimators; lower is simpler.",
+      "max_depth_is_none": "0 when max_depth is a finite integer, 1 when max_depth is None; finite depths therefore precede unbounded depth.",
+      "max_depth_value_if_not_none_else_0": "The finite max_depth integer when present, otherwise 0; among finite depths, lower is simpler.",
+      "min_samples_leaf": "Use the negative explicit integer; larger min_samples_leaf is simpler.",
+      "max_features_simplicity_rank": "0 for the literal string sqrt and 1 for numeric 0.75; sqrt is simpler.",
+      "candidate_index": "The zero-based declared candidate index; lower is the deterministic final tie-break."
+    },
+    "none_ranking": "max_depth=None is explicitly the most complex max_depth choice and is encoded after every finite max_depth. max_leaf_nodes, max_samples, and monotonic_cst are explicit None values identical in every RF candidate and therefore add no comparison dimension; no undocumented None judgment is permitted.",
+    "performance_independence": "This key is computed only from the frozen candidate configuration and candidate index, never from validation or test performance."
+  },
+  "final_identity_freeze": {
+    "required_fields": [
+      "model family and task",
+      "target alias and source field",
+      "accepted dataset manifest SHA-256",
+      "exact predictor/node/edge order",
+      "preprocessing specification identity",
+      "selected hyperparameters",
+      "threshold for classification",
+      "library and environment versions",
+      "fixed final seed list",
+      "checkpoint/serialization format"
+    ],
+    "freeze_event": "After the four independent model-specific training gates accept their outputs and before any test target is opened.",
+    "after_test_opening": "No retuning, recalibration, feature change, architecture change, seed change, or model replacement."
+  },
+  "selection_outputs": "For each task, retain a complete candidate table with candidate index, configuration, seed, train/validation sizes, primary and secondary metrics, tie-break decisions, and immutable selected identity."
+}

@@ -1,0 +1,694 @@
+{
+  "design_level": {
+    "51001": {
+      "metrics": {
+        "mae": 0.1582967071154889,
+        "r2": 0.5151090105216862,
+        "rmse": 0.2408261074559547
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07810219178969174
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.27404629629629584
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.36086734378936763
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.9163790180718754
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.2777007727072306
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.2858532275132275
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.15763749078082423
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.3975248907692286
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.3853919849465459
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.608213381326015
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.1729439741227687
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.08912952016347847
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.28341209656084637
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.16455980685980695
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.38380085752651205
+        }
+      ]
+    },
+    "51002": {
+      "metrics": {
+        "mae": 0.14288639824841154,
+        "r2": 0.5788416809773014,
+        "rmse": 0.22444203665076976
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07650573743386241
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.310021355691266
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.3621504990379992
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.927569112575586
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.2864067452443936
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.2642666876889645
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.1509692082388511
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.4590131773732223
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.45207858033996445
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.6356369056235875
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.1422784051720436
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.08741703383036709
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.27384665477049397
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.16806642686788525
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.3545195025510206
+        }
+      ]
+    },
+    "51003": {
+      "metrics": {
+        "mae": 0.1476294292435225,
+        "r2": 0.5555618322360352,
+        "rmse": 0.23056170942095416
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07611380621693115
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.28979342950837705
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.36255788923791143
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.9445494011114552
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.3023871197089942
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.30058305224867726
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.167013563712522
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.45301790168908446
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.42535522967112255
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.6286774741211719
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.16859134070294796
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.08615572540885034
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.2723028187594481
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.155954193744417
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.40602092661664846
+        }
+      ]
+    },
+    "51004": {
+      "metrics": {
+        "mae": 0.1501050016794456,
+        "r2": 0.5849088846274877,
+        "rmse": 0.22281951678445314
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07234347718253964
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.32057795723621557
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.40187792859147053
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.9202117421929928
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.25488415475617826
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.3380658331186009
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.20087918868829596
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.4594305372174122
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.43513730040627374
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.6054976822540881
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.1670001362476809
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.09437209782060961
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.25482048389936784
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.1630014188011063
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.3539113455988459
+        }
+      ]
+    },
+    "51005": {
+      "metrics": {
+        "mae": 0.16063863380978952,
+        "r2": 0.5190120467237163,
+        "rmse": 0.23985490755759392
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07640083122895619
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.30803370003122943
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.3606855017006802
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.9276324995275896
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.29660126212522014
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.34353067995716813
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.18374173872644115
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.4592578091609118
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.38706521215199047
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.6270417055827769
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.17877491850907032
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.09780050633889915
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.26549209045253674
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.17931050260916337
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.3370946147272042
+        }
+      ]
+    },
+    "ensemble": {
+      "metrics": {
+        "mae": 0.15191123401933157,
+        "r2": 0.5532073116789704,
+        "rmse": 0.23117163138019894
+      },
+      "records": [
+        {
+          "design_id": "D003",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1,
+          "y_predicted_design_mean": 0.07589320877039622
+        },
+        {
+          "design_id": "D007",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4066666666666666,
+          "y_predicted_design_mean": 0.30049454775267675
+        },
+        {
+          "design_id": "D017",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9777777777777779,
+          "y_predicted_design_mean": 0.3696278324714858
+        },
+        {
+          "design_id": "D031",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9809523809523808,
+          "y_predicted_design_mean": 0.9272683546958997
+        },
+        {
+          "design_id": "D033",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.1666666666666666,
+          "y_predicted_design_mean": 0.28359601090840336
+        },
+        {
+          "design_id": "D042",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.19,
+          "y_predicted_design_mean": 0.30645989610532764
+        },
+        {
+          "design_id": "D052",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999996,
+          "y_predicted_design_mean": 0.17204823802938687
+        },
+        {
+          "design_id": "D064",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.5571428571428572,
+          "y_predicted_design_mean": 0.44564886324197184
+        },
+        {
+          "design_id": "D066",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.9650000000000001,
+          "y_predicted_design_mean": 0.4170056615031794
+        },
+        {
+          "design_id": "D067",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.7542857142857142,
+          "y_predicted_design_mean": 0.6210134297815278
+        },
+        {
+          "design_id": "D072",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0476190476190476,
+          "y_predicted_design_mean": 0.1659177549509023
+        },
+        {
+          "design_id": "D074",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.0833333333333333,
+          "y_predicted_design_mean": 0.09097497671244094
+        },
+        {
+          "design_id": "D082",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.08,
+          "y_predicted_design_mean": 0.2699748288885385
+        },
+        {
+          "design_id": "D087",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.13999999999999993,
+          "y_predicted_design_mean": 0.16617846977647577
+        },
+        {
+          "design_id": "D099",
+          "realization_count": 5,
+          "y_actual_design_mean": 0.4533333333333333,
+          "y_predicted_design_mean": 0.36706944940404623
+        }
+      ]
+    }
+  },
+  "design_level_failures": [],
+  "design_level_result": "PASS",
+  "expected_ensemble_metrics": {
+    "mae": 0.15808091799149845,
+    "r2": 0.53639074374294,
+    "residual_mean": -0.07090708365234122,
+    "residual_population_std": 0.22839090100667048,
+    "rmse": 0.23914476405457608
+  },
+  "expected_seed_metrics": {
+    "51001": {
+      "mae": 0.16366464120229415,
+      "r2": 0.4994505665947446,
+      "residual_mean": -0.08048099497027082,
+      "residual_population_std": 0.2350955518522598,
+      "rmse": 0.24848965582519386
+    },
+    "51002": {
+      "mae": 0.1502496617135619,
+      "r2": 0.5612458715097475,
+      "residual_mean": -0.07280211635588466,
+      "residual_population_std": 0.2209614778412427,
+      "rmse": 0.23264591729854567
+    },
+    "51003": {
+      "mae": 0.15431673699383355,
+      "r2": 0.5386736908517353,
+      "residual_mean": -0.06691359368794789,
+      "residual_population_std": 0.22897853141858734,
+      "rmse": 0.23855522813564323
+    },
+    "51004": {
+      "mae": 0.15664219695762424,
+      "r2": 0.5671286424161665,
+      "residual_mean": -0.06671776625107327,
+      "residual_population_std": 0.22124007717016514,
+      "rmse": 0.2310810076137662
+    },
+    "51005": {
+      "mae": 0.16717122300646145,
+      "r2": 0.5032349570882626,
+      "residual_mean": -0.06762094699652929,
+      "residual_population_std": 0.23813374230984313,
+      "rmse": 0.24754852392853852
+    }
+  },
+  "metric_failures": [],
+  "recomputed_ensemble_metrics": {
+    "mae": 0.15808091799149845,
+    "r2": 0.53639074374294,
+    "residual_mean": -0.07090708365234122,
+    "residual_population_std": 0.22839090100667048,
+    "rmse": 0.23914476405457608
+  },
+  "recomputed_seed_metrics": {
+    "51001": {
+      "mae": 0.16366464120229415,
+      "r2": 0.4994505665947446,
+      "residual_mean": -0.08048099497027082,
+      "residual_population_std": 0.2350955518522598,
+      "rmse": 0.24848965582519386
+    },
+    "51002": {
+      "mae": 0.1502496617135619,
+      "r2": 0.5612458715097475,
+      "residual_mean": -0.07280211635588466,
+      "residual_population_std": 0.2209614778412427,
+      "rmse": 0.23264591729854567
+    },
+    "51003": {
+      "mae": 0.15431673699383355,
+      "r2": 0.5386736908517353,
+      "residual_mean": -0.06691359368794789,
+      "residual_population_std": 0.22897853141858734,
+      "rmse": 0.23855522813564323
+    },
+    "51004": {
+      "mae": 0.15664219695762424,
+      "r2": 0.5671286424161665,
+      "residual_mean": -0.06671776625107327,
+      "residual_population_std": 0.22124007717016514,
+      "rmse": 0.2310810076137662
+    },
+    "51005": {
+      "mae": 0.16717122300646145,
+      "r2": 0.5032349570882626,
+      "residual_mean": -0.06762094699652929,
+      "residual_population_std": 0.23813374230984313,
+      "rmse": 0.24754852392853852
+    }
+  },
+  "residual_definition": "prediction_minus_actual",
+  "residual_population_std_denominator": "N",
+  "result": "PASS",
+  "validation_designs": 15,
+  "validation_rows": 75
+}

@@ -1,0 +1,196 @@
+{
+  "class_weights": {
+    "0": 3.5714285714285716,
+    "1": 0.5813953488372093
+  },
+  "expected_common_metrics": {
+    "accuracy": 0.96,
+    "balanced_accuracy": 0.9794520547945205,
+    "class_0_precision": 0.4,
+    "class_0_recall_specificity": 1.0,
+    "class_1_precision": 1.0,
+    "class_1_recall": 0.958904109589041,
+    "macro_f1": 0.7752247752247752,
+    "pr_auc_average_precision": 0.9989041095890412,
+    "roc_auc": 0.9794520547945205,
+    "weighted_f1": 0.9681518481518481
+  },
+  "expected_confusion_matrix": [
+    [
+      2,
+      0
+    ],
+    [
+      3,
+      70
+    ]
+  ],
+  "feature_order": [
+    "num_planes",
+    "sats_per_plane",
+    "configured_satellite_count",
+    "altitude_km",
+    "inclination_deg",
+    "satellite_node_failure_probability",
+    "satellite_edge_failure_probability",
+    "civilian_count",
+    "government_count",
+    "military_count",
+    "total_ground_station_count",
+    "ground_station_failure_probability"
+  ],
+  "per_seed": {
+    "51001": {
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.9794520547945205,
+        "brier_score": 0.0318363033138163,
+        "class_0_precision": 0.4,
+        "class_0_recall_specificity": 1.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.958904109589041,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            70
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.7752247752247752,
+        "pr_auc_average_precision": 0.9989041095890412,
+        "roc_auc": 0.9794520547945205,
+        "weighted_f1": 0.9681518481518481,
+        "weighted_validation_log_loss": 0.11965080203731042
+      },
+      "probability_max": 1.0,
+      "probability_min": 0.15993937373900619,
+      "probability_sum_to_one": true
+    },
+    "51002": {
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.9794520547945205,
+        "brier_score": 0.029880781947883843,
+        "class_0_precision": 0.4,
+        "class_0_recall_specificity": 1.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.958904109589041,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            70
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.7752247752247752,
+        "pr_auc_average_precision": 0.9989041095890412,
+        "roc_auc": 0.9794520547945205,
+        "weighted_f1": 0.9681518481518481,
+        "weighted_validation_log_loss": 0.11973290136973447
+      },
+      "probability_max": 1.0,
+      "probability_min": 0.20043160412858554,
+      "probability_sum_to_one": true
+    },
+    "51003": {
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.9794520547945205,
+        "brier_score": 0.029884132618624087,
+        "class_0_precision": 0.4,
+        "class_0_recall_specificity": 1.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.958904109589041,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            70
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.7752247752247752,
+        "pr_auc_average_precision": 0.9989041095890412,
+        "roc_auc": 0.9794520547945205,
+        "weighted_f1": 0.9681518481518481,
+        "weighted_validation_log_loss": 0.11701180598222932
+      },
+      "probability_max": 1.0,
+      "probability_min": 0.1950238031876964,
+      "probability_sum_to_one": true
+    },
+    "51004": {
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.9794520547945205,
+        "brier_score": 0.030659951082928984,
+        "class_0_precision": 0.4,
+        "class_0_recall_specificity": 1.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.958904109589041,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            70
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.7752247752247752,
+        "pr_auc_average_precision": 0.9989041095890412,
+        "roc_auc": 0.9794520547945205,
+        "weighted_f1": 0.9681518481518481,
+        "weighted_validation_log_loss": 0.11972335864514548
+      },
+      "probability_max": 1.0,
+      "probability_min": 0.1844560297158983,
+      "probability_sum_to_one": true
+    },
+    "51005": {
+      "metrics": {
+        "accuracy": 0.96,
+        "balanced_accuracy": 0.9794520547945205,
+        "brier_score": 0.03217438466814877,
+        "class_0_precision": 0.4,
+        "class_0_recall_specificity": 1.0,
+        "class_1_precision": 1.0,
+        "class_1_recall": 0.958904109589041,
+        "confusion_matrix": [
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            70
+          ]
+        ],
+        "decision_threshold": 0.5,
+        "macro_f1": 0.7752247752247752,
+        "pr_auc_average_precision": 0.9989041095890412,
+        "roc_auc": 0.9794520547945205,
+        "weighted_f1": 0.9681518481518481,
+        "weighted_validation_log_loss": 0.12137886882484951
+      },
+      "probability_max": 1.0,
+      "probability_min": 0.15873492438933623,
+      "probability_sum_to_one": true
+    }
+  },
+  "result": "PASS",
+  "validation_rows": 75
+}

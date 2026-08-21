@@ -1,0 +1,23 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression.authorization_inventory.v1",
+  "inventory_policy": "self_excluding",
+  "authorization_semantic_sha256": "688870e392d1c76a802cf545b32e5cbfb2ec21d02e717c792149e8a78ef6bea1",
+  "runtime_plan_semantic_sha256": "e6b598f28528f91ce3ecf6025feaa7556c160bc2c3bbe59e6a43aa959cdb1e53",
+  "campaign_hash": "faa947e5a2dc603121615945beb5bcbd93a4ce5afeabc9a6fcc72f5b4eb406bd",
+  "activation_head": "d9cb035abff3668ccdba80039523110043ecf6ac",
+  "committed_training_tooling_sha": "d9cb035abff3668ccdba80039523110043ecf6ac",
+  "artifacts": [
+    {"path": "active_authorization.json", "bytes": 8607, "sha256": "c729e8b027eea6b60392dc11f8d61272fe7fb860b5050b28e6a0f854b7bed7ae", "semantic_sha256": "688870e392d1c76a802cf545b32e5cbfb2ec21d02e717c792149e8a78ef6bea1"},
+    {"path": "preflight_certificate.json", "bytes": 4503, "sha256": "4db8e35075579df028d92da894704a7c98fa4aac02b6899a24e1ebf736b31bef"},
+    {"path": "README.md", "bytes": 4429, "sha256": "178c7a1d0d1486318490bdfb2081189c8bd150a8ad76c82a6a10a666f7b6cbbe"},
+    {"path": "runtime_plan.json", "bytes": 3090, "sha256": "da28b6d289196b377061580963b7fc6b8d352c45616a5ef1a4e50b0c10ae5f59", "semantic_sha256": "e6b598f28528f91ce3ecf6025feaa7556c160bc2c3bbe59e6a43aa959cdb1e53"},
+    {"path": "tgnn_regression_training_command.ps1", "bytes": 4308, "sha256": "7d6b3a45811707ee209fae238d4e75fb8f50902ae88db9867cb5bf9531125dd4"}
+  ],
+  "required_files": ["active_authorization.json", "runtime_plan.json", "preflight_certificate.json", "tgnn_regression_training_command.ps1", "authorization_inventory.json", "README.md"],
+  "authorization_exact_file": {"path": "active_authorization.json", "bytes": 8607, "sha256": "c729e8b027eea6b60392dc11f8d61272fe7fb860b5050b28e6a0f854b7bed7ae"},
+  "runtime_plan_exact_file": {"path": "runtime_plan.json", "bytes": 3090, "sha256": "da28b6d289196b377061580963b7fc6b8d352c45616a5ef1a4e50b0c10ae5f59"},
+  "preflight_certificate_sha256": "4db8e35075579df028d92da894704a7c98fa4aac02b6899a24e1ebf736b31bef",
+  "training_executed": false,
+  "preprocessing_statistics_calculated": false,
+  "test_targets_read": false
+}

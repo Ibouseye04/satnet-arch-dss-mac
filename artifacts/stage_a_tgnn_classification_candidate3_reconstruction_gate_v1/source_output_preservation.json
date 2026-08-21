@@ -1,0 +1,30 @@
+{
+  "schema": "satnet.stage_a_tgnn_classification.candidate3_reconstruction_gate.source_output_preservation.v1",
+  "verification_mode": "read-only source-output hash and tree preservation verification",
+  "source_output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-training-v1",
+  "expected_preserved_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "observed_preserved_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "tree_hash_definition": "SHA-256 of newline-joined absolute-path|byte-count|file-SHA256 rows sorted by absolute path",
+  "source_file_count": 16,
+  "tree_hash_match": true,
+  "final_seed_checkpoints": [
+    {"path": "checkpoints/final_seed_62001.pt", "bytes": 471273, "sha256": "b5b4323f2bb34c8740fb73bcf50c5603c46feb10ae323fa86dfad4baeb141367", "unchanged": true},
+    {"path": "checkpoints/final_seed_62002.pt", "bytes": 471273, "sha256": "fa74a12749a2da0d66faa6620b7b244f38db11b674feefcd9781fdb80fd1ae86", "unchanged": true},
+    {"path": "checkpoints/final_seed_62003.pt", "bytes": 471273, "sha256": "e6803fe705c0ad0ff28e9c4d1ee52264d2bf5ddd76a7e23421c670b8836d61b2", "unchanged": true},
+    {"path": "checkpoints/final_seed_62004.pt", "bytes": 471273, "sha256": "95f127cf534327c293b4215dc7d330a9a40bb5be026c33d764519254b1adf106", "unchanged": true},
+    {"path": "checkpoints/final_seed_62005.pt", "bytes": 471273, "sha256": "235b907a504bb29c114f1e97dc275b81f7fff5ac2cafe8470afcc9b80493c2ae", "unchanged": true}
+  ],
+  "validation_predictions": {
+    "path": "validation_predictions.jsonl",
+    "bytes": 13539,
+    "sha256": "bfe88f4133a73677db8d094cd75c8adce518574cb51a7dbc4e15d335969d6210",
+    "unchanged": true
+  },
+  "source_output_modified": false,
+  "all_five_final_seed_checkpoints_unchanged": true,
+  "validation_predictions_unchanged": true,
+  "no_source_output_file_modified": true,
+  "test_indexes_opened": false,
+  "test_targets_opened": false,
+  "status": "pass"
+}

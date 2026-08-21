@@ -1,0 +1,56 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression_candidate1_checkpoint_semantic_identity_assessment.v1",
+  "checkpoint_path": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1\\checkpoints\\candidate_1.pt",
+  "load_mode": "torch.load(map_location='cpu', weights_only=False); no model or optimizer instantiated",
+  "exact_file": {
+    "bytes": 150163,
+    "sha256": "f12b4002201aeee3e6cb1bb347ec4a7480a72eb9891e0f6014e188c4208800b2"
+  },
+  "checkpoint_content": {
+    "top_level_keys_insertion_order": ["model_state_dict", "optimizer_state_dict", "epoch", "configuration", "target", "preprocessing_identity", "seed", "validation_primary_metric", "environment_identity"],
+    "candidate_index": 1,
+    "seed": 61001,
+    "epoch": 36,
+    "hidden_dimension": 32,
+    "learning_rate": 0.003,
+    "validation_primary_metric": 0.1019323321363057,
+    "loss_identity": "torch.nn.SmoothL1Loss(beta=1.0)",
+    "preprocessing_identity": "6023bcde5f62d1724485789ed2876ac84f0619839b6de1bf8072067f92df252e",
+    "training_index_binding": "f590fd975950bd6ab1b9cac26cd01e8d8826751774cf48ddb02f301a7dbe6271",
+    "validation_index_binding": "cfc3d0c13898b0d24f2c273bfc9d15c11bbf20607900146e8fa5aa0d0815d361",
+    "checkpoint_explicit_index_fields": [],
+    "target_metadata": {"alias": "gcc_frac_min", "source_field": "space_gcc_fraction_original_min", "transformation": "none"}
+  },
+  "state_structure": {
+    "model_state_entry_count": 22,
+    "optimizer_state_top_level_key_count": 2,
+    "optimizer_state_top_level_keys": ["state", "param_groups"],
+    "optimizer_parameter_state_entry_count": 22,
+    "scheduler_present": false,
+    "gradient_clipping_present": false,
+    "all_tensors_finite": true
+  },
+  "architecture": {
+    "class": "satnet.models.gnn_model.SatelliteGNN",
+    "input_features": 14,
+    "recurrent": "one torch_geometric_temporal GCLSTM layer",
+    "chebyshev_K": 2,
+    "pooling": "global mean pooling",
+    "head": "Linear(32, 1) scalar regression",
+    "dropout": 0.0,
+    "model_state_key_order": ["recurrent.W_i", "recurrent.b_i", "recurrent.W_f", "recurrent.b_f", "recurrent.W_c", "recurrent.b_c", "recurrent.W_o", "recurrent.b_o", "recurrent.conv_i.bias", "recurrent.conv_i.lins.0.weight", "recurrent.conv_i.lins.1.weight", "recurrent.conv_f.bias", "recurrent.conv_f.lins.0.weight", "recurrent.conv_f.lins.1.weight", "recurrent.conv_c.bias", "recurrent.conv_c.lins.0.weight", "recurrent.conv_c.lins.1.weight", "recurrent.conv_o.bias", "recurrent.conv_o.lins.0.weight", "recurrent.conv_o.lins.1.weight", "linear.weight", "linear.bias"]
+  },
+  "canonical_semantic_sha256": {
+    "scheme": "Canonical JSON of sorted tensor descriptors and checkpoint metadata; tensors bind dtype, shape, element count, and raw CPU-contiguous data SHA-256.",
+    "model_state": "4265d32cb33473c9b3f47a53cd8abafa13454f72bb0763e9ad6fd9be7b8113ef",
+    "optimizer_state": "4d69fc43793fbdbaeee141eed43a4666366285a3148b463e46a2eeb9ca5b97c6",
+    "metadata": "c52d90c413704aa69b961c0245cf35c746be1ad26799c65002e9074e35a860ae",
+    "preprocessing_binding": "1e4bee37b7ca35fee93418c1a7d63c356235f7ab07b0b9ad81a5d9b4a4bf5644"
+  },
+  "preprocessing_binding": {
+    "schema": "stage_a_tgnn_preprocessing_statistics_v1",
+    "file_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94",
+    "semantic_sha256": "446c91cb7d793e1ae6c598e9e880663acdb1ac237d1bd3f7372eb65750acef94"
+  },
+  "reference_limit": "The original expected candidate-1 checkpoint bytes are absent from the failed output because candidate_1.pt was later overwritten by the final-seed loop. Semantic identities above are independently calculated for the reconstructed checkpoint; scientific equivalence is established by exact history and stored best-metric evidence rather than by comparison to the unavailable original bytes."
+}

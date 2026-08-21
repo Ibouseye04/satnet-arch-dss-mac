@@ -1,0 +1,43 @@
+{
+  "schema": "satnet.stage_a_tgnn_regression.serialization_recovery_authorization_inventory.v1",
+  "self_excluding": true,
+  "deterministic_order": "relative filename ascending",
+  "artifact_count": 7,
+  "artifacts": [
+    {
+      "path": "active_serialization_recovery_authorization.json",
+      "bytes": 3942,
+      "sha256": "9608dcacfc593d4d16db82b2c245caa1a2c077147e40a305b83ff4953b11ea60"
+    },
+    {
+      "path": "bootstrap_occurrence_verification.json",
+      "bytes": 907,
+      "sha256": "ba60a3bccbbbdecb30f808bd88f0068bbc026648efe0709d7402643b92cb8d1e"
+    },
+    {
+      "path": "checkpoint_semantic_acceptance.json",
+      "bytes": 1570,
+      "sha256": "57ae513a32e8ff4126ab6b363c796530401c7b92212e88efae9c3720629c0c6e"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2352,
+      "sha256": "1e4201c33166987f457db7a0b3d1807dcb776321f8c5713d76d1b8b68e1d12f2"
+    },
+    {
+      "path": "serialization_recovery_preflight_certificate.json",
+      "bytes": 4019,
+      "sha256": "d0f7a81d2b0adc113873b612493fcf2f8121c96089fbc206e0401bc5f2f156d4"
+    },
+    {
+      "path": "serialization_recovery_runtime_plan.json",
+      "bytes": 3952,
+      "sha256": "ae46e52ea3b46890153c126911b00e6034f295a697c343f3148a9a63e4621f98"
+    },
+    {
+      "path": "tgnn_regression_serialization_recovery_command.ps1",
+      "bytes": 4978,
+      "sha256": "6190f70f5d54e3431521ad8725965142a2ef60f3e7737eb4756492e13b90212b"
+    }
+  ]
+}

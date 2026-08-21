@@ -1,0 +1,66 @@
+{
+  "designs_per_replicate": 15,
+  "intervals": {
+    "accuracy": {
+      "lower_2_5_percent": 1.0,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 1.0,
+      "valid_replicates": 10000
+    },
+    "balanced_accuracy": {
+      "lower_2_5_percent": 1.0,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 1.0,
+      "valid_replicates": 10000
+    },
+    "brier_score": {
+      "lower_2_5_percent": 9.37380185365312e-07,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 0.04332411569530344,
+      "valid_replicates": 10000
+    },
+    "class_0_recall_specificity": {
+      "lower_2_5_percent": null,
+      "undefined_replicates": 10000,
+      "upper_97_5_percent": null,
+      "valid_replicates": 0
+    },
+    "class_1_recall": {
+      "lower_2_5_percent": 1.0,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 1.0,
+      "valid_replicates": 10000
+    },
+    "macro_f1": {
+      "lower_2_5_percent": 0.5,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 0.5,
+      "valid_replicates": 10000
+    },
+    "pr_auc": {
+      "lower_2_5_percent": 1.0,
+      "undefined_replicates": 0,
+      "upper_97_5_percent": 1.0,
+      "valid_replicates": 10000
+    },
+    "roc_auc": {
+      "lower_2_5_percent": null,
+      "undefined_replicates": 10000,
+      "upper_97_5_percent": null,
+      "valid_replicates": 0
+    }
+  },
+  "no_non_finite_values": true,
+  "percentiles": [
+    2.5,
+    97.5
+  ],
+  "published_report_match": true,
+  "realizations_retained_per_selected_design": 5,
+  "replicates": 10000,
+  "resampling_unit": "design_id",
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.bootstrap_verification.v1",
+  "seed": 63001,
+  "status": "pass",
+  "undefined_bounds_null_when_no_valid_replicates": true
+}

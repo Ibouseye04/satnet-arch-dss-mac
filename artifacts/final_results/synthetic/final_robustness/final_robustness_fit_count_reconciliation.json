@@ -1,0 +1,10 @@
+{
+  "note": "Arithmetic/bookkeeping reconciliation only; no change to any task, model, feature, target, seed, split, configuration, metric, or scientific procedure.",
+  "rf_expected": 25,
+  "rf_tasks": 5,
+  "schema_version": "satnet.final_robustness_fit_count_reconciliation.v1",
+  "seeds_per_task": 5,
+  "tgnn_expected": 10,
+  "tgnn_tasks": 2,
+  "total_expected": 35
+}

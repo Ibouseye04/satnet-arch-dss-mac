@@ -1,0 +1,83 @@
+{
+  "policy_id": "stage_a_regression_metrics_v1",
+  "status": "frozen",
+  "target": {"alias": "gcc_frac_min", "source_field": "space_gcc_fraction_original_min", "transformation": "none"},
+  "selection_hierarchy": [
+    {"rank": 1, "metric": "validation_rmse", "direction": "lower_is_better"},
+    {"rank": 2, "metric": "validation_mae", "direction": "lower_is_better"},
+    {"rank": 3, "metric": "validation_r2", "direction": "higher_is_better"},
+    {"rank": 4, "metric": "simpler_model_or_architecture", "direction": "preferred_if_still_tied"}
+  ],
+  "reported_metrics": [
+    "rmse",
+    "mae",
+    "r2",
+    "prediction_versus_actual_data",
+    "residuals",
+    "residual_mean",
+    "residual_population_std",
+    "run_level_results",
+    "design_level_aggregated_results",
+    "design_level_uncertainty_intervals"
+  ],
+  "run_level_formulas": {
+    "population": "N run predictions, indexed by i from 1 through N",
+    "error_i": "y_hat_i - y_i",
+    "rmse_run": "sqrt((1 / N) * sum_{i=1..N}(error_i^2))",
+    "mae_run": "(1 / N) * sum_{i=1..N}(|error_i|)",
+    "r2_run": "1 - (sum_{i=1..N}((y_i - y_hat_i)^2) / sum_{i=1..N}((y_i - mean(y))^2))",
+    "r2_zero_denominator": "If sum_{i=1..N}((y_i - mean(y))^2) is zero, record r2 as null/undefined; do not substitute zero."
+  },
+  "design_level_aggregation": {
+    "realizations_per_design": 5,
+    "design_means": {
+      "y_design_d": "(1 / 5) * sum_{j=1..5}(y_dj)",
+      "y_hat_design_d": "(1 / 5) * sum_{j=1..5}(y_hat_dj)"
+    },
+    "metric_population": "The D design-level means, indexed by d from 1 through D",
+    "formulas": {
+      "rmse_design": "sqrt((1 / D) * sum_{d=1..D}((y_hat_design_d - y_design_d)^2))",
+      "mae_design": "(1 / D) * sum_{d=1..D}(|y_hat_design_d - y_design_d|)",
+      "r2_design": "1 - (sum_{d=1..D}((y_design_d - y_hat_design_d)^2) / sum_{d=1..D}((y_design_d - mean(y_design))^2))"
+    },
+    "r2_zero_denominator": "If the design-level R2 denominator is zero, record r2 as null/undefined; do not substitute zero."
+  },
+  "aggregation": {
+    "run_level": "one prediction and one observed target per run/sequence",
+    "design_level": "For each design with exactly five realizations, calculate the arithmetic mean of its five realization targets and the arithmetic mean of its five realization predictions, then calculate RMSE, MAE, and R2 across the D design-level means using the exact design-level formulas.",
+    "residual_definition": "residual_i = y_hat_i - y_i",
+    "residual_mean": "(1 / N) * sum_{i=1..N}(residual_i)",
+    "residual_population_std": "sqrt((1 / N) * sum_{i=1..N}((residual_i - residual_mean)^2))",
+    "residual_std_denominator": "N; population standard deviation, not sample standard deviation"
+  },
+  "record_definitions": {
+    "prediction_versus_actual_fields": ["design_id", "realization_id", "run_id", "y_actual", "y_predicted"],
+    "residual_fields": ["design_id", "realization_id", "run_id", "residual"],
+    "field_semantics": {
+      "y_actual": "Observed gcc_frac_min target for the run.",
+      "y_predicted": "Prediction for the run after the frozen estimator/ensemble aggregation.",
+      "residual": "y_predicted - y_actual for the same run."
+    },
+    "ordering": "Emit run-level prediction-versus-actual and residual records in ascending design_id, then ascending realization_id, then ascending run_id. Emit design-level records in ascending design_id."
+  },
+  "uncertainty": {
+    "method": "design-aware nonparametric bootstrap with replacement",
+    "bootstrap_unit": "design_id",
+    "resampling_unit": "design_id, never an individual realization",
+    "retention_rule": "For each selected design occurrence, retain all five realization rows belonging to that design; repeated selections retain repeated copies of all five rows.",
+    "run_level_bootstrap": "Calculate run-level RMSE, MAE, and R2 over all retained realization rows.",
+    "design_level_bootstrap": "Calculate the selected design-level target and prediction means for the selected designs, then calculate design-level RMSE, MAE, and R2 over those selected design-level means.",
+    "replicates": 10000,
+    "bootstrap_seed": 63002,
+    "confidence_level": 0.95,
+    "interval": "percentile 2.5th and 97.5th percentiles",
+    "undefined_r2_rule": "A replicate with a zero R2 denominator has r2=null/undefined. Exclude only undefined R2 replicates from R2 percentile calculation; do not exclude them from RMSE or MAE calculations.",
+    "r2_replicate_counts": "Report the number of defined R2 replicates and the number of undefined R2 replicates."
+  },
+  "target_policy": {
+    "normalization": "none",
+    "transformation": "none",
+    "reversibility_requirement": "not applicable because no transformation is permitted",
+    "test_use": "test targets are used only for the single authorized final evaluation"
+  }
+}

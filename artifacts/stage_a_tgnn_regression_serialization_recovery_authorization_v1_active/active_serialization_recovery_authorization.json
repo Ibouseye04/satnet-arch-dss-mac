@@ -1,0 +1,101 @@
+{
+  "schema": "satnet.stage_a.tgnn_regression.serialization_recovery_authorization.v1",
+  "authorization_id": "stage_a_tgnn_regression_serialization_recovery_authorization_v1_active",
+  "status": "active",
+  "verdict": "STAGE A TGNN REGRESSION SERIALIZATION-ONLY RECOVERY AUTHORIZED — READY TO RESTORE AND FINALIZE ONCE",
+  "scope": "one-time serialization-only selected-checkpoint restoration plus reporting finalization from frozen artifacts; no training or inference",
+  "activation": {
+    "branch": "activate/stage-a-tgnn-regression-serialization-recovery-v1",
+    "worktree": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-serialization-recovery-v1-activation",
+    "head": "f783e61879140faf4b5c4b7c18a63728ddc67f57",
+    "source_overwrite_guard_sha": "3c388d353939178b2c4cf7843f2b50a39fffe61d",
+    "recovery_tooling_sha": "f783e61879140faf4b5c4b7c18a63728ddc67f57",
+    "clean": true
+  },
+  "campaign": {
+    "hash": "faa947e5a2dc603121615945beb5bcbd93a4ce5afeabc9a6fcc72f5b4eb406bd",
+    "failed_output_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-training-v1",
+    "failed_output_tree_sha256": "141b5ac617337b168dadbd9e2a9579e5e9ba35877feedf7d01f713088101e29c",
+    "reconstruction_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-candidate1-reconstruction-v1",
+    "reconstruction_tree_sha256": "29a3f93735fc9b4d51a21f9e25257cbfd96068bae252b4b8675e4282541c441a",
+    "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-regression-reporting-recovery-v2",
+    "recovery_root_absent": true,
+    "recovery_timestamp": "2026-08-04T18:49:31.526Z"
+  },
+  "assessment": {
+    "classification": "SERIALIZATION_ONLY",
+    "assessment_commit": "628b9a1",
+    "scientific_divergence_found": false,
+    "exact_history_match": true,
+    "exact_best_metric_match": true
+  },
+  "final_seed_checkpoint_identities": [
+    {
+      "path": "checkpoints/final_seed_62001.pt",
+      "bytes": 150633,
+      "sha256": "d2c4feab32af6aa873ed2c4ee5955643c5de8fc97babf093ae0a5b8d50f4f29d"
+    },
+    {
+      "path": "checkpoints/final_seed_62002.pt",
+      "bytes": 150633,
+      "sha256": "7eb3ae92b756d5738da026a002a10e6b2bbbe429bf52c2a63aa74b41f4bed019"
+    },
+    {
+      "path": "checkpoints/final_seed_62003.pt",
+      "bytes": 150633,
+      "sha256": "b30bf14ae5311bda10afa090ee10c65352c2d1b2023d58de426f11603c5a30ea"
+    },
+    {
+      "path": "checkpoints/final_seed_62004.pt",
+      "bytes": 150633,
+      "sha256": "f74ec30e19dba7d38c84363b1f9532f6246bcbaba901bae07f421e5660a0c982"
+    },
+    {
+      "path": "checkpoints/final_seed_62005.pt",
+      "bytes": 150633,
+      "sha256": "2570f45ccd441c60b1f2bed6abf9959317c5b29be976c296eac87e110bc3df83"
+    }
+  ],
+  "decision": {
+    "training_completed": true,
+    "candidate_count": 4,
+    "final_seed_count": 5,
+    "selected_candidate": 1,
+    "selected_best_epoch": 36,
+    "frozen_validation_prediction_count": 75,
+    "selected_checkpoint_recovery_authorized": true,
+    "reporting_finalization_authorized": true,
+    "test_access": false,
+    "test_predictions": false,
+    "test_metrics": false
+  },
+  "prohibitions": [
+    "rerun candidate training",
+    "rerun final-seed training",
+    "rerun checkpoint reconstruction",
+    "backward()",
+    "optimizer.step()",
+    "optimizer construction",
+    "preprocessing refit",
+    "validation prediction generation",
+    "test index or target access",
+    "RF output modification",
+    "TGNN classification output modification",
+    "final-seed checkpoint replacement"
+  ],
+  "publication_allowlist": [
+    "checkpoints/candidate_1.pt",
+    "selected_checkpoint_identity.json",
+    "validation_bootstrap_intervals.json",
+    "final_seed_training_results.json",
+    "training_report.json",
+    "reporting_recovery_manifest.json",
+    "artifact_inventory.json"
+  ],
+  "execution": {
+    "executed_in_authorization_task": false,
+    "one_time_only": true,
+    "lock_count": 0,
+    "completion_marker_absent": true
+  }
+}

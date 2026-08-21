@@ -1,0 +1,17 @@
+{
+  "final_seed_checkpoints_unchanged": true,
+  "no_scientific_regeneration_except_isolated_candidate3_reconstruction": true,
+  "recovery_manifest_original_failure_and_recovery_fields_verified": true,
+  "recovery_root": "C:\\Users\\johns\\satnet-stage-a-tgnn-classification-reporting-finalization-v1-recovery",
+  "recovery_tree": {
+    "bytes": 955085,
+    "file_count": 8,
+    "sha256": "1b05bbb88acd0fa3da58040e49bd9dd91470b20b149de27ae26edaf3ce4086d5"
+  },
+  "schema": "satnet.stage_a_tgnn_classification.training_gate.recovery_integrity.v1",
+  "selected_checkpoint_original_identity_restored": true,
+  "selected_checkpoint_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+  "status": "pass",
+  "superseded_checkpoint_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3",
+  "validation_predictions_unchanged": true
+}

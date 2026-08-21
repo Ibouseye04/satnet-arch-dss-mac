@@ -1,0 +1,63 @@
+{
+  "report_id": "stage_a_training_plan_v1_metric_and_selection_verification",
+  "read_only": true,
+  "classification": {
+    "target_alias": "partition_any",
+    "source_field": "overall_threshold_breach_any",
+    "positive_class": 1,
+    "class_0_train_count": 49,
+    "class_1_train_count": 301,
+    "total_train_count": 350,
+    "class_weight_formula": "w_c = N_train / (2 * n_train_c)",
+    "expected_class_weights": {
+      "class_0": 3.5714285714285716,
+      "class_1": 0.5813953488372093
+    },
+    "weights_use_training_labels_only": true,
+    "threshold": 0.5,
+    "threshold_optimization": false,
+    "calibration": false,
+    "primary_selection_metric": "weighted validation log loss",
+    "validation_log_loss_weighting_and_averaging": "Apply the training-derived weight for each validation label and normalize the weighted losses by the sum of validation sample weights.",
+    "selection_hierarchy_complete": true,
+    "selection_hierarchy": ["weighted_validation_log_loss lower", "macro_f1 higher", "balanced_accuracy higher", "class_0_recall_specificity higher", "simpler_model_or_architecture"],
+    "class_0_recall_separately_reported": true,
+    "class_1_recall_separately_reported": true,
+    "two_negative_validation_samples_limitation_retained": true,
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 63001,
+    "undefined_bootstrap_metrics_remain_undefined": true
+  },
+  "regression": {
+    "target_alias": "gcc_frac_min",
+    "source_field": "space_gcc_fraction_original_min",
+    "target_transformation": "none",
+    "hierarchy": ["validation RMSE lower", "validation MAE lower", "validation R2 higher", "simpler_model_or_architecture"],
+    "run_level_observation_rule": "one prediction and one observed target per run/sequence",
+    "design_level_aggregation_rule": "arithmetic mean of five realization targets and arithmetic mean of five realization predictions per design, then metrics across designs",
+    "residual_definition": "observed target minus predicted target",
+    "residual_standard_deviation": "population standard deviation",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 63002,
+    "zero_target_variance_r2_rule": "NaN and valid-replicate count reported",
+    "exact_rmse_mae_r2_formulas_documented": false,
+    "result": "blocked until exact run-level and design-level formulas are frozen"
+  },
+  "model_selection": {
+    "validation_only": true,
+    "test_used_for_selection": false,
+    "rf_candidate_order_deterministic": true,
+    "tgnn_early_stopping_classification_metric": "training-weighted validation log loss",
+    "tgnn_early_stopping_regression_metric": "validation RMSE",
+    "minimum_delta": 0.0,
+    "patience": 12,
+    "epoch_tie_rule": "earliest epoch",
+    "best_checkpoint_rule_deterministic": true,
+    "repeated_seeds_reuse_selected_configuration": true,
+    "repeated_seeds_trigger_new_search": false,
+    "tgnn_simpler_tie_break_computable": true,
+    "rf_simpler_tie_break_fully_ordered": false,
+    "rf_tie_break_gap": "max_features complexity is named but sqrt versus 0.75 is not explicitly ordered"
+  },
+  "overall_result": "Classification policy passes. Regression exact-formula verification and RF simplicity tie handling block acceptance."
+}

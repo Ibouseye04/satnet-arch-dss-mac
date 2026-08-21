@@ -1,0 +1,11 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.authorization_inventory.v1",
+  "self_excluding": true,
+  "artifacts": [
+    {"path": "active_authorization.json", "bytes": 6352, "sha256": "94248eb3aebc3507a7c8c54324d4848a22688f648298179c214920aac318833c"},
+    {"path": "preflight_certificate.json", "bytes": 3756, "sha256": "a2c5007a1f90ef87544bef3588a3720e6593a9a2bf0332c023278dd6c3e4e1df"},
+    {"path": "README.md", "bytes": 3906, "sha256": "d9838885a042992b88695470ec6bedbfbf30ae99aca7a490906859b1b46dc827"},
+    {"path": "runtime_plan.json", "bytes": 1910, "sha256": "71435265dcbf8074583f50cf3569ef46984a2f0fc2a4f9d2cec4e3e74067905c"},
+    {"path": "tgnn_classification_training_command.ps1", "bytes": 3333, "sha256": "96bfad7c4700eb1503da0915e007ca66bc406500bd730bd83654df23644a8b89"}
+  ]
+}

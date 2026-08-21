@@ -1,0 +1,64 @@
+{
+  "policy_id": "stage_a_common_split_usage_v1",
+  "status": "frozen",
+  "authoritative_split": {
+    "source": "accepted dataset manifests and their independent gates",
+    "train": {"designs": 70, "runs": 350, "target_status": "available"},
+    "validation": {"designs": 15, "runs": 75, "target_status": "available"},
+    "test": {"designs": 15, "runs": 75, "target_status": "sealed"},
+    "realizations_per_design": 5,
+    "total_designs": 100,
+    "total_runs": 500
+  },
+  "assignment_rules": [
+    "Use the accepted design-level assignments exactly; do not regenerate or re-stratify them.",
+    "A design and all five realization runs are indivisible and must remain in one split.",
+    "No design_id, run_id, run_key, or design/realization pair may overlap between splits.",
+    "The RF and TGNN experiments use the same semantic split assignments and target mappings.",
+    "The 11 ordered temporal snapshots of each TGNN run are indivisible and remain within that run's split."
+  ],
+  "allowed_usage": {
+    "train": [
+      "fit model parameters",
+      "fit classification class weights",
+      "fit continuous-feature preprocessing statistics",
+      "candidate training"
+    ],
+    "validation": [
+      "model selection",
+      "TGNN early stopping and checkpoint selection",
+      "classification threshold confirmation under the pre-frozen rule",
+      "validation uncertainty reporting"
+    ],
+    "test": [
+      "sealed-index identity and integrity checks only before authorization",
+      "one final evaluation after one-time authorization"
+    ]
+  },
+  "prohibited_usage_before_test_authorization": [
+    "test targets or target-bearing test source artifacts",
+    "test-derived preprocessing or normalization statistics",
+    "test-derived class weights",
+    "test-derived threshold selection",
+    "test-derived calibration",
+    "test-derived architecture or hyperparameter selection",
+    "train/validation merging"
+  ],
+  "final_test_boundary": {
+    "test_targets_opened_only_after": [
+      "all four model specifications are frozen",
+      "all four selected configurations are recorded",
+      "classification threshold is frozen at 0.5",
+      "final repeated-seed model weights are frozen",
+      "training and validation artifacts are no longer eligible for selection changes"
+    ],
+    "test_target_use": "evaluation metrics only",
+    "post_opening_change_policy": "No model, preprocessing, threshold, architecture, or hyperparameter changes are permitted."
+  },
+  "no_merge_policy": "Train and validation are never merged for this Stage A evaluation protocol; final models remain training-fitted with validation-only selection/early stopping.",
+  "sealed_test_requirements": [
+    "Only the target-free sealed test index may be inspected before authorization.",
+    "Test target paths and values must not be opened, loaded, parsed, or materialized before authorization.",
+    "A failed or incomplete test evaluation is recorded as incomplete; it is not repaired by retuning or rerunning after results are opened."
+  ]
+}

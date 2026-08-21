@@ -1,0 +1,119 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any, Sequence
+
+from satnet.ground.catalog import GroundStationCatalog
+
+from .constants import CONTRACT_SPEC_HASH, RUN_ID_WIDTH
+from .io import atomic_write_json, read_canonical_json
+from .mapping import FinalRunMapping
+from .orchestrator import artifact_paths, attempt_input_identity, run_directory, validate_completed_run
+
+
+def _attempt_records(root: Path, run_id: int) -> tuple[dict[str, Any], ...]:
+    attempt_root = root / "operational" / "attempts" / f"run_{run_id:0{RUN_ID_WIDTH}d}"
+    if not attempt_root.exists():
+        return ()
+    return tuple(read_canonical_json(path) for path in sorted(attempt_root.glob("attempt_*.json")))
+
+
+def materialize_generation_ledger(
+    *,
+    output_root: str | Path,
+    mappings: Sequence[FinalRunMapping],
+    catalog: GroundStationCatalog,
+) -> dict[str, Any]:
+    root = Path(output_root)
+    records: list[dict[str, Any]] = []
+    distinct_submissions = 0
+    successful = 0
+    attempt_events = 0
+    for mapping in sorted(mappings, key=lambda item: item.run_id):
+        attempts = _attempt_records(root, mapping.run_id)
+        attempt_events += len(attempts)
+        if attempts:
+            distinct_submissions += 1
+        result_hash: str | None = None
+        inventory_hash: str | None = None
+        target_hash: str | None = None
+        state = "not_started"
+        final_root = run_directory(root, mapping.run_id)
+        if final_root.exists():
+            result = validate_completed_run(
+                mapping=mapping, catalog=catalog, run_root=final_root
+            )
+            result_hash = result["run_result_hash"]
+            inventory = read_canonical_json(artifact_paths(final_root)["inventory"])
+            target = read_canonical_json(artifact_paths(final_root)["target"])
+            inventory_hash = inventory["scientific_inventory_hash"]
+            target_hash = target["target_artifact_hash"]
+            state = "succeeded"
+            successful += 1
+        elif attempts:
+            state = attempts[-1]["state"]
+        identity = attempt_input_identity(mapping)
+        records.append(
+            {
+                "attempt_count": len(attempts),
+                "contract_spec_hash": identity["contract_spec_hash"],
+                "design_id": identity["design_id"],
+                "design_index": identity["design_index"],
+                "design_record_hash": identity["design_record_hash"],
+                "failure_evidence_hashes": [
+                    record.get("failure_evidence_hash")
+                    for record in attempts
+                    if record["state"] == "failed" and record.get("failure_evidence_hash")
+                ],
+                "ground_design_hash": identity["ground_design_hash"],
+                "ground_failure_seed": identity["ground_failure_seed"],
+                "ground_selection_hash": identity["ground_selection_hash"],
+                "ground_selection_seed": identity["ground_selection_seed"],
+                "published_result_hash": result_hash,
+                "realization_id": identity["realization_id"],
+                "realization_index": identity["realization_index"],
+                "run_id": identity["run_id"],
+                "run_key": identity["run_key"],
+                "run_record_hash": identity["run_record_hash"],
+                "satellite_seed": identity["satellite_seed"],
+                "scientific_inventory_hash": inventory_hash,
+                "split": identity["split"],
+                "state": state,
+                "target_artifact_hash": target_hash,
+            }
+        )
+    ledger = {
+        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "distinct_frozen_run_submission_count": distinct_submissions,
+        "generation_ledger_schema_version": "2",
+        "operational_attempt_event_count": attempt_events,
+        "records": records,
+        "successful_generation_count": successful,
+    }
+    atomic_write_json(root / "operational" / "generation_ledger.json", ledger, overwrite=True)
+    return ledger
+
+
+def materialize_replay_ledger(
+    *, replay_root: str | Path, mappings: Sequence[FinalRunMapping]
+) -> dict[str, Any]:
+    root = Path(replay_root)
+    records: list[dict[str, Any]] = []
+    for mapping in sorted(mappings, key=lambda item: item.run_id):
+        path = run_directory(root, mapping.run_id) / "replay_report.json"
+        if path.is_file():
+            records.append(read_canonical_json(path))
+    run_ids = [record["run_id"] for record in records]
+    if run_ids != sorted(set(run_ids)):
+        raise ValueError("Replay ledger contains duplicate or unordered run IDs")
+    ledger = {
+        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "records": records,
+        "replay_ledger_schema_version": "2",
+        "replay_submission_count": len(records),
+        "successful_replay_count": sum(
+            record["replay_state"] == "succeeded" for record in records
+        ),
+    }
+    atomic_write_json(root / "replay_ledger.json", ledger, overwrite=True)
+    return ledger

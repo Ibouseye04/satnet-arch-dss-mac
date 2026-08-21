@@ -1,0 +1,60 @@
+{
+  "schema": "satnet.stage_a.tgnn_classification.reporting_recovery_preflight_certificate.v1",
+  "preflight_mode": "read-only",
+  "executed_recovery": false,
+  "verdict": "STAGE A TGNN CLASSIFICATION RECOVERY BLOCKED — INSUFFICIENT COMPLETED TRAINING EVIDENCE",
+  "activation": {
+    "head": "7b7a198de1884034318486e9f92ed208590ba505",
+    "clean_worktree": true,
+    "failed_execution_head": "fa314c07cdb3c60186365888e9c726a0e4a567e3"
+  },
+  "campaign_hash": "fbba2688e3b33838331aea216bcd48f5ab7aa070eb22677b6920f1cd9de0ec8f",
+  "pre_recovery_tree_hash": "0d4b7f46c7b662d20b19419a2e7f04d27417d73071cbe904a4fa7f5af4883d7a",
+  "output_root_exists": true,
+  "training_evidence": {
+    "candidate_runs": 4,
+    "final_seed_runs": 5,
+    "candidate_epoch_history_exists": true,
+    "preprocessing_exists": true,
+    "validation_predictions_exists": true,
+    "validation_prediction_count": 75,
+    "checkpoint_count": 9,
+    "final_checkpoint_count": 5,
+    "selected_candidate_index": 3,
+    "selected_checkpoint_exists": true,
+    "selected_checkpoint_identity_consistent": false,
+    "selected_checkpoint_declared_sha256": "e94c94bac6b6f0bf89d25e878871df9f1d4261dd98f8d796ab5206abf349302a",
+    "selected_checkpoint_actual_sha256": "08d83176f09b88c701ba64ccc233a7ff93621d2a3fbfa7f6a4ec94500ce961a3"
+  },
+  "normal_training_rerun_guard": {
+    "output_root_exists_guard_verified": true,
+    "lock_exists_guard_verified": true,
+    "training_wrapper_invoked": false
+  },
+  "prohibitions_verified": {
+    "test_targets_opened": false,
+    "dataset_root_opened": false,
+    "optimizer_instantiated": false,
+    "epoch_runs": false,
+    "backward_pass": false,
+    "model_or_checkpoint_written": false,
+    "preprocessing_fitted": false,
+    "candidate_search_executed": false,
+    "final_seed_training_executed": false,
+    "new_validation_predictions_generated": false
+  },
+  "reporting_validation": {
+    "single_class_probe": {
+      "confusion_matrix": [[0, 0], [0, 1]],
+      "roc_auc": null,
+      "class_0_recall_specificity": null,
+      "class_0_precision": null,
+      "canonical_json_allow_nan_false": true,
+      "non_finite_values_serialized": false
+    },
+    "recursive_pre_write_non_finite_rejection": true,
+    "undefined_bootstrap_bounds_null_when_valid_replicates_zero": true,
+    "valid_numeric_zero_preserved": true
+  },
+  "blocking_reason": "The selected search checkpoint is not byte-identity consistent with selected_checkpoint_identity.json. Reporting-only recovery must not replace, reconstruct, or silently accept that missing frozen scientific artifact."
+}

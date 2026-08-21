@@ -1,0 +1,28 @@
+{
+  "artifact_id": "stage_a_tgnn_cpu_runtime_v1_zero_edge_runtime_verification",
+  "status": "pass",
+  "purpose": "Synthetic structural smoke only; no production sequence or dataset artifact was opened.",
+  "model": {"class": "torch_geometric_temporal.nn.recurrent.GCLSTM", "in_channels": 14, "out_channels": 32, "K": 2},
+  "synthetic_input": {
+    "node_feature_matrix_shape": [5, 14],
+    "non_empty_edge_index_shape": [2, 8],
+    "zero_edge_index_shape": [2, 0],
+    "zero_edge_index_dtype": "torch.int64",
+    "zero_edge_input_used_directly": true,
+    "placeholder_edge_inserted": false,
+    "self_loop_inserted": false
+  },
+  "outputs": {
+    "non_empty_snapshot": {"passed": true, "hidden_shape": [5, 32], "cell_shape": [5, 32]},
+    "zero_edge_snapshot": {"passed": true, "hidden_shape": [5, 32], "cell_shape": [5, 32], "adapter_required": false}
+  },
+  "prohibited_execution_checks": {
+    "production_data_loaded": false,
+    "loss_calculated": false,
+    "optimizer_instantiated": false,
+    "backward_performed": false,
+    "checkpoint_created": false,
+    "preprocessing_statistics_calculated": false
+  },
+  "conclusion": "The contracted GCLSTM accepts an exact [2, 0] zero-edge snapshot directly; no placeholder edge, self-loop, or runtime adapter is required."
+}
