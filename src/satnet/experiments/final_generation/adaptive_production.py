@@ -76,7 +76,13 @@ def _historical_root_snapshot(excluded: Sequence[Path]) -> dict[str, str | None]
     return result
 
 
-def _generate(mappings: Sequence[Any], output_root: Path, catalog: Any) -> dict[str, Any]:
+def _generate(
+    mappings: Sequence[Any],
+    output_root: Path,
+    catalog: Any,
+    *,
+    resume_replay_root: Path | None = None,
+) -> dict[str, Any]:
     ensure_mode_root(
         output_root,
         "production",
@@ -96,6 +102,8 @@ def _generate(mappings: Sequence[Any], output_root: Path, catalog: Any) -> dict[
                     output_root=output_root,
                     mode="production",
                     retry=attempt > 0,
+                    verified_resume=resume_replay_root is not None,
+                    resume_replay_root=resume_replay_root,
                 )
                 results.append(result)
                 break
@@ -130,19 +138,26 @@ def _generate(mappings: Sequence[Any], output_root: Path, catalog: Any) -> dict[
 
 
 def _replay(mappings: Sequence[Any], generation_root: Path, replay_root: Path, catalog: Any) -> dict[str, Any]:
-    reports = replay_runs_read_only(
-        mappings=mappings,
-        catalog=catalog,
-        input_root=generation_root,
-        replay_output_root=replay_root,
-        input_mode="production",
-        output_mode="production_replay",
+    existing = tuple(
+        mapping
+        for mapping in mappings
+        if (run_directory(replay_root, mapping.run_id) / "replay_report.json").is_file()
     )
+    missing = tuple(mapping for mapping in mappings if mapping not in existing)
+    if missing:
+        replay_runs_read_only(
+            mappings=missing,
+            catalog=catalog,
+            input_root=generation_root,
+            replay_output_root=replay_root,
+            input_mode="production",
+            output_mode="production_replay",
+        )
     ledger = materialize_replay_ledger(replay_root=replay_root, mappings=mappings)
     return {
         "replay_ledger": ledger,
-        "replay_submissions": len(mappings),
-        "successful_replay": len(reports),
+        "replay_submissions": ledger["replay_submission_count"],
+        "successful_replay": ledger["successful_replay_count"],
     }
 
 
@@ -249,7 +264,7 @@ def _behavioral_traces(mappings: Sequence[Any], root: Path) -> dict[str, Any]:
                 )
             examples = [
                 example for example in stats.adaptive_selection_examples
-                if any(record.get("candidate_offset", 0) != 0 and record.get("selected") for record in example.get("selected", []))
+                if any(record.get("candidate_offset", 0) != 0 for record in example.get("selected", []))
             ]
             if examples and selected_trace is None:
                 selected_trace = {
@@ -350,7 +365,12 @@ def _run_phase1(args: argparse.Namespace) -> dict[str, Any]:
         (preflight_root, preflight_replay_root, production_root, replay_root)
     )
     preflight_mappings = _selected(mappings, range(PREFLIGHT_RUN_COUNT))
-    preflight_generation = _generate(preflight_mappings, preflight_root, catalog)
+    preflight_generation = _generate(
+        preflight_mappings,
+        preflight_root,
+        catalog,
+        resume_replay_root=preflight_replay_root,
+    )
     preflight_replay = _replay(preflight_mappings, preflight_root, preflight_replay_root, catalog)
     preflight_validation = _validate(preflight_mappings, preflight_root, preflight_replay_root, catalog)
     preflight_audit = _runtime_audit(preflight_mappings, preflight_root)
