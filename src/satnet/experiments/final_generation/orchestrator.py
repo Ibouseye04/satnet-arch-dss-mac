@@ -184,7 +184,12 @@ def _validate_resume_certificate(
     generation_mode: str,
 ) -> None:
     replay_mode = "production_replay" if generation_mode == "production" else "qualification_replay"
-    verified_root = ensure_mode_root(replay_root, replay_mode, create=False)
+    verified_root = ensure_mode_root(
+        replay_root,
+        replay_mode,
+        create=False,
+        contract_spec_hash=mapping.run["contract_spec_hash"],
+    )
     report = read_canonical_json(
         run_directory(verified_root, mapping.run_id) / "replay_report.json"
     )
