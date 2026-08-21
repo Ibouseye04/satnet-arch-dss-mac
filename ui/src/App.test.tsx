@@ -71,6 +71,13 @@ describe('SATNET DSS UI', () => {
     expect(screen.getByTestId('analyze-button')).toBeDisabled()
   })
 
+  it('discloses the frozen synthetic research catalog in methodology', async () => {
+    await renderReady()
+    await userEvent.click(screen.getByRole('button', { name: /Read methodology, assumptions, and model limitations/ }))
+    expect(await screen.findByText(/frozen synthetic SATNET research catalog of 150 stations/)).toBeInTheDocument()
+    expect(screen.getByText(/rather than validated real-world operational station locations/)).toBeInTheDocument()
+  })
+
   it('converts percentage inputs to API fractions in the valid request payload', async () => {
     const calls = await renderReady()
     await userEvent.click(screen.getByTestId('analyze-button'))

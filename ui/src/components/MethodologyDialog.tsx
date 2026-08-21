@@ -9,6 +9,7 @@ export default function MethodologyDialog({ open, onClose }: { open: boolean; on
       <ListItem><ListItemText primary="Expected Minimum Connectivity" secondary="The arithmetic mean of the five TGNN-predicted minimum GCC values." /></ListItem>
       <ListItem><ListItemText primary="Meeting count" secondary="The 5-realization meeting count is descriptive and is not a calibrated probability." /></ListItem>
       <ListItem><ListItemText primary="Metric provenance" secondary="TGNN predicts space-segment resilience. Ground and integrated system metrics are SATNET-calculated values." /></ListItem>
+      <ListItem><ListItemText primary="Ground catalog" secondary="Ground-segment calculations use the frozen synthetic SATNET research catalog of 150 stations (50 civilian, 50 government, 50 military) used by the integrated experiment. These stations represent experimental architecture classes rather than validated real-world operational station locations." /></ListItem>
     </List>
     <Divider sx={{ my: 2 }} />
     <Typography variant="h6" gutterBottom>Model limitations</Typography>

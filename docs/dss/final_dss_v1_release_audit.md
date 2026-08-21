@@ -11,6 +11,19 @@
 - Inference remains CPU, evaluation-only, raw, and unclipped. No training, tuning, threshold fitting, or model selection was performed.
 - Accepted export contract: space-segment-only TGNN; 3 node features and 4 edge features. The committed 14-node/10-edge integrated schema is explicitly future/not authorized and is not used by this DSS.
 
+## Ground catalog identity and contract binding
+
+The DSS ground segment uses `artifacts/integrated_ground_pilot_25/inputs/pilot_catalog.csv`, the frozen deterministic synthetic research catalog underlying the accepted final integrated 10K experiment.
+
+- Raw catalog SHA-256: `e8855d4ded4c242f3e5b35b90610d5f9c4f218bdf717d2d08b2464cac39f1598`.
+- Canonical SATNET catalog hash: `810c64dfb030b042311c90f2f42f8dee866a48fc63a6a29e362ee328c52eaa6e`.
+- Enabled population: 150 total — 50 civilian, 50 government, and 50 military.
+- The provenance record identifies the catalog as synthetic and pilot-only, with deterministic synthetic geometry for integrated engineering validation. It explicitly records that a real-world production research catalog was not available and that real-world scientific review was not performed.
+- The final 10K `manifest_inventory.json` binds to the same canonical catalog hash and raw `pilot_catalog_file_sha256`.
+- The final 10K contract specifies `doe.integer_allocation.catalog_capacity_per_class = 50`, references the same catalog hash in `validated_foundation`, and defines the DOE/G1 ground architecture against this frozen catalog foundation.
+
+Classification: **AUTHORITATIVE_FROZEN_SYNTHETIC_RESEARCH_CATALOG**. It is authoritative for reproducing and operating the SATNET dissertation research methodology, but it is not authoritative real-world ground-station truth and is not presented as a validated representation of operational station locations.
+
 ## Five-realization definition
 
 Each analysis derives five deterministic satellite-failure realization seeds from the canonical physical architecture. The threshold is excluded from seed derivation. Each realization is a complete temporal SATNET rollout with 11 inclusive snapshots (`t=0..10`), followed by one frozen TGNN prediction. The primary result is:
@@ -89,14 +102,14 @@ The existing 5×7, 550 km, 53-degree example remains the default. It is valid wi
 
 - UI source audit: PASS.
 - API contract and inference path: PASS by targeted DSS/API tests and the deployment sanity check.
-- Ground/system service acceptance: BLOCKED for this workstation because `SATNET_DSS_GROUND_CATALOG` was not configured with the requested qualified authoritative catalog. The repository's committed pilot catalog is explicitly synthetic and not scientifically reviewed; it was not represented as authoritative and was not modified.
-- A real API end-to-end analysis is therefore required with the already accepted authoritative catalog before merge acceptance can be declared.
+- Ground/system service acceptance: PASS using the frozen synthetic research catalog bound to the accepted final integrated 10K experiment.
+- Ground/system results are conditional on the synthetic research ground catalog used by the experiment and must not be interpreted as measured performance of an operational ground network.
 
 ## Known limitations
 
 1. The current default architecture yields very low resilience under the accepted fixed topology/failure profile; it is not an optimal recommendation.
 2. The DSS uses a space-only frozen TGNN; integrated TGNN support is not authorized.
-3. Ground/system metrics require an externally supplied qualified catalog and remain unavailable when that deployment input is missing.
+3. Ground/system results are conditional on the synthetic research ground catalog used by the experiment and must not be interpreted as measured performance of an operational ground network.
 4. Five deterministic realizations are engineering scenarios, not a probability estimate or Monte Carlo uncertainty interval.
 5. TGNN predictions are deliberately not clipped; out-of-range raw predictions remain visible in API/detail contracts for fail-open scientific inspection.
 6. No automatic architecture optimization, recommendation engine, authentication, persistence, cloud deployment, RF UI, or retraining is part of this release.
@@ -107,12 +120,11 @@ The existing 5×7, 550 km, 53-degree example remains the default. It is valid wi
 - Starting SHA: `4283cef36b1b9032472dfe61dc93e81b2f90a9b5`.
 - Starting remote SHA: matched starting SHA.
 - Starting target worktree: clean.
-- Frontend tests: `npm test` — **PASS**, 11 tests passed.
+- Frontend tests: `npm test` — **PASS**, 12 tests passed.
 - Frontend build: `npm run build` — **PASS**; Vite emitted only the existing chunk-size advisory.
-- Python DSS/API tests: `pytest tests/dss -q` — **PASS**, 41 passed with 6 dependency warnings. The real acceptance-path test used the committed synthetic pilot catalog because no authoritative catalog was configured.
-- Real API end-to-end with the frozen checkpoint and synthetic pilot catalog: **PASS**, HTTP 200, expected minimum GCC `0.06807432174682618`, mean ground service `0.03696969696969697`, limiting segment `GROUND`, five realizations.
-- Qualified-authoritative-catalog end-to-end: **BLOCKED** because `SATNET_DSS_GROUND_CATALOG` is not configured with the requested accepted catalog.
-- Final branch/SHA: `feature/final-dss-ui-v1` / recorded in the final handoff after the audit commit; no merge to main.
+- Python DSS/API tests: `pytest tests/dss -q` — **PASS**, 41 passed with 6 dependency warnings.
+- Real API end-to-end with the frozen checkpoint and frozen research catalog: **PASS**, readiness `READY`, HTTP 200, expected minimum GCC `0.06807432174682618`, mean ground service `0.03696969696969697`, ground/system context `AVAILABLE`, limiting segment `GROUND`, five realizations, and unchanged provenance labels.
+- Final branch/SHA: `feature/final-dss-ui-v1` / recorded in the final handoff after the reconciliation commit; no merge to main.
 
 ## Artifact and science protection
 
