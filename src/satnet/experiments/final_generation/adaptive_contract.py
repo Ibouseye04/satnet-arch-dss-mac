@@ -18,7 +18,10 @@ from satnet.experiments.final_dataset.materialize import (
 from satnet.experiments.final_dataset.specification import (
     validate_adaptive_contract_specification,
 )
-from satnet.experiments.production_profile import FINAL_ADAPTIVE_PRODUCTION_PROFILE
+from satnet.experiments.production_profile import (
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+    assert_adaptive_production_values,
+)
 
 from .mapping import FinalRunMapping, map_adaptive_run
 
@@ -40,6 +43,7 @@ def load_adaptive_contract(root: str | Path) -> dict[str, Any]:
         profile=FINAL_ADAPTIVE_PRODUCTION_PROFILE,
     )
     specification = read_json(contract_root / "contract_specification.json")
+    assert_adaptive_production_values(specification["fixed_profile"])
     validate_adaptive_contract_specification(specification)
     return {
         "specification": specification,

@@ -907,13 +907,16 @@ def _compute_grid_plus_isls(
             "viable": False,
             "margin_db": None,
             "selected": False,
+            "rejection_reason": None,
         }
         if dist > max_isl_distance_km:
+            outcome["rejection_reason"] = "maximum_distance"
             stats.links_rejected_distance += 1
             return None, outcome
         los = bool(_check_line_of_sight(current_pos, partner_pos))
         outcome["los"] = los
         if not los:
+            outcome["rejection_reason"] = "earth_obscuration"
             stats.links_rejected_los += 1
             return None, outcome
         mode, signal_dbm, margin_db, viable = link_budget.evaluate_link(dist)
@@ -922,6 +925,7 @@ def _compute_grid_plus_isls(
         outcome["margin_db"] = margin_db
         outcome["viable"] = viable
         if not viable:
+            outcome["rejection_reason"] = "link_budget"
             stats.links_rejected_budget += 1
             return None, outcome
         link = accepted_link(
@@ -1021,6 +1025,7 @@ def _compute_grid_plus_isls(
                     partner_pos,
                     link_type,
                 )
+                outcome["candidate_offset"] = offset
                 candidate_outcomes.append(outcome)
                 if link is not None:
                     adaptive_candidates.append((link, outcome))
@@ -1066,6 +1071,11 @@ def _compute_grid_plus_isls(
                     "sat_id": link.sat_id_2,
                     "plane": link.sat_id_2 // sats_per_plane,
                     "satellite": link.sat_id_2 % sats_per_plane,
+                    "candidate_offset": next(
+                        outcome["candidate_offset"]
+                        for outcome in candidate_outcomes
+                        if outcome["sat_id"] == link.sat_id_2
+                    ),
                     "distance_km": link.distance_km,
                     "margin_db": link.margin_db,
                 }
@@ -1089,6 +1099,7 @@ def _compute_grid_plus_isls(
                         "sat_id": original_sat,
                         "plane": next_plane,
                         "satellite": sat_in_plane,
+                        "candidate_offset": 0,
                     },
                     "adaptive_candidates": candidate_outcomes,
                     "selected": selected_records,
@@ -1369,6 +1380,8 @@ class HypatiaAdapter:
                     total_stats.rf_links += step_stats.rf_links
                     total_stats.accepted_intra_plane_links += step_stats.accepted_intra_plane_links
                     total_stats.accepted_inter_plane_links += step_stats.accepted_inter_plane_links
+                    for example in step_stats.adaptive_selection_examples:
+                        example["time_step"] = step
                     total_stats.adaptive_selection_examples.extend(step_stats.adaptive_selection_examples)
 
                     self._isl_data[step] = links

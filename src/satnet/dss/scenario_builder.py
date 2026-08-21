@@ -10,7 +10,10 @@ from satnet.ground.integrated_graph import OperationalSatelliteGraphSnapshot
 from satnet.ground.position_adapter import reconstruct_operational_satellite_position_sequence
 from satnet.ground.satellite_graph_adapter import reconstruct_operational_satellite_graph_sequence
 from satnet.ground.coordinates import OperationalSatellitePositionSnapshot
-from satnet.experiments.production_profile import FINAL_ADAPTIVE_PRODUCTION_PROFILE
+from satnet.experiments.production_profile import (
+    FINAL_ADAPTIVE_PRODUCTION_PROFILE,
+    assert_adaptive_production_values,
+)
 from satnet.network.hypatia_adapter import PHYSICS_MODEL_VERSION
 from satnet.simulation.tier1_rollout import (
     DEFAULT_EPOCH_ISO,
@@ -51,7 +54,7 @@ class DSSScenario:
 def build_rollout_config(
     architecture: DSSArchitectureRequest, satellite_failure_seed: int
 ) -> Tier1RolloutConfig:
-    return Tier1RolloutConfig(
+    config = Tier1RolloutConfig(
         num_planes=architecture.num_planes,
         sats_per_plane=architecture.sats_per_plane,
         inclination_deg=architecture.inclination_deg,
@@ -73,6 +76,15 @@ def build_rollout_config(
         epoch_iso=DEFAULT_EPOCH_ISO,
         orbital_engine=DSS_ORBITAL_ENGINE,
     )
+    assert_adaptive_production_values(
+        {
+            "isl_policy": config.isl_policy,
+            "adjacent_search_k": config.adjacent_search_k,
+            "max_inter_plane_links_per_sat": config.max_inter_plane_links_per_sat,
+            "failure_model": config.failure_model,
+        }
+    )
+    return config
 
 
 def build_scenario(

@@ -74,6 +74,7 @@ def test_grid_adaptive_selects_highest_ranked_viable_candidates_globally() -> No
         "sat_id": 3,
         "plane": 1,
         "satellite": 0,
+        "candidate_offset": 0,
     }
     assert first_example["selected"][0]["sat_id"] == 4
 
