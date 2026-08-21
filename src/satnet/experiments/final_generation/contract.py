@@ -343,20 +343,28 @@ def validate_output_root(root: str | Path, *, other_roots: Iterable[str | Path] 
     return resolved
 
 
-def mode_marker(mode: str) -> dict[str, str]:
+def mode_marker(
+    mode: str, *, contract_spec_hash: str = CONTRACT_SPEC_HASH
+) -> dict[str, str]:
     if mode not in SUPPORTED_MODES:
         raise ValueError(f"Unsupported execution mode: {mode}")
     return {
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": contract_spec_hash,
         "execution_mode": mode,
         "mode_marker_schema_version": "1",
     }
 
 
-def ensure_mode_root(root: str | Path, mode: str, *, create: bool) -> Path:
+def ensure_mode_root(
+    root: str | Path,
+    mode: str,
+    *,
+    create: bool,
+    contract_spec_hash: str = CONTRACT_SPEC_HASH,
+) -> Path:
     resolved = validate_output_root(root)
     marker_path = resolved / "execution_mode.json"
-    expected = mode_marker(mode)
+    expected = mode_marker(mode, contract_spec_hash=contract_spec_hash)
     if not resolved.exists():
         if not create:
             raise FileNotFoundError(f"Execution root does not exist: {resolved}")

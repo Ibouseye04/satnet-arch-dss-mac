@@ -5,7 +5,7 @@ from typing import Any, Sequence
 
 from satnet.ground.catalog import GroundStationCatalog
 
-from .constants import CONTRACT_SPEC_HASH, RUN_ID_WIDTH
+from .constants import RUN_ID_WIDTH
 from .io import atomic_write_json, read_canonical_json
 from .mapping import FinalRunMapping
 from .orchestrator import artifact_paths, attempt_input_identity, run_directory, validate_completed_run
@@ -83,7 +83,7 @@ def materialize_generation_ledger(
             }
         )
     ledger = {
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": mappings[0].run["contract_spec_hash"] if mappings else None,
         "distinct_frozen_run_submission_count": distinct_submissions,
         "generation_ledger_schema_version": "2",
         "operational_attempt_event_count": attempt_events,
@@ -107,7 +107,7 @@ def materialize_replay_ledger(
     if run_ids != sorted(set(run_ids)):
         raise ValueError("Replay ledger contains duplicate or unordered run IDs")
     ledger = {
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": mappings[0].run["contract_spec_hash"] if mappings else None,
         "records": records,
         "replay_ledger_schema_version": "2",
         "replay_submission_count": len(records),

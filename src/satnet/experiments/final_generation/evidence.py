@@ -6,7 +6,7 @@ from typing import Any, Mapping, Sequence
 from satnet.ground.canonical import canonical_hash
 from satnet.ground.catalog import GroundStationCatalog
 
-from .constants import RUN_ID_WIDTH, CONTRACT_SPEC_HASH
+from .constants import RUN_ID_WIDTH
 from .io import read_canonical_json
 from .mapping import FinalRunMapping
 from .orchestrator import (
@@ -185,7 +185,8 @@ def validate_generation_evidence(
     for field, expected in expected_aggregates.items():
         if ledger.get(field) != expected:
             raise ValueError(f"Generation aggregate disagrees with records: {field}")
-    if ledger.get("contract_spec_hash") != CONTRACT_SPEC_HASH:
+    expected_contract_hashes = {mapping.run["contract_spec_hash"] for mapping in ordered}
+    if len(expected_contract_hashes) != 1 or ledger.get("contract_spec_hash") != next(iter(expected_contract_hashes)):
         raise ValueError("Generation ledger contract hash mismatch")
     return targets, results
 
@@ -214,7 +215,7 @@ def validate_replay_evidence(
         target_hash = generation_targets[mapping.run_id]["target_artifact_hash"]
         stages = record["per_stage_comparison"]
         if (
-            record["contract_spec_hash"] != CONTRACT_SPEC_HASH
+            record["contract_spec_hash"] != mapping.run["contract_spec_hash"]
             or record["design_record_hash"] != mapping.design["design_record_hash"]
             or record["run_id"] != mapping.run_id
             or record["run_key"] != mapping.run_key
@@ -240,6 +241,7 @@ def validate_replay_evidence(
         raise ValueError("Replay aggregate disagrees with records: replay_submission_count")
     if ledger.get("successful_replay_count") != derived_successes:
         raise ValueError("Replay aggregate disagrees with records: successful_replay_count")
-    if ledger.get("contract_spec_hash") != CONTRACT_SPEC_HASH:
+    expected_contract_hashes = {mapping.run["contract_spec_hash"] for mapping in ordered}
+    if len(expected_contract_hashes) != 1 or ledger.get("contract_spec_hash") != next(iter(expected_contract_hashes)):
         raise ValueError("Replay ledger contract hash mismatch")
     return indexed

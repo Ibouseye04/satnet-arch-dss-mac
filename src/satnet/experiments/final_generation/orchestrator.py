@@ -221,7 +221,12 @@ def generate_run(
     verified_resume: bool = False,
     resume_replay_root: str | Path | None = None,
 ) -> dict[str, Any]:
-    root = ensure_mode_root(output_root, mode, create=True)
+    root = ensure_mode_root(
+        output_root,
+        mode,
+        create=True,
+        contract_spec_hash=mapping.run["contract_spec_hash"],
+    )
     final_root = run_directory(root, mapping.run_id)
     if final_root.exists():
         if not verified_resume:
@@ -383,7 +388,7 @@ def generate_run(
             "attempt_input_identity": input_identity,
             "attempt_input_identity_hash": input_identity_hash,
             "completed_stages": completed,
-            "contract_spec_hash": CONTRACT_SPEC_HASH,
+            "contract_spec_hash": mapping.run["contract_spec_hash"],
             "published_result_hash": result["run_result_hash"],
             "run_id": mapping.run_id,
             "run_key": mapping.run_key,

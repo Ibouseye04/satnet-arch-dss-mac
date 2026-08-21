@@ -27,9 +27,20 @@ def replay_run_read_only(
     }
     if not valid_pair:
         raise ValueError("Unsupported replay mode pair")
-    source_root = ensure_mode_root(input_root, input_mode, create=False)
+    contract_spec_hash = mapping.run["contract_spec_hash"]
+    source_root = ensure_mode_root(
+        input_root,
+        input_mode,
+        create=False,
+        contract_spec_hash=contract_spec_hash,
+    )
     output_root = validate_output_root(replay_output_root, other_roots=(source_root,))
-    output_root = ensure_mode_root(output_root, output_mode, create=True)
+    output_root = ensure_mode_root(
+        output_root,
+        output_mode,
+        create=True,
+        contract_spec_hash=contract_spec_hash,
+    )
     source_run = run_directory(source_root, mapping.run_id)
     if not source_run.is_dir():
         raise FileNotFoundError(f"Source run does not exist: run_{mapping.run_id:04d}")

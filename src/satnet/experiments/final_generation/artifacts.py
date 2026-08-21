@@ -123,7 +123,7 @@ def make_satellite_artifact(
         raise ValueError("Satellite rollout summary mismatch")
     payload: dict[str, Any] = {
         "actual_configuration_hash": config.config_hash(),
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": run["contract_spec_hash"],
         "design_record_hash": design["design_record_hash"],
         "expected_configuration_hash": run["expected_satellite_config_hash"],
         "failed_edges": [list(edge) for edge in sorted(failure_realization.failed_edges)],
@@ -179,6 +179,7 @@ def read_satellite_artifact(
     expected = make_satellite_artifact(
         design={"design_record_hash": payload["design_record_hash"]},
         run={
+            "contract_spec_hash": payload["contract_spec_hash"],
             "expected_satellite_config_hash": payload["expected_configuration_hash"],
             "run_id": payload["run_id"],
             "run_key": payload["run_key"],
@@ -198,7 +199,7 @@ def make_target_artifact(
     *, design: Mapping[str, Any], run: Mapping[str, Any], g5_summary: object
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": run["contract_spec_hash"],
         "design_record_hash": design["design_record_hash"],
         "identity_domain": TARGET_ARTIFACT_DOMAIN,
         "identity_version": TARGET_ARTIFACT_IDENTITY_VERSION,
@@ -262,9 +263,15 @@ def make_scientific_inventory(run_root: str | Path) -> dict[str, Any]:
             }
         )
     records.sort(key=lambda record: record["path"])
+    contract_spec_hash = CONTRACT_SPEC_HASH
+    try:
+        satellite_artifact = read_canonical_json(root / RUN_FILES["satellite"])
+        contract_spec_hash = satellite_artifact["contract_spec_hash"]
+    except (KeyError, OSError, ValueError):
+        pass
     payload = {
         "artifacts": records,
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": contract_spec_hash,
         "identity_domain": SCIENTIFIC_INVENTORY_DOMAIN,
         "identity_version": SCIENTIFIC_INVENTORY_IDENTITY_VERSION,
         "scientific_inventory_schema_version": SCIENTIFIC_INVENTORY_SCHEMA_VERSION,
@@ -284,7 +291,7 @@ def make_run_result(
     *, design: Mapping[str, Any], run: Mapping[str, Any], inventory: Mapping[str, Any], target: Mapping[str, Any]
 ) -> dict[str, Any]:
     payload = {
-        "contract_spec_hash": CONTRACT_SPEC_HASH,
+        "contract_spec_hash": run["contract_spec_hash"],
         "design_record_hash": design["design_record_hash"],
         "identity_domain": RUN_RESULT_DOMAIN,
         "identity_version": RUN_RESULT_IDENTITY_VERSION,
