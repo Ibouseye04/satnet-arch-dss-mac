@@ -1,0 +1,99 @@
+{
+  "phase2_schema_version": "satnet.phase2.adaptive_v2_ml_export.v1",
+  "status": "PASS",
+  "source_production_root": "C:\\Users\\johns\\external\\satnet-10k-final-production-v2-adaptive",
+  "source_replay_root": "C:\\Users\\johns\\external\\satnet-10k-final-production-v2-adaptive-replay",
+  "phase1_scientific_source_sha": "346b3ff1670237645acf4836283adbbdc359093a",
+  "phase2_exporter_tooling_sha": "767b9161f0301236153551a2319dd570d7dd342f",
+  "source_contract_specification_hash": "23c5fffc10849c3bc3ea027251ac3e5ad4c96f0eea85edf1e8deab079cb0871e",
+  "source_contract_bundle_hash": "da3c73711b1d60635afcceee8bda0a60d1379e492e1ad0d588d5a0c25e10abe3",
+  "design_manifest_hash": "f29d519e551986732c8eb87f44de29ff3c16aa7956428df424757d7dbcb485f1",
+  "run_manifest_hash": "3e24f4a58be51e1ccb9a8d2381cbc016dd36693bdb43b939c1d63b8671981a89",
+  "split_manifest_hash": "881569300f30c25ed37be051f91aa6e5eb6c03c97743047d1b7819cc296adc79",
+  "ml_output_root": "C:\\Users\\johns\\external\\satnet-10k-final-ml-datasets-v2-adaptive",
+  "ml_output_inventory_sha256": "29ef628bbec3ad6a003ede89749b1ba64925098b1edc55cec7e3cb98946af6b8",
+  "ml_bundle_content_hash": "1399f12e6ed7e159076028bc01971cf2274924fc55b43cca0a44219db8c978d1",
+  "rf_outputs": {
+    "rf_space_classification": {
+      "path": "rf_space_classification/rf_space_classification.csv",
+      "sha256": "b450ed10b795c4ab8cd394987ddc76e307b971ff259dcecc78d59ac5c50f8d39",
+      "schema": "rf_space_classification/rf_space_classification_schema.json",
+      "schema_sha256": "c6d2f6c3c8fd5bb7403e18bdcedd1ea4d323120fd49580f88c8f5e4829e33811",
+      "features": ["num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability"],
+      "target": "space_threshold_breach_any",
+      "rows": 10000
+    },
+    "rf_space_regression": {
+      "path": "rf_space_regression/rf_space_regression.csv",
+      "sha256": "282bb593620ddd2a14d47193c3a7faf5976fed6b4ba4d46cc762632fcbe3b15a",
+      "schema": "rf_space_regression/rf_space_regression_schema.json",
+      "schema_sha256": "615fe2480d697917d243f7c2fb1701e1aba9ac4e9748eb0bf50b3bb9bb47ef25",
+      "features": ["num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability"],
+      "target": "space_gcc_fraction_original_min",
+      "rows": 10000
+    },
+    "rf_integrated_classification": {
+      "path": "rf_integrated_classification/rf_integrated_classification.csv",
+      "sha256": "5233159a1ea331bdac9f57c5062c46a04e3e5927b5b440a974155c175676faeb",
+      "schema": "rf_integrated_classification/rf_integrated_classification_schema.json",
+      "schema_sha256": "86788749a6f9e92c0baf6458ad768bc0057592465b9fd9ea8ade742d40054735",
+      "features": ["num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability", "civilian_count", "government_count", "military_count", "ground_station_failure_probability"],
+      "target": "overall_threshold_breach_any",
+      "rows": 10000
+    },
+    "rf_integrated_regression": {
+      "path": "rf_integrated_regression/rf_integrated_regression.csv",
+      "sha256": "0aea675bfeb05f760fe0c4e4c600f4a15f4f9df8efb9fb99206b7fcdebec0588",
+      "schema": "rf_integrated_regression/rf_integrated_regression_schema.json",
+      "schema_sha256": "d7720b34f7d595e47604e0a482b89058a6353fa17764ef5c9c5eeaca8b272c5c",
+      "features": ["num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability", "civilian_count", "government_count", "military_count", "ground_station_failure_probability"],
+      "targets": ["failure_adjusted_overall_service_fraction_mean", "failure_adjusted_overall_service_fraction_min"],
+      "rows": 10000
+    }
+  },
+  "tgnn_outputs": {
+    "scope": "space-only",
+    "sample_unit": "one complete simulation run",
+    "sequence_length": 11,
+    "node_feature_dimension": 3,
+    "edge_feature_dimension": 4,
+    "sequence_count": 10000,
+    "classification_manifest_sha256": "4ae854854c88e5ff5b30ed0b29ed576c45f4ca575bd138d1d50b924ef0349942",
+    "classification_target_manifest_sha256": "35154caa15b253cf081f374df4d686f81e68a1ab6773725965178d4dc297b90c",
+    "regression_manifest_sha256": "3f9170ccd1e49eeb1d58f18a366acf11ffe1860b01cf61d5769dd700353fa041",
+    "regression_target_manifest_sha256": "e99aa103cf30d8ea37c50e0cdfaedd5f432cbb986b74d6f71531486463459f9f",
+    "representative_sequence_run_0009_sha256": "289dd43f68f07a2b6222e2397def14fedefe07faf10e737707d823a1d98b492d"
+  },
+  "counts": {
+    "source_runs": 10000,
+    "exported_run_identity_coverage": "complete",
+    "missing_run_ids": 0,
+    "duplicate_run_ids": 0,
+    "unique_designs": 2000,
+    "realizations_per_design": 5,
+    "split_runs": {"train": 7000, "validation": 1500, "test": 1500},
+    "split_designs": {"train": 1400, "validation": 300, "test": 300}
+  },
+  "class_distributions": {
+    "rf_space_classification": {"overall": {"false": 1443, "true": 8557}, "train": {"false": 950, "true": 6050}, "validation": {"false": 266, "true": 1234}, "test": {"false": 227, "true": 1273}},
+    "rf_integrated_classification": {"overall": {"false": 62, "true": 9938}, "train": {"false": 37, "true": 6963}, "validation": {"false": 15, "true": 1485}, "test": {"false": 10, "true": 1490}}
+  },
+  "regression_statistics": {
+    "rf_space_regression": {
+      "train": {"count": 7000, "min": 0.025, "max": 1.0, "mean": 0.25757816893424035, "std_population": 0.31121399414603423, "unique": 197},
+      "validation": {"count": 1500, "min": 0.03125, "max": 1.0, "mean": 0.2916166666666667, "std_population": 0.33273898882932074, "unique": 150},
+      "test": {"count": 1500, "min": 0.02857142857142857, "max": 1.0, "mean": 0.27002809523809523, "std_population": 0.32477159791253574, "unique": 141}
+    },
+    "rf_integrated_regression": {
+      "train": {"failure_adjusted_overall_service_fraction_mean": {"count": 7000, "min": 0.0, "max": 0.9740259740259739, "mean": 0.183032009894867, "std_population": 0.2548056141888655, "unique": 1658}, "failure_adjusted_overall_service_fraction_min": {"count": 7000, "min": 0.0, "max": 0.9428571428571428, "mean": 0.12907721371882086, "std_population": 0.21074146554705472, "unique": 183}},
+      "validation": {"failure_adjusted_overall_service_fraction_mean": {"count": 1500, "min": 0.0, "max": 0.9393939393939393, "mean": 0.2106439874939875, "std_population": 0.2719169074700886, "unique": 599}, "failure_adjusted_overall_service_fraction_min": {"count": 1500, "min": 0.0, "max": 0.925, "mean": 0.14999451058201058, "std_population": 0.22279151289115226, "unique": 119}},
+      "test": {"failure_adjusted_overall_service_fraction_mean": {"count": 1500, "min": 0.0, "max": 0.9109090909090909, "mean": 0.18856988455988455, "std_population": 0.26104229635735254, "unique": 563}, "failure_adjusted_overall_service_fraction_min": {"count": 1500, "min": 0.0, "max": 0.88, "mean": 0.13641486772486772, "std_population": 0.22062005623274897, "unique": 116}}
+    }
+  },
+  "topology": {"aggregate": [{"count": 10000, "tuple": ["grid_adaptive", 1, 1, "persistent_temporal_union_edges_v1"]}], "grid_fixed_source_count": 0},
+  "quality_gates": {"source_export_target_mismatch_count": 0, "design_cross_split_leakage": 0, "nan": 0, "inf": 0, "out_of_range_or_illegal": 0, "historical_fixed_source_contamination": 0},
+  "historical_fixed_artifact_immutability": {"unchanged": true, "inventory_sha256": "f96900290bddb015614a239f9b400fc1102a95fc82c403c6e61f960e8e5d6c8b", "report_sha256": "fcae984eee1b2d83bb8edb4c592ca6fbca2e43080013ff74601d7a95f7d68f61"},
+  "graph_parity_evidence": {"representative_runs": ["P01", "P02", "P03", "P04", "P05"], "split_coverage": ["train", "validation", "test"], "adaptive_only_edge": {"run_id": 9, "design_id": "D0001", "edge": [0, 15], "link_type": "inter_plane", "source_timestep": 0, "serialized_timestep": 0, "present_in_source": true, "present_in_tgnn": true}},
+  "no_model_training": true,
+  "final": "PASS"
+}
