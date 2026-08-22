@@ -205,9 +205,9 @@ def _runtime_audit(mappings: Sequence[Any], root: Path) -> dict[str, Any]:
     for field, values in target_values.items():
         summary[field] = {
             "count": len(values),
-            "max": max(values) if values else None,
-            "mean": sum(values) / len(values) if values else None,
-            "min": min(values) if values else None,
+            "max": canonical_float_string(max(values)) if values else None,
+            "mean": canonical_float_string(sum(values) / len(values)) if values else None,
+            "min": canonical_float_string(min(values)) if values else None,
         }
     return {
         "duplicate_run_ids": sorted(set(duplicate_run_ids)),
