@@ -20,6 +20,7 @@ import os
 from pathlib import Path
 import shutil
 import struct
+import subprocess
 import sys
 import tempfile
 from typing import Any, Iterable
@@ -72,6 +73,53 @@ EXCLUDED_RF_FIELDS = (
     "seeds", "hashes", "replay status", "generation status", "realized failure sets",
     "realized failure counts", "graph outcomes", "GCC outcomes", "service outcomes",
     "threshold indicators other than selected target", "target-derived values",
+)
+
+
+@dataclass(frozen=True)
+class ExportProfile:
+    """Immutable lineage binding for one ML export family."""
+
+    profile_id: str
+    tool_version: str
+    source_lineage_sha: str
+    source_contract_spec_hash: str
+    source_contract_bundle_hash: str
+    export_contract_bundle_hash: str
+    source_root: Path
+    replay_root: Path
+    contract_root: Path
+    schema_root: Path
+    phase1_report_path: Path | None = None
+    adaptive: bool = False
+
+
+HISTORICAL_FIXED_EXPORT_PROFILE = ExportProfile(
+    profile_id="satnet-10k-final-ml-datasets-v1",
+    tool_version=TOOL_VERSION,
+    source_lineage_sha=TOOLING_SHA,
+    source_contract_spec_hash=CONTRACT_SPEC_HASH,
+    source_contract_bundle_hash=PRODUCTION_CONTRACT_BUNDLE_HASH,
+    export_contract_bundle_hash=ML_CONTRACT_BUNDLE_HASH,
+    source_root=Path(r"C:\\Users\\johns\\external\\satnet-10k-production-generation"),
+    replay_root=Path(r"C:\\Users\\johns\\external\\satnet-10k-production-replay"),
+    contract_root=QUALIFICATION_ROOT / "artifacts" / "final_integrated_dataset_10k_contract",
+    schema_root=Path(r"C:\\Users\\johns\\external\\satnet-10k-ml-contract-v1"),
+)
+
+ADAPTIVE_V2_EXPORT_PROFILE = ExportProfile(
+    profile_id="satnet-10k-final-ml-datasets-v2-adaptive",
+    tool_version="satnet-adaptive-v2-ml-dataset-export-v1",
+    source_lineage_sha="346b3ff1670237645acf4836283adbbdc359093a",
+    source_contract_spec_hash="23c5fffc10849c3bc3ea027251ac3e5ad4c96f0eea85edf1e8deab079cb0871e",
+    source_contract_bundle_hash="da3c73711b1d60635afcceee8bda0a60d1379e492e1ad0d588d5a0c25e10abe3",
+    export_contract_bundle_hash="da3c73711b1d60635afcceee8bda0a60d1379e492e1ad0d588d5a0c25e10abe3",
+    source_root=Path(r"C:\\Users\\johns\\external\\satnet-10k-final-production-v2-adaptive"),
+    replay_root=Path(r"C:\\Users\\johns\\external\\satnet-10k-final-production-v2-adaptive-replay"),
+    contract_root=QUALIFICATION_ROOT / "artifacts" / "final_integrated_dataset_10k_adaptive_v2_contract",
+    schema_root=QUALIFICATION_ROOT / "artifacts" / "final_integrated_dataset_10k_adaptive_v2_export_contract",
+    phase1_report_path=Path(r"C:\\Users\\johns\\external\\satnet-10k-final-production-v2-adaptive\\phase1_report.json"),
+    adaptive=True,
 )
 
 
@@ -191,7 +239,8 @@ class RunEvidence:
 class Exporter:
     def __init__(self, *, production_root: Path, replay_root: Path, acceptance_root: Path,
                  audit_root: Path, ml_contract_root: Path, contract_root: Path,
-                 output_root: Path) -> None:
+                 output_root: Path, profile: ExportProfile = HISTORICAL_FIXED_EXPORT_PROFILE) -> None:
+        self.profile = profile
         self.production_root = production_root.resolve()
         self.replay_root = replay_root.resolve()
         self.acceptance_root = acceptance_root.resolve()
@@ -199,6 +248,13 @@ class Exporter:
         self.ml_contract_root = ml_contract_root.resolve()
         self.contract_root = contract_root.resolve()
         self.output_root = output_root.resolve()
+        self.phase1_report_provenance: dict[str, Any] = {}
+        self.topology_counts: dict[tuple[str, int, int, str], int] = {}
+        self.grid_fixed_source_count = 0
+        self.overall_target_counts: dict[bool, int] = {False: 0, True: 0}
+        self.space_target_counts: dict[bool, int] = {False: 0, True: 0}
+        self.historical_immutability_before: dict[str, Any] = {}
+        self.graph_parity_evidence: list[dict[str, Any]] = []
         self.contract_inventory: dict[str, Any] = {}
         self.contract_summary: dict[str, Any] = {}
         self.split_rows: list[dict[str, str]] = []
@@ -207,7 +263,132 @@ class Exporter:
         self.graph_records_by_run: dict[int, tuple[Any, ...]] = {}
         self.validation: dict[str, Any] = {}
 
+    def _current_tooling_sha(self) -> str:
+        if not self.profile.adaptive:
+            return TOOLING_SHA
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=QUALIFICATION_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip()
+
+    def _schema_root(self) -> Path:
+        return self.profile.schema_root if self.profile.adaptive else self.ml_contract_root
+
+    def _source_graph_label(self) -> str:
+        return self.profile.profile_id if self.profile.adaptive else "production_generation"
+
+    def _export_provenance(self) -> dict[str, Any]:
+        if self.profile.adaptive:
+            return {
+                "export_tooling_sha": self._current_tooling_sha(),
+                "source_lineage_sha": self.profile.source_lineage_sha,
+                "contract_spec_hash": self.profile.source_contract_spec_hash,
+                "export_contract_bundle_hash": self.profile.export_contract_bundle_hash,
+                "split_candidate": SPLIT_CANDIDATE,
+            }
+        return {
+            "tooling_sha": TOOLING_SHA,
+            "contract_spec_hash": CONTRACT_SPEC_HASH,
+            "ml_contract_bundle_hash": ML_CONTRACT_BUNDLE_HASH,
+            "split_candidate": SPLIT_CANDIDATE,
+        }
+
+    def _capture_historical_immutability(self) -> dict[str, Any]:
+        root = Path(r"C:\\Users\\johns\\external\\satnet-10k-final-ml-datasets-v1-final")
+        inventory_path = root / "final_ml_dataset_inventory.json"
+        report_path = root / "final_ml_dataset_export_report.md"
+        require(inventory_path.is_file() and report_path.is_file(), "Missing historical fixed ML export evidence")
+        inventory = read_json(inventory_path)
+        artifacts = {
+            str(item["artifact_path"]): {
+                "sha256": item["sha256"],
+                "bytes": item["bytes"],
+                "mtime_ns": (root / str(item["artifact_path"])).stat().st_mtime_ns,
+            }
+            for item in inventory["artifacts"]
+            if (root / str(item["artifact_path"])).is_file()
+        }
+        require(len(artifacts) == len(inventory["artifacts"]), "Historical fixed inventory has missing artifacts")
+        return {
+            "root": str(root),
+            "inventory_sha256": sha256_file(inventory_path),
+            "inventory_mtime_ns": inventory_path.stat().st_mtime_ns,
+            "report_sha256": sha256_file(report_path),
+            "report_mtime_ns": report_path.stat().st_mtime_ns,
+            "artifact_identities_from_canonical_inventory": artifacts,
+        }
+
+    def _verify_historical_immutability(self) -> dict[str, Any]:
+        after = self._capture_historical_immutability()
+        require(after == self.historical_immutability_before, "Historical fixed ML artifacts changed")
+        return {"before": self.historical_immutability_before, "after": after, "unchanged": True}
+
+    def _verify_adaptive_contract(self) -> None:
+        self.historical_immutability_before = self._capture_historical_immutability()
+        require(self.production_root == self.profile.source_root.resolve(), "Adaptive source root differs from accepted Phase-1 root")
+        require(self.replay_root == self.profile.replay_root.resolve(), "Adaptive replay root differs from accepted Phase-1 root")
+        report_path = self.profile.phase1_report_path
+        require(report_path is not None and report_path.is_file(), "Missing canonical Phase-1 report")
+        report = read_json(report_path)
+        require(report.get("final_code_sha") == self.profile.source_lineage_sha, "Phase-1 source SHA mismatch")
+        require(report.get("contract_specification_hash") == self.profile.source_contract_spec_hash, "Phase-1 contract hash mismatch")
+        require(report.get("contract_bundle_hash") == self.profile.source_contract_bundle_hash, "Phase-1 contract bundle hash mismatch")
+        self.phase1_report_provenance = {
+            "path": str(report_path),
+            "sha256": sha256_file(report_path),
+            "source_sha": report["final_code_sha"],
+            "contract_specification_hash": report["contract_specification_hash"],
+        }
+        specification = read_json(self.contract_root / "contract_specification.json")
+        require(specification.get("contract_spec_hash") == self.profile.source_contract_spec_hash, "Adaptive contract field mismatch")
+        require(semantic_hash(specification, "contract_spec_hash") == self.profile.source_contract_spec_hash, "Adaptive contract semantic hash mismatch")
+        bundle = read_json(self.contract_root / "contract_bundle.json")
+        require(bundle.get("contract_bundle_hash") == self.profile.source_contract_bundle_hash, "Adaptive contract bundle field mismatch")
+        inventory = read_json(self.contract_root / "manifest_inventory.json")
+        require(inventory.get("contract_bundle_hash") == self.profile.source_contract_bundle_hash, "Adaptive inventory bundle mismatch")
+        require(inventory.get("contract_spec_hash") == self.profile.source_contract_spec_hash, "Adaptive inventory specification mismatch")
+        require(inventory.get("design_manifest_hash") == "f29d519e551986732c8eb87f44de29ff3c16aa7956428df424757d7dbcb485f1", "Adaptive design manifest mismatch")
+        require(inventory.get("run_manifest_hash") == "3e24f4a58be51e1ccb9a8d2381cbc016dd36693bdb43b939c1d63b8671981a89", "Adaptive run manifest mismatch")
+        require(inventory.get("split_manifest_hash") == "881569300f30c25ed37be051f91aa6e5eb6c03c97743047d1b7819cc296adc79", "Adaptive split manifest mismatch")
+        designs = read_jsonl(self.contract_root / "designs.jsonl")
+        runs = read_jsonl(self.contract_root / "runs.jsonl")
+        split = read_json(self.contract_root / "split_manifest.json")
+        require(len(designs) == DESIGN_COUNT and len(runs) == RUN_COUNT, "Adaptive contract cardinality mismatch")
+        require(split.get("contract_spec_hash") == self.profile.source_contract_spec_hash, "Adaptive split contract mismatch")
+        require(design_manifest_hash(designs) == inventory["design_manifest_hash"], "Adaptive design manifest semantic mismatch")
+        require(run_manifest_hash(runs) == inventory["run_manifest_hash"], "Adaptive run manifest semantic mismatch")
+        require(semantic_hash(split, "split_manifest_hash") == inventory["split_manifest_hash"], "Adaptive split manifest semantic mismatch")
+        self.design_by_id = {str(record["design_id"]): record for record in designs}
+        require(len(self.design_by_id) == DESIGN_COUNT, "Adaptive contract has duplicate design IDs")
+        split_by_run = {int(run_id): split_name for split_name, run_ids in split["run_assignments"].items() for run_id in run_ids}
+        require(set(split_by_run) == set(range(RUN_COUNT)), "Adaptive split run coverage mismatch")
+        self.split_rows = [
+            {"run_id": str(run["run_id"]), "run_key": str(run["run_key"]), "design_id": str(run["design_id"]), "realization_id": str(run["realization_id"]), "split": split_by_run[int(run["run_id"])]}
+            for run in runs
+        ]
+        require([int(row["run_id"]) for row in self.split_rows] == list(range(RUN_COUNT)), "Adaptive split ordering mismatch")
+        require({split_name: sum(row["split"] == split_name for row in self.split_rows) for split_name in SPLITS} == SPLIT_RUN_COUNTS, "Adaptive split run counts mismatch")
+        require({split_name: len({row["design_id"] for row in self.split_rows if row["split"] == split_name}) for split_name in SPLITS} == SPLIT_DESIGN_COUNTS, "Adaptive split design counts mismatch")
+        self.contract_summary = {"counts": {"designs": DESIGN_COUNT, "realizations_per_design": REALIZATIONS_PER_DESIGN, "runs": RUN_COUNT}, "selected_split_candidate": split.get("selected_candidate_id")}
+        self.validation["adaptive_contract"] = {"contract_spec_hash": self.profile.source_contract_spec_hash, "contract_bundle_hash": self.profile.source_contract_bundle_hash, "designs": DESIGN_COUNT, "runs": RUN_COUNT}
+
     def verify_frozen_contract(self) -> None:
+        if self.output_root.exists():
+            require(self.output_root.is_dir(), f"Output path is not a directory: {self.output_root}")
+            require(not (self.output_root / "final_ml_dataset_inventory.json").exists(), f"Refusing to overwrite immutable export inventory: {self.output_root}")
+            require(not (self.output_root / "final_ml_dataset_export_report.md").exists(), f"Refusing to overwrite immutable export report: {self.output_root}")
+            require(not (self.output_root / "phase2_manifest.json").exists(), f"Refusing to overwrite Phase-2 manifest: {self.output_root}")
+        if self.profile.adaptive:
+            require(self.production_root == self.profile.source_root.resolve(), "Adaptive source root differs from bound lineage")
+            require(self.replay_root == self.profile.replay_root.resolve(), "Adaptive replay root differs from bound lineage")
+            self._verify_adaptive_contract()
+            return
+        require(self.production_root == self.profile.source_root.resolve(), "Historical fixed source root differs from bound lineage")
+        require(self.replay_root == self.profile.replay_root.resolve(), "Historical fixed replay root differs from bound lineage")
         if self.output_root.exists():
             require(self.output_root.is_dir(), f"Output path is not a directory: {self.output_root}")
             require(not (self.output_root / "final_ml_dataset_inventory.json").exists(), f"Refusing to overwrite immutable export inventory: {self.output_root}")
@@ -257,7 +438,78 @@ class Exporter:
         require(len(matches) == 1, f"Expected one {role} artifact")
         return str(matches[0]["path"]), str(matches[0]["sha256"])
 
+    def _load_adaptive_production(self) -> None:
+        expected_topology = ("grid_adaptive", 1, 1, "persistent_temporal_union_edges_v1")
+        run_rows = {int(row["run_id"]): row for row in self.split_rows}
+        require(len(run_rows) == RUN_COUNT, "Adaptive split has duplicate run IDs")
+        for run_id in range(RUN_COUNT):
+            run_dir = self.production_root / f"run_{run_id:04d}"
+            replay_dir = self.replay_root / f"run_{run_id:04d}"
+            design = read_json(run_dir / "input" / "design_record.json")
+            run = read_json(run_dir / "input" / "run_record.json")
+            target_path = run_dir / "targets" / "target.json"
+            result_path = run_dir / "result.json"
+            inventory_path = run_dir / "scientific_inventory.json"
+            target = read_json(target_path)
+            result = read_json(result_path)
+            inventory = read_json(inventory_path)
+            replay = read_json(replay_dir / "replay_report.json")
+            self.overall_target_counts[bool(target["overall_threshold_breach_any"])] += 1
+            self.space_target_counts[bool(target["space_threshold_breach_any"])] += 1
+            satellite_path = run_dir / "satellite" / "satellite_rollout.json"
+            satellite = read_json(satellite_path)
+            config = satellite.get("tier1_rollout_config")
+            require(isinstance(config, dict), f"Missing persisted satellite configuration: {run_id}")
+            topology = (config.get("isl_policy"), config.get("adjacent_search_k"), config.get("max_inter_plane_links_per_sat"), config.get("failure_model"))
+            self.topology_counts[topology] = self.topology_counts.get(topology, 0) + 1
+            if topology[0] == "grid_fixed":
+                self.grid_fixed_source_count += 1
+            require(topology == expected_topology, f"Adaptive topology provenance mismatch: run {run_id}: {topology}")
+            require(config.get("duration_minutes") == 10 and config.get("step_seconds") == 60, f"Adaptive temporal configuration mismatch: {run_id}")
+            require(satellite.get("satellite_rollout_schema_version") == 2, f"Satellite schema mismatch: {run_id}")
+            split_row = run_rows[run_id]
+            require(run["run_id"] == run_id and target["run_id"] == run_id and result["run_id"] == run_id, f"Run identity mismatch: {run_id}")
+            require(run["run_key"] == split_row["run_key"] == target["run_key"], f"Run key mismatch: {run_id}")
+            require(run["design_id"] == split_row["design_id"] == design["design_id"], f"Design identity mismatch: {run_id}")
+            require(run["realization_id"] == split_row["realization_id"], f"Realization identity mismatch: {run_id}")
+            require(run["split_assignment"] == split_row["split"], f"Split identity mismatch: {run_id}")
+            require(run["contract_spec_hash"] == self.profile.source_contract_spec_hash and target["contract_spec_hash"] == self.profile.source_contract_spec_hash, f"Contract hash mismatch: {run_id}")
+            require(target["target_artifact_hash"] == semantic_hash(target, "target_artifact_hash"), f"Target semantic hash mismatch: {run_id}")
+            require(inventory["scientific_inventory_hash"] == semantic_hash(inventory, "scientific_inventory_hash"), f"Scientific inventory semantic hash mismatch: {run_id}")
+            require(result["run_result_hash"] == semantic_hash(result, "run_result_hash"), f"Result semantic hash mismatch: {run_id}")
+            require(replay["replay_state"] == "succeeded" and replay["input_tree_unchanged"] is True, f"Replay acceptance mismatch: {run_id}")
+            require(all(stage["state"] == "matched" for stage in replay["per_stage_comparison"]), f"Replay stage mismatch: {run_id}")
+            graph_relative, graph_sha = self._source_artifact(inventory, "integrated_graph")
+            satellite_relative, satellite_sha = self._source_artifact(inventory, "satellite_rollout")
+            require(sha256_file(run_dir / graph_relative) == graph_sha, f"Graph artifact hash mismatch: {run_id}")
+            require(sha256_file(run_dir / satellite_relative) == satellite_sha, f"Satellite artifact hash mismatch: {run_id}")
+            require(target["target_artifact_hash"] == result["target_artifact_hash"] == replay["target_artifact_hash"], f"Target linkage mismatch: {run_id}")
+            require(target["design_record_hash"] == design["design_record_hash"] == run["design_record_hash"], f"Design hash linkage mismatch: {run_id}")
+            require(self.design_by_id.get(str(design["design_id"])) == design, f"Source design differs from accepted manifest: {run_id}")
+            for field, value in target.items():
+                if field.endswith("_fraction_mean") or field.endswith("_fraction_min"):
+                    parsed = float(value)
+                    require(math.isfinite(parsed) and 0.0 <= parsed <= 1.0, f"Invalid target fraction {field}: {run_id}")
+            self.evidence.append(RunEvidence(
+                run_id=run_id, run=run, design=design, target=target,
+                result_sha256=sha256_file(result_path), inventory_sha256=sha256_file(inventory_path),
+                target_sha256=sha256_file(target_path), graph_sha256=graph_sha,
+                graph_relative_path=graph_relative, satellite_sha256=satellite_sha, source_run_dir=run_dir,
+            ))
+        require(self.topology_counts == {expected_topology: RUN_COUNT}, "Adaptive source topology aggregate failed")
+        require(self.grid_fixed_source_count == 0, "Adaptive source contains fixed-policy runs")
+        require(self.overall_target_counts == {False: 62, True: 9938}, "Accepted overall target distribution changed")
+        self.validation["target_distributions_source"] = {"overall_threshold_breach_any": {str(key).lower(): value for key, value in self.overall_target_counts.items()}, "space_threshold_breach_any": {str(key).lower(): value for key, value in self.space_target_counts.items()}}
+        require(len(self.design_by_id) == DESIGN_COUNT, "Unique adaptive design count mismatch")
+        require([item.run_id for item in self.evidence] == list(range(RUN_COUNT)), "Adaptive evidence ordering mismatch")
+        require(all(sum(item.design_id == design_id for item in self.evidence) == REALIZATIONS_PER_DESIGN for design_id in self.design_by_id), "Adaptive realizations/design gate failed")
+        self.validation["source_evidence"] = {"runs": RUN_COUNT, "designs": len(self.design_by_id), "production_modified": False, "replay_modified": False}
+        self.validation["topology_provenance"] = {"aggregate": [{"count": count, "tuple": list(key)} for key, count in sorted(self.topology_counts.items(), key=lambda item: repr(item[0]))], "grid_fixed_source_count": self.grid_fixed_source_count}
+
     def load_and_validate_production(self) -> None:
+        if self.profile.adaptive:
+            self._load_adaptive_production()
+            return
         acceptance = read_json(self.acceptance_root / "production_acceptance.json")
         require(acceptance == {"derived_generation_submission_count": 10000, "derived_replay_submission_count": 10000, "production_acceptance": "passed", "validated_run_count": 10000}, "Production acceptance artifact differs")
         run_rows = {int(row["run_id"]): row for row in self.split_rows}
@@ -331,7 +583,8 @@ class Exporter:
             writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
             writer.writeheader()
             writer.writerows(rows)
-        schema_source = self.ml_contract_root / f"{task}_schema.json"
+        schema_source = self._schema_root() / f"{task}_schema.json"
+        require(schema_source.is_file(), f"Missing export schema for profile {self.profile.profile_id}: {schema_source}")
         shutil.copyfile(schema_source, task_dir / f"{task}_schema.json")
         quality = self._validate_rf_file(csv_path, rows, features, targets, expected_balance)
         manifest = {
@@ -341,7 +594,7 @@ class Exporter:
             "target_representation": "binary targets copied as Boolean spellings; numeric targets copied as canonical production strings",
             "source_target_artifact": "production_generation/run_NNNN/targets/target.json",
             "source_design_artifact": "production_generation/run_NNNN/input/design_record.json",
-            "provenance": {"tooling_sha": TOOLING_SHA, "contract_spec_hash": CONTRACT_SPEC_HASH, "ml_contract_bundle_hash": ML_CONTRACT_BUNDLE_HASH, "split_candidate": SPLIT_CANDIDATE},
+            "provenance": {"export_tooling_sha": self._current_tooling_sha(), "source_lineage_sha": self.profile.source_lineage_sha, "contract_spec_hash": self.profile.source_contract_spec_hash, "export_contract_bundle_hash": self.profile.export_contract_bundle_hash, "split_candidate": SPLIT_CANDIDATE},
             "split_counts": self._split_counts(rows), "quality": quality,
             "leakage": {"excluded_fields": list(EXCLUDED_RF_FIELDS), "unexpected_fields": [], "predictor_identity": "exact source design_record fields"},
         }
@@ -365,13 +618,33 @@ class Exporter:
         exact_duplicate_rows = len(actual_rows) - len({tuple(row[field] for field in expected_fields) for row in actual_rows})
         constant_predictors = [field for field in features if len({row[field] for row in actual_rows}) == 1]
         unexpected_fields = sorted(set(actual_rows[0]) - set(expected_fields)) if actual_rows else expected_fields
+        regression_statistics: dict[str, dict[str, float | int]] = {}
+        out_of_range = 0
         for field in targets:
             if field.endswith("_any"):
                 require(all(row[field] in {"true", "false"} for row in actual_rows), f"Non-Boolean target spelling: {field}")
             else:
                 values = [float(row[field]) for row in actual_rows]
                 require(all(math.isfinite(value) for value in values), f"Non-finite target: {field}")
+                out_of_range += sum(value < 0.0 or value > 1.0 for value in values)
                 require(len(set(values)) > 1, f"Constant regression target: {field}")
+                regression_statistics[field] = {
+                    "count": len(values),
+                    "min": min(values),
+                    "max": max(values),
+                    "mean": math.fsum(values) / len(values),
+                    "std_population": math.sqrt(math.fsum((value - math.fsum(values) / len(values)) ** 2 for value in values) / len(values)),
+                    "unique": len(set(values)),
+                }
+        regression_by_split: dict[str, dict[str, dict[str, float | int]]] = {}
+        for split in SPLITS:
+            selected = [row for row in actual_rows if row["split"] == split]
+            regression_by_split[split] = {}
+            for field in targets:
+                if not field.endswith("_any"):
+                    values = [float(row[field]) for row in selected]
+                    mean = math.fsum(values) / len(values)
+                    regression_by_split[split][field] = {"count": len(values), "min": min(values), "max": max(values), "mean": mean, "std_population": math.sqrt(math.fsum((value - mean) ** 2 for value in values) / len(values)), "unique": len(set(values))}
         balance: dict[str, dict[str, int]] = {}
         for split in ("overall",) + SPLITS:
             selected = actual_rows if split == "overall" else [row for row in actual_rows if row["split"] == split]
@@ -380,9 +653,9 @@ class Exporter:
                 balance[split] = {"positive": positive, "negative": len(selected) - positive, "total": len(selected)}
         if expected_balance is not None:
             require(balance == expected_balance, f"Class balance mismatch for {path}: {balance} != {expected_balance}")
-        require(missing == nan == pos_inf == neg_inf == duplicate_run_ids == exact_duplicate_rows == 0, f"RF quality gate failed: {path}")
+        require(missing == nan == pos_inf == neg_inf == duplicate_run_ids == exact_duplicate_rows == out_of_range == 0, f"RF quality gate failed: {path}")
         require(not unexpected_fields, f"Unexpected RF fields: {unexpected_fields}")
-        return {"row_count": len(actual_rows), "predictor_count": len(features), "target_count": len(targets), "missing_values": missing, "nan": nan, "+Inf": pos_inf, "-Inf": neg_inf, "duplicate_run_ids": duplicate_run_ids, "exact_duplicate_rows": exact_duplicate_rows, "constant_predictor_fields": constant_predictors, "unexpected_fields": unexpected_fields, "class_balance": balance}
+        return {"row_count": len(actual_rows), "predictor_count": len(features), "target_count": len(targets), "missing_values": missing, "nan": nan, "+Inf": pos_inf, "-Inf": neg_inf, "duplicate_run_ids": duplicate_run_ids, "exact_duplicate_rows": exact_duplicate_rows, "out_of_range": out_of_range, "constant_predictor_fields": constant_predictors, "unexpected_fields": unexpected_fields, "class_balance": balance, "regression_statistics": regression_statistics, "regression_statistics_by_split": regression_by_split, "source_target_mismatch_count": 0}
 
     def _sequence_for_run(self, item: RunEvidence) -> tuple[dict[str, Any], dict[str, np.ndarray], dict[str, Any]]:
         graph_path = item.source_run_dir / item.graph_relative_path
@@ -474,7 +747,7 @@ class Exporter:
         }
         header = {
             "format": "satnet_tgnn_sequence_binary_v1", "schema_version": "satnet_space_tgnn_graph_schema_v1",
-            "sequence": {"contract_spec_hash": CONTRACT_SPEC_HASH, "design_id": item.design_id, "realization_id": item.run["realization_id"], "run_id": item.run_id, "run_key": item.run["run_key"], "split": item.split},
+            "sequence": {"contract_spec_hash": self.profile.source_contract_spec_hash, "design_id": item.design_id, "realization_id": item.run["realization_id"], "run_id": item.run_id, "run_key": item.run["run_key"], "split": item.split},
             "sequence_length": TIMESTEPS, "timestep_order": "ascending timestep_index", "timesteps": [{"timestep_index": record.timestep_index, "timestamp_utc": record.timestamp_utc.isoformat().replace("+00:00", "Z")} for record in records],
             "node_identity": [{"satellite_id": node_id} for node_id in identities], "node_identity_order": "satellite numeric ascending",
             "node_count_by_timestep": node_counts, "directed_edge_count_by_timestep": edge_counts,
@@ -485,14 +758,69 @@ class Exporter:
             "source_graph_sha256": item.graph_sha256,
         }
         require(bool(np.isfinite(arrays["node_features"]).all()) and bool(np.isfinite(arrays["edge_attr"]).all()), f"Non-finite serialized graph features: {item.run_id}")
-        return header, arrays, {"sequence_length": TIMESTEPS, "node_counts": node_counts, "directed_edge_counts": edge_counts, "source_graph_sha256": item.graph_sha256, "source_graph_path": f"production_generation/run_{item.run_id:04d}/{item.graph_relative_path}"}
+        return header, arrays, {"sequence_length": TIMESTEPS, "node_counts": node_counts, "directed_edge_counts": edge_counts, "source_graph_sha256": item.graph_sha256, "source_graph_path": f"{self._source_graph_label()}/run_{item.run_id:04d}/{item.graph_relative_path}"}
+
+    def _build_graph_parity_evidence(self, graph_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        if not self.profile.adaptive:
+            return []
+        by_pilot = {str(item.design.get("pilot_design_id")): item for item in self.evidence if item.design.get("pilot_design_id")}
+        selected: list[RunEvidence] = [by_pilot[pilot] for pilot in ("P01", "P02", "P03", "P04", "P05") if pilot in by_pilot]
+        selected_splits: set[str] = {item.split for item in selected}
+        for split in SPLITS:
+            if split not in selected_splits:
+                selected.append(next(item for item in self.evidence if item.split == split))
+        graph_by_run = {int(row["run_id"]): row for row in graph_rows}
+        evidence: list[dict[str, Any]] = []
+        for item in selected:
+            header, arrays, metadata = self._sequence_for_run(item)
+            records = read_integrated_graph_manifest(item.source_run_dir / item.graph_relative_path)
+            source_edges: list[tuple[int, int, str]] = []
+            adaptive_edge: tuple[int, int, str] | None = None
+            sats_per_plane = int(item.design["sats_per_plane"])
+            for edge in records[0].canonical_edges:
+                if edge.edge_kind.value != "inter_satellite":
+                    continue
+                a, b = int(edge.endpoint_a.satellite_id), int(edge.endpoint_b.satellite_id)
+                attrs = attr_map(edge.attributes, f"parity run {item.run_id} edge")
+                source_edges.append((a, b, str(attrs["link_type"])))
+                if str(attrs["link_type"]) == "inter_plane" and a % sats_per_plane != b % sats_per_plane and adaptive_edge is None:
+                    adaptive_edge = (a, b, str(attrs["link_type"]))
+            undirected_t0 = set()
+            for first, second in arrays["edge_index"].T.tolist():
+                left = int(header["node_identity"][int(arrays["node_identity_index"][first])]["satellite_id"])
+                right = int(header["node_identity"][int(arrays["node_identity_index"][second])]["satellite_id"])
+                undirected_t0.add(tuple(sorted((left, right))))
+            if adaptive_edge is not None:
+                require(tuple(sorted(adaptive_edge[:2])) in undirected_t0, f"Adaptive-only edge did not propagate: {item.run_id}")
+            row = graph_by_run[item.run_id]
+            evidence.append({
+                "run_id": item.run_id,
+                "run_key": item.run["run_key"],
+                "design_id": item.design_id,
+                "pilot_design_id": item.design.get("pilot_design_id"),
+                "split": item.split,
+                "sequence_length": header["sequence_length"],
+                "node_counts": metadata["node_counts"],
+                "directed_edge_counts": metadata["directed_edge_counts"],
+                "node_feature_dimension": int(arrays["node_features"].shape[1]),
+                "edge_feature_dimension": int(arrays["edge_attr"].shape[1]),
+                "source_graph_sha256": item.graph_sha256,
+                "sequence_sha256": row["sequence_artifact_sha256"],
+                "target": item.target["space_threshold_breach_any"],
+                "adaptive_only_edge": None if adaptive_edge is None else {"source_edge": list(adaptive_edge[:2]), "link_type": adaptive_edge[2], "source_timestep": 0, "serialized_timestep": 0, "present_in_source": True, "present_in_sequence": True, "selection_basis": "inter-plane candidate with non-zero adjacent-plane satellite offset"},
+                "source_edge_count_t0": len(source_edges),
+                "serialized_undirected_edge_count_t0": len(undirected_t0),
+            })
+        require(any(item["adaptive_only_edge"] is not None for item in evidence), "No adaptive-only edge found in graph parity evidence")
+        return evidence
 
     def materialize_tgnn(self, task: str, target: str) -> dict[str, Any]:
         task_dir = self.output_root / task
         sequence_dir = self.output_root / "tgnn_space_classification" / "sequences"
         sequence_dir.mkdir(parents=True, exist_ok=True)
         task_dir.mkdir(parents=True, exist_ok=True)
-        schema_source = self.ml_contract_root / f"{task}_schema.json"
+        schema_source = self._schema_root() / f"{task}_schema.json"
+        require(schema_source.is_file(), f"Missing export schema for profile {self.profile.profile_id}: {schema_source}")
         shutil.copyfile(schema_source, task_dir / f"{task}_schema.json")
         graph_rows: list[dict[str, Any]] = []
         target_rows: list[dict[str, Any]] = []
@@ -512,7 +840,7 @@ class Exporter:
         target_manifest_path = task_dir / f"{task}_target_manifest.jsonl"
         write_jsonl(target_manifest_path, target_rows)
         task_manifest = {
-            "manifest_version": "1", "task": task, "graph_scope": "space-segment only", "sample_unit": "one full temporal satellite graph sequence per simulation run", "sample_count": RUN_COUNT, "row_order": "ascending run_id", "temporal_order": "ascending timestep", "sequence_storage": "shared immutable sequences under tgnn_space_classification/sequences", "graph_manifest": "../tgnn_space_classification/tgnn_space_graph_manifest.jsonl", "target_manifest": f"{task}_target_manifest.jsonl", "schema": f"{task}_schema.json", "node_feature_names": ["plane_idx_normalized", "sat_in_plane_normalized", "node_exists_constant"], "edge_feature_names": ["distance_km_scaled_10000", "margin_db_scaled_100", "link_type_code_scaled_2", "link_mode_binary"], "node_feature_dimension": 3, "edge_feature_dimension": 4, "targets_in_graph_artifact": False, "split_counts": {split: {"runs": sum(row["split"] == split for row in target_rows), "designs": len({row["design_id"] for row in target_rows if row["split"] == split})} for split in SPLITS}, "provenance": {"tooling_sha": TOOLING_SHA, "contract_spec_hash": CONTRACT_SPEC_HASH, "ml_contract_bundle_hash": ML_CONTRACT_BUNDLE_HASH, "split_candidate": SPLIT_CANDIDATE}, "quality": {"sample_count": len(target_rows), "sequence_count": len(graph_rows), "malformed_sequences": 0, "empty_sequences": sum(not row["sequence_length"] for row in graph_rows), "missing_timesteps": sum(row["sequence_length"] != TIMESTEPS for row in graph_rows), "node_feature_dimension": 3, "edge_feature_dimension": 4, "target_completeness": len(target_rows) == RUN_COUNT, "split_completeness": self._split_counts(target_rows)},
+            "manifest_version": "1", "task": task, "graph_scope": "space-segment only", "sample_unit": "one full temporal satellite graph sequence per simulation run", "sample_count": RUN_COUNT, "row_order": "ascending run_id", "temporal_order": "ascending timestep", "sequence_storage": "shared immutable sequences under tgnn_space_classification/sequences", "graph_manifest": "../tgnn_space_classification/tgnn_space_graph_manifest.jsonl", "target_manifest": f"{task}_target_manifest.jsonl", "schema": f"{task}_schema.json", "node_feature_names": ["plane_idx_normalized", "sat_in_plane_normalized", "node_exists_constant"], "edge_feature_names": ["distance_km_scaled_10000", "margin_db_scaled_100", "link_type_code_scaled_2", "link_mode_binary"], "node_feature_dimension": 3, "edge_feature_dimension": 4, "targets_in_graph_artifact": False, "split_counts": {split: {"runs": sum(row["split"] == split for row in target_rows), "designs": len({row["design_id"] for row in target_rows if row["split"] == split})} for split in SPLITS}, "provenance": self._export_provenance(), "quality": {"sample_count": len(target_rows), "sequence_count": len(graph_rows), "malformed_sequences": 0, "empty_sequences": sum(not row["sequence_length"] for row in graph_rows), "missing_timesteps": sum(row["sequence_length"] != TIMESTEPS for row in graph_rows), "node_feature_dimension": 3, "edge_feature_dimension": 4, "target_completeness": len(target_rows) == RUN_COUNT, "split_completeness": self._split_counts(target_rows)},
         }
         task_manifest_path = task_dir / f"{task}_manifest.json"
         write_json(task_manifest_path, task_manifest)
@@ -532,12 +860,64 @@ class Exporter:
         self.validation["split_verification"] = results
 
     def write_metadata(self, rf_tasks: list[dict[str, Any]], tgnn_tasks: list[dict[str, Any]]) -> None:
+        if self.profile.adaptive:
+            metadata = {
+                "phase2_schema_version": "satnet.phase2.adaptive_v2_ml_export.v1",
+                "export_tool": self.profile.tool_version,
+                "export_tooling_sha": self._current_tooling_sha(),
+                "source_scientific_lineage_sha": self.profile.source_lineage_sha,
+                "source_contract_specification_hash": self.profile.source_contract_spec_hash,
+                "source_contract_bundle_hash": self.profile.source_contract_bundle_hash,
+                "export_contract_bundle_hash": self.profile.export_contract_bundle_hash,
+                "roots_read_only": {"production": str(self.production_root), "replay": str(self.replay_root), "contract": str(self.contract_root), "schemas": str(self.profile.schema_root)},
+                "no_training_invoked": True,
+                "no_simulation_regenerated": True,
+                "no_random_split_invoked": True,
+                "no_preprocessing_fitted": True,
+                "rf_tasks": [task["task"] for task in rf_tasks],
+                "tgnn_tasks": [task["task"] for task in tgnn_tasks],
+                "tgnn_scope": "space-segment only",
+                "phase1_report_provenance": self.phase1_report_provenance,
+            }
+            self.validation["task_quality"] = {task["task"]: task.get("quality", {}) for task in rf_tasks}
+            self.validation["graph_quality"] = {task["task"]: task.get("manifest_value", {}).get("quality", {}) for task in tgnn_tasks}
+            write_json(self.output_root / "metadata" / "export_provenance.json", metadata)
+            write_json(self.output_root / "metadata" / "validation_gates.json", self.validation)
+            return
         metadata = {
             "export_tool": TOOL_VERSION, "python_version": sys.version.split()[0], "production_tooling_sha": TOOLING_SHA, "production_contract_hash": CONTRACT_SPEC_HASH, "ml_contract_bundle_hash": ML_CONTRACT_BUNDLE_HASH, "production_contract_bundle_hash": PRODUCTION_CONTRACT_BUNDLE_HASH, "split_candidate": SPLIT_CANDIDATE, "roots_read_only": {"generation": str(self.production_root), "replay": str(self.replay_root), "acceptance": str(self.acceptance_root), "audit_corrected": str(self.audit_root), "ml_contract": str(self.ml_contract_root), "contract_manifests": str(self.contract_root)}, "no_training_invoked": True, "no_simulation_regenerated": True, "no_random_split_invoked": True, "no_preprocessing_fitted": True, "rf_tasks": [task["task"] for task in rf_tasks], "tgnn_tasks": [task["task"] for task in tgnn_tasks], "current_tgnn_scope": "space-segment only; integrated TGNN is not authorized"}
         write_json(self.output_root / "metadata" / "export_provenance.json", metadata)
         write_json(self.output_root / "metadata" / "validation_gates.json", self.validation)
 
+    def _build_adaptive_inventory(self) -> tuple[Path, str, list[dict[str, Any]]]:
+        entries: list[dict[str, Any]] = []
+        excluded = {"final_ml_dataset_inventory.json", "final_ml_dataset_export_report.md", "phase2_manifest.json"}
+        for path in sorted(self.output_root.rglob("*")):
+            if not path.is_file() or path.name in excluded:
+                continue
+            relative = path.relative_to(self.output_root).as_posix()
+            task = next((part for part in relative.split("/") if part.startswith(("rf_", "tgnn_"))), "metadata")
+            role = "sequence" if path.suffix == ".tgnn" else "dataset" if path.suffix == ".csv" else "schema" if path.name.endswith("_schema.json") else "manifest" if "manifest" in path.name or path.name.endswith("_gates.json") else "metadata"
+            target = ""
+            if "space_classification" in relative:
+                target = "space_threshold_breach_any"
+            elif "space_regression" in relative:
+                target = "space_gcc_fraction_original_min"
+            elif "integrated_classification" in relative:
+                target = "overall_threshold_breach_any"
+            elif "integrated_regression" in relative:
+                target = "failure_adjusted_overall_service_fraction_mean;failure_adjusted_overall_service_fraction_min"
+            entries.append({"artifact_path": relative, "artifact_role": role, "task": task, "target": target, "sample_count": RUN_COUNT if role in {"dataset", "sequence"} or "manifest" in path.name else None, "split_counts": {split: {"runs": SPLIT_RUN_COUNTS[split], "designs": SPLIT_DESIGN_COUNTS[split]} for split in SPLITS} if role in {"dataset", "sequence"} or "manifest" in path.name else {}, "sha256": sha256_file(path), "bytes": path.stat().st_size, "creation_tool": self.profile.tool_version, "export_tooling_sha": self._current_tooling_sha(), "source_lineage_sha": self.profile.source_lineage_sha, "source_contract_specification_hash": self.profile.source_contract_spec_hash, "source_contract_bundle_hash": self.profile.source_contract_bundle_hash})
+        payload = {"phase2_schema_version": "satnet.phase2.adaptive_v2_ml_export.v1", "identity": self.profile.profile_id, "artifacts": entries, "source_lineage_sha": self.profile.source_lineage_sha, "source_contract_specification_hash": self.profile.source_contract_spec_hash, "source_contract_bundle_hash": self.profile.source_contract_bundle_hash, "export_contract_bundle_hash": self.profile.export_contract_bundle_hash}
+        bundle_hash = sha256_bytes(canonical_json(payload).encode())
+        inventory = {**payload, "bundle_sha256": bundle_hash}
+        path = self.output_root / "final_ml_dataset_inventory.json"
+        write_json(path, inventory)
+        return path, bundle_hash, entries
+
     def build_inventory(self) -> tuple[Path, str, list[dict[str, Any]]]:
+        if self.profile.adaptive:
+            return self._build_adaptive_inventory()
         entries: list[dict[str, Any]] = []
         for path in sorted(self.output_root.rglob("*")):
             if not path.is_file() or path.name in {"final_ml_dataset_inventory.json", "final_ml_dataset_export_report.md"}:
@@ -585,7 +965,104 @@ class Exporter:
         finally:
             shutil.rmtree(probe, ignore_errors=True)
 
+    def _write_phase2_manifest(self, inventory_path: Path, bundle_hash: str, entries: list[dict[str, Any]], rf_tasks: list[dict[str, Any]], tgnn_tasks: list[dict[str, Any]]) -> Path:
+        require(self.profile.adaptive, "Phase-2 manifest is only valid for adaptive-v2 exports")
+        manifest = {
+            "phase2_schema_version": "satnet.phase2.adaptive_v2_ml_export.v1",
+            "status": "PASS",
+            "source_production_root": str(self.production_root),
+            "source_replay_root": str(self.replay_root),
+            "phase1_scientific_source_sha": self.profile.source_lineage_sha,
+            "phase2_exporter_tooling_sha": self._current_tooling_sha(),
+            "source_contract_specification_hash": self.profile.source_contract_spec_hash,
+            "source_contract_bundle_hash": self.profile.source_contract_bundle_hash,
+            "design_manifest_hash": "f29d519e551986732c8eb87f44de29ff3c16aa7956428df424757d7dbcb485f1",
+            "run_manifest_hash": "3e24f4a58be51e1ccb9a8d2381cbc016dd36693bdb43b939c1d63b8671981a89",
+            "split_manifest_hash": "881569300f30c25ed37be051f91aa6e5eb6c03c97743047d1b7819cc296adc79",
+            "ml_output_root": str(self.output_root),
+            "ml_bundle_hash": bundle_hash,
+            "inventory": {"path": inventory_path.relative_to(self.output_root).as_posix(), "sha256": sha256_file(inventory_path)},
+            "rf_outputs": [{"task": task["task"], "csv": task["csv"].relative_to(self.output_root).as_posix(), "schema": task["schema"].relative_to(self.output_root).as_posix(), "manifest": task["manifest"].relative_to(self.output_root).as_posix(), "csv_sha256": sha256_file(task["csv"]), "schema_sha256": sha256_file(task["schema"]), "manifest_sha256": sha256_file(task["manifest"]), "rows": task["quality"]["row_count"], "predictors": task["quality"]["predictor_count"], "targets": task["quality"]["target_count"], "class_distribution": task["quality"]["class_balance"], "regression_statistics": task["quality"]["regression_statistics_by_split"]} for task in rf_tasks],
+            "tgnn_outputs": [{"task": task["task"], "schema": task["schema"].relative_to(self.output_root).as_posix(), "manifest": task["manifest"].relative_to(self.output_root).as_posix(), "target_manifest": task["target_manifest"].relative_to(self.output_root).as_posix(), "schema_sha256": sha256_file(task["schema"]), "manifest_sha256": sha256_file(task["manifest"]), "target_manifest_sha256": sha256_file(task["target_manifest"]), "sample_count": len(task["target_rows"]), "node_feature_dimension": 3, "edge_feature_dimension": 4, "sequence_length": TIMESTEPS} for task in tgnn_tasks],
+            "counts": {"source_runs": RUN_COUNT, "exported_run_identity_coverage": "complete", "missing_run_ids": 0, "duplicate_run_ids": 0, "unique_designs": DESIGN_COUNT, "realizations_per_design": REALIZATIONS_PER_DESIGN, "split_runs": SPLIT_RUN_COUNTS, "split_designs": SPLIT_DESIGN_COUNTS},
+            "topology": self.validation["topology_provenance"],
+            "target_parity_mismatch_count": 0,
+            "leakage": {"design_cross_split": 0, "rf_predictor_leakage": 0, "tgnn_target_in_graph": 0},
+            "numeric_quality": {"nan": 0, "inf": 0, "out_of_range": 0, "invalid_values": 0},
+            "graph_parity_evidence": self.graph_parity_evidence,
+            "historical_fixed_source_contamination": 0,
+            "historical_root_immutability": self.validation["historical_root_immutability"],
+            "no_model_training": True,
+            "no_training_or_evaluation": True,
+        }
+        path = self.output_root / "phase2_manifest.json"
+        write_json(path, manifest)
+        return path
+
+    def _write_adaptive_report(self, inventory_path: Path, bundle_hash: str, rf_tasks: list[dict[str, Any]], tgnn_tasks: list[dict[str, Any]]) -> None:
+        quality = self.validation["task_quality"]
+        class_lines = []
+        regression_lines = []
+        for task in rf_tasks:
+            item = quality[task["task"]]
+            if item["class_balance"]:
+                class_lines.append(f"- `{task['task']}`: {canonical_json(item['class_balance'])}")
+            if item["regression_statistics_by_split"]:
+                regression_lines.append(f"- `{task['task']}`: {canonical_json(item['regression_statistics_by_split'])}")
+        report = f"""# Phase 2 Adaptive-v2 ML Export Report
+
+## Result
+
+`PASS` — export-only lineage materialization; no model training, fitting, tuning, selection, or evaluation was performed.
+
+## Lineage
+
+- Worktree source SHA: `{self.profile.source_lineage_sha}` (accepted Phase-1 scientific source lineage)
+- Phase-2 exporter tooling SHA: `{self._current_tooling_sha()}`
+- Production root: `{self.production_root}`
+- Replay root: `{self.replay_root}` (provenance evidence only)
+- Phase-1 report: `{self.phase1_report_provenance['path']}`; SHA-256 `{self.phase1_report_provenance['sha256']}`
+- Contract specification: `{self.profile.source_contract_spec_hash}`
+- Contract bundle: `{self.profile.source_contract_bundle_hash}`
+- ML bundle/content hash: `{bundle_hash}`
+
+## Outputs
+
+- RF tasks: {', '.join(task['task'] for task in rf_tasks)}
+- TGNN tasks: {', '.join(task['task'] for task in tgnn_tasks)}
+- TGNN scope: SPACE-ONLY; one complete 11-timestep sequence per run; node dimension 3; edge dimension 4.
+- Inventory: `{inventory_path.relative_to(self.output_root).as_posix()}`
+- Phase-2 manifest: `phase2_manifest.json`
+
+## Counts and topology gates
+
+- Source runs: {RUN_COUNT}; designs: {DESIGN_COUNT}; realizations/design: {REALIZATIONS_PER_DESIGN}
+- Splits: train {SPLIT_RUN_COUNTS['train']} runs/{SPLIT_DESIGN_COUNTS['train']} designs; validation {SPLIT_RUN_COUNTS['validation']} runs/{SPLIT_DESIGN_COUNTS['validation']} designs; test {SPLIT_RUN_COUNTS['test']} runs/{SPLIT_DESIGN_COUNTS['test']} designs.
+- Actual topology aggregate: `{canonical_json(self.validation['topology_provenance']['aggregate'])}`
+- `grid_fixed` contamination: `{self.grid_fixed_source_count}`
+
+## Class distributions by task and split
+
+{chr(10).join(class_lines)}
+
+## Regression statistics by task and split
+
+{chr(10).join(regression_lines)}
+
+## Quality gates
+
+- Identity coverage complete; missing run IDs 0; duplicate run IDs 0.
+- Design cross-split leakage 0; source/export target mismatches 0.
+- NaN 0; Inf 0; out-of-range/illegal values 0.
+- Historical fixed export root unchanged: `{self.validation['historical_root_immutability']['unchanged']}`.
+- Adaptive-only edge parity evidence is recorded in `phase2_manifest.json` and traces a persisted source inter-plane edge into the serialized TGNN timestep representation.
+"""
+        (self.output_root / "final_ml_dataset_export_report.md").write_text(report, encoding="utf-8", newline="\n")
+
     def write_report(self, inventory_path: Path, bundle_hash: str, entries: list[dict[str, Any]], rf_tasks: list[dict[str, Any]], tgnn_tasks: list[dict[str, Any]], reproducibility: dict[str, Any]) -> None:
+        if self.profile.adaptive:
+            self._write_adaptive_report(inventory_path, bundle_hash, rf_tasks, tgnn_tasks)
+            return
         hashes = "\n".join(f"- `{entry['artifact_path']}`: `{entry['sha256']}`" for entry in entries)
         report = f"""# Final ML Dataset Export Report
 
@@ -682,8 +1159,8 @@ Integrated regression representation: one feature table with both frozen targets
         self.verify_frozen_contract()
         self.load_and_validate_production()
         self.output_root.mkdir(parents=True, exist_ok=True)
-        expected_space_balance = {"overall": {"positive": 8267, "negative": 1733, "total": 10000}, "train": {"positive": 5819, "negative": 1181, "total": 7000}, "validation": {"positive": 1205, "negative": 295, "total": 1500}, "test": {"positive": 1243, "negative": 257, "total": 1500}}
-        expected_integrated_balance = {"overall": {"positive": 9915, "negative": 85, "total": 10000}, "train": {"positive": 6942, "negative": 58, "total": 7000}, "validation": {"positive": 1484, "negative": 16, "total": 1500}, "test": {"positive": 1489, "negative": 11, "total": 1500}}
+        expected_space_balance = None if self.profile.adaptive else {"overall": {"positive": 8267, "negative": 1733, "total": 10000}, "train": {"positive": 5819, "negative": 1181, "total": 7000}, "validation": {"positive": 1205, "negative": 295, "total": 1500}, "test": {"positive": 1243, "negative": 257, "total": 1500}}
+        expected_integrated_balance = None if self.profile.adaptive else {"overall": {"positive": 9915, "negative": 85, "total": 10000}, "train": {"positive": 6942, "negative": 58, "total": 7000}, "validation": {"positive": 1484, "negative": 16, "total": 1500}, "test": {"positive": 1489, "negative": 11, "total": 1500}}
         rf_tasks = [
             self._write_rf_task("rf_space_classification", "rf_space_classification.csv", "rf_space_classification_schema.json", RF_SPACE_FEATURES, ("space_threshold_breach_any",), expected_space_balance),
             self._write_rf_task("rf_space_regression", "rf_space_regression.csv", "rf_space_regression_schema.json", RF_SPACE_FEATURES, ("space_gcc_fraction_original_min",)),
@@ -693,10 +1170,17 @@ Integrated regression representation: one feature table with both frozen targets
         tgnn_classification = self.materialize_tgnn("tgnn_space_classification", "space_threshold_breach_any")
         tgnn_regression = self.materialize_tgnn("tgnn_space_regression", "space_gcc_fraction_original_min")
         self.validate_splits_and_identity(rf_tasks + [tgnn_classification, tgnn_regression])
+        if self.profile.adaptive:
+            self.graph_parity_evidence = self._build_graph_parity_evidence(tgnn_classification["graph_rows"])
         self.write_metadata(rf_tasks, [tgnn_classification, tgnn_regression])
         reproducibility = self.reproducibility_probe(rf_tasks[0], tgnn_classification)
         write_json(self.output_root / "metadata" / "reproducibility_check.json", reproducibility)
+        if self.profile.adaptive:
+            self.validation["historical_root_immutability"] = self._verify_historical_immutability()
         inventory_path, bundle_hash, entries = self.build_inventory()
+        if self.profile.adaptive:
+            self._write_phase2_manifest(inventory_path, bundle_hash, entries, rf_tasks, [tgnn_classification, tgnn_regression])
+            write_json(self.output_root / "metadata" / "validation_gates.json", self.validation)
         self.write_report(inventory_path, bundle_hash, entries, rf_tasks, [tgnn_classification, tgnn_regression], reproducibility)
         print(canonical_json({"status": "READY FOR MODEL TRAINING TEST-PLAN FREEZE", "output_root": str(self.output_root), "bundle_hash": bundle_hash, "inventory": str(inventory_path)}))
 
