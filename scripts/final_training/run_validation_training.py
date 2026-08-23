@@ -33,6 +33,7 @@ PLAN_HASH = "e14ec5e5b2221aa2c9aa187a2baacc517e676f9dc748612c206eb1dc43788a0a"
 PLAN_INVENTORY_SHA = "04604051ebc5f4ce659fe558f50ed35689665f7243328ab67a6831948c11f991"
 PHASE2_SOURCE_SHA = "f47800bd5121203b6ba8ec918aaf0b6adc6d0aa1"
 PHASE2A_RECONCILIATION_EVIDENCE_SHA = "3f746c2e52112a01a5c408509d268f547e4774ec"
+PREVIOUS_PHASE3_TOOLING_SHA = "22be1d456d6da892b3d0c03376fe79775abda6b4"
 PHASE2_EXPORTER_SHA = "767b9161f0301236153551a2319dd570d7dd342f"
 PHASE1_SOURCE_SHA = "346b3ff1670237645acf4836283adbbdc359093a"
 ADAPTIVE_CONTRACT_SPEC_HASH = "23c5fffc10849c3bc3ea027251ac3e5ad4c96f0eea85edf1e8deab079cb0871e"
@@ -143,8 +144,7 @@ def env_versions() -> dict[str, str]:
     import sklearn
     import torch
     import torch_geometric
-    import torch_geometric_temporal
-    return {"python": sys.version.split()[0], "torch": torch.__version__, "torch_geometric": torch_geometric.__version__, "torch_geometric_temporal_imported": str(getattr(torch_geometric_temporal, "__version__", None)), "torch_geometric_temporal_distribution": md.version("torch-geometric-temporal"), "scikit_learn": sklearn.__version__, "numpy": np.__version__, "pandas": pandas.__version__, "device": "cpu"}
+    return {"python": sys.version.split()[0], "torch": torch.__version__, "torch_geometric": torch_geometric.__version__, "torch_geometric_temporal_imported": "not imported during Phase-3 training", "torch_geometric_temporal_distribution": md.version("torch-geometric-temporal"), "scikit_learn": sklearn.__version__, "numpy": np.__version__, "pandas": pandas.__version__, "device": "cpu"}
 
 
 def progress_path() -> Path:
@@ -318,9 +318,19 @@ def prepare_phase3_root() -> tuple[dict[str, Any], str]:
             raise RuntimeError("Phase-3 output root exists without a resumable identity; refusing overwrite")
         identity = load_json(identity_path)
         existing_contract = load_json(contract_path)
+        prior_tooling_sha = identity.get("training_tooling_sha")
         contract_hash = existing_contract.get("candidate_set_hash")
-        if identity.get("training_tooling_sha") != CODE_SHA or identity.get("candidate_set_hash") != contract_hash or identity.get("dataset_bundle_hash") != DATASET_HASH or identity.get("training_payload_inventory_sha256") != TRAINING_PAYLOAD_INVENTORY_SHA or identity.get("training_payload_bundle_hash") != TRAINING_PAYLOAD_BUNDLE_HASH or identity.get("validation_gates_sha256") != CURRENT_VALIDATION_GATES_SHA or identity.get("phase2_source_sha") != PHASE2_SOURCE_SHA or identity.get("test_evaluation") is not False:
+        if prior_tooling_sha not in {CODE_SHA, PREVIOUS_PHASE3_TOOLING_SHA} or identity.get("candidate_set_hash") != contract_hash or identity.get("dataset_bundle_hash") != DATASET_HASH or identity.get("training_payload_inventory_sha256") != TRAINING_PAYLOAD_INVENTORY_SHA or identity.get("training_payload_bundle_hash") != TRAINING_PAYLOAD_BUNDLE_HASH or identity.get("validation_gates_sha256") != CURRENT_VALIDATION_GATES_SHA or identity.get("phase2_source_sha") != PHASE2_SOURCE_SHA or identity.get("test_evaluation") is not False:
             raise RuntimeError("Existing Phase-3 output root identity conflicts with this run")
+        if prior_tooling_sha == PREVIOUS_PHASE3_TOOLING_SHA:
+            progress = load_json(progress_path()) if progress_path().is_file() else {}
+            if progress.get("total", {}).get("completed") != 0:
+                raise RuntimeError("Cannot upgrade tooling identity after completed candidates exist")
+            existing_contract, contract_hash = candidate_contract()
+            atomic_json(contract_path, existing_contract)
+            atomic_json(identity_path, {**identity, "training_tooling_sha": CODE_SHA, "resumed_from_training_tooling_sha": prior_tooling_sha})
+        elif existing_contract.get("training_tooling_sha") != CODE_SHA:
+            raise RuntimeError("Phase-3 contract tooling identity conflicts with this run")
         return existing_contract, str(contract_hash)
     contract, contract_hash = candidate_contract()
     atomic_json(contract_path, contract)
