@@ -83,10 +83,111 @@ def test_regression_metrics_include_required_residual_statistics() -> None:
     assert metrics["prediction_range"] == [0.1, 0.8]
 
 
+def _temporary_output_contract(root: Path) -> phase4b.OutputContract:
+    return phase4b.OutputContract(
+        tgnn_metrics=root / "tgnn_metrics.json",
+        tgnn_predictions=root / "tgnn_predictions.jsonl",
+        rf_metrics=root / "rf_metrics.json",
+        rf_predictions=root / "rf_predictions.jsonl",
+        classification=root / "classification.json",
+        comparison=root / "comparison.json",
+        summary=root / "summary.json",
+        report=root / "report.md",
+        inventory=root / "inventory.json",
+        identity=root / "identity.json",
+    )
+
+
+def _stub_preflight(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        phase4b,
+        "preflight",
+        lambda: {
+            "status": "PASS",
+            "model_artifacts": [],
+            "output_contract": {},
+            "interpretation_contract": {},
+        },
+    )
+
+
 def test_inference_requires_explicit_authorization(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(phase4b, "preflight", lambda: pytest.fail("preflight must not run before authorization"))
     with pytest.raises(phase4b.ExternalInferenceError, match="explicit authorization"):
         phase4b.run_inference()
+
+
+def test_preflight_does_not_create_inference_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "inference"
+    monkeypatch.setattr(phase4b, "INFERENCE_ROOT", root)
+    monkeypatch.setattr(phase4b, "OUTPUTS", _temporary_output_contract(root))
+    monkeypatch.setattr(phase4b, "verify_rf_ood_domain", lambda episodes, artifacts: {"ood_all_episodes": True})
+    monkeypatch.setattr(phase4b, "verify_model_freezes", lambda: [])
+    monkeypatch.setattr(phase4b, "verify_dataset_bundle", lambda: {"bundle_sha256": phase4b.DATASET_BUNDLE_SHA256})
+    monkeypatch.setattr(phase4b, "verify_external_bundle", lambda: {"bundle_sha256": phase4b.EXTERNAL_BUNDLE_SHA256})
+    monkeypatch.setattr(phase4b, "load_external_episodes", lambda: [object()] * 300)
+    monkeypatch.setattr(phase4b, "verify_tgnn_target_manifest", lambda episodes: None)
+
+    result = phase4b.preflight()
+
+    assert result["status"] == "PASS"
+    assert result["inference_root_absent"] is True
+    assert not root.exists()
+
+
+def test_authorized_inference_rejects_existing_inference_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "inference"
+    root.mkdir()
+    monkeypatch.setattr(phase4b, "INFERENCE_ROOT", root)
+    monkeypatch.setattr(phase4b, "OUTPUTS", _temporary_output_contract(root))
+    _stub_preflight(monkeypatch)
+
+    with pytest.raises(phase4b.ExternalInferenceError, match="must be absent"):
+        phase4b.run_inference(authorized=True)
+
+
+def test_existing_result_files_cannot_be_overwritten(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "inference"
+    root.mkdir()
+    result_file = root / "summary.json"
+    result_file.write_text("original\n", encoding="utf-8")
+    monkeypatch.setattr(phase4b, "INFERENCE_ROOT", root)
+    monkeypatch.setattr(phase4b, "OUTPUTS", _temporary_output_contract(root))
+    _stub_preflight(monkeypatch)
+
+    with pytest.raises(phase4b.ExternalInferenceError):
+        phase4b.run_inference(authorized=True)
+
+    assert result_file.read_text(encoding="utf-8") == "original\n"
+
+
+def test_first_authorized_inference_creates_root_after_preflight(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "inference"
+    outputs = _temporary_output_contract(root)
+    monkeypatch.setattr(phase4b, "INFERENCE_ROOT", root)
+    monkeypatch.setattr(phase4b, "OUTPUTS", outputs)
+    _stub_preflight(monkeypatch)
+    monkeypatch.setattr(phase4b, "load_external_episodes", lambda: [])
+    monkeypatch.setattr(phase4b, "verify_model_freezes", lambda: [
+        phase4b.FrozenArtifact(task, seed, "config", "RF" if task.startswith("rf_") else "TGNN", Path("unused"), "sha", Path("manifest"), "manifest-sha", "selection-sha", "candidate")
+        for task in phase4b.TASKS
+        for seed in phase4b.SEEDS
+    ])
+    monkeypatch.setattr(phase4b, "_predict_task", lambda task, seed, artifact, episodes: [])
+    monkeypatch.setattr(phase4b, "_metrics_from_records", lambda task, records: {"descriptive_only": "classification" in task})
+    monkeypatch.setattr(phase4b, "_five_seed_descriptive_summary", lambda metrics, tasks: {})
+    monkeypatch.setattr(phase4b, "paired_bootstrap", lambda rf, tgnn: {"label": phase4b.COMPARISON_LABEL})
+    monkeypatch.setattr(phase4b, "write_report", lambda summary, comparison: None)
+    identity_root_seen: list[bool] = []
+    monkeypatch.setattr(phase4b, "write_execution_identity", lambda result: identity_root_seen.append(root.exists()))
+
+    result = phase4b.run_inference(authorized=True)
+
+    assert result["inference_performed"] is True
+    assert root.is_dir()
+    assert identity_root_seen == [True]
+    assert outputs.summary.exists()
+    assert outputs.inventory.exists()
 
 
 def test_inference_code_has_no_training_or_optimizer_calls() -> None:

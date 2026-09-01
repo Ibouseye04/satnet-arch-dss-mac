@@ -249,6 +249,32 @@ def atomic_json(path: Path, value: Any) -> None:
     os.replace(temporary, path)
 
 
+def assert_inference_root_absent() -> None:
+    require(
+        not INFERENCE_ROOT.exists() and not INFERENCE_ROOT.is_symlink(),
+        f"inference output root must be absent: {INFERENCE_ROOT}",
+    )
+
+
+def claim_inference_root() -> None:
+    try:
+        INFERENCE_ROOT.mkdir(parents=True, exist_ok=False)
+    except FileExistsError as exc:
+        raise ExternalInferenceError(
+            f"inference output root must be absent and cannot be reused: {INFERENCE_ROOT}"
+        ) from exc
+    except OSError as exc:
+        raise ExternalInferenceError(f"cannot create inference output root: {INFERENCE_ROOT}") from exc
+
+
+def assert_output_contract_is_fresh() -> None:
+    root = INFERENCE_ROOT.resolve()
+    for path in OUTPUTS.__dict__.values():
+        resolved = path.resolve()
+        require(resolved == root or root in resolved.parents, f"output escapes inference root: {path}")
+        require(not path.exists(), f"inference output already exists: {path}")
+
+
 def verify_external_bundle() -> dict[str, Any]:
     inventory_path = EXTERNAL_ROOT / "external_validation_inventory.json"
     observed_bundle = bundle_hash(EXTERNAL_ROOT, {inventory_path.name})
@@ -466,6 +492,7 @@ def verify_rf_ood_domain(episodes: Sequence[ExternalEpisode], artifacts: Sequenc
 
 
 def preflight() -> dict[str, Any]:
+    assert_inference_root_absent()
     external = verify_external_bundle()
     episodes = load_external_episodes()
     verify_tgnn_target_manifest(episodes)
@@ -491,6 +518,7 @@ def preflight() -> dict[str, Any]:
         "candidate_set_hash": CANDIDATE_SET_HASH,
         "selection_freeze_hashes": {"rf": RF_SELECTION_HASH, "tgnn": TGNN_SELECTION_HASH},
         "phase4_inventory_sha256": PHASE4_INVENTORY_SHA256,
+        "inference_root_absent": True,
         "authoritative_heldout_model_comparison": AUTHORITATIVE_HELDOUT_COMPARISON,
         "output_contract": {name: str(path) for name, path in OUTPUTS.__dict__.items()},
         "interpretation_contract": {
@@ -769,6 +797,8 @@ def write_report(summary: Mapping[str, Any], comparison: Mapping[str, Any]) -> N
 def run_inference(*, authorized: bool = False) -> dict[str, Any]:
     require(authorized, "external inference requires explicit authorization")
     preflight_result = preflight()
+    claim_inference_root()
+    assert_output_contract_is_fresh()
     write_execution_identity(preflight_result)
     episodes = load_external_episodes()
     artifacts = {(artifact.task, artifact.seed): artifact for artifact in verify_model_freezes()}
@@ -806,17 +836,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-inference", action="store_true", help="run only after explicit authorization")
     parser.add_argument("--authorize-external-inference", action="store_true", help="required with --run-inference")
-    parser.add_argument("--write-identity", action="store_true", help="write preflight identity into the separate inference root")
     args = parser.parse_args()
     if args.run_inference:
         require(args.authorize_external_inference, "--authorize-external-inference is required")
         run_inference(authorized=True)
         return
     result = preflight()
-    if args.write_identity:
-        write_execution_identity(result)
-    else:
-        print(json.dumps({"status": result["status"], "inference_performed": False}, sort_keys=True))
+    print(json.dumps({"status": result["status"], "inference_performed": False}, sort_keys=True))
 
 
 if __name__ == "__main__":
