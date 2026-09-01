@@ -17,6 +17,8 @@ from typing import Any, Mapping
 
 from satnet.experiments.external_validation.phase4a import (
     ADJACENT_SEARCH_K,
+    EXTERNAL_STATISTICAL_CONTRACT,
+    EXTERNAL_TASKS,
     FAILURE_MODEL,
     ISL_POLICY,
     MAX_INTER_PLANE_LINKS_PER_SAT,
@@ -64,7 +66,8 @@ TASK_CONFIG_IDS = {
     "tgnn_space_classification": "tgnn_010",
     "tgnn_space_regression": "tgnn_012",
 }
-TASKS = tuple(TASK_CONFIG_IDS)
+FROZEN_TASKS = tuple(TASK_CONFIG_IDS)
+TASKS = EXTERNAL_TASKS
 RF_SPACE_TASK = "rf_space_regression"
 TGNN_SPACE_TASK = "tgnn_space_regression"
 HISTORICAL_RAW_FILES = (
@@ -146,6 +149,20 @@ def validate_adaptive_topology_identity(metadata: Mapping[str, Any]) -> None:
     }
     if any(metadata.get(key) != value for key, value in expected.items()):
         raise RuntimeError(f"Adaptive-v2 topology identity mismatch: {metadata}")
+
+
+def validate_external_task_scope(tasks: tuple[str, ...] | list[str]) -> None:
+    observed = tuple(tasks)
+    if observed != EXTERNAL_TASKS or any("integrated" in task for task in observed):
+        raise RuntimeError(f"external scientific scope must be exactly {EXTERNAL_TASKS}: {observed}")
+
+
+def validate_external_statistical_contract(contract: Mapping[str, Any]) -> None:
+    if dict(contract) != EXTERNAL_STATISTICAL_CONTRACT:
+        raise RuntimeError("Adaptive-v2 external statistical contract mismatch")
+    comparison = contract["primary_comparison"]
+    if (comparison["left_task"], comparison["right_task"]) != (RF_SPACE_TASK, TGNN_SPACE_TASK):
+        raise RuntimeError("external primary comparison is not the frozen space-regression comparison")
 
 
 def verify_source_provenance(source_root: Path) -> dict[str, Any]:
@@ -295,8 +312,7 @@ def adaptive_behavioral_evidence() -> dict[str, Any]:
         "los_and_physics_filtering": adaptive_stats.links_rejected_los + adaptive_stats.links_rejected_budget > 0,
         "candidate_replacement_evidence": bool(adaptive_stats.adaptive_selection_examples),
         "adaptive_selection_examples": adaptive_stats.adaptive_selection_examples,
-        "graph_identity_propagates_to_sequence": True,
-        "target_derived_from_adaptive_graph": True,
+        "evidence_scope": "synthetic representative topology only; external artifact evidence is construction-generated",
     }
 
 
@@ -323,6 +339,8 @@ def run_preflight(config: Phase4AConfig) -> dict[str, Any]:
     )
     topology = {"isl_policy": ISL_POLICY, "k": ADJACENT_SEARCH_K, "endpoint_capacity": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL}
     validate_adaptive_topology_identity(topology)
+    validate_external_task_scope(TASKS)
+    validate_external_statistical_contract(EXTERNAL_STATISTICAL_CONTRACT)
     adaptive = adaptive_behavioral_evidence()
     return {
         "status": "PASS",
@@ -335,7 +353,8 @@ def run_preflight(config: Phase4AConfig) -> dict[str, Any]:
         "adaptive": adaptive,
         "topology": topology,
         "grid_fixed_source_count": 0,
-        "statistical_comparison": {"historical_contract": "paired episode_id bootstrap, 2000 replicates, seed 20260820, 95% percentile", "adaptive_v2_status": "not run before inference"},
+        "statistical_contract": EXTERNAL_STATISTICAL_CONTRACT,
+        "statistical_comparison": {"historical_contract": EXTERNAL_STATISTICAL_CONTRACT, "adaptive_v2_status": "not run before inference"},
     }
 
 

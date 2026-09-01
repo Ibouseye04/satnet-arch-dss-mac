@@ -807,11 +807,12 @@ class ISLComputationStats:
     accepted_intra_plane_links: int = 0
     accepted_inter_plane_links: int = 0
     adaptive_selection_examples: List[Dict[str, object]] = field(default_factory=list)
+    isl_policy: str = ""
 
 
 def _compute_grid_plus_isls(
     config: WalkerDeltaConfig,
-    positions: List[SatellitePosition],
+    positions: List[Optional[SatellitePosition]],
     link_budget: LinkBudgetEngine,
     max_isl_distance_km: float = 10000.0,
     isl_policy: str = "grid_fixed",
@@ -850,7 +851,7 @@ def _compute_grid_plus_isls(
         raise ValueError("max_inter_plane_links_per_sat must be 1 or 2")
 
     links: List[ISLLink] = []
-    stats = ISLComputationStats()
+    stats = ISLComputationStats(isl_policy=isl_policy)
     
     num_planes = config.num_planes
     sats_per_plane = config.sats_per_plane
@@ -890,11 +891,24 @@ def _compute_grid_plus_isls(
 
     def evaluate_candidate(
         current_sat: int,
-        current_pos: SatellitePosition,
+        current_pos: Optional[SatellitePosition],
         partner_sat: int,
-        partner_pos: SatellitePosition,
+        partner_pos: Optional[SatellitePosition],
         link_type: str,
     ) -> Tuple[Optional[ISLLink], Dict[str, object]]:
+        if current_pos is None or partner_pos is None:
+            return None, {
+                "sat_id": partner_sat,
+                "plane": partner_sat // sats_per_plane,
+                "satellite": partner_sat % sats_per_plane,
+                "los": None,
+                "distance_km": None,
+                "within_max_distance": False,
+                "viable": False,
+                "margin_db": None,
+                "selected": False,
+                "unavailable_endpoint": True,
+            }
         stats.total_candidate_links += 1
         dist = _compute_distance_km(current_pos, partner_pos)
         outcome: Dict[str, object] = {

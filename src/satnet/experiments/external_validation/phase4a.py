@@ -21,6 +21,7 @@ import math
 import os
 import struct
 import shutil
+import subprocess
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -106,6 +107,36 @@ ISL_POLICY = "grid_adaptive"
 ADJACENT_SEARCH_K = 1
 MAX_INTER_PLANE_LINKS_PER_SAT = 1
 FAILURE_MODEL = "persistent_temporal_union_edges_v1"
+EXTERNAL_TASKS = (
+    "rf_space_classification",
+    "tgnn_space_classification",
+    "rf_space_regression",
+    "tgnn_space_regression",
+)
+EXTERNAL_PRIMARY_COMPARISON = ("rf_space_regression", "tgnn_space_regression")
+EXTERNAL_PRIMARY_SEED = 42
+EXTERNAL_BOOTSTRAP_REPLICATES = 2000
+EXTERNAL_BOOTSTRAP_SEED = 20260820
+EXTERNAL_BOOTSTRAP_INTERVAL = "95% percentile"
+EXTERNAL_STATISTICAL_CONTRACT = {
+    "primary_comparison": {
+        "left_task": EXTERNAL_PRIMARY_COMPARISON[0],
+        "right_task": EXTERNAL_PRIMARY_COMPARISON[1],
+        "metric": "MAE",
+        "difference": "RF MAE minus TGNN MAE",
+        "positive_interpretation": "TGNN lower error",
+        "seed": EXTERNAL_PRIMARY_SEED,
+    },
+    "paired_unit": "episode_id",
+    "replicates": EXTERNAL_BOOTSTRAP_REPLICATES,
+    "bootstrap_seed": EXTERNAL_BOOTSTRAP_SEED,
+    "interval": EXTERNAL_BOOTSTRAP_INTERVAL,
+    "primary_reporting_seed": EXTERNAL_PRIMARY_SEED,
+    "ensemble": False,
+    "classification": "descriptive_only",
+    "classification_inferential_procedure": None,
+    "authorized_descriptive_seeds": [42, 123, 456, 789, 2026],
+}
 TARGET_START = datetime(2024, 2, 1, 12, tzinfo=timezone.utc)
 TARGET_END = datetime(2025, 12, 31, 12, tzinfo=timezone.utc)
 
@@ -192,6 +223,10 @@ def _sha256_file(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
 
 
 def _adapter_sha256() -> str:
@@ -407,7 +442,7 @@ def _build_graph(
     target: datetime,
     config: Phase4AConfig,
     *,
-    positions_override: Sequence[SatellitePosition] | None = None,
+    positions_override: Sequence[SatellitePosition | None] | None = None,
 ) -> tuple[nx.Graph, list[dict[str, Any]], list[SatellitePosition | None]]:
     planes = max(item.plane_idx for item in selected) + 1
     sats = max(item.sat_in_plane for item in selected) + 1
@@ -426,7 +461,6 @@ def _build_graph(
             if positions_override is not None
             else (_propagate(item.orbit, target, index) if item.orbit is not None else None)
         )
-    valid_positions = [position for position in positions]
     graph = nx.Graph()
     for index, item in enumerate(selected):
         graph.add_node(
@@ -436,19 +470,31 @@ def _build_graph(
             norad_id=item.norad_id,
             exists=bool(item.status_available and item.orbit is not None and positions[index] is not None),
         )
-    accepted_positions = [position for position in valid_positions]
-    topology_stats = None
-    if all(position is not None and graph.nodes[index]["exists"] for index, position in enumerate(accepted_positions)):
-        links, topology_stats = _compute_grid_plus_isls(
-            walker,
-            [position for position in accepted_positions if position is not None],
-            LinkBudgetEngine(),
-            max_isl_distance_km=config.max_isl_distance_km,
-            isl_policy=ISL_POLICY,
-            adjacent_search_k=ADJACENT_SEARCH_K,
-            max_inter_plane_links_per_sat=MAX_INTER_PLANE_LINKS_PER_SAT,
+    links, topology_stats = _compute_grid_plus_isls(
+        walker,
+        positions,
+        LinkBudgetEngine(),
+        max_isl_distance_km=config.max_isl_distance_km,
+        isl_policy=ISL_POLICY,
+        adjacent_search_k=ADJACENT_SEARCH_K,
+        max_inter_plane_links_per_sat=MAX_INTER_PLANE_LINKS_PER_SAT,
+        collect_adaptive_examples=1,
+    )
+    if topology_stats.isl_policy != ISL_POLICY:
+        raise RuntimeError(
+            f"external topology runtime policy mismatch: {topology_stats.isl_policy!r}"
         )
-        for link in links:
+    graph.graph["topology_stats"] = {
+        "total_candidate_links": topology_stats.total_candidate_links,
+        "links_rejected_distance": topology_stats.links_rejected_distance,
+        "links_rejected_los": topology_stats.links_rejected_los,
+        "links_rejected_budget": topology_stats.links_rejected_budget,
+        "links_accepted": topology_stats.links_accepted,
+        "isl_policy": topology_stats.isl_policy,
+        "adaptive_selection_examples": topology_stats.adaptive_selection_examples,
+    }
+    for link in links:
+        if graph.nodes[link.sat_id_1]["exists"] and graph.nodes[link.sat_id_2]["exists"]:
             graph.add_edge(
                 link.sat_id_1,
                 link.sat_id_2,
@@ -609,11 +655,9 @@ def _edge_failure_probability(
                 if orbit
                 else None
             )
-        if not all(position is not None for position in positions):
-            continue
         _, stats = _compute_grid_plus_isls(
             walker,
-            [position for position in positions if position is not None],
+            positions,
             LinkBudgetEngine(),
             max_isl_distance_km=config.max_isl_distance_km,
             isl_policy=ISL_POLICY,
@@ -629,16 +673,39 @@ def _edge_failure_probability(
     return (unavailable / total if total else 0.0, unavailable, total)
 
 
-def _graph_snapshot(selected: Sequence[SelectedSatellite], timestamp: datetime, config: Phase4AConfig) -> tuple[dict[str, Any], nx.Graph, list[SatellitePosition | None]]:
-    graph, edges, positions = _build_graph(selected, timestamp, config)
+def _graph_snapshot(
+    selected: Sequence[SelectedSatellite],
+    timestamp: datetime,
+    config: Phase4AConfig,
+    *,
+    positions_override: Sequence[SatellitePosition | None] | None = None,
+) -> tuple[dict[str, Any], nx.Graph, list[SatellitePosition | None]]:
+    graph, edges, positions = _build_graph(
+        selected, timestamp, config, positions_override=positions_override
+    )
     nodes = [{"node_id": i, "norad_id": item.norad_id, "plane_idx": item.plane_idx, "sat_in_plane": item.sat_in_plane, "features": _node_features(item.plane_idx, item.sat_in_plane, max(x.plane_idx for x in selected) + 1, max(x.sat_in_plane for x in selected) + 1, bool(graph.nodes[i]["exists"]))} for i, item in enumerate(selected)]
     directed_edges = [dict(edge) for edge in edges]
     directed_edges.extend({**edge, "source": edge["target"], "target": edge["source"]} for edge in edges)
+    inter_plane_edges = [
+        (u, v)
+        for u, v, data in graph.edges(data=True)
+        if data["link_type"] != "intra_plane"
+    ]
+    inter_plane_degrees: dict[int, int] = {}
+    for source, target in inter_plane_edges:
+        inter_plane_degrees[source] = inter_plane_degrees.get(source, 0) + 1
+        inter_plane_degrees[target] = inter_plane_degrees.get(target, 0) + 1
     return {
         "timestamp": timestamp.isoformat().replace("+00:00", "Z"),
         "nodes": nodes,
         "edges": directed_edges,
         "physical_edge_count": len(edges),
+        "unavailable_node_count": sum(not bool(data["exists"]) for _, data in graph.nodes(data=True)),
+        "connected_component_count": compute_num_components(graph),
+        "gcc_size": compute_gcc_size(graph),
+        "inter_plane_edge_count": len(inter_plane_edges),
+        "max_inter_plane_endpoint_degree": max(inter_plane_degrees.values(), default=0),
+        "topology_candidate_statistics": graph.graph["topology_stats"],
         "adaptive_topology_identity": _topology_identity(graph),
         "isl_policy": ISL_POLICY,
         "adjacent_search_k": ADJACENT_SEARCH_K,
@@ -669,21 +736,50 @@ def _source_manifest(root: Path) -> dict[str, Any]:
             raise FileNotFoundError(path)
         revision = SOURCE_REVISIONS[repository]
         files.append({"source_repository": repository, "revision": revision, "file": relative, "bytes": path.stat().st_size, "sha256": _sha256_file(path), "download_timestamp": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(), "license_source_metadata": metadata, "source_url": SOURCE_URLS[repository]})
-    return {
+    manifest = {
         "manifest_version": "phase4a.external_source_manifest.v1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "sources": files,
     }
+    ledger_path = root / "contracts/external_source_manifest.json"
+    if ledger_path.is_file():
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        expected = {
+            (str(entry["source_repository"]), str(entry["file"])): str(entry["sha256"])
+            for entry in ledger.get("sources", [])
+        }
+        observed = {
+            (str(entry["source_repository"]), str(entry["file"])): str(entry["sha256"])
+            for entry in files
+        }
+        if observed != expected:
+            raise RuntimeError("raw source hashes differ from the recovered source ledger")
+    return manifest
+
+
+def _persist_source_manifest(root: Path, source_manifest: Mapping[str, Any]) -> str:
+    """Persist canonical source-manifest bytes and verify their on-disk identity."""
+    payload = _json_bytes(source_manifest)
+    expected = _sha256_bytes(payload)
+    path = root / "external_source_manifest.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    observed = _sha256_file(path)
+    if observed != expected:
+        raise RuntimeError("persisted source manifest hash does not match canonical bytes")
+    return observed
 
 
 def _contract(config: Phase4AConfig, source_manifest: Mapping[str, Any]) -> dict[str, Any]:
+    source_manifest_sha256 = _sha256_bytes(_json_bytes(source_manifest))
     return {
         "schema_version": "phase4a.external_validation_contract.v1",
         "status": "FROZEN_BEFORE_TARGET_CONSTRUCTION",
-        "scope": ["rf_space_classification", "tgnn_space_classification", "rf_space_regression", "tgnn_space_regression"],
+        "scope": list(EXTERNAL_TASKS),
         "not_authorized": ["integrated_ground_validation", "RF inference", "TGNN inference", "checkpoint loading", "training", "tuning"],
         "source_revisions": SOURCE_REVISIONS,
-        "source_manifest_sha256": _sha256_file(config.output_root / "external_source_manifest.json"),
+        "source_manifest_sha256": source_manifest_sha256,
+        "statistical_contract": EXTERNAL_STATISTICAL_CONTRACT,
         "evaluation_period": {"start": config.start.isoformat().replace("+00:00", "Z"), "end": config.end.isoformat().replace("+00:00", "Z")},
         "episode_design": {"count": config.episode_count, "timestamps": "inclusive deterministic rounded linear spacing", "duration_minutes": config.duration_minutes, "cadence_seconds": config.step_seconds, "timesteps": NUM_TIMESTEPS, "schedule": "cycle product order num_planes=(4,5,6), sats_per_plane=(5,6,7,8)"},
         "matched_domain": {"shell": "53-degree / approximately 550-km Starlink shell; shell_id=2", "plane_counts": PLANE_COUNTS, "sats_per_plane_counts": SATS_PER_PLANE_COUNTS},
@@ -734,9 +830,9 @@ def _provenance() -> list[dict[str, str]]:
 def _descriptive_stats(values: Sequence[float]) -> dict[str, float | int | None]:
     clean = [float(value) for value in values if math.isfinite(float(value))]
     if not clean:
-        return {"count": 0, "min": None, "mean": None, "std": None, "q25": None, "median": None, "q75": None}
+        return {"count": 0, "min": None, "max": None, "mean": None, "std": None, "q25": None, "median": None, "q75": None}
     ordered = sorted(clean)
-    return {"count": len(clean), "min": min(clean), "mean": mean(clean), "std": pstdev(clean), "q25": ordered[int(0.25 * (len(ordered) - 1))], "median": median(ordered), "q75": ordered[int(0.75 * (len(ordered) - 1))]}
+    return {"count": len(clean), "min": min(clean), "max": max(clean), "mean": mean(clean), "std": pstdev(clean), "q25": ordered[int(0.25 * (len(ordered) - 1))], "median": median(ordered), "q75": ordered[int(0.75 * (len(ordered) - 1))]}
 
 
 def _read_frozen_tgnn_sequence(path: Path) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
@@ -813,17 +909,203 @@ def _bundle_hash(root: Path) -> str:
     return digest.hexdigest()
 
 
+def _canonical_edge_records(edges: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    records: dict[tuple[int, int], dict[str, Any]] = {}
+    for edge in edges:
+        source = int(edge["source"])
+        target = int(edge["target"])
+        if source == target:
+            raise RuntimeError("self-loop in external physical edge artifact")
+        key = (min(source, target), max(source, target))
+        record = {
+            "source": key[0],
+            "target": key[1],
+            "distance_km": float(edge["distance_km"]),
+            "margin_db": float(edge["margin_db"]),
+            "link_type": str(edge["link_type"]),
+            "link_mode": str(edge["link_mode"]),
+        }
+        previous = records.get(key)
+        if previous is not None and previous != record:
+            raise RuntimeError("opposite directed edge records disagree")
+        records[key] = record
+    return [records[key] for key in sorted(records)]
+
+
+def audit_constructed_adaptive_artifacts(root: Path, config: Phase4AConfig) -> dict[str, Any]:
+    """Recompute targets and topology evidence from persisted construction artifacts."""
+    rf_rows = list(csv.DictReader((root / "episodes/external_rf_dataset.csv").open(newline="", encoding="utf-8")))
+    if len(rf_rows) != config.episode_count:
+        raise RuntimeError("persisted external RF dataset does not contain 300 episodes")
+    expected_timestamps = choose_episode_timestamps(config.start, config.end, config.episode_count)
+    if [int(row["episode_id"]) for row in rf_rows] != list(range(config.episode_count)):
+        raise RuntimeError("persisted external episode IDs are not exactly 0..299")
+    if [row["episode_timestamp"] for row in rf_rows] != [value.isoformat().replace("+00:00", "Z") for value in expected_timestamps]:
+        raise RuntimeError("persisted external episode timestamp schedule mismatch")
+    classifications: list[int] = []
+    regressions: list[float] = []
+    all_edges: list[dict[str, Any]] = []
+    nodes_per: list[int] = []
+    edges_per: list[int] = []
+    densities: list[float] = []
+    distances: list[float] = []
+    margins: list[float] = []
+    unavailable_counts: list[int] = []
+    component_counts: list[int] = []
+    inter_plane_counts: list[int] = []
+    inter_plane_degrees: list[int] = []
+    graph_sequence_parity = True
+    target_graph_parity = True
+    candidate_filtering_observed = False
+    candidate_replacement_observed = False
+    for row in rf_rows:
+        sequence_path = root / row["tgnn_sequence"]
+        graph_path = root / row["graph_edges"]
+        sequence = json.loads(sequence_path.read_text(encoding="utf-8"))
+        graph_artifact = json.loads(graph_path.read_text(encoding="utf-8"))
+        if sequence["episode_id"] != int(row["episode_id"]) or graph_artifact["episode_id"] != int(row["episode_id"]):
+            raise RuntimeError("episode identity mismatch across external artifacts")
+        fractions: list[float] = []
+        for sequence_snapshot, graph_snapshot in zip(sequence["snapshots"], graph_artifact["snapshots"]):
+            sequence_edges = _canonical_edge_records(sequence_snapshot["edges"])
+            graph_edges = _canonical_edge_records(graph_snapshot["edges"])
+            if sequence_edges != graph_edges:
+                graph_sequence_parity = False
+            graph_for_hash = nx.Graph()
+            graph_for_hash.add_edges_from(
+                (
+                    edge["source"],
+                    edge["target"],
+                    {
+                        "distance_km": edge["distance_km"],
+                        "margin_db": edge["margin_db"],
+                        "link_type": edge["link_type"],
+                        "link_mode": edge["link_mode"],
+                    },
+                )
+                for edge in graph_edges
+            )
+            if sequence_snapshot["isl_policy"] != ISL_POLICY or graph_snapshot["adaptive_topology_identity"] != _topology_identity(graph_for_hash):
+                raise RuntimeError("persisted Adaptive-v2 topology identity mismatch")
+            candidate_stats = sequence_snapshot["topology_candidate_statistics"]
+            candidate_filtering_observed = candidate_filtering_observed or any(
+                int(candidate_stats[field]) > 0
+                for field in ("links_rejected_distance", "links_rejected_los", "links_rejected_budget")
+            )
+            candidate_replacement_observed = candidate_replacement_observed or bool(candidate_stats["adaptive_selection_examples"])
+            graph = nx.Graph()
+            for node in sequence_snapshot["nodes"]:
+                graph.add_node(int(node["node_id"]), exists=bool(float(node["features"][2])))
+            graph.add_edges_from((edge["source"], edge["target"]) for edge in graph_edges)
+            if graph.number_of_edges() != len(graph_edges):
+                raise RuntimeError("persisted physical edge identity is not unique")
+            if any(not graph.nodes[node]["exists"] for edge in graph_edges for node in (edge["source"], edge["target"])):
+                raise RuntimeError("unavailable node retained an incident external edge")
+            if max((int(sequence_snapshot["max_inter_plane_endpoint_degree"]), int(graph_snapshot.get("max_inter_plane_endpoint_degree", 0))), default=0) > MAX_INTER_PLANE_LINKS_PER_SAT:
+                raise RuntimeError("external adaptive endpoint capacity exceeded")
+            gcc_fraction = compute_gcc_size(graph) / len(graph.nodes) if graph.nodes else 0.0
+            fractions.append(gcc_fraction)
+            nodes_per.append(graph.number_of_nodes())
+            edges_per.append(len(graph_edges) * 2)
+            densities.append(2.0 * len(graph_edges) / (len(graph.nodes) * (len(graph.nodes) - 1)) if len(graph.nodes) > 1 else 0.0)
+            distances.extend(edge["distance_km"] for edge in graph_edges)
+            margins.extend(edge["margin_db"] for edge in graph_edges)
+            unavailable_counts.append(sum(not bool(data["exists"]) for _, data in graph.nodes(data=True)))
+            component_counts.append(compute_num_components(graph))
+            inter = [edge for edge in graph_edges if edge["link_type"] != "intra_plane"]
+            inter_plane_counts.append(len(inter))
+            degree: dict[int, int] = {}
+            for edge in inter:
+                degree[edge["source"]] = degree.get(edge["source"], 0) + 1
+                degree[edge["target"]] = degree.get(edge["target"], 0) + 1
+            inter_plane_degrees.append(max(degree.values(), default=0))
+            all_edges.extend(graph_edges)
+        recomputed_regression = min(fractions)
+        recomputed_classification = int(any(value < config.gcc_threshold for value in fractions))
+        if float(row["space_gcc_fraction_original_min"]) != recomputed_regression or int(row["space_threshold_breach_any"]) != recomputed_classification:
+            target_graph_parity = False
+        regressions.append(recomputed_regression)
+        classifications.append(recomputed_classification)
+    if not graph_sequence_parity or not target_graph_parity:
+        raise RuntimeError("persisted external graph, sequence, and target artifacts disagree")
+    if not candidate_filtering_observed or not candidate_replacement_observed:
+        raise RuntimeError("persisted external artifacts lack observed adaptive candidate/filter evidence")
+    return {
+        "audit_version": "phase4a.external_dataset_audit.v2",
+        "descriptive_only": True,
+        "inference_performed": False,
+        "episode_count": len(rf_rows),
+        "rejected_episode_count": 0,
+        "missing_or_stale_satellite_states": sum(int(float(row["tle_age_max_seconds"]) > config.max_tle_age_hours * 3600.0) for row in rf_rows),
+        "classification": {"negative": classifications.count(0), "positive": classifications.count(1), "limited": len(set(classifications)) < 2 or min(classifications.count(0), classifications.count(1)) < 20},
+        "regression": _descriptive_stats(regressions),
+        "external_inputs": {name: _descriptive_stats([float(row[name]) for row in rf_rows]) for name in (*EXTERNAL_RF_FEATURE_ORDER, "tle_age_max_seconds")},
+        "tgnn": {"nodes_per_snapshot": _descriptive_stats(nodes_per), "edges_per_snapshot": _descriptive_stats(edges_per), "distance_km": _descriptive_stats(distances), "margin_db": _descriptive_stats(margins), "graph_density": _descriptive_stats(densities)},
+        "node_failure_semantics": {"synthetic_reference": "nominal topology first; failed nodes and incident edges removed from effective graph", "external_representation": "nominal node identity retained with node_exists_constant=0; incident edges removed", "unrelated_available_links_preserved": True, "gcc_denominator": "nominal selected satellite count"},
+        "unavailable_nodes_per_snapshot": _descriptive_stats(unavailable_counts),
+        "snapshots_containing_unavailable_nodes": sum(value > 0 for value in unavailable_counts),
+        "snapshots_with_zero_edges": sum(value == 0 for value in edges_per),
+        "snapshots_with_multiple_components": sum(value > 1 for value in component_counts),
+        "inter_plane_edge_count": _descriptive_stats(inter_plane_counts),
+        "max_inter_plane_endpoint_degree": max(inter_plane_degrees, default=0),
+        "source_tle_age_seconds": _descriptive_stats([float(row["tle_age_max_seconds"]) for row in rf_rows]),
+        "adaptive_propagation_evidence": {"graph_sequence_edge_parity": graph_sequence_parity, "graph_gcc_target_parity": target_graph_parity, "all_topology_hashes_recomputed": True, "all_persisted_edges_adaptive": all(edge["link_type"] in {"intra_plane", "inter_plane", "seam_link"} for edge in all_edges), "isl_policy": ISL_POLICY, "k": ADJACENT_SEARCH_K, "endpoint_capacity": MAX_INTER_PLANE_LINKS_PER_SAT, "los_budget_candidate_filtering": candidate_filtering_observed, "adaptive_candidate_replacement_observed": candidate_replacement_observed},
+        "synthetic_train_domain": _frozen_train_domain(config.synthetic_dataset_root),
+        "target_construction": {"classification": "any timestep fraction < 0.8", "regression": "minimum timestep fraction", "threshold": config.gcc_threshold, "denominator": "nominal selected satellite count"},
+    }
+
+
+def _implementation_git_sha() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=Path(__file__).parents[4],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _artifact_inventory(root: Path) -> list[dict[str, Any]]:
+    return [
+        {
+            "path": path.relative_to(root).as_posix(),
+            "bytes": path.stat().st_size,
+            "sha256": _sha256_file(path),
+        }
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and path.name != "external_validation_inventory.json"
+    ]
+
+
+def freeze_pre_inference_inventory(root: Path, config: Phase4AConfig, audit: Mapping[str, Any]) -> dict[str, Any]:
+    source_manifest = json.loads((root / "external_source_manifest.json").read_text(encoding="utf-8"))
+    artifacts = _artifact_inventory(root)
+    inventory = {"inventory_version": "phase4a.external_validation_inventory.v2", "status": "REAL-DATA EXTERNAL VALIDATION DATASET FROZEN", "scientific_lineage": "Adaptive-v2", "implementation_git_sha": _implementation_git_sha(), "model_inference_performed": False, "external_predictions_generated": False, "external_metrics_calculated": False, "episode_count": int(audit["episode_count"]), "episode_ids": list(range(int(audit["episode_count"]))), "rejected_episode_count": int(audit["rejected_episode_count"]), "external_tasks": list(EXTERNAL_TASKS), "statistical_contract": EXTERNAL_STATISTICAL_CONTRACT, "source_revisions": SOURCE_REVISIONS, "source_raw_sha256": {f'{entry["source_repository"]}:{entry["file"]}': entry["sha256"] for entry in source_manifest["sources"]}, "adapter_sha256": _adapter_sha256(), "grid_fixed_source_count": 0, "adaptive_topology": {"isl_policy": ISL_POLICY, "k": ADJACENT_SEARCH_K, "endpoint_capacity": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL}, "classification_balance": audit["classification"], "regression_distribution": audit["regression"], "distribution_shift_audit": audit, "provenance_classes": [item["provenance_class"] for item in _provenance()], "self_excluding_inventory_convention": "inventory SHA excludes external_validation_inventory.json; bundle hashes relative paths, NUL separators, and bytes", "artifacts": artifacts, "external_pre_inference_bundle_sha256": _bundle_hash(root)}
+    _write_json(root / "external_validation_inventory.json", inventory)
+    inventory["external_pre_inference_inventory_sha256"] = _sha256_file(root / "external_validation_inventory.json")
+    return inventory
+
+
 def build_external_validation(config: Phase4AConfig) -> dict[str, Any]:
     """Build the complete pre-inference package and return its handoff."""
     root = config.output_root
-    root.mkdir(parents=True, exist_ok=True)
+    if root.exists():
+        raise RuntimeError(f"Adaptive-v2 external output root must be absent: {root.resolve()}")
+    root.mkdir(parents=True, exist_ok=False)
     for directory in ("contracts", "adapter", "episodes", "audits", "manifests"):
         (root / directory).mkdir(exist_ok=True)
     source_manifest = _source_manifest(config.source_root)
+    source_manifest_sha256 = _sha256_bytes(_json_bytes(source_manifest))
     contract = _contract(config, source_manifest)
+    if contract["source_manifest_sha256"] != source_manifest_sha256:
+        raise RuntimeError("source manifest hash changed before contract creation")
+    persisted_source_manifest_sha256 = _persist_source_manifest(root, source_manifest)
+    if persisted_source_manifest_sha256 != source_manifest_sha256:
+        raise RuntimeError("persisted source manifest hash changed before contract write")
     _write_json(root / "contracts/external_validation_contract.json", contract)
     _write_json(root / "contracts/external_source_manifest.json", source_manifest)
-    _write_json(root / "external_source_manifest.json", source_manifest)
+    _write_json(root / "contracts/external_statistical_contract.json", EXTERNAL_STATISTICAL_CONTRACT)
     _write_json(root / "contracts/external_adapter_specification.json", {"adapter": "satnet.experiments.external_validation.phase4a", "implementation_sha256": _adapter_sha256(), "physics_source": "satnet.network.hypatia_adapter", "model_inference_performed": False, "provenance": _provenance()})
 
     timestamps = choose_episode_timestamps(config.start, config.end, config.episode_count)
@@ -869,11 +1151,32 @@ def build_external_validation(config: Phase4AConfig) -> dict[str, Any]:
         episode_key = f"episode_{episode_id:04d}"
         sequence_path = root / "episodes" / "tgnn_sequences" / f"{episode_key}.json"
         _write_json(sequence_path, {"episode_id": episode_id, "timestamps": [row["timestamp"] for row in sequence], "node_feature_order": EXTERNAL_TGNN_NODE_FEATURE_ORDER, "edge_feature_order": EXTERNAL_TGNN_EDGE_FEATURE_ORDER, "snapshots": sequence})
+        graph_path = root / "episodes" / "graph_edges" / f"{episode_key}.json"
+        _write_json(
+            graph_path,
+            {
+                "episode_id": episode_id,
+                "snapshots": [
+                    {
+                        "timestep": snapshot["timestep"],
+                        "timestamp": snapshot["timestamp"],
+                        "nodes": snapshot["nodes"],
+                        "edges": [
+                            edge
+                            for edge in snapshot["edges"]
+                            if int(edge["source"]) < int(edge["target"])
+                        ],
+                        "adaptive_topology_identity": snapshot["adaptive_topology_identity"],
+                    }
+                    for snapshot in sequence
+                ],
+            },
+        )
         topology_ids = [str(snapshot["adaptive_topology_identity"]) for snapshot in sequence]
         source_hash_json = json.dumps(source_hashes, sort_keys=True, separators=(",", ":"))
-        rf_row = {"episode_id": episode_id, "episode_timestamp": timestamp.isoformat().replace("+00:00", "Z"), "num_planes": planes, "sats_per_plane": sats, "altitude_km": mean(altitudes) if altitudes else 0.0, "inclination_deg": mean(inclinations) if inclinations else 0.0, "satellite_node_failure_probability": node_failure, "satellite_edge_failure_probability": edge_failure, "space_gcc_fraction_original_min": regression, "space_threshold_breach_any": int(classification), "tgnn_sequence": sequence_path.relative_to(root).as_posix(), "tle_age_max_seconds": max((item.tle_age_seconds or 0.0) for item in selected), "node_failure_numerator": node_num, "node_failure_denominator": node_den, "edge_failure_numerator": edge_num, "edge_failure_denominator": edge_den, "source_norad_ids": ";".join(str(item.norad_id) for item in selected), "source_artifact_hashes": source_hash_json, "adaptive_topology_identities": json.dumps(topology_ids, separators=(",", ":")), "isl_policy": ISL_POLICY, "adjacent_search_k": ADJACENT_SEARCH_K, "max_inter_plane_links_per_sat": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL}
+        rf_row = {"episode_id": episode_id, "episode_timestamp": timestamp.isoformat().replace("+00:00", "Z"), "num_planes": planes, "sats_per_plane": sats, "altitude_km": mean(altitudes) if altitudes else 0.0, "inclination_deg": mean(inclinations) if inclinations else 0.0, "satellite_node_failure_probability": node_failure, "satellite_edge_failure_probability": edge_failure, "space_gcc_fraction_original_min": regression, "space_threshold_breach_any": int(classification), "tgnn_sequence": sequence_path.relative_to(root).as_posix(), "graph_edges": graph_path.relative_to(root).as_posix(), "tle_age_max_seconds": max((item.tle_age_seconds or 0.0) for item in selected), "node_failure_numerator": node_num, "node_failure_denominator": node_den, "edge_failure_numerator": edge_num, "edge_failure_denominator": edge_den, "source_norad_ids": ";".join(str(item.norad_id) for item in selected), "source_artifact_hashes": source_hash_json, "adaptive_topology_identities": json.dumps(topology_ids, separators=(",", ":")), "isl_policy": ISL_POLICY, "adjacent_search_k": ADJACENT_SEARCH_K, "max_inter_plane_links_per_sat": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL}
         rf_rows.append(rf_row)
-        manifest_rows.append({"episode_id": episode_id, "timestamp": timestamp.isoformat().replace("+00:00", "Z"), "num_planes": planes, "sats_per_plane": sats, "nominal_satellites": len(selected), "sequence": sequence_path.relative_to(root).as_posix(), "max_tle_age_seconds": rf_row["tle_age_max_seconds"], "node_failure_probability": node_failure, "edge_failure_probability": edge_failure, "regression_target": regression, "classification_target": int(classification), "plane_inference": plane_audit, "source_artifact_hashes": source_hashes, "adaptive_topology_identities": topology_ids, "isl_policy": ISL_POLICY, "adjacent_search_k": ADJACENT_SEARCH_K, "max_inter_plane_links_per_sat": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL})
+        manifest_rows.append({"episode_id": episode_id, "timestamp": timestamp.isoformat().replace("+00:00", "Z"), "num_planes": planes, "sats_per_plane": sats, "nominal_satellites": len(selected), "sequence": sequence_path.relative_to(root).as_posix(), "graph_edges": graph_path.relative_to(root).as_posix(), "max_tle_age_seconds": rf_row["tle_age_max_seconds"], "node_failure_probability": node_failure, "edge_failure_probability": edge_failure, "regression_target": regression, "classification_target": int(classification), "plane_inference": plane_audit, "source_artifact_hashes": source_hashes, "adaptive_topology_identities": topology_ids, "isl_policy": ISL_POLICY, "adjacent_search_k": ADJACENT_SEARCH_K, "max_inter_plane_links_per_sat": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL})
 
     if rejected:
         raise RuntimeError(f"Phase 4A rejected {len(rejected)} episodes; acceptance requires 300: {rejected[:3]}")
@@ -892,21 +1195,14 @@ def build_external_validation(config: Phase4AConfig) -> dict[str, Any]:
     _write_csv(root / "manifests/external_episode_manifest.csv", manifest_rows)
     _write_json(root / "manifests/external_provenance_catalog.json", _provenance())
 
-    classifications = [int(row["space_threshold_breach_any"]) for row in rf_rows]
-    regressions = [float(row["space_gcc_fraction_original_min"]) for row in rf_rows]
-    edge_distances = [edge["distance_km"] for snapshot in all_snapshots for edge in snapshot["edges"]]
-    edge_margins = [edge["margin_db"] for snapshot in all_snapshots for edge in snapshot["edges"]]
-    nodes_per = [len(snapshot["nodes"]) for snapshot in all_snapshots]
-    edges_per = [len(snapshot["edges"]) for snapshot in all_snapshots]
-    audit = {"audit_version": "phase4a.external_dataset_audit.v1", "descriptive_only": True, "inference_performed": False, "episode_count": len(rf_rows), "rejected_episode_count": len(rejected), "missing_or_stale_satellite_states": sum(int(float(row["tle_age_max_seconds"]) > config.max_tle_age_hours * 3600.0) for row in rf_rows), "classification": {"negative": classifications.count(0), "positive": classifications.count(1), "limited": len(set(classifications)) < 2 or min(classifications.count(0), classifications.count(1)) < 20}, "regression": _descriptive_stats(regressions), "external_inputs": {name: _descriptive_stats([float(row[name]) for row in rf_rows]) for name in ("num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability")}, "tgnn": {"nodes_per_snapshot": _descriptive_stats(nodes_per), "edges_per_snapshot": _descriptive_stats(edges_per), "distance_km": _descriptive_stats(edge_distances), "margin_db": _descriptive_stats(edge_margins), "graph_density": _descriptive_stats([2 * e / (n * (n - 1)) if n > 1 else 0.0 for n, e in zip(nodes_per, edges_per)])}, "synthetic_train_domain": _frozen_train_domain(config.synthetic_dataset_root), "target_construction": {"classification": "any timestep fraction < 0.8", "regression": "minimum timestep fraction", "threshold": config.gcc_threshold}}
+    audit = audit_constructed_adaptive_artifacts(root, config)
     _write_json(root / "audits/external_dataset_audit.json", audit)
-    for filename, source in (("external_validation_contract.json", root / "contracts/external_validation_contract.json"), ("external_adapter_specification.json", root / "contracts/external_adapter_specification.json"), ("external_source_manifest.json", root / "external_source_manifest.json"), ("external_episode_manifest.csv", root / "manifests/external_episode_manifest.csv"), ("external_dataset_audit.json", root / "audits/external_dataset_audit.json")):
+    _write_json(root / "audits/adaptive_behavioral_evidence.json", audit["adaptive_propagation_evidence"])
+    for filename, source in (("external_validation_contract.json", root / "contracts/external_validation_contract.json"), ("external_statistical_contract.json", root / "contracts/external_statistical_contract.json"), ("external_adapter_specification.json", root / "contracts/external_adapter_specification.json"), ("external_source_manifest.json", root / "external_source_manifest.json"), ("external_episode_manifest.csv", root / "manifests/external_episode_manifest.csv"), ("external_dataset_audit.json", root / "audits/external_dataset_audit.json"), ("adaptive_behavioral_evidence.json", root / "audits/adaptive_behavioral_evidence.json")):
         destination = root / filename
         if source.resolve() != destination.resolve():
             shutil.copyfile(source, destination)
-    inventory = {"inventory_version": "phase4a.external_validation_inventory.v1", "status": "REAL-DATA EXTERNAL VALIDATION DATASET FROZEN", "scientific_lineage": "Adaptive-v2", "model_inference_performed": False, "episode_count": len(rf_rows), "rejected_episode_count": len(rejected), "source_revisions": SOURCE_REVISIONS, "source_raw_sha256": {f'{entry["source_repository"]}:{entry["file"]}': entry["sha256"] for entry in source_manifest["sources"]}, "adapter_sha256": _adapter_sha256(), "grid_fixed_source_count": 0, "adaptive_topology": {"isl_policy": ISL_POLICY, "k": ADJACENT_SEARCH_K, "endpoint_capacity": MAX_INTER_PLANE_LINKS_PER_SAT, "temporal_failure_edge_policy": FAILURE_MODEL}, "classification_balance": audit["classification"], "regression_distribution": audit["regression"], "distribution_shift_audit": audit, "provenance_classes": [item["provenance_class"] for item in _provenance()], "external_pre_inference_bundle_sha256": _bundle_hash(root)}
-    _write_json(root / "external_validation_inventory.json", inventory)
-    return inventory
+    return freeze_pre_inference_inventory(root, config, audit)
 
 
 def _write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:

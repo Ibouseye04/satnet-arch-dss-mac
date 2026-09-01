@@ -1,20 +1,39 @@
 from __future__ import annotations
 
 import inspect
+import json
 from pathlib import Path
 
 import pytest
 
 from satnet.experiments.external_validation import adaptive_v2
+from satnet.experiments.external_validation import phase4a
 from satnet.experiments.external_validation.phase4a import (
     ADJACENT_SEARCH_K,
+    EXTERNAL_RF_FEATURE_ORDER,
+    EXTERNAL_STATISTICAL_CONTRACT,
+    EXTERNAL_TASKS,
+    EXTERNAL_TGNN_EDGE_FEATURE_ORDER,
+    EXTERNAL_TGNN_NODE_FEATURE_ORDER,
     FAILURE_MODEL,
     ISL_POLICY,
     MAX_INTER_PLANE_LINKS_PER_SAT,
-    EXTERNAL_RF_FEATURE_ORDER,
-    EXTERNAL_TGNN_EDGE_FEATURE_ORDER,
-    EXTERNAL_TGNN_NODE_FEATURE_ORDER,
+    OrbitalRecord,
+    Phase4AConfig,
+    SelectedSatellite,
+    SatellitePosition,
+    _build_graph,
+    _contract,
+    _json_bytes,
+    _persist_source_manifest,
+    _sha256_bytes,
+    _write_csv,
+    _write_json,
+    _graph_snapshot,
+    _target_from_snapshots,
+    audit_constructed_adaptive_artifacts,
 )
+from satnet.network.hypatia_adapter import HypatiaAdapter
 
 
 def test_adaptive_topology_identity_is_exact() -> None:
@@ -136,8 +155,133 @@ def test_adaptive_behavior_is_exercised_by_production_code() -> None:
     assert evidence["max_observed_inter_plane_degree"] <= 1
     assert evidence["los_and_physics_filtering"] is True
     assert evidence["candidate_replacement_evidence"] is True
-    assert evidence["graph_identity_propagates_to_sequence"] is True
-    assert evidence["target_derived_from_adaptive_graph"] is True
+    assert evidence["evidence_scope"].startswith("synthetic representative topology only")
+
+
+def _test_selected(count: int = 6, unavailable: set[int] | None = None) -> tuple[tuple[SelectedSatellite, ...], list[SatellitePosition]]:
+    unavailable = unavailable or set()
+    selected = tuple(
+        SelectedSatellite(
+            norad_id=index,
+            plane_idx=index // 3,
+            sat_in_plane=index % 3,
+            orbit=OrbitalRecord(
+                norad_id=index,
+                epoch=phase4a.TARGET_START,
+                inclination_deg=53.0,
+                raan_deg=float(index // 3),
+                eccentricity=0.001,
+                arg_perigee_deg=0.0,
+                mean_anomaly_deg=float(index),
+                mean_motion_rev_day=15.5,
+                mean_motion_dot_rev_day2=0.0,
+                bstar=0.0,
+                altitude_km=550.0,
+                satrec=None,
+            ),
+            status="anomalous" if index in unavailable else "operational",
+            status_available=index not in unavailable,
+            is_isl_capable=True,
+            tle_age_seconds=0.0,
+        )
+        for index in range(count)
+    )
+    with HypatiaAdapter(num_planes=2, sats_per_plane=3, inclination_deg=53.0, altitude_km=550.0, phasing_factor=1) as adapter:
+        adapter.generate_tles()
+        positions = adapter.get_positions_at_step(0)
+    return selected, positions
+
+
+def test_source_contract_hash_uses_canonical_bytes_before_output_exists(tmp_path: Path) -> None:
+    output_root = tmp_path / "absent-output"
+    manifest = {"manifest_version": "test", "sources": []}
+    config = Phase4AConfig(output_root, source_root=tmp_path / "source")
+    assert not (output_root / "external_source_manifest.json").exists()
+    contract = _contract(config, manifest)
+    assert contract["source_manifest_sha256"] == _sha256_bytes(_json_bytes(manifest))
+    assert not (output_root / "external_source_manifest.json").exists()
+    persisted = _persist_source_manifest(output_root, manifest)
+    assert persisted == contract["source_manifest_sha256"]
+    assert phase4a._sha256_file(output_root / "external_source_manifest.json") == persisted
+
+
+def test_unavailable_nodes_only_remove_incident_edges_and_match_features(tmp_path: Path) -> None:
+    available, positions = _test_selected()
+    unavailable, _ = _test_selected(unavailable={0})
+    config = Phase4AConfig(tmp_path / "output")
+    nominal, _, _ = _build_graph(available, phase4a.TARGET_START, config, positions_override=positions)
+    degraded, _, _ = _build_graph(unavailable, phase4a.TARGET_START, config, positions_override=positions)
+    assert nominal.number_of_edges() > 0
+    assert degraded.number_of_edges() < nominal.number_of_edges()
+    assert all(0 not in edge for edge in degraded.edges())
+    nominal_survivor_edges = {edge for edge in nominal.edges() if 0 not in edge}
+    assert nominal_survivor_edges == set(degraded.edges())
+    assert degraded.nodes[0]["exists"] is False
+    assert degraded.number_of_nodes() == 6
+    snapshot, _, _ = _graph_snapshot(unavailable, phase4a.TARGET_START, config, positions_override=positions)
+    assert snapshot["nodes"][0]["features"][2] == 0.0
+    assert all(node["features"][2] == 1.0 for node in snapshot["nodes"][1:])
+
+
+def test_gcc_target_uses_exact_original_denominator() -> None:
+    import networkx as nx
+
+    graph = nx.Graph()
+    graph.add_nodes_from(range(4))
+    graph.add_edge(0, 1)
+    regression, classification, fractions = _target_from_snapshots([({}, graph)], 4, 0.8)
+    assert fractions == [0.5]
+    assert regression == 0.5
+    assert classification is True
+
+
+def test_multiple_unavailable_nodes_preserve_unrelated_links(tmp_path: Path) -> None:
+    selected, positions = _test_selected(unavailable={0, 3})
+    graph, _, _ = _build_graph(selected, phase4a.TARGET_START, Phase4AConfig(tmp_path), positions_override=positions)
+    assert graph.number_of_nodes() == 6
+    assert graph.nodes[0]["exists"] is False
+    assert graph.nodes[3]["exists"] is False
+    assert all(0 not in edge and 3 not in edge for edge in graph.edges())
+
+
+def test_forced_grid_fixed_runtime_is_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    selected, positions = _test_selected()
+    original = phase4a._compute_grid_plus_isls
+
+    def force_fixed(*args, **kwargs):
+        kwargs["isl_policy"] = "grid_fixed"
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(phase4a, "_compute_grid_plus_isls", force_fixed)
+    with pytest.raises(RuntimeError, match="runtime policy mismatch"):
+        _build_graph(selected, phase4a.TARGET_START, Phase4AConfig(tmp_path), positions_override=positions)
+
+
+def test_external_scope_and_statistical_contract_are_frozen() -> None:
+    assert EXTERNAL_TASKS == (
+        "rf_space_classification",
+        "tgnn_space_classification",
+        "rf_space_regression",
+        "tgnn_space_regression",
+    )
+    adaptive_v2.validate_external_task_scope(list(EXTERNAL_TASKS))
+    with pytest.raises(RuntimeError, match="exactly"):
+        adaptive_v2.validate_external_task_scope(["rf_integrated_classification"])
+    adaptive_v2.validate_external_statistical_contract(EXTERNAL_STATISTICAL_CONTRACT)
+    assert EXTERNAL_STATISTICAL_CONTRACT["paired_unit"] == "episode_id"
+    assert EXTERNAL_STATISTICAL_CONTRACT["replicates"] == 2000
+    assert EXTERNAL_STATISTICAL_CONTRACT["bootstrap_seed"] == 20260820
+    assert EXTERNAL_STATISTICAL_CONTRACT["primary_comparison"]["difference"] == "RF MAE minus TGNN MAE"
+    assert EXTERNAL_STATISTICAL_CONTRACT["classification"] == "descriptive_only"
+    assert EXTERNAL_STATISTICAL_CONTRACT["classification_inferential_procedure"] is None
+
+
+def test_construction_module_has_no_inference_training_or_risk_tuning_path() -> None:
+    source = inspect.getsource(phase4a)
+    for forbidden in (".fit(", ".backward(", "optimizer.step", "torch.optim", "risk_bin", "threshold_tuning", "predict("):
+        assert forbidden not in source
+    assert "descriptive_only" in source
+    assert "classification_inferential_procedure" in source
 
 
 def test_historical_episode_identity_is_audit_only() -> None:
