@@ -1,0 +1,161 @@
+{
+  "schema_version": "satnet.external_validation_adaptive_v2.forensics.v1",
+  "status": "RECOVERED_BEFORE_ADAPTIVE_INFERENCE",
+  "historical_roots": {
+    "external_validation": "C:\\Users\\johns\\external\\satnet-real-external-validation-v1",
+    "external_inference": "C:\\Users\\johns\\external\\satnet-real-external-inference-v1"
+  },
+  "historical_code_identity": {
+    "construction_implementation_sha": "e55dba59e83864d2dd11fa47482bd4ec2bdd797a",
+    "historical_adapter_sha256": "83ebc1e4d31b6aa8ff9b1574e3a39b4b9716d1b182ebe2fd5e7e961ed4ef4e23",
+    "historical_lineage": "grid_fixed",
+    "historical_external_bundle_sha256": "9abede2f83adbfc96e8267805e3253d6dbcd6f5240d675729d5677aa053b7e28",
+    "historical_source_manifest_sha256": "02153a1fcb8cac32d0d6b5999ea7c2953d00024c874d23e392664011bb1bbf29"
+  },
+  "episode_contract": {
+    "count": 300,
+    "episode_id_order": "0..299",
+    "date_range": {
+      "start": "2024-02-01T12:00:00Z",
+      "end": "2025-12-31T12:00:00Z"
+    },
+    "timestamp_schedule": "inclusive deterministic rounded linear spacing",
+    "configuration_schedule": "cycle product order num_planes=(4,5,6), sats_per_plane=(5,6,7,8)",
+    "duration_minutes": 10,
+    "timestep_seconds": 60,
+    "snapshots_per_episode": 11
+  },
+  "constellation": {
+    "operator": "SpaceX",
+    "constellation": "Starlink",
+    "matched_shell": "shell_id=2, approximately 53-degree / 550-km shell",
+    "plane_counts": [4, 5, 6],
+    "sats_per_plane_counts": [5, 6, 7, 8]
+  },
+  "raw_sources_safe_to_reuse": [
+    {
+      "path": "raw/starlink-fleet-data/README.md",
+      "repository": "juliensimon/starlink-fleet-data",
+      "revision": "b9068f0abc217b031db784e052b4aec26e60c8aa",
+      "sha256": "ed7e55deba16fc0748ea3d43708b222d9e05996eb7d0bb176b091d9f10507335",
+      "role": "source documentation; CelesTrak usage policy"
+    },
+    {
+      "path": "raw/starlink-fleet-data/data/tle_snapshots.parquet",
+      "repository": "juliensimon/starlink-fleet-data",
+      "revision": "b9068f0abc217b031db784e052b4aec26e60c8aa",
+      "sha256": "c5e6558e0fa8f9c41407d8b9afc95c49a27d91b2b01408e29c4d591ac4f7a6f3",
+      "role": "daily Starlink shell/status/ISL-capability observations derived from CelesTrak GP data"
+    },
+    {
+      "path": "raw/space-track-tle-history/README.md",
+      "repository": "juliensimon/space-track-tle-history",
+      "revision": "717fd92350652061dddc396f82470eeb7e2a434b",
+      "sha256": "1ed3ca63b14a9e7be3c7c126ddcf6cbf2bedde537794f1664eb7483b238fb50e",
+      "role": "source documentation; Space-Track/USSF public source"
+    },
+    {
+      "path": "raw/space-track-tle-history/data/tle_2024.parquet",
+      "repository": "juliensimon/space-track-tle-history",
+      "revision": "717fd92350652061dddc396f82470eeb7e2a434b",
+      "sha256": "862740092876cfd22675b66a87d6ab570d31e714411bf575c227224e9a87a741",
+      "role": "public Space-Track/USSF orbital elements"
+    },
+    {
+      "path": "raw/space-track-tle-history/data/tle_2025.parquet",
+      "repository": "juliensimon/space-track-tle-history",
+      "revision": "717fd92350652061dddc396f82470eeb7e2a434b",
+      "sha256": "9e9339cdbfc536cb91a1b5a26c898f193fdb683202f1cb1ceb7cee8bda81f64e",
+      "role": "public Space-Track/USSF orbital elements"
+    }
+  ],
+  "source_transformations": {
+    "orbit": "latest source2 orbital record at or before episode timestamp, no future substitution, maximum age 24 hours; SGP4/WGS72 followed by existing SATNET GMST TEME-to-ECEF transform",
+    "plane_inference": "circular RAAN clustering with gaps greater than 1 degree split, wrap-around merge, phase ordering by (mean_anomaly + arg_perigee) modulo 360 then NORAD ID",
+    "status": "operational maps to available; raising, deorbiting, decayed, anomalous, and unknown map to unavailable",
+    "candidate_eligibility": "is_isl_capable=true and valid source records; public heuristic distinct from operational availability",
+    "rf_features": ["num_planes", "sats_per_plane", "altitude_km", "inclination_deg", "satellite_node_failure_probability", "satellite_edge_failure_probability"],
+    "node_failure_probability": "strict pre-start 30-day daily non-operational qualifying status rows divided by all qualifying rows",
+    "edge_failure_probability": "strict pre-start 30-day daily rejected adaptive-candidate evaluations divided by valid candidate evaluations with both endpoint TLEs within 24 hours",
+    "tgnn_features": {
+      "node_order": ["plane_idx_normalized", "sat_in_plane_normalized", "node_exists_constant"],
+      "edge_order": ["distance_km_scaled_10000", "margin_db_scaled_100", "link_type_code_scaled_2", "link_mode_binary"],
+      "node_scaling": "plane/(num_planes-1), sat/(sats_per_plane-1), exists in {0,1}",
+      "edge_scaling": "distance/10000, margin/100, type_code/2 with intra=0 inter=1 seam=2, optical=1 otherwise=0"
+    }
+  },
+  "historical_targets": {
+    "regression": "space_gcc_fraction_original_min = min over 11 snapshots of |GCC_t| / nominal selected satellite count",
+    "classification": "space_threshold_breach_any = any timestep where space GCC original fraction < 0.8",
+    "target_denominator": "nominal selected satellite count; unavailable nodes remain in denominator",
+    "target_is_topology_derived": true
+  },
+  "historical_tasks_actually_evaluated": [
+    "rf_space_classification",
+    "tgnn_space_classification",
+    "rf_space_regression",
+    "tgnn_space_regression"
+  ],
+  "historical_seed_contract": {
+    "seeds": [42, 123, 456, 789, 2026],
+    "primary_reporting_seed": 42,
+    "ensemble": false,
+    "model_selection": false,
+    "retraining": false,
+    "threshold_tuning": false
+  },
+  "historical_statistics_contract": {
+    "regression_comparison": "rf_space_regression seed 42 minus tgnn_space_regression seed 42",
+    "sampling_unit": "episode_id",
+    "paired": true,
+    "replicates": 2000,
+    "bootstrap_seed": 20260820,
+    "interval": "95% percentile",
+    "adaptive_v2_inferential_status": "must not be assumed frozen until explicitly rebound; preflight records historical procedure only"
+  },
+  "historical_primary_seed_42_regression_metrics": {
+    "rf_space_regression": {
+      "mae": 0.1273978715832696,
+      "rmse": 0.1518656295021988,
+      "r2": -2.167802879091473,
+      "median_absolute_error": 0.10431527413956966,
+      "maximum_absolute_error": 0.4537676603027772
+    },
+    "tgnn_space_regression": {
+      "mae": 0.06290224140586045,
+      "rmse": 0.08109491182396349,
+      "r2": 0.09671172774298153,
+      "median_absolute_error": 0.05242897974593299,
+      "maximum_absolute_error": 0.27803170382976533
+    },
+    "rf_minus_tgnn_mae": 0.06449563017740914,
+    "historical_bootstrap_ci": [0.05592972863883819, 0.0734203385275529]
+  },
+  "artifact_classification": {
+    "safe_raw_exogenous": "the five raw source files listed above; their identities and roles may be rebound unchanged",
+    "forbidden_fixed_derived": [
+      "external_rf_dataset.csv",
+      "rf_space_classification.csv",
+      "rf_space_regression.csv",
+      "tgnn_sequences/episode_*.json",
+      "external_validation_inventory.json",
+      "all historical fixed graph edges and GCC results",
+      "all historical model predictions, metrics, and fixed checkpoints"
+    ],
+    "historical_derived_bundle_reuse": false,
+    "historical_fixed_checkpoint_reuse": false
+  },
+  "adaptive_v2_rebinding": {
+    "isl_policy": "grid_adaptive",
+    "k": 1,
+    "endpoint_capacity": 1,
+    "temporal_failure_edge_policy": "persistent_temporal_union_edges_v1",
+    "topology_must_be_regenerated": true,
+    "historical_grid_fixed_outputs_must_not_be_relabeled": true
+  },
+  "ground_segment": {
+    "historical_integrated_ground_validation": false,
+    "adaptive_v2_scope": "satellite-to-satellite only"
+  },
+  "inference_status": "EXTERNAL MODEL INFERENCE NOT YET RUN"
+}
