@@ -1,0 +1,237 @@
+{
+  "five_seed_descriptive_summary": {
+    "rf_space_classification": {
+      "positive_class_recall": {
+        "mean": 1.0,
+        "standard_deviation": 0.0
+      }
+    },
+    "rf_space_regression": {
+      "mae": {
+        "mean": 0.1257127365026789,
+        "standard_deviation": 1.5004794040756416e-05
+      },
+      "maximum_absolute_error": {
+        "mean": 0.5001327861952857,
+        "standard_deviation": 8.183843502357979e-05
+      },
+      "median_absolute_error": {
+        "mean": 0.10416666666666681,
+        "standard_deviation": 0.0
+      },
+      "r2": {
+        "mean": -2.1385908675094467,
+        "standard_deviation": 0.0008587314527323629
+      },
+      "residual_mean": {
+        "mean": -0.1257126228759507,
+        "standard_deviation": 1.4850197776795753e-05
+      },
+      "residual_standard_deviation": {
+        "mean": 0.07906487138357102,
+        "standard_deviation": 1.532345431307353e-05
+      },
+      "rmse": {
+        "mean": 0.14850898114210126,
+        "standard_deviation": 2.031559165191007e-05
+      }
+    }
+  },
+  "per_seed": {
+    "rf_space_classification/seed_123": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0,
+        "standard_deviation": 0.0
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "rf_space_classification/seed_2026": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0,
+        "standard_deviation": 0.0
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "rf_space_classification/seed_42": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0,
+        "standard_deviation": 0.0
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "rf_space_classification/seed_456": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0,
+        "standard_deviation": 0.0
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "rf_space_classification/seed_789": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1.0,
+        "standard_deviation": 0.0
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "rf_space_regression/seed_123": {
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "mae": 0.1257283318297866,
+      "maximum_absolute_error": 0.5000370370370365,
+      "median_absolute_error": 0.10416666666666681,
+      "prediction_range": [
+        0.04166666666666653,
+        0.09996296296296348
+      ],
+      "r2": -2.1393298925837887,
+      "residual_mean": -0.1257283318297866,
+      "residual_standard_deviation": 0.0790727361767118,
+      "rmse": 0.14852646576005502
+    },
+    "rf_space_regression/seed_2026": {
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "mae": 0.12569659598540656,
+      "maximum_absolute_error": 0.5002439393939389,
+      "median_absolute_error": 0.10416666666666681,
+      "prediction_range": [
+        0.04166666666666653,
+        0.09975606060606113
+      ],
+      "r2": -2.137837813144145,
+      "residual_mean": -0.12569659598540656,
+      "residual_standard_deviation": 0.07905689045035481,
+      "rmse": 0.14849116529274706
+    },
+    "rf_space_regression/seed_42": {
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "mae": 0.12570230389265985,
+      "maximum_absolute_error": 0.5001287878787873,
+      "median_absolute_error": 0.10416666666666681,
+      "prediction_range": [
+        0.04166666666666653,
+        0.09987121212121264
+      ],
+      "r2": -2.1379251223759677,
+      "residual_mean": -0.12570230389265985,
+      "residual_standard_deviation": 0.07905169504290434,
+      "rmse": 0.14849323113556034
+    },
+    "rf_space_regression/seed_456": {
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "mae": 0.12573327354709762,
+      "maximum_absolute_error": 0.5000499999999994,
+      "median_absolute_error": 0.10416666666666681,
+      "prediction_range": [
+        0.04166666666666653,
+        0.09995000000000052
+      ],
+      "r2": -2.1399053280604,
+      "residual_mean": -0.12573270541345655,
+      "residual_standard_deviation": 0.07909134853439483,
+      "rmse": 0.14854007749956294
+    },
+    "rf_space_regression/seed_789": {
+      "label": "Out-of-domain physical-viability proxy stress test",
+      "mae": 0.1257031772584438,
+      "maximum_absolute_error": 0.5002041666666661,
+      "median_absolute_error": 0.10416666666666681,
+      "prediction_range": [
+        0.04166666666666653,
+        0.09979583333333383
+      ],
+      "r2": -2.137956181382932,
+      "residual_mean": -0.1257031772584438,
+      "residual_standard_deviation": 0.07905168671348928,
+      "rmse": 0.14849396602258086
+    }
+  }
+}

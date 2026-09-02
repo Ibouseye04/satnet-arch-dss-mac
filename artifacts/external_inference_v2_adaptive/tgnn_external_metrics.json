@@ -1,0 +1,237 @@
+{
+  "five_seed_descriptive_summary": {
+    "tgnn_space_classification": {
+      "positive_class_recall": {
+        "mean": 1.0,
+        "standard_deviation": 0.0
+      }
+    },
+    "tgnn_space_regression": {
+      "mae": {
+        "mean": 0.06134901017766782,
+        "standard_deviation": 0.0003762588268080405
+      },
+      "maximum_absolute_error": {
+        "mean": 0.3411959302425385,
+        "standard_deviation": 0.04179607407561525
+      },
+      "median_absolute_error": {
+        "mean": 0.04826531477579994,
+        "standard_deviation": 0.0019002254799885862
+      },
+      "r2": {
+        "mean": 0.06919932692856105,
+        "standard_deviation": 0.0247017258231283
+      },
+      "residual_mean": {
+        "mean": -0.013791099833937549,
+        "standard_deviation": 0.00987506075790717
+      },
+      "residual_standard_deviation": {
+        "mean": 0.07905567059281436,
+        "standard_deviation": 0.0017993999795176286
+      },
+      "rmse": {
+        "mean": 0.08086774798363325,
+        "standard_deviation": 0.0010749366601955634
+      }
+    }
+  },
+  "per_seed": {
+    "tgnn_space_classification/seed_123": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Real-input external generalization",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 0.998510624965032,
+        "median": 0.9999769330024719,
+        "min": 0.933075487613678,
+        "standard_deviation": 0.006490855293157629
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "tgnn_space_classification/seed_2026": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Real-input external generalization",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 0.9987088789542516,
+        "median": 0.9999964833259583,
+        "min": 0.8480061888694763,
+        "standard_deviation": 0.009930725849303192
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "tgnn_space_classification/seed_42": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Real-input external generalization",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 0.9991639230648677,
+        "median": 0.9999706745147705,
+        "min": 0.96233069896698,
+        "standard_deviation": 0.0033866386044652083
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "tgnn_space_classification/seed_456": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Real-input external generalization",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 0.9993846861521403,
+        "median": 0.9999926686286926,
+        "min": 0.9490733742713928,
+        "standard_deviation": 0.003321778081330476
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "tgnn_space_classification/seed_789": {
+      "descriptive_only": true,
+      "excluded_inferential_metrics": [
+        "balanced_accuracy",
+        "specificity",
+        "negative_class_recall",
+        "roc_auc",
+        "pr_auc"
+      ],
+      "label": "Real-input external generalization",
+      "observed_class_balance": {
+        "negative": 0,
+        "positive": 300
+      },
+      "positive_class_recall": 1.0,
+      "positive_class_score_distribution": {
+        "max": 1.0,
+        "mean": 0.9979586988687515,
+        "median": 0.9999337196350098,
+        "min": 0.8961846232414246,
+        "standard_deviation": 0.008850511518248684
+      },
+      "predicted_negative_count": 0,
+      "predicted_positive_count": 300
+    },
+    "tgnn_space_regression/seed_123": {
+      "label": "Real-input external generalization",
+      "mae": 0.06163543890866023,
+      "maximum_absolute_error": 0.36176192462444307,
+      "median_absolute_error": 0.04715150892734528,
+      "prediction_range": [
+        0.03203931450843811,
+        0.4984018802642822
+      ],
+      "r2": 0.053090879312464256,
+      "residual_mean": -0.007963483738394641,
+      "residual_standard_deviation": 0.08118205063636363,
+      "rmse": 0.08157170109037071
+    },
+    "tgnn_space_regression/seed_2026": {
+      "label": "Real-input external generalization",
+      "mae": 0.060809411531245264,
+      "maximum_absolute_error": 0.3127339959144593,
+      "median_absolute_error": 0.05009802131425767,
+      "prediction_range": [
+        -0.013051658868789673,
+        0.5643063187599182
+      ],
+      "r2": 0.09219717259117888,
+      "residual_mean": -0.018014001406721335,
+      "residual_standard_deviation": 0.0778115528215126,
+      "rmse": 0.07986953110652649
+    },
+    "tgnn_space_regression/seed_42": {
+      "label": "Real-input external generalization",
+      "mae": 0.06176780104388006,
+      "maximum_absolute_error": 0.2989672988653183,
+      "median_absolute_error": 0.04505271961291629,
+      "prediction_range": [
+        0.0379999577999115,
+        0.46635133028030396
+      ],
+      "r2": 0.05904148658534414,
+      "residual_mean": -0.010501000342261852,
+      "residual_standard_deviation": 0.08063408967488284,
+      "rmse": 0.08131498893737385
+    },
+    "tgnn_space_regression/seed_456": {
+      "label": "Real-input external generalization",
+      "mae": 0.061535962994168046,
+      "maximum_absolute_error": 0.4134918034076691,
+      "median_absolute_error": 0.04962370551767803,
+      "prediction_range": [
+        0.018753528594970703,
+        0.4199848175048828
+      ],
+      "r2": 0.03801609673222661,
+      "residual_mean": -0.030608366983624364,
+      "residual_standard_deviation": 0.07630859046034612,
+      "rmse": 0.08221844748868135
+    },
+    "tgnn_space_regression/seed_789": {
+      "label": "Real-input external generalization",
+      "mae": 0.06099643641038547,
+      "maximum_absolute_error": 0.3190246284008026,
+      "median_absolute_error": 0.049400618506802454,
+      "prediction_range": [
+        -0.04911133646965027,
+        0.47387176752090454
+      ],
+      "r2": 0.1036509994215914,
+      "residual_mean": -0.0018686466986855476,
+      "residual_standard_deviation": 0.07934206937096663,
+      "rmse": 0.07936407129521386
+    }
+  }
+}

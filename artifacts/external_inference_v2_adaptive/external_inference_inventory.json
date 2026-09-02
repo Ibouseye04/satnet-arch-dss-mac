@@ -1,0 +1,54 @@
+{
+  "artifacts": [
+    {
+      "bytes": 6922,
+      "path": "classification_descriptive_results.json",
+      "sha256": "ae84cf1a7840f43f8a1ef36d7be1bc7c7b13102eb90d14235fd05e1ed21d7f10"
+    },
+    {
+      "bytes": 725,
+      "path": "external_descriptive_comparison.json",
+      "sha256": "87d33049b3820754097c05585b697236f1f9ce5abae796cf2af4dbd9b2dac69d"
+    },
+    {
+      "bytes": 20932,
+      "path": "external_execution_identity.json",
+      "sha256": "b988c11d01f8a846ca1c60f3710253cb371cc18fe4933b5c05a4a70bc9d81478"
+    },
+    {
+      "bytes": 3769274,
+      "path": "external_inference_report.md",
+      "sha256": "f5879f802d73d3151fb88a6c0a1ce6e3d604d7e23a619e6f7dd1312983fda7c4"
+    },
+    {
+      "bytes": 3766722,
+      "path": "external_inference_summary.json",
+      "sha256": "48b17e68948a1531ce8dab2a7d3cdd3e2b9fc24f42bf967f61f0f4c9e0471054"
+    },
+    {
+      "bytes": 7351,
+      "path": "rf_ood_stress_metrics.json",
+      "sha256": "ba6c9f839cbec45661c8d92ec9ce9192659e8e86c71884f05f3ab1436621adfd"
+    },
+    {
+      "bytes": 1509614,
+      "path": "rf_ood_stress_predictions.jsonl",
+      "sha256": "3560cfe4c8b3291227b62f69c1cf296633d6eafa263910d6b916a2237d0d0220"
+    },
+    {
+      "bytes": 7553,
+      "path": "tgnn_external_metrics.json",
+      "sha256": "b3909f4109e87f42efe84ddfaf72d9e6a8017ce13418ca0d8bb1b38ff800c005"
+    },
+    {
+      "bytes": 893939,
+      "path": "tgnn_external_predictions.jsonl",
+      "sha256": "9fe297ad7b599c6b41d28b38917437bb644a5130355f386be6fc5215403d3ec0"
+    }
+  ],
+  "external_inventory_sha256": "7440239bf9df99f59bad7483f072106bdce74954a32c7d02dc1b378d595f24c1",
+  "external_pre_inference_bundle_sha256": "63b098ddc28a1d7ee45f38fc57b22793d876855b832a65c62760371935c577cc",
+  "inference_performed": true,
+  "schema_version": "satnet.adaptive_v2.external_inference_inventory.v1",
+  "status": "COMPLETE"
+}

@@ -1,0 +1,16 @@
+{
+  "bootstrap_seed": 20260820,
+  "confidence_interval": "95% percentile",
+  "difference": "RF MAE minus TGNN MAE",
+  "interpretation": "Descriptive stress-test statistic for mismatched RF feature semantics; not evidence for choosing one model over the other or for equivalent real-world validation.",
+  "label": "Descriptive external comparison under mismatched RF feature semantics",
+  "metric": "MAE",
+  "observed_delta_mae_rf_minus_tgnn": 0.06393450284877979,
+  "observed_rf_mae": 0.12570230389265985,
+  "observed_tgnn_mae": 0.06176780104388006,
+  "paired_unit": "episode_id",
+  "percentile_2_5": 0.05536015513770209,
+  "percentile_97_5": 0.07286114058732782,
+  "primary_seed": 42,
+  "replicates": 2000
+}
