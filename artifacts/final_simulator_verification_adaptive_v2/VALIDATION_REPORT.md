@@ -674,12 +674,39 @@ The detailed machine-readable comparison is preserved in `hypatia_provenance/hyp
 
 **Hypatia provenance / implementation-lineage verification status: PASS**
 
+## Permanent Executable Known-Answer Suite
+
+The completed component-level simulator verification was consolidated into a permanent dissertation-facing executable test suite under:
+
+`tests/validation/adaptive_v2`
+
+The suite contains four focused validation modules:
+
+- `test_space_known_answers.py`
+- `test_ground_known_answers.py`
+- `test_failures_and_metrics_known_answers.py`
+- `test_integrated_service_known_answers.py`
+
+Final consolidated execution:
+
+`python -m pytest tests/validation/adaptive_v2 -q`
+
+Result:
+
+`65 passed`
+
+The suite permanently locks the independently verified known answers and cross-component invariants for orbital propagation, LOS and link budgets, Adaptive-v2 topology selection, ground geometry and visibility, deterministic failure sampling, persistent satellite failures, canonical graph metrics, integrated graph construction, baseline ground service, failure-adjusted ground service, space-metric invariance under ground-only failures, and the overall-service bottleneck definition.
+
+Published validation commit:
+
+`a066f686da041294dafd61c71b79340cbad0e146`
+
+**Overall: PASS**
+
 ## Remaining Validation Work
 
-The following are outside the completed component-level simulator known-answer campaign and remain separate validation tasks:
+The following remain separate validation tasks:
 
-- permanent executable consolidation of the controlled known-answer tests;
 - final ML surrogate runtime, memory, scalability, and predictive-performance benchmarking;
 - dissertation-facing presentation of the validation evidence.
-
 

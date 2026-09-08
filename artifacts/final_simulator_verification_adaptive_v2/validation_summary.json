@@ -39,7 +39,8 @@
     "space_metric_invariant_to_ground_failure": "PASS",
     "overall_service_bottleneck_definition": "PASS",
     "independent_grouped_split_candidate_search": "PASS",
-    "hypatia_provenance_implementation_lineage": "PASS"
+    "hypatia_provenance_implementation_lineage": "PASS",
+    "permanent_executable_known_answer_suite": "PASS"
   },
   "known_observations": {
     "visibility_30deg_boundary": {
@@ -67,8 +68,19 @@
     "ground_failure_realization_hash": "99314d3ec63b3cb3e64bc52983f8315d31e07040087bfe0f317eccc32ef44828",
     "integrated_graph_hash": "a4abb55c301db0b3e2ea02073595997153c9f03999e915505da3cdc54eb7720b"
   },
+  "permanent_known_answer_suite": {
+    "test_count": 65,
+    "test_command": "python -m pytest tests/validation/adaptive_v2 -q",
+    "result": "65 passed",
+    "published_commit": "a066f686da041294dafd61c71b79340cbad0e146",
+    "files": [
+      "tests/validation/adaptive_v2/test_space_known_answers.py",
+      "tests/validation/adaptive_v2/test_ground_known_answers.py",
+      "tests/validation/adaptive_v2/test_failures_and_metrics_known_answers.py",
+      "tests/validation/adaptive_v2/test_integrated_service_known_answers.py"
+    ]
+  },
   "remaining_work": [
-    "permanent executable consolidation of known-answer tests",
     "ML surrogate runtime memory scalability and predictive-performance benchmark",
     "dissertation-facing validation presentation"
   ]
