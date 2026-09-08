@@ -37,7 +37,8 @@
     "g4_baseline_service": "PASS",
     "g5_failure_adjusted_service": "PASS",
     "space_metric_invariant_to_ground_failure": "PASS",
-    "overall_service_bottleneck_definition": "PASS"
+    "overall_service_bottleneck_definition": "PASS",
+    "independent_grouped_split_candidate_search": "PASS"
   },
   "known_observations": {
     "visibility_30deg_boundary": {
@@ -66,7 +67,6 @@
     "integrated_graph_hash": "a4abb55c301db0b3e2ea02073595997153c9f03999e915505da3cdc54eb7720b"
   },
   "remaining_work": [
-    "independent reproduction of grouped split candidate 3958 from all 4096 candidates",
     "formal upstream Hypatia provenance comparison",
     "permanent executable consolidation of known-answer tests",
     "ML surrogate runtime memory scalability and predictive-performance benchmark",

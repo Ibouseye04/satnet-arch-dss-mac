@@ -639,12 +639,31 @@ The verification campaign independently covered:
 
 **Component-level simulator verification status: PASS**
 
+## Independent Grouped Split Verification
+
+An independent exhaustive reconstruction evaluated all 4,096 deterministic grouped-split candidates without calling SATNET's production candidate-assignment, scoring, or split-selection functions.
+
+Results:
+
+- total candidates evaluated: `4,096`;
+- candidates satisfying all hard requirements: `636`;
+- independently selected candidate: `3958`;
+- frozen selected candidate: `3958`;
+- exact frozen three-part rational score reproduced;
+- frozen design assignments reproduced exactly;
+- candidate `3958` was the unique best-scoring candidate;
+- exact best-score tie count: `1`;
+- runner-up candidate: `1814`.
+
+**Independent grouped split verification status: PASS**
+
 ## Remaining Validation Work
 
 The following are outside the completed component-level simulator known-answer campaign and remain separate validation tasks:
 
-- independent reproduction of grouped split candidate 3958 from all 4,096 split candidates;
 - formal upstream Hypatia provenance / implementation-lineage comparison;
 - permanent executable consolidation of the controlled known-answer tests;
 - final ML surrogate runtime, memory, scalability, and predictive-performance benchmarking;
 - dissertation-facing presentation of the validation evidence.
+
+

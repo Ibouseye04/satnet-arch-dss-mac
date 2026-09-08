@@ -1,0 +1,46 @@
+﻿{
+  "verification": "independent_grouped_split_candidate_search",
+  "validation_date": "2026-09-08",
+  "authoritative_source_sha": "9274ba721007c66f0b98aac7e50ba1e9b6b154b5",
+  "production_profile": "final_integrated_dataset_10k_adaptive_v2",
+  "implementation_independence": {
+    "satnet_imports_used": false,
+    "production_candidate_assignment_function_used": false,
+    "production_score_function_used": false,
+    "production_split_selection_function_used": false,
+    "method": "independent Python standard-library SHA-256, canonical JSON, Fraction arithmetic, marginal counting, hard-requirement evaluation, and exhaustive candidate search"
+  },
+  "candidate_search": {
+    "candidate_count": 4096,
+    "hard_requirement_valid_candidate_count": 636,
+    "selected_candidate_id": 3958,
+    "frozen_candidate_id": 3958,
+    "unique_best": true,
+    "exact_best_score_tie_count": 1,
+    "top_five_candidate_ids": [3958, 1814, 2715, 3913, 2269],
+    "runner_up_candidate_id": 1814
+  },
+  "selected_score": {
+    "maximum_normalized_deviation": {
+      "numerator": 13,
+      "denominator": 12
+    },
+    "sum_squared_normalized_deviation": {
+      "numerator": 76911673445800762926898913381335902967278149906828183527260711392171,
+      "denominator": 1283292689643907090017637023137699135698504320555981985994366736000
+    },
+    "total_absolute_deviation": {
+      "numerator": 11267,
+      "denominator": 10
+    }
+  },
+  "verification_results": {
+    "independent_best_candidate_matches_frozen": true,
+    "best_score_exactly_matches_frozen": true,
+    "candidate_3958_score_matches_frozen": true,
+    "candidate_3958_assignments_match_manifest": true,
+    "candidate_3958_is_unique_best": true
+  },
+  "frozen_split_manifest_hash": "881569300f30c25ed37be051f91aa6e5eb6c03c97743047d1b7819cc296adc79",
+  "overall_status": "PASS"
+}
