@@ -1,0 +1,99 @@
+﻿{
+    "validation_date":  "2026-09-08",
+    "status":  "PASS",
+    "satnet":  {
+                   "authoritative_science_branch":  "experiment/final-integrated-dataset-10k-adaptive-v2",
+                   "authoritative_science_sha":  "9274ba721007c66f0b98aac7e50ba1e9b6b154b5",
+                   "validation_branch":  "validation/final-simulator-verification-adaptive-v2",
+                   "adapter_file":  "src/satnet/network/hypatia_adapter.py"
+               },
+    "upstream_hypatia":  {
+                             "repository":  "snkas/hypatia",
+                             "branch":  "master",
+                             "sha":  "0ac531c313eba2335f6344b46347140c3a0d4230",
+                             "commit_date":  "2022-10-10T16:22:11Z",
+                             "files_inspected":  {
+                                                     "tle_generation":  {
+                                                                            "path":  "satgenpy/satgen/tles/generate_tles_from_scratch.py",
+                                                                            "blob_sha":  "57fc22142108fdee72f2b1e794aa19035bd9d010"
+                                                                        },
+                                                     "tle_exports":  {
+                                                                         "path":  "satgenpy/satgen/tles/__init__.py"
+                                                                     },
+                                                     "plus_grid":  {
+                                                                       "path":  "satgenpy/satgen/isls/generate_plus_grid_isls.py",
+                                                                       "blob_sha":  "ee7daa28b4d70bc225384d60ccc7c6f9a43384c5"
+                                                                   },
+                                                     "distance_tools":  {
+                                                                            "path":  "satgenpy/satgen/distance_tools/distance_tools.py",
+                                                                            "blob_sha":  "b41584fa96e7523e5726b598a1683bb60e15a285"
+                                                                        }
+                                                 }
+                         },
+    "findings":  {
+                     "walker_and_tle_generation":  {
+                                                       "classification":  "SATNET implementation informed by Hypatia constellation-generation concepts",
+                                                       "hypatia_behavior":  [
+                                                                                "RAAN is distributed evenly across orbital planes",
+                                                                                "mean-anomaly phasing uses an optional half-slot shift on odd-numbered planes",
+                                                                                "Hypatia generates and exports TLEs through its own SGP4-based generator"
+                                                                            ],
+                                                       "satnet_behavior":  [
+                                                                               "RAAN is distributed evenly across orbital planes",
+                                                                               "Walker-Delta phasing is implemented as 360 * F * plane_index / total_satellites",
+                                                                               "SATNET generates TLE lines internally",
+                                                                               "SATNET independently formats TLE epochs and checksums"
+                                                                           ],
+                                                       "executed_satgenpy_tle_generator":  false
+                                                   },
+                     "satgenpy_optional_import":  {
+                                                      "classification":  "Dormant optional compatibility import in the authoritative Adaptive-v2 path",
+                                                      "satnet_import_symbol":  "generate_tles_from_scratch_with_sgp4",
+                                                      "upstream_export_at_inspected_sha":  "generate_tles_from_scratch_with_sgp",
+                                                      "satnet_import_symbol_call_count_in_adapter":  0,
+                                                      "satgenpy_available_runtime_reference_count_after_assignment":  0
+                                                  },
+                     "plus_grid_topology":  {
+                                                "classification":  "Hypatia-derived base topology concept",
+                                                "hypatia_behavior":  [
+                                                                         "connect each satellite to the next satellite in the same orbital plane",
+                                                                         "connect each satellite to one satellite in the next orbital plane",
+                                                                         "support an integer adjacent-plane ISL shift",
+                                                                         "wrap satellite and plane indices"
+                                                                     ],
+                                                "satnet_fixed_policy":  "Hypatia-style +Grid candidate construction with SATNET physical viability filtering",
+                                                "satnet_adaptive_policy":  "SATNET-specific extension of the Hypatia-derived +Grid concept"
+                                            },
+                     "grid_adaptive":  {
+                                           "classification":  "SATNET-specific extension",
+                                           "authoritative_parameters":  {
+                                                                            "isl_policy":  "grid_adaptive",
+                                                                            "adjacent_search_k":  1,
+                                                                            "max_inter_plane_links_per_sat":  1
+                                                                        },
+                                           "candidate_offsets_for_k1":  [
+                                                                            0,
+                                                                            -1,
+                                                                            1
+                                                                        ],
+                                           "selection_additions":  [
+                                                                       "distance filtering",
+                                                                       "Earth-obscuration line-of-sight filtering",
+                                                                       "optical/RF link-budget viability",
+                                                                       "inter-plane endpoint-capacity enforcement"
+                                                                   ]
+                                       },
+                     "line_of_sight":  {
+                                           "classification":  "SATNET-specific physical viability layer",
+                                           "earth_radius_km":  6371.0,
+                                           "atmosphere_buffer_km":  80.0,
+                                           "minimum_clearance_km":  6451.0,
+                                           "method":  "minimum distance from Earth center to the satellite-to-satellite line segment must be greater than or equal to the buffered Earth radius"
+                                       }
+                 },
+    "dissertation_interpretation":  {
+                                        "recommended_statement":  "SATNET retained and adapted Hypatia-derived constellation and +Grid topology concepts while implementing its own Walker-Delta/TLE generation and extending the +Grid architecture with SATNET physical-link viability filtering and the Adaptive-v2 inter-plane selection policy.",
+                                        "avoid_statement":  "SATNET simply calls Hypatia to generate the final constellation and topology."
+                                    },
+    "overall_conclusion":  "Hypatia provides an upstream conceptual and algorithmic foundation for constellation organization and +Grid candidate topology, but the authoritative Adaptive-v2 scientific execution path materially extends and independently implements those concepts within SATNET."
+}

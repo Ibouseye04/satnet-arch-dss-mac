@@ -657,11 +657,27 @@ Results:
 
 **Independent grouped split verification status: PASS**
 
+## Hypatia Provenance and Implementation Lineage
+
+The authoritative SATNET Adaptive-v2 implementation was compared against the upstream `snkas/hypatia` repository at commit `0ac531c313eba2335f6344b46347140c3a0d4230`.
+
+The comparison established the following implementation lineage:
+
+- Hypatia provides the upstream conceptual and algorithmic foundation for evenly distributed orbital planes and the +Grid inter-satellite-link candidate topology;
+- SATNET implements its own Walker-Delta phasing using the general `360 * F * plane_index / total_satellites` formulation and internally generates the TLE representation;
+- the optional `satgenpy` TLE-generator import in `hypatia_adapter.py` is dormant in the authoritative Adaptive-v2 execution path and is not invoked by the final simulation workflow;
+- SATNET's `grid_fixed` policy retains the Hypatia-style +Grid candidate structure while applying SATNET distance, Earth-obscuration, and link-budget viability filtering;
+- SATNET's `grid_adaptive` policy is a SATNET-specific extension that searches adjacent-plane candidate offsets and selects physically viable links subject to the configured inter-plane endpoint capacity; and
+- SATNET's buffered Earth-obscuration line-of-sight calculation is a SATNET-specific physical viability layer rather than an upstream Hypatia implementation.
+
+The detailed machine-readable comparison is preserved in `hypatia_provenance/hypatia_lineage_verification.json`.
+
+**Hypatia provenance / implementation-lineage verification status: PASS**
+
 ## Remaining Validation Work
 
 The following are outside the completed component-level simulator known-answer campaign and remain separate validation tasks:
 
-- formal upstream Hypatia provenance / implementation-lineage comparison;
 - permanent executable consolidation of the controlled known-answer tests;
 - final ML surrogate runtime, memory, scalability, and predictive-performance benchmarking;
 - dissertation-facing presentation of the validation evidence.

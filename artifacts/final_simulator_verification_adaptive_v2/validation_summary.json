@@ -38,7 +38,8 @@
     "g5_failure_adjusted_service": "PASS",
     "space_metric_invariant_to_ground_failure": "PASS",
     "overall_service_bottleneck_definition": "PASS",
-    "independent_grouped_split_candidate_search": "PASS"
+    "independent_grouped_split_candidate_search": "PASS",
+    "hypatia_provenance_implementation_lineage": "PASS"
   },
   "known_observations": {
     "visibility_30deg_boundary": {
@@ -67,7 +68,6 @@
     "integrated_graph_hash": "a4abb55c301db0b3e2ea02073595997153c9f03999e915505da3cdc54eb7720b"
   },
   "remaining_work": [
-    "formal upstream Hypatia provenance comparison",
     "permanent executable consolidation of known-answer tests",
     "ML surrogate runtime memory scalability and predictive-performance benchmark",
     "dissertation-facing validation presentation"
