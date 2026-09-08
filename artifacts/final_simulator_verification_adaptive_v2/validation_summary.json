@@ -1,0 +1,75 @@
+﻿{
+  "validation_date": "2026-09-08",
+  "validation_branch": "validation/final-simulator-verification-adaptive-v2",
+  "authoritative_source_sha": "9274ba721007c66f0b98aac7e50ba1e9b6b154b5",
+  "production_profile": "final_integrated_dataset_10k_adaptive_v2",
+  "contract_spec_hash": "23c5fffc10849c3bc3ea027251ac3e5ad4c96f0eea85edf1e8deab079cb0871e",
+  "contract_bundle_hash": "da3c73711b1d60635afcceee8bda0a60d1379e492e1ad0d588d5a0c25e10abe3",
+  "overall_status": "PASS",
+  "checks": {
+    "adaptive_profile": "PASS",
+    "design_run_identity": "PASS",
+    "grouped_split_integrity": "PASS",
+    "deterministic_seed_derivation": "PASS",
+    "transition_lhs_candidate_51": "PASS",
+    "global_lhs_candidate_49": "PASS",
+    "exact_2000_design_rebuild": "PASS",
+    "exact_10000_run_rebuild": "PASS",
+    "walker_delta_generation": "PASS",
+    "sgp4_vallado_reference": "PASS",
+    "datetime_to_julian_date": "PASS",
+    "teme_to_gmst_pef_rotation": "PASS",
+    "earth_obscuration_los": "PASS",
+    "rf_link_budget": "PASS",
+    "optical_link_budget": "PASS",
+    "adaptive_grid_topology": "PASS",
+    "persistent_temporal_union_edge_failure": "PASS",
+    "persistent_satellite_node_failure": "PASS",
+    "gcc_denominator_semantics": "PASS",
+    "canonical_graph_metrics": "PASS",
+    "wgs84_ground_to_ecef": "PASS",
+    "topocentric_elevation_slant_range": "PASS",
+    "frozen_10deg_visibility_threshold": "PASS",
+    "ground_failure_sampling": "PASS",
+    "ground_failure_realization": "PASS",
+    "integrated_g3_graph": "PASS",
+    "satellite_projection_preservation": "PASS",
+    "g4_baseline_service": "PASS",
+    "g5_failure_adjusted_service": "PASS",
+    "space_metric_invariant_to_ground_failure": "PASS",
+    "overall_service_bottleneck_definition": "PASS"
+  },
+  "known_observations": {
+    "visibility_30deg_boundary": {
+      "status": "DOCUMENTED_NON_MATERIAL_NUMERICAL_EDGE_CASE",
+      "constructed_deg": 30.0,
+      "computed_deg": 29.999999999999996,
+      "difference_deg": -3.552713678800501e-15,
+      "difference_ulps": -1.0,
+      "frozen_adaptive_v2_threshold_deg": 10.0,
+      "frozen_threshold_validation": "PASS"
+    },
+    "contract_design_index_last": {
+      "status": "DOCUMENTED_FROZEN_METADATA_DEFECT",
+      "frozen_value": 99,
+      "actual_design_index_last": 1999,
+      "actual_design_count": 2000,
+      "actual_run_count": 10000
+    }
+  },
+  "frozen_manifest_hashes": {
+    "designs_jsonl": "f29d519e551986732c8eb87f44de29ff3c16aa7956428df424757d7dbcb485f1",
+    "runs_jsonl": "3e24f4a58be51e1ccb9a8d2381cbc016dd36693bdb43b939c1d63b8671981a89"
+  },
+  "controlled_evidence": {
+    "ground_failure_realization_hash": "99314d3ec63b3cb3e64bc52983f8315d31e07040087bfe0f317eccc32ef44828",
+    "integrated_graph_hash": "a4abb55c301db0b3e2ea02073595997153c9f03999e915505da3cdc54eb7720b"
+  },
+  "remaining_work": [
+    "independent reproduction of grouped split candidate 3958 from all 4096 candidates",
+    "formal upstream Hypatia provenance comparison",
+    "permanent executable consolidation of known-answer tests",
+    "ML surrogate runtime memory scalability and predictive-performance benchmark",
+    "dissertation-facing validation presentation"
+  ]
+}
